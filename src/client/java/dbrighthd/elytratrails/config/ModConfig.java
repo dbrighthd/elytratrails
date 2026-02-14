@@ -9,30 +9,28 @@ public class ModConfig implements ConfigData {
     @ConfigEntry.Gui.Tooltip
     public boolean enableTrail = true;
     @ConfigEntry.Gui.Tooltip
+    public boolean enableRandomWidth = false;
+    @ConfigEntry.Gui.Tooltip
+    public boolean useSplineTrail = true;
+    @ConfigEntry.Gui.Tooltip
+    public boolean speedDependentTrail = true;
+    @ConfigEntry.Gui.Tooltip
+    public boolean trailMovesWithElytraAngle = true;
+    @ConfigEntry.Gui.Tooltip
     public double maxWidth = 0.05;
     @ConfigEntry.Gui.Tooltip
     public double trailLifetime = 1.5;
     @ConfigEntry.Gui.Tooltip
     public int maxSamplePerSecond = 60;
     @ConfigEntry.Gui.Tooltip
-    public boolean speedDependentTrail = true;
-    @ConfigEntry.Gui.Tooltip
     public double trailMinSpeed = 0.7;
-    @ConfigEntry.Gui.Tooltip
-    public boolean trailMovesWithElytraAngle = true;
-
     @ConfigEntry.Gui.Tooltip
     public double startRampDistance = 4.0;
     @ConfigEntry.Gui.Tooltip
     public double endRampDistance = 4.0;
 
 
-    @ConfigEntry.Gui.Tooltip
-    public boolean useSplineTrail = true;
 
-
-    @ConfigEntry.Gui.Tooltip
-    public boolean enableRandomWidth = true;
     @ConfigEntry.Gui.Tooltip
     public double randomWidthVariation = 0.5;
     @ConfigEntry.Gui.Tooltip

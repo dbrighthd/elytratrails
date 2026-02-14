@@ -31,6 +31,8 @@ import net.minecraft.resources.Identifier;
 import net.minecraft.util.Util;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.phys.Vec3;
+import it.unimi.dsi.fastutil.ints.IntIterator;
+import it.unimi.dsi.fastutil.ints.IntOpenHashSet;
 
 import java.util.function.BiFunction;
 
@@ -74,7 +76,11 @@ public class ElytraTrailsClient implements ClientModInitializer {
 
 			long now = Util.getNanos();
 
+			IntOpenHashSet renderedThisFrame = new IntOpenHashSet();
+
 			WingTipPos.consumeAll((entityId, left, right, capturedAtNanos) -> {
+				renderedThisFrame.add(entityId);
+
 				var entity = mc.level.getEntity(entityId);
 				if (!(entity instanceof Player living)) return;
 
@@ -82,17 +88,14 @@ public class ElytraTrailsClient implements ClientModInitializer {
 				boolean flyingBeforeRaw = wasFallFlyingRaw.getOrDefault(entityId, false);
 
 				if (flyingNowRaw && !flyingBeforeRaw) {
-					//just started fallflying
 					fallFlyingStartTimeByEntity.put(entityId, now);
 				} else if (!flyingNowRaw && flyingBeforeRaw) {
-					//stopped fallflying
 					fallFlyingStartTimeByEntity.remove(entityId);
 				}
 				wasFallFlyingRaw.put(entityId, flyingNowRaw);
 
 				boolean showingNow = showTrail(living, now);
 				boolean showingBefore = wasTrailShowing.getOrDefault(entityId, false);
-
 
 				if (showingNow && !showingBefore) {
 					TrailStore.breakTrail(entityId, now);
@@ -108,6 +111,19 @@ public class ElytraTrailsClient implements ClientModInitializer {
 
 				TrailStore.add(entityId, left, right, now);
 			});
+			IntIterator it = wasTrailShowing.keySet().iterator();
+			while (it.hasNext()) {
+				int entityId = it.nextInt();
+
+				boolean wasShowing = wasTrailShowing.getOrDefault(entityId, false);
+				if (!wasShowing) continue;
+
+				if (!renderedThisFrame.contains(entityId)) {
+					TrailStore.breakTrail(entityId, now);
+					wasTrailShowing.put(entityId, false);
+
+				}
+			}
 
 			TrailStore.cleanup(now);
 		});
