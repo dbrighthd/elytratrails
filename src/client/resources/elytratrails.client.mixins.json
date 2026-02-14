@@ -1,0 +1,16 @@
+{
+	"required": true,
+	"package": "dbrighthd.elytratrails.mixin.client",
+	"plugin": "dbrighthd.elytratrails.compat.CompatMixinPlugin",
+	"compatibilityLevel": "JAVA_21",
+	"client": [
+		"AvatarRendererMixin",
+		"AvatarRenderStateAccessor",
+		"EquipmentElytraModelAccessor",
+		"GameRendererMixin",
+		"ModelFeatureRendererMixin"
+	],
+	"injectors": {
+		"defaultRequire": 1
+	}
+}

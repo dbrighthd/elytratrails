@@ -1,0 +1,39 @@
+{
+	"schemaVersion": 1,
+	"id": "elytratrails",
+	"version": "${version}",
+	"name": "Elytra Trails",
+	"description": "Pretty trails when you are flying!",
+	"authors": [
+		"dbrighthd"
+	],
+	"contact": {
+		"homepage": "https://fabricmc.net/",
+		"sources": "https://github.com/FabricMC/fabric-example-mod"
+	},
+	"license": "CC0-1.0",
+	"icon": "assets/elytratrails/icon.png",
+	"environment": "*",
+	"entrypoints": {
+		"main": [
+			"dbrighthd.elytratrails.ElytraTrails"
+		],
+		"client": [
+			"dbrighthd.elytratrails.ElytraTrailsClient"
+		],
+		"modmenu": ["dbrighthd.elytratrails.ElytraTrailsModMenu"]
+	},
+	"mixins": [
+		"elytratrails.mixins.json",
+		{
+			"config": "elytratrails.client.mixins.json",
+			"environment": "client"
+		}
+	],
+	"depends": {
+		"fabricloader": ">=0.18.4",
+		"minecraft": "~1.21.11",
+		"java": ">=21",
+		"fabric-api": "*"
+	}
+}
