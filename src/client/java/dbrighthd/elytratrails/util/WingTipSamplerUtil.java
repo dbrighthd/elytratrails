@@ -1,6 +1,7 @@
 // WingTipSampler.java
 package dbrighthd.elytratrails.util;
 
+import com.llamalad7.mixinextras.sugar.Local;
 import com.mojang.blaze3d.vertex.PoseStack;
 import dbrighthd.elytratrails.mixin.client.EquipmentElytraModelAccessor;
 import dbrighthd.elytratrails.mixin.client.ModelFeatureStorageAccessor;
@@ -10,10 +11,12 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.client.model.Model;
 import net.minecraft.client.model.geom.ModelPart;
 import net.minecraft.client.model.object.equipment.ElytraModel;
+import net.minecraft.client.player.LocalPlayer;
 import net.minecraft.client.renderer.SubmitNodeCollection;
 import net.minecraft.client.renderer.SubmitNodeStorage;
 import net.minecraft.client.renderer.entity.EntityRenderDispatcher;
 import net.minecraft.client.renderer.entity.EntityRenderer;
+import net.minecraft.client.renderer.entity.player.AvatarRenderer;
 import net.minecraft.client.renderer.entity.state.AvatarRenderState;
 import net.minecraft.client.renderer.entity.state.EntityRenderState;
 import net.minecraft.client.renderer.entity.state.HumanoidRenderState;
@@ -23,10 +26,11 @@ import net.minecraft.client.renderer.state.CameraRenderState;
 import net.minecraft.core.BlockPos;
 import net.minecraft.util.Mth;
 import net.minecraft.util.Util;
+import net.minecraft.world.entity.Avatar;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.phys.Vec3;
 import org.joml.Quaternionf;
-
+import org.jetbrains.annotations.NotNull;
 import java.util.List;
 import java.util.Map;
 
@@ -62,22 +66,15 @@ public final class WingTipSamplerUtil {
         double camZ = -cameraWorldPos.z;
 
         for (Player player : mc.level.players()) {
-            EntityRenderer renderer = dispatcher.getRenderer(player);
-
             int entityId = player.getId();
+            AvatarRenderState state = new AvatarRenderState();
+            @SuppressWarnings("unchecked")
+            var renderer = (EntityRenderer<@NotNull Avatar, @NotNull AvatarRenderState>) dispatcher.getRenderer(state);
 
-            EntityRenderState state = STATE_CACHE.get(entityId);
-            if (state == null) {
-                state = (EntityRenderState) renderer.createRenderState();
-                STATE_CACHE.put(entityId, state);
-            }
-
-            // Update state offscreen
             renderer.extractRenderState(player, state, partialTick);
-            if (!(state instanceof AvatarRenderState avatar)) continue;
 
             STORAGE.clear();
-            dispatcher.submit(avatar, camState, camX, camY, camZ, new PoseStack(), STORAGE);
+            dispatcher.submit(state, camState, camX, camY, camZ, new PoseStack(), STORAGE);
             int orders = STORAGE.getSubmitsPerOrder().size();
             int totalModelSubmits = 0;
 
@@ -126,7 +123,7 @@ public final class WingTipSamplerUtil {
             Vec3 leftTipCamRelative = transformLocalPointThroughPart(base, leftWingPart, leftWingTipLocal);
             Vec3 rightTipCamRelative = transformLocalPointThroughPart(base, rightWingPart, rightWingTipLocal);
 
-            Vec3 entityWorldPos = new Vec3(avatar.x, avatar.y, avatar.z);
+            Vec3 entityWorldPos = new Vec3(state.x, state.y, state.z);
 
             Vec3 leftTipWorld = cameraWorldPos.add(leftTipCamRelative);
             Vec3 rightTipWorld = cameraWorldPos.add(rightTipCamRelative);
