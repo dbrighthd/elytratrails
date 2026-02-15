@@ -15,9 +15,13 @@ public class ModConfig implements ConfigData {
     @ConfigEntry.Gui.Tooltip
     public boolean speedDependentTrail = true;
     @ConfigEntry.Gui.Tooltip
+    public boolean firstPersonTrail = true;
+    @ConfigEntry.Gui.Tooltip
     public boolean trailMovesWithElytraAngle = true;
     @ConfigEntry.Gui.Tooltip
     public double maxWidth = 0.05;
+    @ConfigEntry.Gui.Tooltip
+    public double fadeTime = 0.5;
     @ConfigEntry.Gui.Tooltip
     public double trailLifetime = 1.5;
     @ConfigEntry.Gui.Tooltip

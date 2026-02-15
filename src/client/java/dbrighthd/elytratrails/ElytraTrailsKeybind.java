@@ -67,7 +67,7 @@ public final class ElytraTrailsKeybind {
             else if (randDown) desiredMode = 0;
             else desiredMode = +1;
 
-            SpinController.tickTwirlKey(anyDown, desiredMode);
+            TwirlController.tickTwirlKey(anyDown, desiredMode);
 
             while (TOGGLE_TRAILS.consumeClick()) {
                 ModConfig modConfig = getConfig();

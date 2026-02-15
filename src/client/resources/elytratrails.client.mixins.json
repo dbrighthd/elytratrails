@@ -5,10 +5,9 @@
 	"compatibilityLevel": "JAVA_21",
 	"client": [
 		"AvatarRendererMixin",
-		"AvatarRenderStateAccessor",
 		"EquipmentElytraModelAccessor",
 		"GameRendererMixin",
-		"ModelFeatureRendererMixin"
+		"ModelFeatureStorageAccessor"
 	],
 	"injectors": {
 		"defaultRequire": 1

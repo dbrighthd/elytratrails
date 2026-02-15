@@ -47,26 +47,37 @@ public class TrailRenderer implements SubmitNodeCollector.CustomGeometryRenderer
 
         VertexBuilder vertexBuilder = new VertexBuilder(vertexConsumer, pose, packedLight, packedOverlay);
 
-        renderTrailStore(vertexBuilder, cameraWorldPos, nowNanos, maxWidthBlocks);
+        boolean isFirstPerson = minecraft.options.getCameraType().isFirstPerson();
+        int localId = (minecraft.player == null) ? Integer.MIN_VALUE : minecraft.player.getId();
+
+        renderTrailStore(vertexBuilder, cameraWorldPos, nowNanos, maxWidthBlocks, isFirstPerson, localId);
     }
 
-    private void renderTrailStore(VertexBuilder vertexBuilder, Vec3 cameraWorldPos, long nowNanos, float maxWidthBlocks) {
+    private void renderTrailStore(VertexBuilder vertexBuilder,
+                                  Vec3 cameraWorldPos,
+                                  long nowNanos,
+                                  float maxWidthBlocks,
+                                  boolean isFirstPerson,
+                                  int localPlayerId) {
         for (Int2ObjectMap.Entry<Deque<TrailStore.TrailPoint>> entityTrailEntry : trails.int2ObjectEntrySet()) {
+            int entityId = entityTrailEntry.getIntKey();
             Deque<TrailStore.TrailPoint> trailPoints = entityTrailEntry.getValue();
             if (trailPoints.size() < 2) continue;
+
+            boolean applyFirstPersonNearFade = isFirstPerson && entityId == localPlayerId;
 
             java.util.ArrayList<TrailStore.TrailPoint> run = new java.util.ArrayList<>();
 
             for (TrailStore.TrailPoint p : trailPoints) {
                 if (p.breakHere()) {
-                    renderRun(vertexBuilder, run, cameraWorldPos, nowNanos, maxWidthBlocks);
+                    renderRun(vertexBuilder, run, cameraWorldPos, nowNanos, maxWidthBlocks, applyFirstPersonNearFade);
                     run.clear();
                     continue;
                 }
                 run.add(p);
             }
 
-            renderRun(vertexBuilder, run, cameraWorldPos, nowNanos, maxWidthBlocks);
+            renderRun(vertexBuilder, run, cameraWorldPos, nowNanos, maxWidthBlocks, applyFirstPersonNearFade);
         }
     }
 
@@ -74,13 +85,14 @@ public class TrailRenderer implements SubmitNodeCollector.CustomGeometryRenderer
                            java.util.ArrayList<TrailStore.TrailPoint> run,
                            Vec3 cameraWorldPos,
                            long nowNanos,
-                           float maxWidthBlocks) {
+                           float maxWidthBlocks,
+                           boolean applyFirstPersonNearFade) {
         if (run.size() < 2) return;
 
         if (getConfig().useSplineTrail) {
-            renderRunSplineAuto(vertexBuilder, run, cameraWorldPos, nowNanos, maxWidthBlocks);
+            renderRunSplineAuto(vertexBuilder, run, cameraWorldPos, nowNanos, maxWidthBlocks, applyFirstPersonNearFade);
         } else {
-            renderRunLinear(vertexBuilder, run, cameraWorldPos, nowNanos, maxWidthBlocks);
+            renderRunLinear(vertexBuilder, run, cameraWorldPos, nowNanos, maxWidthBlocks, applyFirstPersonNearFade);
         }
     }
 
@@ -88,7 +100,8 @@ public class TrailRenderer implements SubmitNodeCollector.CustomGeometryRenderer
                                  java.util.ArrayList<TrailStore.TrailPoint> run,
                                  Vec3 cameraWorldPos,
                                  long nowNanos,
-                                 float maxWidthBlocks) {
+                                 float maxWidthBlocks,
+                                 boolean applyFirstPersonNearFade) {
         int count = run.size();
 
         double[] dist = new double[count];
@@ -121,7 +134,8 @@ public class TrailRenderer implements SubmitNodeCollector.CustomGeometryRenderer
                     stitchedScaledSideAtStart,
                     maxWidthBlocks,
                     dFromStartA, dToEndA,
-                    dFromStartB, dToEndB
+                    dFromStartB, dToEndB,
+                    applyFirstPersonNearFade
             );
         }
     }
@@ -130,15 +144,16 @@ public class TrailRenderer implements SubmitNodeCollector.CustomGeometryRenderer
                                      java.util.ArrayList<TrailStore.TrailPoint> run,
                                      Vec3 cameraWorldPos,
                                      long nowNanos,
-                                     float maxWidthBlocks) {
+                                     float maxWidthBlocks,
+                                     boolean applyFirstPersonNearFade) {
 
         int n = run.size();
 
         java.util.ArrayList<Vec3> pts = new java.util.ArrayList<>();
         java.util.ArrayList<Long> times = new java.util.ArrayList<>();
 
-        pts.add(run.get(0).pos());
-        times.add(run.get(0).timeNanos());
+        pts.add(run.getFirst().pos());
+        times.add(run.getFirst().timeNanos());
 
         for (int i = 0; i < n - 1; i++) {
             Vec3 p0 = run.get(Math.max(i - 1, 0)).pos();
@@ -149,10 +164,10 @@ public class TrailRenderer implements SubmitNodeCollector.CustomGeometryRenderer
             long t1 = run.get(i).timeNanos();
             long t2 = run.get(i + 1).timeNanos();
 
-            int steps = stepsFor(p1, p2); // auto
+            int steps = stepsFor(p1, p2);
 
             for (int s = 1; s <= steps; s++) {
-                double tt = s / (double) steps; // 0..1
+                double tt = s / (double) steps;
                 pts.add(catmullRom(p0, p1, p2, p3, tt));
 
                 long interpTime = (long) (t1 + (t2 - t1) * tt);
@@ -192,14 +207,15 @@ public class TrailRenderer implements SubmitNodeCollector.CustomGeometryRenderer
                     stitchedScaledSideAtStart,
                     maxWidthBlocks,
                     dFromStartA, dToEndA,
-                    dFromStartB, dToEndB
+                    dFromStartB, dToEndB,
+                    applyFirstPersonNearFade
             );
         }
     }
 
     private static int stepsFor(Vec3 p1, Vec3 p2) {
         double d = p2.distanceTo(p1);
-        return Mth.clamp((int) Math.ceil(d * 4.0), 1, 16); // ~4 per block
+        return Mth.clamp((int) Math.ceil(d * 4.0), 1, 16);
     }
 
     private static Vec3 catmullRom(Vec3 p0, Vec3 p1, Vec3 p2, Vec3 p3, double t) {
@@ -230,7 +246,8 @@ public class TrailRenderer implements SubmitNodeCollector.CustomGeometryRenderer
             Vec3 stitchedScaledSideAtStart,
             float maxWidthBlocks,
             float distFromStartA, float distToEndA,
-            float distFromStartB, float distToEndB
+            float distFromStartB, float distToEndB,
+            boolean applyFirstPersonNearFade
     ) {
         Vec3 startPosCamSpace = startTrailPoint.pos().subtract(cameraWorldPos);
         Vec3 endPosCamSpace   = endTrailPoint.pos().subtract(cameraWorldPos);
@@ -248,8 +265,11 @@ public class TrailRenderer implements SubmitNodeCollector.CustomGeometryRenderer
             randEnd = randFromPoint(endTrailPoint);
         }
 
-        float widthAtStart = maxWidthBlocks * randStart * thicknessAtDistance(distFromStartA, distToEndA) * SEAM_OVERLAP;
-        float widthAtEnd   = maxWidthBlocks * randEnd   * thicknessAtDistance(distFromStartB, distToEndB) * SEAM_OVERLAP;
+        float thicknessStart = thicknessAtDistance(distFromStartA, distToEndA);
+        float thicknessEnd   = thicknessAtDistance(distFromStartB, distToEndB);
+
+        float widthAtStart = maxWidthBlocks * randStart * thicknessStart * SEAM_OVERLAP;
+        float widthAtEnd   = maxWidthBlocks * randEnd   * thicknessEnd   * SEAM_OVERLAP;
 
         Vec3 segmentMidpointCamSpace = startPosCamSpace.add(endPosCamSpace).scale(0.5);
         Vec3 directionTowardCamera = segmentMidpointCamSpace.scale(-1.0);
@@ -289,8 +309,11 @@ public class TrailRenderer implements SubmitNodeCollector.CustomGeometryRenderer
         float ageAtStart = (float) ((nowNanos - startTrailPoint.timeNanos()) / (double) TrailStore.getLifetime());
         float ageAtEnd   = (float) ((nowNanos - endTrailPoint.timeNanos())   / (double) TrailStore.getLifetime());
 
-        int alphaAtStart = clamp255((int) (255 * (1.0f - ageAtStart)));
-        int alphaAtEnd   = clamp255((int) (255 * (1.0f - ageAtEnd)));
+        float fadeMulStart = alphaMultiplier(startTrailPoint, nowNanos, applyFirstPersonNearFade, thicknessStart);
+        float fadeMulEnd   = alphaMultiplier(endTrailPoint,   nowNanos, applyFirstPersonNearFade, thicknessEnd);
+
+        int alphaAtStart = (int) (clamp255((int) (255 * (1.0f - ageAtStart))) * fadeMulStart);
+        int alphaAtEnd   = (int) (clamp255((int) (255 * (1.0f - ageAtEnd)))   * fadeMulEnd);
 
         float normalX = 0.0f, normalY = 1.0f, normalZ = 0.0f;
 
@@ -305,6 +328,28 @@ public class TrailRenderer implements SubmitNodeCollector.CustomGeometryRenderer
         );
 
         return scaledSideAtEnd;
+    }
+
+
+    private static float alphaMultiplier(TrailStore.TrailPoint trailPoint,
+                                         long nowNanos,
+                                         boolean applyFirstPersonNearFade,
+                                         float thicknessMult) {
+        if (!applyFirstPersonNearFade) return 1f;
+        if (thicknessMult >= 0.999f) return 1f;
+        if (trailPoint == null || trailPoint.pos() == null) return 0f;
+
+        double hideSeconds = getConfig().fadeTime;
+        double fadeSeconds = 0.1;
+
+        if (hideSeconds < 0.0) hideSeconds = 0.0;
+
+        double ageSeconds = (nowNanos - trailPoint.timeNanos()) / 1_000_000_000.0;
+
+        if (ageSeconds < hideSeconds) return 0f;
+
+        float t = (float) ((ageSeconds - hideSeconds) / fadeSeconds);
+        return Mth.clamp(t, 0f, 1f);
     }
 
     private static float thicknessAtDistance(float distFromStart, float distToEnd) {
@@ -327,7 +372,7 @@ public class TrailRenderer implements SubmitNodeCollector.CustomGeometryRenderer
 
         float mult = Math.min(up, down);
 
-        if (THICKNESS_POWER != 1.0f) mult = (float) Math.pow(mult, THICKNESS_POWER);
+        mult = (float) Math.pow(mult, THICKNESS_POWER);
         return mult;
     }
 

@@ -3,10 +3,9 @@ package dbrighthd.elytratrails;
 import net.minecraft.util.Mth;
 import net.minecraft.util.Util;
 
-public final class SpinController {
+public final class TwirlController {
     private static final double TAU = Math.PI * 2.0;
 
-    //one twirl duration
     private static final double DURATION_S = 0.5;
 
     private static long startNanos = 0L;
@@ -67,5 +66,5 @@ public final class SpinController {
         return (float) (currentDir * eased * TAU);
     }
 
-    private SpinController() {}
+    private TwirlController() {}
 }

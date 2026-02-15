@@ -30,6 +30,11 @@
   "text.autoconfig.elytratrails.option.randomWidthVariation.@Tooltip" : "How much should width change based on randomness?",
   "text.autoconfig.elytratrails.option.useSplineTrail" : "Trail Spline Smoothing",
   "text.autoconfig.elytratrails.option.useSplineTrail.@Tooltip" : "Should the trail interpolate between points to make it smoother?",
+  "text.autoconfig.elytratrails.option.fadeTime" : "First Person Trail Fade Time",
+  "text.autoconfig.elytratrails.option.fadeTime.@Tooltip" : "Time for first person trails to fade in",
+  "text.autoconfig.elytratrails.option.firstPersonTrail" : "First Person Trail",
+  "text.autoconfig.elytratrails.option.firstPersonTrail.@Tooltip" : "Trails appear from you in first person",
+
   "key.category.elytratrails.skibidi" : "Elytra Trails Keybinds",
   "key.elytratrails.toggle" : "Toggle Elytra Trails",
   "key.elytratrails.twirl_l" : "Lil Twirl Left",
