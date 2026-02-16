@@ -25,7 +25,7 @@ public class ModConfig implements ConfigData {
     @ConfigEntry.Gui.Tooltip
     public double maxWidth = 0.04;
     @ConfigEntry.Gui.Tooltip
-    public double fadeTime = 0.1;
+    public double firstPersonFadeTime = 0.1;
     @ConfigEntry.Gui.Tooltip
     public double trailLifetime = 1.5;
     @ConfigEntry.Gui.Tooltip

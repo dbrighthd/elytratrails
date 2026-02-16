@@ -360,7 +360,7 @@ public class TrailRenderer implements SubmitNodeCollector.CustomGeometryRenderer
         if (thicknessMult >= 0.999f) return 1f;
         if (trailPoint == null || trailPoint.pos() == null) return 0f;
 
-        double hideSeconds = getConfig().fadeTime;
+        double hideSeconds = getConfig().firstPersonFadeTime;
         double fadeSeconds = 0.1;
 
         if (hideSeconds < 0.0) hideSeconds = 0.0;
