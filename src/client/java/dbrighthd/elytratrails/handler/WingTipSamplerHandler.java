@@ -23,7 +23,7 @@ public class WingTipSamplerHandler {
     private static final long FALLFLYING_WARMUP_NANOS = 100_000_000L; // 0.1 seconds
     public static void init()
     {
-        WorldRenderEvents.BEFORE_ENTITIES.register(ctx -> {
+        WorldRenderEvents.AFTER_ENTITIES.register(ctx -> {
             Minecraft mc = Minecraft.getInstance();
             if (mc.level == null) return;
             if (!getConfig().enableTrail) return;

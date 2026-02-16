@@ -19,9 +19,13 @@ public class ModConfig implements ConfigData {
     @ConfigEntry.Gui.Tooltip
     public boolean trailMovesWithElytraAngle = true;
     @ConfigEntry.Gui.Tooltip
-    public double maxWidth = 0.05;
+    public boolean emfSupport = true;
     @ConfigEntry.Gui.Tooltip
-    public double fadeTime = 0.5;
+    public boolean cameraDistanceFade = true;
+    @ConfigEntry.Gui.Tooltip
+    public double maxWidth = 0.04;
+    @ConfigEntry.Gui.Tooltip
+    public double fadeTime = 0.1;
     @ConfigEntry.Gui.Tooltip
     public double trailLifetime = 1.5;
     @ConfigEntry.Gui.Tooltip

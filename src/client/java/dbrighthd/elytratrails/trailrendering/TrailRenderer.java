@@ -27,6 +27,9 @@ public class TrailRenderer implements SubmitNodeCollector.CustomGeometryRenderer
     private static final float SEAM_OVERLAP = 1.02f;
     private static final float THICKNESS_POWER = 0.9f;
 
+    private static final float CAMERA_FADE_ZERO = 0.3f;
+    private static final float CAMERA_FADE_FULL = 0.5f;
+
     public TrailRenderer(Int2ObjectMap<Deque<TrailStore.TrailPoint>> trails) {
         this.trails = trails;
     }
@@ -237,6 +240,18 @@ public class TrailRenderer implements SubmitNodeCollector.CustomGeometryRenderer
         return new Vec3(x, y, z);
     }
 
+    // NEW: camera-distance fade factor (0..1)
+    private static float cameraDistanceFade(float cameraDistBlocks) {
+        float denom = (CAMERA_FADE_FULL - CAMERA_FADE_ZERO);
+        if (denom <= 1e-6f) return cameraDistBlocks >= CAMERA_FADE_FULL ? 1f : 0f;
+
+        float t = (cameraDistBlocks - CAMERA_FADE_ZERO) / denom;
+        t = Mth.clamp(t, 0f, 1f);
+
+        // smoothstep for nicer transition
+        return t * t * (3f - 2f * t);
+    }
+
     private Vec3 drawSegment(
             VertexBuilder vertexBuilder,
             TrailStore.TrailPoint startTrailPoint,
@@ -312,6 +327,13 @@ public class TrailRenderer implements SubmitNodeCollector.CustomGeometryRenderer
         float fadeMulStart = alphaMultiplier(startTrailPoint, nowNanos, applyFirstPersonNearFade, thicknessStart);
         float fadeMulEnd   = alphaMultiplier(endTrailPoint,   nowNanos, applyFirstPersonNearFade, thicknessEnd);
 
+        if(getConfig().cameraDistanceFade)
+        {
+            fadeMulStart *= cameraDistanceFade((float) startPosCamSpace.length());
+            fadeMulEnd   *= cameraDistanceFade((float) endPosCamSpace.length());
+        }
+
+
         int alphaAtStart = (int) (clamp255((int) (255 * (1.0f - ageAtStart))) * fadeMulStart);
         int alphaAtEnd   = (int) (clamp255((int) (255 * (1.0f - ageAtEnd)))   * fadeMulEnd);
 
@@ -329,7 +351,6 @@ public class TrailRenderer implements SubmitNodeCollector.CustomGeometryRenderer
 
         return scaledSideAtEnd;
     }
-
 
     private static float alphaMultiplier(TrailStore.TrailPoint trailPoint,
                                          long nowNanos,

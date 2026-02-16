@@ -1,0 +1,2 @@
+classTweaker v1 named
+accessible field net/minecraft/client/model/geom/ModelPart children Ljava/util/Map;

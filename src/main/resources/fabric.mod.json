@@ -3,6 +3,7 @@
 	"id": "elytratrails",
 	"version": "${version}",
 	"name": "Elytra Trails",
+	"accessWidener" : "elytratrails.classtweaker",
 	"description": "Pretty trails when you are flying!",
 	"authors": [
 		"dbrighthd"
