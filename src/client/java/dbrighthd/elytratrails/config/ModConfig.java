@@ -9,7 +9,7 @@ public class ModConfig implements ConfigData {
     @ConfigEntry.Gui.Tooltip
     public boolean enableTrail = true;
     @ConfigEntry.Gui.Tooltip
-    public boolean enableRandomWidth = false;
+    public boolean enableRandomWidth = true;
     @ConfigEntry.Gui.Tooltip
     public boolean useSplineTrail = true;
     @ConfigEntry.Gui.Tooltip
@@ -27,7 +27,7 @@ public class ModConfig implements ConfigData {
     @ConfigEntry.Gui.Tooltip
     public double firstPersonFadeTime = 0.1;
     @ConfigEntry.Gui.Tooltip
-    public double trailLifetime = 1.5;
+    public double trailLifetime = 5.0;
     @ConfigEntry.Gui.Tooltip
     public int maxSamplePerSecond = 60;
     @ConfigEntry.Gui.Tooltip

@@ -2,7 +2,8 @@ package dbrighthd.elytratrails.mixin.client;
 
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.math.Axis;
-import dbrighthd.elytratrails.TwirlController;
+import dbrighthd.elytratrails.controller.TwirlController;
+import dbrighthd.elytratrails.controller.TwirlRoll;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.entity.player.AvatarRenderer;
 import net.minecraft.client.renderer.entity.state.AvatarRenderState;
@@ -26,7 +27,7 @@ public abstract class AvatarRendererMixin {
 
         if (!state.isFallFlying) return;
 
-        float extra = TwirlController.getExtraRollRadians(g);
+        float extra = TwirlRoll.getExtraRollRadians(g);
         if (extra != 0f) {
             poseStack.mulPose(Axis.YP.rotation(extra)); // (you said you fixed the axis)
         }

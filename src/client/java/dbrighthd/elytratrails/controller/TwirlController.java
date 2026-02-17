@@ -1,22 +1,20 @@
-package dbrighthd.elytratrails;
+// TwirlController.java
+package dbrighthd.elytratrails.controller;
 
 import net.minecraft.util.Mth;
 import net.minecraft.util.Util;
 
 public final class TwirlController {
     private static final double TAU = Math.PI * 2.0;
-
     private static final double DURATION_S = 0.5;
 
     private static long startNanos = 0L;
     private static boolean active = false;
 
     private static boolean keyDown = false;
-
     private static int pendingMode = +1;
 
     private static int currentDir = +1;
-
     private static int nextAltDir = +1;
 
     public static void tickTwirlKey(boolean isDown, int desiredMode) {
@@ -24,7 +22,7 @@ public final class TwirlController {
         keyDown = isDown;
 
         if (keyDown) {
-            pendingMode = (desiredMode < 0) ? -1 : (desiredMode > 0 ? +1 : 0);
+            pendingMode = Integer.compare(desiredMode, 0);
         }
 
         if (keyDown && !wasDown && !active) {
@@ -43,6 +41,7 @@ public final class TwirlController {
             currentDir = pendingMode;
         }
     }
+
     public static float getExtraRollRadians(float partialTick) {
         if (!active) return 0f;
 
@@ -60,10 +59,12 @@ public final class TwirlController {
         }
 
         t = Mth.clamp(t, 0.0, 1.0);
-
         double eased = 0.5 - 0.5 * Math.cos(Math.PI * t);
-
         return (float) (currentDir * eased * TAU);
+    }
+
+    public static boolean isActive() {
+        return active;
     }
 
     private TwirlController() {}

@@ -1,5 +1,5 @@
 {
-  "text.autoconfig.elytratrails.title": "Elytra Trails Mod Settings",
+  "text.autoconfig.elytratrails.title": "Elytra Contrails Mod Settings",
   "text.autoconfig.elytratrails.option.enableTrail": "Enable Elytra Trail",
   "text.autoconfig.elytratrails.option.enableTrail.@Tooltip": "Toggle if elytra trails render",
   "text.autoconfig.elytratrails.option.maxWidth": "Trail Width",
@@ -39,9 +39,11 @@
   "text.autoconfig.elytratrails.option.cameraDistanceFade" : "Fade Trails Close to Camera",
   "text.autoconfig.elytratrails.option.cameraDistanceFade.@Tooltip" : "Tries to fade trails close to camera to prevent annoyance",
 
-  "key.category.elytratrails.skibidi" : "Elytra Trails Keybinds",
-  "key.elytratrails.toggle" : "Toggle Elytra Trails",
+  "key.category.elytratrails.skibidi" : "Elytra Contrails Keybinds",
+  "key.elytratrails.toggle" : "Toggle Elytra Contrails",
   "key.elytratrails.twirl_l" : "Lil Twirl Left",
   "key.elytratrails.twirl_r" : "Lil Twirl Right",
+  "key.elytratrails.continuous_twirl_r" : "Hold Twirl Left",
+  "key.elytratrails.continuous_twirl_l" : "Hold Twirl Right",
   "key.elytratrails.twirl_random" : "Lil Twirl Alternating"
 }

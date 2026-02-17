@@ -2,7 +2,7 @@
 	"schemaVersion": 1,
 	"id": "elytratrails",
 	"version": "${version}",
-	"name": "Elytra Trails",
+	"name": "Elytra Contrails",
 	"accessWidener" : "elytratrails.classtweaker",
 	"description": "Pretty trails when you are flying!",
 	"authors": [
