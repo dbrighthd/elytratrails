@@ -296,6 +296,8 @@ public final class TrailPackConfigManager {
 
         @Nullable String color;
 
+        @Nullable String prideTrail;
+
         static TrailOverrides fromBase(ModConfig baseConfig) {
             TrailOverrides overrides = new TrailOverrides();
             overrides.enableTrail = baseConfig.enableTrail;
@@ -312,6 +314,7 @@ public final class TrailPackConfigManager {
             overrides.randomWidthVariation = baseConfig.randomWidthVariation;
 
             overrides.color = baseConfig.color;
+            overrides.prideTrail = baseConfig.prideTrail;
             return overrides;
         }
         static TrailOverrides fromResolved(ResolvedTrailSettings s) {
@@ -331,6 +334,7 @@ public final class TrailPackConfigManager {
             o.randomWidthVariation = s.randomWidthVariation();
 
             o.color = s.color();
+            o.prideTrail = s.prideTrail();
             return o;
         }
 
@@ -349,7 +353,8 @@ public final class TrailPackConfigManager {
                     && asNumber(startRampDistance) == s.startRampDistance()
                     && asNumber(endRampDistance) == s.endRampDistance()
                     && asNumber(randomWidthVariation) == s.randomWidthVariation()
-                    && ((color == null && s.color() == null) || (color != null && color.equals(s.color())));
+                    && ((color == null && s.color() == null) || (color != null && color.equals(s.color())))
+                    && ((prideTrail == null && s.prideTrail() == null) || (prideTrail != null && prideTrail.equals(s.prideTrail())));
         }
 
         static TrailOverrides fromOthersDefaults(ModConfig cfg) {
@@ -368,6 +373,7 @@ public final class TrailPackConfigManager {
             overrides.randomWidthVariation = cfg.randomWidthVariationOthersDefault;
 
             overrides.color = cfg.colorOthersDefault;
+            overrides.prideTrail = cfg.prideTrailOthersDefault;
             return overrides;
         }
 
@@ -390,6 +396,7 @@ public final class TrailPackConfigManager {
             overrides.cameraDistanceFade = readBoolean(json, "cameraDistanceFade");
 
             overrides.color = readString(json, "color");
+            overrides.prideTrail = readString(json, "prideTrail");
 
             return overrides;
         }
@@ -406,7 +413,8 @@ public final class TrailPackConfigManager {
                     && startRampDistance == null
                     && endRampDistance == null
                     && randomWidthVariation == null
-                    && color == null;
+                    && color == null
+                    && prideTrail == null;
         }
 
         TrailOverrides with(@Nullable TrailOverrides other) {
@@ -428,6 +436,7 @@ public final class TrailPackConfigManager {
             merged.randomWidthVariation = (other.randomWidthVariation != null) ? other.randomWidthVariation : this.randomWidthVariation;
 
             merged.color = (other.color != null) ? other.color : this.color;
+            merged.prideTrail = (other.prideTrail != null) ? other.prideTrail : this.prideTrail;
 
             return merged;
         }
@@ -445,7 +454,8 @@ public final class TrailPackConfigManager {
                     asNumber(startRampDistance),
                     asNumber(endRampDistance),
                     asNumber(randomWidthVariation),
-                    color
+                    color,
+                    prideTrail
             );
         }
 
@@ -495,7 +505,8 @@ public final class TrailPackConfigManager {
             double startRampDistance,
             double endRampDistance,
             double randomWidthVariation,
-            @Nullable String color
+            @Nullable String color,
+            @Nullable String prideTrail
     ) {
         public static ResolvedTrailSettings defaults() {
             return new ResolvedTrailSettings(
@@ -510,7 +521,8 @@ public final class TrailPackConfigManager {
                     getConfig().startRampDistanceOthersDefault,
                     getConfig().endRampDistanceOthersDefault,
                     getConfig().randomWidthVariationOthersDefault,
-                    getConfig().colorOthersDefault
+                    getConfig().colorOthersDefault,
+                    getConfig().prideTrailOthersDefault
             );
         }
     }
@@ -539,7 +551,19 @@ public final class TrailPackConfigManager {
                 playerConfig.startRampDistance(),
                 playerConfig.endRampDistance(),
                 playerConfig.randomWidthVariation(),
-                playerConfig.color()
+                playerConfig.color(),
+                safePride(playerConfig, defaults)
         );
+    }
+
+    private static @Nullable String safePride(PlayerConfig playerConfig, ResolvedTrailSettings defaults) {
+        try {
+            String v = playerConfig.prideTrail();
+            if (v == null) return defaults.prideTrail();
+            v = v.trim();
+            return v.isEmpty() ? "" : v;
+        } catch (Throwable ignored) {
+            return defaults.prideTrail();
+        }
     }
 }

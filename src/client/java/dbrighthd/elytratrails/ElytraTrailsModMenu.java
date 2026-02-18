@@ -23,10 +23,8 @@ public class ElytraTrailsModMenu implements ModMenuApi {
 
             if (screen instanceof AbstractConfigScreen cloth) {
                 cloth.setSavingRunnable(() -> {
-                    // 1) Save to disk (important!)
                     AutoConfig.getConfigHolder(ModConfig.class).save();
 
-                    // 2) Then do your networking sync
                     var mc = Minecraft.getInstance();
                     if (mc.getConnection() != null && mc.player != null && mc.level != null) {
                         ClientPlayNetworking.send(new PlayerConfigC2SPayload(getLocalPlayerConfigToSend()));

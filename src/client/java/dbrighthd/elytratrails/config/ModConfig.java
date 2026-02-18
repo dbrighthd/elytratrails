@@ -12,15 +12,16 @@ public class ModConfig implements ConfigData {
     @ConfigEntry.Category("general")
     @ConfigEntry.Gui.PrefixText
     @ConfigEntry.Gui.Tooltip
+    public boolean enableAllTrails = true;
+
+    @ConfigEntry.Category("general")
+    @ConfigEntry.Gui.Tooltip
     public boolean resourcePackOverride = true;
 
     //your trail stuff
-    @ConfigEntry.Category("elytra")
-    @ConfigEntry.Gui.PrefixText
-    @ConfigEntry.Gui.Tooltip
-    public boolean enableAllTrails = true;
 
     @ConfigEntry.Category("elytra")
+    @ConfigEntry.Gui.PrefixText
     @ConfigEntry.Gui.Tooltip
     public boolean enableTrail = true;
 
@@ -83,6 +84,16 @@ public class ModConfig implements ConfigData {
     @ConfigEntry.Category("elytra")
     @ConfigEntry.Gui.Tooltip
     public String color = "#FFFFFF";
+
+    /**
+     * Optional pride flag id (from Pride Lib / mod id "pride").
+     *
+     * When non-empty and Pride Lib is present, the trail will be colored as horizontal stripes
+     * across its width (like a texture), while still respecting width variation.
+     */
+    @ConfigEntry.Category("elytra")
+    @ConfigEntry.Gui.Tooltip
+    public String prideTrail = "";
 
     @ConfigEntry.Category("elytra")
     @ConfigEntry.Gui.Tooltip
@@ -162,6 +173,14 @@ public class ModConfig implements ConfigData {
     @ConfigEntry.Category("others")
     @ConfigEntry.Gui.Tooltip
     public String colorOthersDefault = "#FFFFFF";
+
+    /**
+     * Optional pride flag id (from Pride Lib / mod id "pride") used for other players when no
+     * per-player config is available.
+     */
+    @ConfigEntry.Category("others")
+    @ConfigEntry.Gui.Tooltip
+    public String prideTrailOthersDefault = "";
 
     @ConfigEntry.Category("others")
     @ConfigEntry.Gui.Tooltip

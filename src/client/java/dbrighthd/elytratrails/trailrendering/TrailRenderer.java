@@ -2,6 +2,7 @@ package dbrighthd.elytratrails.trailrendering;
 
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.blaze3d.vertex.VertexConsumer;
+import dbrighthd.elytratrails.compat.pride.PrideCompat;
 import dbrighthd.elytratrails.config.ModConfig;
 import dbrighthd.elytratrails.config.pack.TrailPackConfigManager;
 import dbrighthd.elytratrails.config.pack.TrailPackConfigManager.ResolvedTrailSettings;
@@ -319,6 +320,13 @@ public class TrailRenderer implements SubmitNodeCollector.CustomGeometryRenderer
         return new Vec3(x, y, z);
     }
 
+    private static Vec3 lerp(Vec3 a, Vec3 b, float t) {
+        double x = a.x + (b.x - a.x) * (double) t;
+        double y = a.y + (b.y - a.y) * (double) t;
+        double z = a.z + (b.z - a.z) * (double) t;
+        return new Vec3(x, y, z);
+    }
+
     private static float cameraDistanceFade(float cameraDistBlocks) {
         float denom = (CAMERA_FADE_FULL - CAMERA_FADE_ZERO);
 
@@ -428,16 +436,55 @@ public class TrailRenderer implements SubmitNodeCollector.CustomGeometryRenderer
 
         float normalX = 0.0f, normalY = 1.0f, normalZ = 0.0f;
 
-        vertexBuilder.quadQuad(
-                startOuterCorner,
-                startInnerCorner,
-                endInnerCorner,
-                endOuterCorner,
-                colorR, colorG, colorB,
-                alphaAtStart,
-                alphaAtEnd,
-                normalX, normalY, normalZ
-        );
+        PrideCompat.PrideStripes stripes = null;
+        String prideId = settings.prideTrail();
+        if (prideId != null) {
+            prideId = prideId.trim();
+            if (!prideId.isEmpty()) {
+                stripes = PrideCompat.getStripes(prideId);
+            }
+        }
+
+        if (stripes != null && !stripes.isEmpty()) {
+            int[] colors = stripes.argbColors();
+            int n = colors.length;
+
+            // Split across width to get hard edges between stripes.
+            for (int i = 0; i < n; i++) {
+                float s0 = (float) i / (float) n;
+                float s1 = (float) (i + 1) / (float) n;
+
+                Vec3 startA = lerp(startOuterCorner, startInnerCorner, s0);
+                Vec3 startB = lerp(startOuterCorner, startInnerCorner, s1);
+                Vec3 endB   = lerp(endOuterCorner,   endInnerCorner,   s1);
+                Vec3 endA   = lerp(endOuterCorner,   endInnerCorner,   s0);
+
+                int argb = colors[i];
+                int a = (argb >>> 24) & 0xFF;
+                int r = (argb >>> 16) & 0xFF;
+                int g = (argb >>> 8)  & 0xFF;
+                int b = (argb)        & 0xFF;
+
+                int stripeAlphaStart = (alphaAtStart * a) / 255;
+                int stripeAlphaEnd   = (alphaAtEnd   * a) / 255;
+
+                vertexBuilder.vert(startA, 0f, s0, r, g, b, stripeAlphaStart, normalX, normalY, normalZ);
+                vertexBuilder.vert(startB, 0f, s1, r, g, b, stripeAlphaStart, normalX, normalY, normalZ);
+                vertexBuilder.vert(endB,   1f, s1, r, g, b, stripeAlphaEnd,   normalX, normalY, normalZ);
+                vertexBuilder.vert(endA,   1f, s0, r, g, b, stripeAlphaEnd,   normalX, normalY, normalZ);
+            }
+        } else {
+            vertexBuilder.quadQuad(
+                    startOuterCorner,
+                    startInnerCorner,
+                    endInnerCorner,
+                    endOuterCorner,
+                    colorR, colorG, colorB,
+                    alphaAtStart,
+                    alphaAtEnd,
+                    normalX, normalY, normalZ
+            );
+        }
 
         return scaledSideAtEnd;
     }

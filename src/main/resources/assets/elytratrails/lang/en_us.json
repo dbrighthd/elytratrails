@@ -124,12 +124,24 @@
   "text.autoconfig.elytratrails.option.randomWidthVariationOthersDefault": "Other's Width Variation Amount",
   "text.autoconfig.elytratrails.option.randomWidthVariationOthersDefault.@Tooltip": "Default amount randomness affects other trail width",
 
+  "text.autoconfig.elytratrails.option.resourcePackOverride": "Resource Pack Override (Players)",
+  "text.autoconfig.elytratrails.option.resourcePackOverride.@Tooltip": "If enabled, resource pack trail configs can override player trails too (falls back to synced/default settings if none exist).",
+
+  "text.autoconfig.elytratrails.option.prideTrail": "Pride Trail",
+  "text.autoconfig.elytratrails.option.prideTrail.@Tooltip": "Pride Lib flag id to render as horizontal stripes on the trail. Leave blank to disable. Example: rainbow, transgender",
+
+  "text.autoconfig.elytratrails.option.prideTrailOthersDefault": "Other's Pride Trail",
+  "text.autoconfig.elytratrails.option.prideTrailOthersDefault.@Tooltip": "Default Pride Lib flag id for other players/entities when no per-player config is available. Leave blank to disable.",
+
+
+  "text.autoconfig.elytratrails.category.general": "General Settings",
   "text.autoconfig.elytratrails.category.elytra": "Your Trails",
   "text.autoconfig.elytratrails.category.others": "Other's Trails",
   "text.autoconfig.elytratrails.category.server": "Server Syncing",
   "text.autoconfig.elytratrails.category.particles": "Particles",
 
-  "text.autoconfig.elytratrails.option.enableAllTrails.@PrefixText": "Applies to your own trails (elytra + first-person behavior).",
+  "text.autoconfig.elytratrails.option.enableAllTrails.@PrefixText": "General Settings",
+  "text.autoconfig.elytratrails.option.enableTrail.@PrefixText": "Applies to your own trails (elytra + first-person behavior).",
   "text.autoconfig.elytratrails.option.syncWithServer.@PrefixText": "Server syncing (only works if the mod exists on the server!",
   "text.autoconfig.elytratrails.option.useSameDefaultsforOthers.@PrefixText": "Defaults for other entities/players (Defaults for players unless synced with the server).",
   "text.autoconfig.elytratrails.option.enableParticles.@PrefixText": "Optional particle effects while flying.",

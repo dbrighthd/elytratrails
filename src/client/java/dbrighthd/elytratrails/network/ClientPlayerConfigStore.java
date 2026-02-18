@@ -26,7 +26,8 @@ public final class ClientPlayerConfigStore
                 config.startRampDistance,
                 config.endRampDistance,
                 config.color,
-                config.randomWidthVariation
+                config.randomWidthVariation,
+                config.prideTrail
         );
     }
 
@@ -50,7 +51,8 @@ public final class ClientPlayerConfigStore
                     config.startRampDistance,
                     config.endRampDistance,
                     config.color,
-                    config.randomWidthVariation
+                    config.randomWidthVariation,
+                    ""
             );
         }
     }
@@ -73,7 +75,8 @@ public final class ClientPlayerConfigStore
                 config.startRampDistanceOthersDefault,
                 config.endRampDistanceOthersDefault,
                 config.colorOthersDefault,
-                config.randomWidthVariationOthersDefault
+                config.randomWidthVariationOthersDefault,
+                config.prideTrailOthersDefault
         );
     }
 
@@ -99,6 +102,11 @@ public final class ClientPlayerConfigStore
         if (safeColor != null) safeColor = safeColor.trim();
         if (safeColor != null && safeColor.isEmpty()) safeColor = null;
 
+        String safePride = incoming.prideTrail();
+        if (safePride != null) safePride = safePride.trim();
+        if (safePride == null) safePride = "";
+        if (safePride.length() > 128) safePride = safePride.substring(0, 128);
+
         PlayerConfig safe = new PlayerConfig(
                 incoming.enableTrail(),
                 incoming.enableRandomWidth(),
@@ -110,7 +118,8 @@ public final class ClientPlayerConfigStore
                 safeStartRamp,
                 safeEndRamp,
                 safeColor,
-                safeRandVar
+                safeRandVar,
+                safePride
         );
 
         CLIENT_PLAYER_CONFIGS.put(entityId, safe);
