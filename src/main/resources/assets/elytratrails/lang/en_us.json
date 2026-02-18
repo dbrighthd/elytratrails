@@ -79,8 +79,12 @@
   "text.autoconfig.elytratrails.option.syncWithServer": "Sync With Server",
   "text.autoconfig.elytratrails.option.syncWithServer.@Tooltip": "If enabled, uses trail settings received over the network for other players",
 
+  "text.autoconfig.elytratrails.option.shareTrail": "Send Trail Settings",
+  "text.autoconfig.elytratrails.option.shareTrail.@Tooltip[0]": "If enabled, other users will see your trail settings",
+  "text.autoconfig.elytratrails.option.shareTrail.@Tooltip[1]": "If disabled, they will see their default trail on you.",
+
   "text.autoconfig.elytratrails.option.showTrailToOtherPlayers": "Show Your Trail to Others",
-  "text.autoconfig.elytratrails.option.showTrailToOtherPlayers.@Tooltip": "If disabled, other players with this mod won't see your trail (if the server has the mod too)",
+  "text.autoconfig.elytratrails.option.showTrailToOtherPlayers.@Tooltip": "If disabled, completely hide your trail from other players",
 
   "text.autoconfig.elytratrails.option.useSameDefaultsforOthers": "Use Same Defaults For Others",
   "text.autoconfig.elytratrails.option.useSameDefaultsforOthers.@Tooltip": "If enabled, other entities use your 'Your Trails' settings instead of the 'Other's Trails' defaults",

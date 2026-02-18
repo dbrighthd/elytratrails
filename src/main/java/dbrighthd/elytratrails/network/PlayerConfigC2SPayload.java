@@ -26,7 +26,7 @@ public record PlayerConfigC2SPayload(PlayerConfig playerConfig) implements Custo
                     Codec.DOUBLE.fieldOf("endRampDistance").forGetter(PlayerConfig::endRampDistance), // <-- add this
                     Codec.STRING.fieldOf("color").forGetter(PlayerConfig::color),
                     Codec.DOUBLE.fieldOf("randomWidthVariation").forGetter(PlayerConfig::randomWidthVariation),
-                    Codec.STRING.optionalFieldOf("prideTrail", "").forGetter(PlayerConfig::prideTrail)
+                    Codec.STRING.fieldOf("prideTrail").forGetter(PlayerConfig::prideTrail)
             ).apply(instance, PlayerConfig::new));
     public static final StreamCodec<RegistryFriendlyByteBuf, PlayerConfigC2SPayload> CODEC =
             ByteBufCodecs.fromCodecWithRegistries(PLAYER_CONFIG_CODEC)

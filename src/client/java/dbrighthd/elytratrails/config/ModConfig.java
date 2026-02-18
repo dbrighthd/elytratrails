@@ -19,7 +19,6 @@ public class ModConfig implements ConfigData {
     public boolean resourcePackOverride = true;
 
     //your trail stuff
-
     @ConfigEntry.Category("elytra")
     @ConfigEntry.Gui.PrefixText
     @ConfigEntry.Gui.Tooltip
@@ -105,6 +104,10 @@ public class ModConfig implements ConfigData {
     @ConfigEntry.Gui.PrefixText
     @ConfigEntry.Gui.Tooltip
     public boolean syncWithServer = true;
+
+    @ConfigEntry.Category("server")
+    @ConfigEntry.Gui.Tooltip(count = 2)
+    public boolean shareTrail = true;
 
     @ConfigEntry.Category("server")
     @ConfigEntry.Gui.Tooltip

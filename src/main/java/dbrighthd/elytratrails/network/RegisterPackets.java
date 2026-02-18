@@ -22,6 +22,8 @@ public class RegisterPackets {
         PayloadTypeRegistry.playC2S().register(PlayerConfigC2SPayload.ID,PlayerConfigC2SPayload.CODEC);
         PayloadTypeRegistry.playC2S().register(GetAllRequestC2SPayload.ID,GetAllRequestC2SPayload.CODEC);
         PayloadTypeRegistry.playS2C().register(RemoveFromStoreS2CPayload.ID,RemoveFromStoreS2CPayload.CODEC);
+        PayloadTypeRegistry.playC2S().register(RemoveFromStoreC2SPayload.ID,RemoveFromStoreC2SPayload.CODEC);
+
     }
     public static void initServer() {
         ServerPlayNetworking.registerGlobalReceiver(TwirlStateC2SPayload.ID, (payload, context) -> {
@@ -44,6 +46,13 @@ public class RegisterPackets {
             {
                 PlayerConfigS2CPayload serverPayload = new PlayerConfigS2CPayload(configPair.getKey(), configPair.getValue());
                 ServerPlayNetworking.send(context.player(), serverPayload);
+            }
+        });
+        ServerPlayNetworking.registerGlobalReceiver(RemoveFromStoreC2SPayload.ID, (payload, context) -> {
+            for (ServerPlayer player : context.server().getPlayerList().getPlayers())
+            {
+                RemoveFromStoreS2CPayload serverPayload = new RemoveFromStoreS2CPayload(context.player().getId());
+                ServerPlayNetworking.send(player, serverPayload);
             }
         });
     }
