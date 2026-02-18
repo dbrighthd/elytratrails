@@ -5,6 +5,7 @@ import com.mojang.blaze3d.vertex.VertexConsumer;
 import dbrighthd.elytratrails.config.ModConfig;
 import dbrighthd.elytratrails.config.pack.TrailPackConfigManager;
 import dbrighthd.elytratrails.config.pack.TrailPackConfigManager.ResolvedTrailSettings;
+import dbrighthd.elytratrails.network.ClientPlayerConfigStore;
 import it.unimi.dsi.fastutil.longs.Long2ObjectMap;
 import me.shedaniel.autoconfig.AutoConfig;
 import net.minecraft.client.Minecraft;
@@ -14,12 +15,17 @@ import net.minecraft.client.renderer.texture.OverlayTexture;
 import net.minecraft.resources.Identifier;
 import net.minecraft.util.Mth;
 import net.minecraft.util.Util;
+import net.minecraft.world.entity.Entity;
+import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.phys.Vec3;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.Deque;
 
 import static dbrighthd.elytratrails.ElytraTrailsClient.getConfig;
+import static dbrighthd.elytratrails.config.pack.TrailPackConfigManager.resolveFromPlayerConfig;
+import static dbrighthd.elytratrails.network.ClientPlayerConfigStore.CLIENT_PLAYER_CONFIGS;
+import static dbrighthd.elytratrails.network.ClientPlayerConfigStore.getLocalPlayerConfigOthers;
 
 public class TrailRenderer implements SubmitNodeCollector.CustomGeometryRenderer {
 
@@ -38,6 +44,10 @@ public class TrailRenderer implements SubmitNodeCollector.CustomGeometryRenderer
 
     @Override
     public void render(PoseStack.@NotNull Pose pose, @NotNull VertexConsumer vertexConsumer) {
+        if(!getConfig().enableAllTrails)
+        {
+            return;
+        }
         Minecraft minecraft = Minecraft.getInstance();
         if (minecraft.level == null) return;
 
@@ -76,9 +86,11 @@ public class TrailRenderer implements SubmitNodeCollector.CustomGeometryRenderer
             String modelName = ctx == null ? null : ctx.modelName();
             String boneName = ctx == null ? null : ctx.boneName();
 
-            ResolvedTrailSettings settings = TrailPackConfigManager.resolve(modelName, boneName, baseCfg);
-            float maxWidthBlocks = (float) settings.maxWidth();
 
+
+            ResolvedTrailSettings settings = getResolvedSettings(entityId, modelName, boneName);
+
+            float maxWidthBlocks = (float) settings.maxWidth();
             int argb = parseHexColor(settings.color() == null ? baseCfg.color : settings.color(), 0xFFFFFFFF);
             int colorR = (argb >>> 16) & 0xFF;
             int colorG = (argb >>> 8) & 0xFF;
@@ -125,6 +137,21 @@ public class TrailRenderer implements SubmitNodeCollector.CustomGeometryRenderer
         }
     }
 
+    private static ResolvedTrailSettings getResolvedSettings(int entityId, String modelName, String boneName)
+    {
+        var level = Minecraft.getInstance().level;
+        if (level == null) return null;
+
+        Entity e = level.getEntity(entityId);
+        if(e instanceof Player)
+        {
+            return resolveFromPlayerConfig(ClientPlayerConfigStore.getOrDefault(entityId));
+        }
+        else
+        {
+            return TrailPackConfigManager.resolveOthers(modelName, boneName, getConfig());
+        }
+    }
     private void renderRunLinear(VertexBuilder vertexBuilder,
                                  java.util.ArrayList<TrailStore.TrailPoint> run,
                                  Vec3 cameraWorldPos,

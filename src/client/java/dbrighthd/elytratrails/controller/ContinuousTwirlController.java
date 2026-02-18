@@ -1,4 +1,3 @@
-// ContinuousTwirlController.java
 package dbrighthd.elytratrails.controller;
 
 import net.minecraft.util.Mth;
@@ -12,7 +11,6 @@ public final class ContinuousTwirlController {
     private static final double HALF_DURATION_S = DURATION_S * 0.5;
 
     private static final double OMEGA_RAD_S = (Math.PI * Math.PI) / DURATION_S;
-
     private static final double TURN360_DURATION_S = TAU / OMEGA_RAD_S;
 
     private enum Phase {
@@ -36,6 +34,9 @@ public final class ContinuousTwirlController {
     private static int currentDir = 1;
     private static int nextAltDir = 1;
 
+    // NEW: make sure we only send END once per spin
+    private static boolean endSent = false;
+
     public static void tickContinuousTwirlKey(boolean isDown, int desiredMode) {
         boolean wasDown = keyDown;
         keyDown = isDown;
@@ -56,6 +57,7 @@ public final class ContinuousTwirlController {
         baseAngleRad = 0.0;
 
         holdMode = pendingMode;
+        endSent = false;
 
         if (pendingMode == 0) {
             currentDir = nextAltDir;
@@ -63,6 +65,9 @@ public final class ContinuousTwirlController {
         } else {
             currentDir = pendingMode;
         }
+
+        // +/-2 = CONTINUOUS_BEGIN
+        EntityTwirlManager.sendStatePacket(currentDir * 2);
     }
 
     private static boolean shouldContinueConstant() {
@@ -84,6 +89,14 @@ public final class ContinuousTwirlController {
         return HALF_TURN * Math.sin((Math.PI * 0.5) * u);
     }
 
+    private static void sendEndOnce() {
+        if (!endSent) {
+            endSent = true;
+            // +/-4 = CONTINUOUS_END
+            EntityTwirlManager.sendStatePacket(currentDir * 4);
+        }
+    }
+
     public static float getExtraRollRadians(float partialTick) {
         if (!active) return 0f;
 
@@ -98,7 +111,13 @@ public final class ContinuousTwirlController {
                         baseAngleRad += currentDir * HALF_TURN;
                         phaseStartNanos += (long) (HALF_DURATION_S * 1_000_000_000.0);
 
+                        // identical behavior: decide whether to enter constant or ease out
                         phase = shouldContinueConstant() ? Phase.CONSTANT_360 : Phase.EASE_OUT_180;
+
+                        // NEW: if we are going straight to ease-out (short tap), tell others now
+                        if (phase == Phase.EASE_OUT_180) {
+                            sendEndOnce();
+                        }
                         continue;
                     }
 
@@ -111,10 +130,20 @@ public final class ContinuousTwirlController {
                         baseAngleRad += currentDir * TAU;
                         phaseStartNanos += (long) (TURN360_DURATION_S * 1_000_000_000.0);
 
+                        // NEW: completed a 360 while still holding => keepalive/loop ping
+                        // +/-3 = CONTINUOUS_MIDDLE
+                        if (shouldContinueConstant()) {
+                            EntityTwirlManager.sendStatePacket(currentDir * 3);
+                        }
+
                         elapsedS = (now - phaseStartNanos) / 1_000_000_000.0;
 
                         if (!shouldContinueConstant()) {
                             phase = Phase.EASE_OUT_180;
+
+                            // NEW: tell others we're ending, but ONLY once we commit to ending
+                            // (this preserves your "finish the current loop first" feel)
+                            sendEndOnce();
                             break;
                         }
                     }
@@ -142,6 +171,7 @@ public final class ContinuousTwirlController {
                 }
             }
         }
+
         active = false;
         return 0f;
     }

@@ -6,6 +6,8 @@ import dbrighthd.elytratrails.compat.emf.EmfGenericTrailSampler;
 import dbrighthd.elytratrails.compat.emf.EmfWingTipHooks;
 import dbrighthd.elytratrails.mixin.client.EquipmentElytraModelAccessor;
 import dbrighthd.elytratrails.mixin.client.ModelFeatureStorageAccessor;
+import dbrighthd.elytratrails.network.ClientPlayerConfigStore;
+import dbrighthd.elytratrails.network.PlayerConfig;
 import dbrighthd.elytratrails.trailrendering.WingTipPos;
 import net.fabricmc.loader.api.FabricLoader;
 import net.minecraft.client.Minecraft;
@@ -35,6 +37,7 @@ import java.util.List;
 import java.util.Map;
 
 import static dbrighthd.elytratrails.ElytraTrailsClient.getConfig;
+import static dbrighthd.elytratrails.network.ClientPlayerConfigStore.CLIENT_PLAYER_CONFIGS;
 import static dbrighthd.elytratrails.util.ModelTransformationUtil.computeWingOpenness;
 import static dbrighthd.elytratrails.util.ModelTransformationUtil.computeWingTipLocal;
 import static dbrighthd.elytratrails.util.ModelTransformationUtil.transformPoint;
@@ -222,8 +225,8 @@ public final class WingTipSamplerUtil {
             Vec3 entityWorldOffset,
             long nowNanos
     ) {
-        Vec3 leftTipCameraRelative = fallbackWingTip(basePose, elytraRoot, leftWingRoot, true);
-        Vec3 rightTipCameraRelative = fallbackWingTip(basePose, elytraRoot, rightWingRoot, false);
+        Vec3 leftTipCameraRelative = fallbackWingTip(basePose, elytraRoot, leftWingRoot, true, entityId);
+        Vec3 rightTipCameraRelative = fallbackWingTip(basePose, elytraRoot, rightWingRoot, false, entityId);
 
         Vec3[] pointsWorld = new Vec3[]{
                 cameraWorldPos.add(leftTipCameraRelative).add(entityWorldOffset),
@@ -233,13 +236,14 @@ public final class WingTipSamplerUtil {
         WingTipPos.put(entityId, pointsWorld, nowNanos, "elytra", new String[]{"left", "right"});
     }
 
-    private static Vec3 fallbackWingTip(PoseStack basePose, @Nullable ModelPart elytraRoot, ModelPart wingRoot, boolean left) {
+    private static Vec3 fallbackWingTip(PoseStack basePose, @Nullable ModelPart elytraRoot, ModelPart wingRoot, boolean left, int entityId) {
         Vec3 wingTipLocal = computeWingTipLocal(left);
 
         float wingOpenness = computeWingOpenness(wingRoot);
         float localTipXScale = 1.0f;
 
-        if (getConfig().trailMovesWithElytraAngle) {
+        PlayerConfig cfg = ClientPlayerConfigStore.getOrDefault(entityId);
+        if (cfg.trailMovesWithElytraAngle()) {
             localTipXScale = Mth.lerp(wingOpenness, 0.33f, 1.0f);
         }
 

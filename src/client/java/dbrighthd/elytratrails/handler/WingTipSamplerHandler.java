@@ -2,6 +2,8 @@
 package dbrighthd.elytratrails.handler;
 
 import dbrighthd.elytratrails.config.pack.TrailPackConfigManager;
+import dbrighthd.elytratrails.network.ClientPlayerConfigStore;
+import dbrighthd.elytratrails.network.PlayerConfig;
 import dbrighthd.elytratrails.trailrendering.TrailContextStore;
 import dbrighthd.elytratrails.trailrendering.TrailStore;
 import dbrighthd.elytratrails.trailrendering.WingTipPos;
@@ -19,7 +21,6 @@ import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.phys.Vec3;
 
 import static dbrighthd.elytratrails.ElytraTrailsClient.getConfig;
-
 public class WingTipSamplerHandler {
     private static final Int2LongOpenHashMap lastSampleTimeByEntity = new Int2LongOpenHashMap();
     private static long lastGlobalSampleNanos = Long.MIN_VALUE;
@@ -67,7 +68,7 @@ public class WingTipSamplerHandler {
         WorldRenderEvents.AFTER_ENTITIES.register(ctx -> {
             Minecraft mc = Minecraft.getInstance();
             if (mc.level == null) return;
-            if (!getConfig().enableTrail) return;
+            if (!getConfig().enableAllTrails) return;
 
             long now = Util.getNanos();
 
@@ -253,10 +254,18 @@ public class WingTipSamplerHandler {
         if (entity instanceof Player living) {
             if (!living.isFallFlying()) return false;
 
-            if (cfg.speedDependentTrail()) {
-                long start = fallFlyingStartTimeByEntity.getOrDefault(living.getId(), Long.MIN_VALUE);
+            PlayerConfig playerConfig = ClientPlayerConfigStore.getOrDefault(living.getId());
+
+            if (!playerConfig.enableTrail())
+            {
+                return false;
+            }
+            if (playerConfig.speedDependentTrail()) {
+                int id = living.getId();
+
+                long start = fallFlyingStartTimeByEntity.getOrDefault(id, Long.MIN_VALUE);
                 if (start == Long.MIN_VALUE) {
-                    fallFlyingStartTimeByEntity.put(living.getId(), nowNanos);
+                    fallFlyingStartTimeByEntity.put(id, nowNanos);
                     return false;
                 }
 
@@ -268,9 +277,13 @@ public class WingTipSamplerHandler {
                     return living.getKnownSpeed().lengthSqr() > minSq;
                 }
             }
+
             return true;
         }
-
+        if (!cfg.enableTrail())
+        {
+            return false;
+        }
         if (cfg.speedDependentTrail()) {
             double min = cfg.trailMinSpeed();
             if (min >= 0.001) {

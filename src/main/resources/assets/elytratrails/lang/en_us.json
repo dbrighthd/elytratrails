@@ -1,49 +1,145 @@
 {
+  "text.autoconfig.elytratrails.category.elytra.@Tooltip": "Settings that affect your own trails.",
+  "text.autoconfig.elytratrails.category.others.@Tooltip": "Defaults used for other players/entities (unless overridden by packs).",
+  "text.autoconfig.elytratrails.category.server.@Tooltip": "Networking + safety limits for settings received from other players.",
+  "text.autoconfig.elytratrails.category.particles.@Tooltip": "Optional particle effects while flying.",
+
+
   "text.autoconfig.elytratrails.title": "Elytra Contrails Mod Settings",
+
+  "text.autoconfig.elytratrails.option.enableAllTrails": "Enable All Trails",
+  "text.autoconfig.elytratrails.option.enableAllTrails.@Tooltip": "Master toggle: enables/disables every trail type in the mod",
+
   "text.autoconfig.elytratrails.option.enableTrail": "Enable Elytra Trail",
   "text.autoconfig.elytratrails.option.enableTrail.@Tooltip": "Toggle if elytra trails render",
+
   "text.autoconfig.elytratrails.option.maxWidth": "Trail Width",
   "text.autoconfig.elytratrails.option.maxWidth.@Tooltip": "Max trail width (blocks)",
-  "text.autoconfig.elytratrails.option.trailLifetime" : "Trail Duration",
-  "text.autoconfig.elytratrails.option.trailLifetime.@Tooltip" : "How long the trail should stay for (seconds)",
-  "text.autoconfig.elytratrails.option.maxSamplePerSecond" : "Sample Rate",
-  "text.autoconfig.elytratrails.option.maxSamplePerSecond.@Tooltip" : "How many times the trails should sample position per second",
-  "text.autoconfig.elytratrails.option.speedDependentTrail" : "Speed Dependent Trail",
-  "text.autoconfig.elytratrails.option.speedDependentTrail.@Tooltip" : "Only shows trails when flying at a certain speed (defined below)",
-  "text.autoconfig.elytratrails.option.trailMinSpeed" : "Minimum Speed for Trail",
-  "text.autoconfig.elytratrails.option.trailMinSpeed.@Tooltip" : "Speed at which to start showing trails (blocks per tick I think?)",
-  "text.autoconfig.elytratrails.option.trailMovesWithElytraAngle" : "Dynamic Wingtip Position",
-  "text.autoconfig.elytratrails.option.trailMovesWithElytraAngle.@Tooltip" : "Whether the calculated wingtip should change based on the elytra's spread",
-  "text.autoconfig.elytratrails.option.enableParticles" : "Enable Particles During Flight",
-  "text.autoconfig.elytratrails.option.enableParticles.@Tooltip" : "Spawns particles around the player during flight, to show speed",
-  "text.autoconfig.elytratrails.option.particle" : "Particle Shown",
-  "text.autoconfig.elytratrails.option.particle.@Tooltip" : "Which particle should appear during flight",
-  "text.autoconfig.elytratrails.option.particleSpawnsPerTick" : "Particles per tick",
-  "text.autoconfig.elytratrails.option.particleSpawnsPerTick.@Tooltip" : "How many particles should spawn per tick?",
-  "text.autoconfig.elytratrails.option.startRampDistance" : "Thickness Start Distance",
-  "text.autoconfig.elytratrails.option.startRampDistance.@Tooltip" : "How long should it take for trails to reach their max width?",
-  "text.autoconfig.elytratrails.option.endRampDistance" : "Thickness End Distance",
-  "text.autoconfig.elytratrails.option.endRampDistance.@Tooltip" : "How long should it take for trails to reach width 0 from the end?",
-  "text.autoconfig.elytratrails.option.enableRandomWidth" : "Width Variation",
-  "text.autoconfig.elytratrails.option.enableRandomWidth.@Tooltip" : "Should trails have a random factor in their width?",
-  "text.autoconfig.elytratrails.option.randomWidthVariation" : "Width Variation Amount",
-  "text.autoconfig.elytratrails.option.randomWidthVariation.@Tooltip" : "How much should width change based on randomness?",
-  "text.autoconfig.elytratrails.option.useSplineTrail" : "Trail Spline Smoothing",
-  "text.autoconfig.elytratrails.option.useSplineTrail.@Tooltip" : "Should the trail interpolate between points to make it smoother?",
-  "text.autoconfig.elytratrails.option.firstPersonFadeTime" : "First Person Trail Fade Time",
-  "text.autoconfig.elytratrails.option.firstPersonFadeTime.@Tooltip" : "Time for first person trails to fade in",
-  "text.autoconfig.elytratrails.option.firstPersonTrail" : "First Person Trail",
-  "text.autoconfig.elytratrails.option.firstPersonTrail.@Tooltip" : "Trails appear from you in first person",
-  "text.autoconfig.elytratrails.option.emfSupport" : "EMF Model Support",
-  "text.autoconfig.elytratrails.option.emfSupport.@Tooltip" : "Having this on tries to make it work with EMF models, can cause issues",
-  "text.autoconfig.elytratrails.option.cameraDistanceFade" : "Fade Trails Close to Camera",
-  "text.autoconfig.elytratrails.option.cameraDistanceFade.@Tooltip" : "Tries to fade trails close to camera to prevent annoyance",
 
-  "key.category.elytratrails.skibidi" : "Elytra Contrails Keybinds",
-  "key.elytratrails.toggle" : "Toggle Elytra Contrails",
-  "key.elytratrails.twirl_l" : "Lil Twirl Left",
-  "key.elytratrails.twirl_r" : "Lil Twirl Right",
-  "key.elytratrails.continuous_twirl_r" : "Hold Twirl Left",
-  "key.elytratrails.continuous_twirl_l" : "Hold Twirl Right",
-  "key.elytratrails.twirl_random" : "Lil Twirl Alternating"
+  "text.autoconfig.elytratrails.option.trailLifetime": "Trail Duration",
+  "text.autoconfig.elytratrails.option.trailLifetime.@Tooltip": "How long the trail should stay for (seconds)",
+
+  "text.autoconfig.elytratrails.option.maxSamplePerSecond": "Sample Rate",
+  "text.autoconfig.elytratrails.option.maxSamplePerSecond.@Tooltip": "How many times the trails should sample position per second",
+
+  "text.autoconfig.elytratrails.option.speedDependentTrail": "Speed Dependent Trail",
+  "text.autoconfig.elytratrails.option.speedDependentTrail.@Tooltip": "Only shows trails when flying at a certain speed (defined below)",
+
+  "text.autoconfig.elytratrails.option.trailMinSpeed": "Minimum Speed for Trail",
+  "text.autoconfig.elytratrails.option.trailMinSpeed.@Tooltip": "Speed at which to start showing trails (blocks per tick I think?)",
+
+  "text.autoconfig.elytratrails.option.trailMovesWithElytraAngle": "Dynamic Wingtip Position",
+  "text.autoconfig.elytratrails.option.trailMovesWithElytraAngle.@Tooltip": "Whether the calculated wingtip should change based on the elytra's spread",
+
+  "text.autoconfig.elytratrails.option.enableParticles": "Enable Particles During Flight",
+  "text.autoconfig.elytratrails.option.enableParticles.@Tooltip": "Spawns particles around the player during flight, to show speed",
+
+  "text.autoconfig.elytratrails.option.particle": "Particle Shown",
+  "text.autoconfig.elytratrails.option.particle.@Tooltip": "Which particle should appear during flight",
+
+  "text.autoconfig.elytratrails.option.particleSpawnsPerTick": "Particles per tick",
+  "text.autoconfig.elytratrails.option.particleSpawnsPerTick.@Tooltip": "How many particles should spawn per tick?",
+
+  "text.autoconfig.elytratrails.option.startRampDistance": "Thickness Start Distance",
+  "text.autoconfig.elytratrails.option.startRampDistance.@Tooltip": "How long should it take for trails to reach their max width?",
+
+  "text.autoconfig.elytratrails.option.endRampDistance": "Thickness End Distance",
+  "text.autoconfig.elytratrails.option.endRampDistance.@Tooltip": "How long should it take for trails to reach width 0 from the end?",
+
+  "text.autoconfig.elytratrails.option.enableRandomWidth": "Width Variation",
+  "text.autoconfig.elytratrails.option.enableRandomWidth.@Tooltip": "Should trails have a random factor in their width?",
+
+  "text.autoconfig.elytratrails.option.randomWidthVariation": "Width Variation Amount",
+  "text.autoconfig.elytratrails.option.randomWidthVariation.@Tooltip": "How much should width change based on randomness?",
+
+  "text.autoconfig.elytratrails.option.useSplineTrail": "Trail Spline Smoothing",
+  "text.autoconfig.elytratrails.option.useSplineTrail.@Tooltip": "Should the trail interpolate between points to make it smoother?",
+
+  "text.autoconfig.elytratrails.option.firstPersonFadeTime": "First Person Trail Fade Time",
+  "text.autoconfig.elytratrails.option.firstPersonFadeTime.@Tooltip": "Time for first person trails to fade in",
+
+  "text.autoconfig.elytratrails.option.firstPersonTrail": "First Person Trail",
+  "text.autoconfig.elytratrails.option.firstPersonTrail.@Tooltip": "Trails appear from you in first person",
+
+  "text.autoconfig.elytratrails.option.emfSupport": "EMF Model Support",
+  "text.autoconfig.elytratrails.option.emfSupport.@Tooltip": "Having this on tries to make it work with EMF models, can cause issues",
+
+  "text.autoconfig.elytratrails.option.cameraDistanceFade": "Fade Trails Close to Camera",
+  "text.autoconfig.elytratrails.option.cameraDistanceFade.@Tooltip": "Tries to fade trails close to camera to prevent annoyance",
+
+  "text.autoconfig.elytratrails.option.color": "Trail Color",
+  "text.autoconfig.elytratrails.option.color.@Tooltip": "Trail color as hex (example: #FFFFFF)",
+
+  "text.autoconfig.elytratrails.option.maxOnlineWidth": "Max Online Width",
+  "text.autoconfig.elytratrails.option.maxOnlineWidth.@Tooltip": "Maximum trail width accepted from other players (blocks)",
+
+  "text.autoconfig.elytratrails.option.maxOnlineLifetime": "Max Online Lifetime",
+  "text.autoconfig.elytratrails.option.maxOnlineLifetime.@Tooltip": "Maximum trail lifetime accepted from other players (seconds)",
+
+  "text.autoconfig.elytratrails.option.syncWithServer": "Sync With Server",
+  "text.autoconfig.elytratrails.option.syncWithServer.@Tooltip": "If enabled, uses trail settings received over the network for other players",
+
+  "text.autoconfig.elytratrails.option.showTrailToOtherPlayers": "Show Your Trail to Others",
+  "text.autoconfig.elytratrails.option.showTrailToOtherPlayers.@Tooltip": "If disabled, other players with this mod won't see your trail (if the server has the mod too)",
+
+  "text.autoconfig.elytratrails.option.useSameDefaultsforOthers": "Use Same Defaults For Others",
+  "text.autoconfig.elytratrails.option.useSameDefaultsforOthers.@Tooltip": "If enabled, other entities use your 'Your Trails' settings instead of the 'Other's Trails' defaults",
+
+  "text.autoconfig.elytratrails.option.enableTrailOthersDefault": "Enable Other's Trails",
+  "text.autoconfig.elytratrails.option.enableTrailOthersDefault.@Tooltip": "Default: whether trails render for other entities/players",
+
+  "text.autoconfig.elytratrails.option.enableRandomWidthOthersDefault": "Other's Width Variation",
+  "text.autoconfig.elytratrails.option.enableRandomWidthOthersDefault.@Tooltip": "Default: should other trails have random width variation?",
+
+  "text.autoconfig.elytratrails.option.useSplineTrailOthersDefault": "Other's Spline Smoothing",
+  "text.autoconfig.elytratrails.option.useSplineTrailOthersDefault.@Tooltip": "Default: smooth other trails by interpolating points",
+
+  "text.autoconfig.elytratrails.option.speedDependentTrailOthersDefault": "Other's Speed Dependent Trail",
+  "text.autoconfig.elytratrails.option.speedDependentTrailOthersDefault.@Tooltip": "Default: only show other trails when they are moving fast enough",
+
+  "text.autoconfig.elytratrails.option.trailMovesWithElytraAngleOthersDefault": "Other's Dynamic Wingtip Position",
+  "text.autoconfig.elytratrails.option.trailMovesWithElytraAngleOthersDefault.@Tooltip": "Default: whether other wingtips move with elytra angle",
+
+  "text.autoconfig.elytratrails.option.cameraDistanceFadeOthersDefault": "Other's Camera Fade",
+  "text.autoconfig.elytratrails.option.cameraDistanceFadeOthersDefault.@Tooltip": "Default: fade other trails when close to your camera",
+
+  "text.autoconfig.elytratrails.option.maxWidthOthersDefault": "Other's Trail Width",
+  "text.autoconfig.elytratrails.option.maxWidthOthersDefault.@Tooltip": "Default max width for other trails (blocks)",
+
+  "text.autoconfig.elytratrails.option.trailLifetimeOthersDefault": "Other's Trail Duration",
+  "text.autoconfig.elytratrails.option.trailLifetimeOthersDefault.@Tooltip": "Default lifetime for other trails (seconds)",
+
+  "text.autoconfig.elytratrails.option.trailMinSpeedOthersDefault": "Other's Minimum Speed",
+  "text.autoconfig.elytratrails.option.trailMinSpeedOthersDefault.@Tooltip": "Default minimum speed for other trails to appear",
+
+  "text.autoconfig.elytratrails.option.startRampDistanceOthersDefault": "Other's Thickness Start Distance",
+  "text.autoconfig.elytratrails.option.startRampDistanceOthersDefault.@Tooltip": "Default: distance for other trails to ramp up to max width",
+
+  "text.autoconfig.elytratrails.option.endRampDistanceOthersDefault": "Other's Thickness End Distance",
+  "text.autoconfig.elytratrails.option.endRampDistanceOthersDefault.@Tooltip": "Default: distance for other trails to ramp down to 0 width",
+
+  "text.autoconfig.elytratrails.option.colorOthersDefault": "Other's Trail Color",
+  "text.autoconfig.elytratrails.option.colorOthersDefault.@Tooltip": "Default color for other trails as hex (example: #FFFFFF)",
+
+  "text.autoconfig.elytratrails.option.randomWidthVariationOthersDefault": "Other's Width Variation Amount",
+  "text.autoconfig.elytratrails.option.randomWidthVariationOthersDefault.@Tooltip": "Default amount randomness affects other trail width",
+
+  "text.autoconfig.elytratrails.category.elytra": "Your Trails",
+  "text.autoconfig.elytratrails.category.others": "Other's Trails",
+  "text.autoconfig.elytratrails.category.server": "Server Syncing",
+  "text.autoconfig.elytratrails.category.particles": "Particles",
+
+  "text.autoconfig.elytratrails.option.enableAllTrails.@PrefixText": "Applies to your own trails (elytra + first-person behavior).",
+  "text.autoconfig.elytratrails.option.syncWithServer.@PrefixText": "Server syncing (only works if the mod exists on the server!",
+  "text.autoconfig.elytratrails.option.useSameDefaultsforOthers.@PrefixText": "Defaults for other entities/players (Defaults for players unless synced with the server).",
+  "text.autoconfig.elytratrails.option.enableParticles.@PrefixText": "Optional particle effects while flying.",
+
+
+  "key.category.elytratrails.skibidi": "Elytra Contrails Keybinds",
+  "key.elytratrails.toggle": "Toggle Elytra Contrails",
+  "key.elytratrails.twirl_l": "Lil Twirl Left",
+  "key.elytratrails.twirl_r": "Lil Twirl Right",
+  "key.elytratrails.continuous_twirl_r": "Hold Twirl Left",
+  "key.elytratrails.continuous_twirl_l": "Hold Twirl Right",
+  "key.elytratrails.twirl_random": "Lil Twirl Alternating"
 }

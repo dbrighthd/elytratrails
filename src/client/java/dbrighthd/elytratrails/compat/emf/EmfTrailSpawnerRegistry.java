@@ -225,6 +225,7 @@ public final class EmfTrailSpawnerRegistry {
             } catch (Throwable ignored) {
                 continue;
             }
+            //noinspection ConstantValue
             if (root == null) continue;
 
             List<String> spawnerPaths = findSpawnerPaths(root);
@@ -235,6 +236,7 @@ public final class EmfTrailSpawnerRegistry {
             }
         }
 
+        //noinspection ConstantValue
         if (locators.isEmpty()) return null;
 
         locators.sort(LOCATOR_ORDER);

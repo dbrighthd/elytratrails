@@ -1,4 +1,3 @@
-// TwirlController.java
 package dbrighthd.elytratrails.controller;
 
 import net.minecraft.util.Mth;
@@ -40,6 +39,10 @@ public final class TwirlController {
         } else {
             currentDir = pendingMode;
         }
+
+        // Send "normal twirl" to server/others (sign encodes direction)
+        // +/-1 = NORMAL
+        EntityTwirlManager.sendStatePacket(currentDir);
     }
 
     public static float getExtraRollRadians(float partialTick) {

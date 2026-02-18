@@ -5,6 +5,7 @@ import com.google.gson.GsonBuilder;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import dbrighthd.elytratrails.config.ModConfig;
+import dbrighthd.elytratrails.network.PlayerConfig;
 import net.minecraft.resources.Identifier;
 import net.minecraft.server.packs.resources.Resource;
 import net.minecraft.server.packs.resources.ResourceManager;
@@ -18,7 +19,6 @@ import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
 import static dbrighthd.elytratrails.ElytraTrailsClient.getConfig;
-
 
 public final class TrailPackConfigManager {
     private TrailPackConfigManager() {}
@@ -73,6 +73,9 @@ public final class TrailPackConfigManager {
         return configDefaultSeconds;
     }
 
+    /**
+     * ORIGINAL behavior: base overrides come from the "elytra" (non-others) fields.
+     */
     public static ResolvedTrailSettings resolve(@Nullable String modelName, @Nullable String boneName, @Nullable ModConfig baseConfig) {
         if (baseConfig == null) return ResolvedTrailSettings.defaults();
 
@@ -97,6 +100,38 @@ public final class TrailPackConfigManager {
 
         return mergedOverrides.resolve();
     }
+
+    /**
+     * NEW behavior: base overrides come from the "*OthersDefault" fields.
+     */
+    public static ResolvedTrailSettings resolveOthers(@Nullable String modelName, @Nullable String boneName, @Nullable ModConfig baseConfig) {
+        if (baseConfig == null) return ResolvedTrailSettings.defaults();
+
+        String normalizedModelKey = normalizeModelKey(modelName);
+        ModelTrailConfig modelConfig = (normalizedModelKey == null) ? null : MODEL_TRAIL_CONFIGS.get(normalizedModelKey);
+
+        // If enabled, "others" use the same base defaults as local config.
+        TrailOverrides mergedOverrides = baseConfig.useSameDefaultsforOthers
+                ? TrailOverrides.fromBase(baseConfig)
+                : TrailOverrides.fromOthersDefaults(baseConfig);
+
+        if (modelConfig != null && modelConfig.defaultOverrides != null) {
+            mergedOverrides = mergedOverrides.with(modelConfig.defaultOverrides);
+        }
+
+        if (modelConfig != null && boneName != null) {
+            String normalizedBoneKey = normalizeBoneKey(boneName);
+            if (normalizedBoneKey != null) {
+                TrailOverrides boneOverrides = modelConfig.boneOverrides.get(normalizedBoneKey);
+                if (boneOverrides != null) {
+                    mergedOverrides = mergedOverrides.with(boneOverrides);
+                }
+            }
+        }
+
+        return mergedOverrides.resolve();
+    }
+
 
     private static @Nullable String modelKeyFromTrailConfigsPath(String rawPath) {
         String normalizedPath = rawPath.replace('\\', '/');
@@ -165,57 +200,58 @@ public final class TrailPackConfigManager {
                                     Map<String, TrailOverrides> boneOverrides) {
 
         static @Nullable ModelTrailConfig fromJson(JsonObject root) {
-                TrailOverrides defaultsFromDefaultsObject = null;
-                if (root.has("defaults") && root.get("defaults") instanceof JsonObject defaultsObject) {
-                    defaultsFromDefaultsObject = TrailOverrides.fromJson(defaultsObject);
-                }
-
-                TrailOverrides defaultsFromTopLevel = TrailOverrides.fromJson(root);
-
-                TrailOverrides mergedDefaults = null;
-                if (defaultsFromDefaultsObject != null && !defaultsFromDefaultsObject.isEmpty()) {
-                    mergedDefaults = defaultsFromDefaultsObject;
-                }
-                if (defaultsFromTopLevel != null && !defaultsFromTopLevel.isEmpty()) {
-                    mergedDefaults = (mergedDefaults == null) ? defaultsFromTopLevel : mergedDefaults.with(defaultsFromTopLevel);
-                }
-
-                Map<String, TrailOverrides> boneOverrides = new ConcurrentHashMap<>();
-                if (root.has("bones") && root.get("bones") instanceof JsonObject bonesObject) {
-                    for (var entry : bonesObject.entrySet()) {
-                        if (!(entry.getValue() instanceof JsonObject boneObject)) continue;
-
-                        TrailOverrides overrides = TrailOverrides.fromJson(boneObject);
-                        if (overrides == null || overrides.isEmpty()) continue;
-
-                        String normalizedBoneKey = normalizeBoneKey(entry.getKey());
-                        if (normalizedBoneKey != null) {
-                            boneOverrides.put(normalizedBoneKey, overrides);
-                        }
-                    }
-                }
-
-                if ((mergedDefaults == null || mergedDefaults.isEmpty()) && boneOverrides.isEmpty()) return null;
-                return new ModelTrailConfig(mergedDefaults, boneOverrides);
+            TrailOverrides defaultsFromDefaultsObject = null;
+            if (root.has("defaults") && root.get("defaults") instanceof JsonObject defaultsObject) {
+                defaultsFromDefaultsObject = TrailOverrides.fromJson(defaultsObject);
             }
 
-            double maxLifetimeSeconds() {
-                double max = -1.0;
+            TrailOverrides defaultsFromTopLevel = TrailOverrides.fromJson(root);
 
-                if (defaultOverrides != null && defaultOverrides.trailLifetime != null) {
-                    max = Math.max(max, defaultOverrides.trailLifetime);
-                }
-                for (TrailOverrides overrides : boneOverrides.values()) {
-                    if (overrides != null && overrides.trailLifetime != null) {
-                        max = Math.max(max, overrides.trailLifetime);
+            TrailOverrides mergedDefaults = null;
+            if (defaultsFromDefaultsObject != null && !defaultsFromDefaultsObject.isEmpty()) {
+                mergedDefaults = defaultsFromDefaultsObject;
+            }
+            if (defaultsFromTopLevel != null && !defaultsFromTopLevel.isEmpty()) {
+                mergedDefaults = (mergedDefaults == null) ? defaultsFromTopLevel : mergedDefaults.with(defaultsFromTopLevel);
+            }
+
+            Map<String, TrailOverrides> boneOverrides = new ConcurrentHashMap<>();
+            if (root.has("bones") && root.get("bones") instanceof JsonObject bonesObject) {
+                for (var entry : bonesObject.entrySet()) {
+                    if (!(entry.getValue() instanceof JsonObject boneObject)) continue;
+
+                    TrailOverrides overrides = TrailOverrides.fromJson(boneObject);
+                    if (overrides == null || overrides.isEmpty()) continue;
+
+                    String normalizedBoneKey = normalizeBoneKey(entry.getKey());
+                    if (normalizedBoneKey != null) {
+                        boneOverrides.put(normalizedBoneKey, overrides);
                     }
                 }
-
-                return max;
             }
+
+            if ((mergedDefaults == null || mergedDefaults.isEmpty()) && boneOverrides.isEmpty()) return null;
+            return new ModelTrailConfig(mergedDefaults, boneOverrides);
         }
 
+        double maxLifetimeSeconds() {
+            double max = -1.0;
+
+            if (defaultOverrides != null && defaultOverrides.trailLifetime != null) {
+                max = Math.max(max, defaultOverrides.trailLifetime);
+            }
+            for (TrailOverrides overrides : boneOverrides.values()) {
+                if (overrides != null && overrides.trailLifetime != null) {
+                    max = Math.max(max, overrides.trailLifetime);
+                }
+            }
+
+            return max;
+        }
+    }
+
     private static final class TrailOverrides {
+        @Nullable Boolean enableTrail;
         @Nullable Boolean enableRandomWidth;
         @Nullable Boolean useSplineTrail;
         @Nullable Boolean speedDependentTrail;
@@ -232,6 +268,7 @@ public final class TrailPackConfigManager {
 
         static TrailOverrides fromBase(ModConfig baseConfig) {
             TrailOverrides overrides = new TrailOverrides();
+            overrides.enableTrail = baseConfig.enableTrail;
             overrides.enableRandomWidth = baseConfig.enableRandomWidth;
             overrides.useSplineTrail = baseConfig.useSplineTrail;
             overrides.speedDependentTrail = baseConfig.speedDependentTrail;
@@ -248,6 +285,25 @@ public final class TrailPackConfigManager {
             return overrides;
         }
 
+        static TrailOverrides fromOthersDefaults(ModConfig cfg) {
+            TrailOverrides overrides = new TrailOverrides();
+            overrides.enableTrail = cfg.enableTrailOthersDefault;
+            overrides.enableRandomWidth = cfg.enableRandomWidthOthersDefault;
+            overrides.useSplineTrail = cfg.useSplineTrailOthersDefault;
+            overrides.speedDependentTrail = cfg.speedDependentTrailOthersDefault;
+            overrides.cameraDistanceFade = cfg.cameraDistanceFadeOthersDefault;
+
+            overrides.maxWidth = cfg.maxWidthOthersDefault;
+            overrides.trailLifetime = cfg.trailLifetimeOthersDefault;
+            overrides.trailMinSpeed = cfg.trailMinSpeedOthersDefault;
+            overrides.startRampDistance = cfg.startRampDistanceOthersDefault;
+            overrides.endRampDistance = cfg.endRampDistanceOthersDefault;
+            overrides.randomWidthVariation = cfg.randomWidthVariationOthersDefault;
+
+            overrides.color = cfg.colorOthersDefault;
+            return overrides;
+        }
+
         static @Nullable TrailOverrides fromJson(@Nullable JsonObject json) {
             if (json == null) return null;
 
@@ -260,6 +316,7 @@ public final class TrailPackConfigManager {
             overrides.endRampDistance = readDouble(json, "endRampDistance", "endramp");
             overrides.randomWidthVariation = readDouble(json, "randomWidthVariation");
 
+            overrides.enableTrail = readBoolean(json, "enableTrail");
             overrides.enableRandomWidth = readBoolean(json, "enableRandomWidth");
             overrides.useSplineTrail = readBoolean(json, "useSplineTrail");
             overrides.speedDependentTrail = readBoolean(json, "speedDependentTrail", "speeddependant", "speedDependent");
@@ -271,7 +328,8 @@ public final class TrailPackConfigManager {
         }
 
         boolean isEmpty() {
-            return enableRandomWidth == null
+            return enableTrail == null
+                    && enableRandomWidth == null
                     && useSplineTrail == null
                     && speedDependentTrail == null
                     && cameraDistanceFade == null
@@ -289,6 +347,7 @@ public final class TrailPackConfigManager {
 
             TrailOverrides merged = new TrailOverrides();
 
+            merged.enableTrail = (other.enableTrail != null) ? other.enableTrail : this.enableTrail;
             merged.enableRandomWidth = (other.enableRandomWidth != null) ? other.enableRandomWidth : this.enableRandomWidth;
             merged.useSplineTrail = (other.useSplineTrail != null) ? other.useSplineTrail : this.useSplineTrail;
             merged.speedDependentTrail = (other.speedDependentTrail != null) ? other.speedDependentTrail : this.speedDependentTrail;
@@ -307,8 +366,8 @@ public final class TrailPackConfigManager {
         }
 
         ResolvedTrailSettings resolve() {
-            // This is always merged on top of a base config via fromBase(), so these should be non-null.
             return new ResolvedTrailSettings(
+                    asTrue(enableTrail),
                     asTrue(enableRandomWidth),
                     asTrue(useSplineTrail),
                     asTrue(speedDependentTrail),
@@ -358,6 +417,7 @@ public final class TrailPackConfigManager {
     }
 
     public record ResolvedTrailSettings(
+            boolean enableTrail,
             boolean enableRandomWidth,
             boolean useSplineTrail,
             boolean speedDependentTrail,
@@ -372,18 +432,47 @@ public final class TrailPackConfigManager {
     ) {
         public static ResolvedTrailSettings defaults() {
             return new ResolvedTrailSettings(
-                    getConfig().enableRandomWidth,
-                    getConfig().useSplineTrail,
-                    getConfig().speedDependentTrail,
-                    getConfig().cameraDistanceFade,
-                    getConfig().maxWidth,
-                    getConfig().trailLifetime,
-                    getConfig().trailMinSpeed,
-                    getConfig().startRampDistance,
-                    getConfig().endRampDistance,
-                    getConfig().randomWidthVariation,
-                    getConfig().color
+                    getConfig().enableTrailOthersDefault,
+                    getConfig().enableRandomWidthOthersDefault,
+                    getConfig().useSplineTrailOthersDefault,
+                    getConfig().speedDependentTrailOthersDefault,
+                    getConfig().cameraDistanceFadeOthersDefault,
+                    getConfig().maxWidthOthersDefault,
+                    getConfig().trailLifetimeOthersDefault,
+                    getConfig().trailMinSpeedOthersDefault,
+                    getConfig().startRampDistanceOthersDefault,
+                    getConfig().endRampDistanceOthersDefault,
+                    getConfig().randomWidthVariationOthersDefault,
+                    getConfig().colorOthersDefault
             );
         }
+    }
+
+    public static ResolvedTrailSettings resolveFromPlayerConfig(@Nullable PlayerConfig playerConfig) {
+        ResolvedTrailSettings defaults = ResolvedTrailSettings.defaults();
+        if (playerConfig == null) return defaults;
+
+        // If PlayerConfig has enableTrail(), use it. Otherwise fall back to defaults.enableTrail().
+        boolean enableTrail;
+        try {
+            enableTrail = playerConfig.enableTrail();
+        } catch (Throwable ignored) {
+            enableTrail = defaults.enableTrail();
+        }
+
+        return new ResolvedTrailSettings(
+                enableTrail,
+                playerConfig.enableRandomWidth(),
+                defaults.useSplineTrail(),              // not in PlayerConfig
+                playerConfig.speedDependentTrail(),
+                defaults.cameraDistanceFade(),          // not in PlayerConfig
+                playerConfig.maxWidth(),
+                playerConfig.trailLifetime(),
+                playerConfig.trailMinSpeed(),
+                playerConfig.startRampDistance(),
+                playerConfig.endRampDistance(),
+                playerConfig.randomWidthVariation(),
+                playerConfig.color()
+        );
     }
 }
