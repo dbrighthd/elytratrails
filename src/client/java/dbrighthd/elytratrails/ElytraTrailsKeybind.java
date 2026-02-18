@@ -118,7 +118,7 @@ public final class ElytraTrailsKeybind {
 
             while (TOGGLE_TRAILS.consumeClick()) {
                 ModConfig modConfig = getConfig();
-                modConfig.enableTrail = !modConfig.enableTrail;
+                modConfig.enableAllTrails = !modConfig.enableAllTrails;
                 setConfig(modConfig);
             }
         });
