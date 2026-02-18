@@ -8,8 +8,13 @@ import me.shedaniel.autoconfig.annotation.ConfigEntry;
 public class ModConfig implements ConfigData {
 
 
-    //your trail stuff
+    //general
+    @ConfigEntry.Category("general")
+    @ConfigEntry.Gui.PrefixText
+    @ConfigEntry.Gui.Tooltip
+    public boolean resourcePackOverride = true;
 
+    //your trail stuff
     @ConfigEntry.Category("elytra")
     @ConfigEntry.Gui.PrefixText
     @ConfigEntry.Gui.Tooltip

@@ -137,21 +137,29 @@ public class TrailRenderer implements SubmitNodeCollector.CustomGeometryRenderer
         }
     }
 
-    private static ResolvedTrailSettings getResolvedSettings(int entityId, String modelName, String boneName)
-    {
+    private static ResolvedTrailSettings getResolvedSettings(int entityId, String modelName, String boneName) {
         var level = Minecraft.getInstance().level;
         if (level == null) return null;
 
         Entity e = level.getEntity(entityId);
-        if(e instanceof Player)
-        {
-            return resolveFromPlayerConfig(ClientPlayerConfigStore.getOrDefault(entityId));
+
+        // Players: normally come from network / defaults.
+        if (e instanceof Player) {
+            ResolvedTrailSettings base = resolveFromPlayerConfig(ClientPlayerConfigStore.getOrDefault(entityId));
+
+            // If enabled, apply resource-pack overrides ON TOP of the player's base settings,
+            // but only when a pack config actually exists for this model/bone.
+            if (getConfig().resourcePackOverride) {
+                return TrailPackConfigManager.resolveOnTop(modelName, boneName, base);
+            }
+
+            return base;
         }
-        else
-        {
-            return TrailPackConfigManager.resolveOthers(modelName, boneName, getConfig());
-        }
+
+        // Non-players: always use pack resolution (with Others defaults / or same defaults depending on config)
+        return TrailPackConfigManager.resolveOthers(modelName, boneName, getConfig());
     }
+
     private void renderRunLinear(VertexBuilder vertexBuilder,
                                  java.util.ArrayList<TrailStore.TrailPoint> run,
                                  Vec3 cameraWorldPos,

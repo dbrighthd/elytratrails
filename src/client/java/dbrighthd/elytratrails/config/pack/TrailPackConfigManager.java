@@ -101,9 +101,39 @@ public final class TrailPackConfigManager {
         return mergedOverrides.resolve();
     }
 
-    /**
-     * NEW behavior: base overrides come from the "*OthersDefault" fields.
-     */
+    public static ResolvedTrailSettings resolveOnTop(@Nullable String modelName,
+                                                     @Nullable String boneName,
+                                                     @Nullable ResolvedTrailSettings base) {
+        if (base == null) return ResolvedTrailSettings.defaults();
+
+        String normalizedModelKey = normalizeModelKey(modelName);
+        ModelTrailConfig modelConfig = (normalizedModelKey == null) ? null : MODEL_TRAIL_CONFIGS.get(normalizedModelKey);
+        if (modelConfig == null) return base;
+
+        // Merge model defaults + bone overrides if present.
+        TrailOverrides merged = TrailOverrides.fromResolved(base);
+
+        if (modelConfig.defaultOverrides != null) {
+            merged = merged.with(modelConfig.defaultOverrides);
+        }
+
+        if (boneName != null) {
+            String normalizedBoneKey = normalizeBoneKey(boneName);
+            if (normalizedBoneKey != null) {
+                TrailOverrides boneOverrides = modelConfig.boneOverrides.get(normalizedBoneKey);
+                if (boneOverrides != null) {
+                    merged = merged.with(boneOverrides);
+                }
+            }
+        }
+
+        // If the pack entry existed but it contributed nothing, keep base unchanged.
+        // (This is rare, but safe.)
+        if (merged.isSameAs(base)) return base;
+
+        return merged.resolve();
+    }
+
     public static ResolvedTrailSettings resolveOthers(@Nullable String modelName, @Nullable String boneName, @Nullable ModConfig baseConfig) {
         if (baseConfig == null) return ResolvedTrailSettings.defaults();
 
@@ -283,6 +313,43 @@ public final class TrailPackConfigManager {
 
             overrides.color = baseConfig.color;
             return overrides;
+        }
+        static TrailOverrides fromResolved(ResolvedTrailSettings s) {
+            TrailOverrides o = new TrailOverrides();
+            // base is "fully resolved", so treat everything as non-null base values
+            o.enableTrail = s.enableTrail();
+            o.enableRandomWidth = s.enableRandomWidth();
+            o.useSplineTrail = s.useSplineTrail();
+            o.speedDependentTrail = s.speedDependentTrail();
+            o.cameraDistanceFade = s.cameraDistanceFade();
+
+            o.maxWidth = s.maxWidth();
+            o.trailLifetime = s.trailLifetime();
+            o.trailMinSpeed = s.trailMinSpeed();
+            o.startRampDistance = s.startRampDistance();
+            o.endRampDistance = s.endRampDistance();
+            o.randomWidthVariation = s.randomWidthVariation();
+
+            o.color = s.color();
+            return o;
+        }
+
+        /**
+         * Used so resolveOnTop can cheaply return base when pack contributes nothing.
+         */
+        boolean isSameAs(ResolvedTrailSettings s) {
+            return asTrue(enableTrail) == s.enableTrail()
+                    && asTrue(enableRandomWidth) == s.enableRandomWidth()
+                    && asTrue(useSplineTrail) == s.useSplineTrail()
+                    && asTrue(speedDependentTrail) == s.speedDependentTrail()
+                    && asTrue(cameraDistanceFade) == s.cameraDistanceFade()
+                    && asNumber(maxWidth) == s.maxWidth()
+                    && asNumber(trailLifetime) == s.trailLifetime()
+                    && asNumber(trailMinSpeed) == s.trailMinSpeed()
+                    && asNumber(startRampDistance) == s.startRampDistance()
+                    && asNumber(endRampDistance) == s.endRampDistance()
+                    && asNumber(randomWidthVariation) == s.randomWidthVariation()
+                    && ((color == null && s.color() == null) || (color != null && color.equals(s.color())));
         }
 
         static TrailOverrides fromOthersDefaults(ModConfig cfg) {
