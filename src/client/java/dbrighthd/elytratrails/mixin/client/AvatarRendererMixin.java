@@ -2,7 +2,6 @@ package dbrighthd.elytratrails.mixin.client;
 
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.math.Axis;
-import dbrighthd.elytratrails.controller.TwirlController;
 import dbrighthd.elytratrails.controller.TwirlRoll;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.entity.player.AvatarRenderer;

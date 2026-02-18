@@ -4,7 +4,7 @@ import com.mojang.blaze3d.vertex.PoseStack;
 import net.fabricmc.loader.api.FabricLoader;
 import net.minecraft.client.model.Model;
 import net.minecraft.client.model.geom.ModelPart;
-import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.entity.Entity;
 import org.jetbrains.annotations.Nullable;
 import traben.entity_model_features.models.IEMFModel;
 import traben.entity_model_features.models.animation.EMFAnimationEntityContext;
@@ -18,8 +18,9 @@ public final class EmfAnimationHooks {
     private static final boolean EMF_LOADED =
             FabricLoader.getInstance().isModLoaded("entity_model_features");
 
-    public static @Nullable ModelPart applyManualAnimationAndGetRoot(Model model, Player player) {
-        if (!EMF_LOADED || model == null || player == null) return null;
+    @SuppressWarnings("deprecation")
+    public static @Nullable ModelPart applyManualAnimationAndGetRoot(Model<?> model, Entity entity) {
+        if (!EMF_LOADED || model == null || entity == null) return null;
         if (!(model instanceof IEMFModel emfModel)) return null;
 
         try {
@@ -30,7 +31,7 @@ public final class EmfAnimationHooks {
 
             boolean contextSet = false;
 
-            if (player instanceof EMFEntity emfEntity) {
+            if (entity instanceof EMFEntity emfEntity) {
                 EMFEntityRenderStateViaReference state = new EMFEntityRenderStateViaReference(emfEntity);
                 EMFAnimationEntityContext.setCurrentEntityNoIteration(state);
                 contextSet = true;

@@ -4,10 +4,12 @@
 	"plugin": "dbrighthd.elytratrails.compat.CompatMixinPlugin",
 	"compatibilityLevel": "JAVA_21",
 	"client": [
+		"ClientLevelEntityRemovalMixin",
 		"AvatarRendererMixin",
 		"EquipmentElytraModelAccessor",
 		"GameRendererMixin",
-		"ModelFeatureStorageAccessor"
+		"ModelFeatureStorageAccessor",
+		"compat.EmfModelPartRootRegisterMixin"
 	],
 	"injectors": {
 		"defaultRequire": 1

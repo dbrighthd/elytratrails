@@ -44,15 +44,18 @@ public final class VertexBuilder {
             Vec3 startInnerCorner,
             Vec3 endInnerCorner,
             Vec3 endOuterCorner,
+            int red,
+            int green,
+            int blue,
             int alphaAtStart,
             int alphaAtEnd,
             float normalX,
             float normalY,
             float normalZ
     ) {
-        vert(startOuterCorner, 0f, 0f, 255, 255, 255, alphaAtStart, normalX, normalY, normalZ);
-        vert(startInnerCorner, 0f, 1f, 255, 255, 255, alphaAtStart, normalX, normalY, normalZ);
-        vert(endInnerCorner,   1f, 1f, 255, 255, 255, alphaAtEnd,   normalX, normalY, normalZ);
-        vert(endOuterCorner,   1f, 0f, 255, 255, 255, alphaAtEnd,   normalX, normalY, normalZ);
+        vert(startOuterCorner, 0f, 0f, red, green, blue, alphaAtStart, normalX, normalY, normalZ);
+        vert(startInnerCorner, 0f, 1f, red, green, blue, alphaAtStart, normalX, normalY, normalZ);
+        vert(endInnerCorner,   1f, 1f, red, green, blue, alphaAtEnd,   normalX, normalY, normalZ);
+        vert(endOuterCorner,   1f, 0f, red, green, blue, alphaAtEnd,   normalX, normalY, normalZ);
     }
 }

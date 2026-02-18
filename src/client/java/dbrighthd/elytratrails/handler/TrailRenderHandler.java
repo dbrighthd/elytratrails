@@ -12,8 +12,7 @@ import static dbrighthd.elytratrails.trailrendering.TrailRenderType.entityTransl
 import static dbrighthd.elytratrails.trailrendering.TrailRenderer.TRAIL_TEX;
 
 public final class TrailRenderHandler {
-    private static final TrailRenderer trailRendererLeft = new TrailRenderer(TrailStore.LEFT);
-    private static final TrailRenderer trailRendererRight = new TrailRenderer(TrailStore.RIGHT);
+    private static final TrailRenderer trailRenderer = new TrailRenderer(TrailStore.TRAILS);
 
     public static void init()
     {
@@ -29,13 +28,7 @@ public final class TrailRenderHandler {
             worldRenderContext.commandQueue().order(1)
                     .submitCustomGeometry(worldRenderContext.matrices(),
                             elytraTrailRenderType,
-                            trailRendererLeft);
-            worldRenderContext.commandQueue().order(1)
-                    .submitCustomGeometry(worldRenderContext.matrices(),
-                            elytraTrailRenderType,
-                            trailRendererRight);
+                            trailRenderer);
         });
     }
-
-
 }

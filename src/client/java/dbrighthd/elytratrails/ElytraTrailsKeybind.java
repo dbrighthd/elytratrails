@@ -74,7 +74,7 @@ public final class ElytraTrailsKeybind {
 
             boolean canTwirl = client.player.isFallFlying();
 
-            // Normal twirl keys
+            // lil twirl keys
             boolean lDown = canTwirl && DO_A_LIL_TWIRL_L.isDown();
             boolean rDown = canTwirl && DO_A_LIL_TWIRL_R.isDown();
             boolean randDown = canTwirl && DO_A_LIL_TWIRL_RANDOM.isDown();
@@ -82,19 +82,19 @@ public final class ElytraTrailsKeybind {
 
             int desiredMode;
             if (lDown) desiredMode = -1;
-            else if (rDown) desiredMode = +1;
+            else if (rDown) desiredMode = 1;
             else if (randDown) desiredMode = 0;
-            else desiredMode = +1;
+            else desiredMode = 1;
 
-            // Continuous twirl keys
+            // continuous twirl keys
             boolean cLDown = canTwirl && DO_A_LIL_CONTINUOUS_TWIRL_L.isDown();
             boolean cRDown = canTwirl && DO_A_LIL_CONTINUOUS_TWIRL_R.isDown();
             boolean continuousDown = cLDown || cRDown;
 
             int continuousMode;
             if (cLDown) continuousMode = -1;
-            else if (cRDown) continuousMode = +1;
-            else continuousMode = +1;
+            else if (cRDown) continuousMode = 1;
+            else continuousMode = 1;
 
             boolean normalActive = TwirlController.isActive();
             boolean contActive = ContinuousTwirlController.isActive();

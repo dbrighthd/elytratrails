@@ -4,7 +4,10 @@ package dbrighthd.elytratrails.compat.emf;
 import net.minecraft.client.model.geom.ModelPart;
 
 import java.util.ArrayDeque;
+import java.util.ArrayList;
 import java.util.Deque;
+import java.util.Comparator;
+import java.util.List;
 import java.util.Map;
 
 public final class EmfWingTipHooks {
@@ -12,28 +15,51 @@ public final class EmfWingTipHooks {
 
     public enum WhichRoot { LEFT_WING, RIGHT_WING }
 
-    /** Paths are now CHILD-ONLY, e.g. "EMF_left_wing/EMF_bone/EMF_leftWingTip" (no "root/"). */
-    public record TipPaths(WhichRoot leftRoot, String leftPath, String leftKey,
-                           WhichRoot rightRoot, String rightPath, String rightKey) {}
+    public record SpawnerPath(WhichRoot where, String path, String key) {}
 
-    private static final String[] LEFT_ALIASES = {
-            "leftWingTip", "left_wing_tip", "elytratrails:leftWingTip", "elytratrails:left_wing_tip",
-            "EMF_leftWingTip", "EMF_left_wing_tip", "EMF_elytratrails:leftWingTip", "EMF_elytratrails:left_wing_tip"
-    };
-    private static final String[] RIGHT_ALIASES = {
-            "rightWingTip", "right_wing_tip", "elytratrails:rightWingTip", "elytratrails:right_wing_tip",
-            "EMF_rightWingTip", "EMF_right_wing_tip", "EMF_elytratrails:rightWingTip", "EMF_elytratrails:right_wing_tip"
-    };
 
-    public static TipPaths findTipPaths(ModelPart leftWingRoot, ModelPart rightWingRoot) {
-        if (leftWingRoot == null || rightWingRoot == null) return null;
+    public static List<SpawnerPath> findAllSpawnerPaths(ModelPart leftWingRoot, ModelPart rightWingRoot) {
+        ArrayList<SpawnerPath> out = new ArrayList<>();
+        if (leftWingRoot != null) out.addAll(findSpawnerPaths(leftWingRoot, WhichRoot.LEFT_WING));
+        if (rightWingRoot != null) out.addAll(findSpawnerPaths(rightWingRoot, WhichRoot.RIGHT_WING));
 
-        Found left = findFirstByNameInEitherTree(leftWingRoot, rightWingRoot, LEFT_ALIASES);
-        Found right = findFirstByNameInEitherTree(leftWingRoot, rightWingRoot, RIGHT_ALIASES);
+        out.sort(Comparator
+                .comparing((SpawnerPath p) -> p.where().ordinal())
+                .thenComparing(SpawnerPath::path)
+                .thenComparing(SpawnerPath::key));
 
-        if (left == null || right == null) return null;
+        return out;
+    }
 
-        return new TipPaths(left.where, left.path, left.key, right.where, right.path, right.key);
+    private static List<SpawnerPath> findSpawnerPaths(ModelPart root, WhichRoot where) {
+        ArrayList<SpawnerPath> found = new ArrayList<>();
+        Deque<Node> stack = new ArrayDeque<>();
+        stack.push(new Node(root, ""));
+
+        while (!stack.isEmpty()) {
+            Node n = stack.pop();
+            Map<String, ModelPart> kids = n.part.children;
+
+            for (var e : kids.entrySet()) {
+                String key = e.getKey();
+                ModelPart child = e.getValue();
+
+                String childPath = n.path.isEmpty() ? key : (n.path + "/" + key);
+
+                if (matchesKeyword(key)) {
+                    found.add(new SpawnerPath(where, childPath, key));
+                }
+
+                stack.push(new Node(child, childPath));
+            }
+        }
+        return found;
+    }
+
+    private static boolean matchesKeyword(String key) {
+        if (key == null) return false;
+        String lower = key.toLowerCase();
+        return lower.contains("wingtip") || lower.contains("trailspawner");
     }
 
     private record Found(WhichRoot where, String path, String key, ModelPart part) {}

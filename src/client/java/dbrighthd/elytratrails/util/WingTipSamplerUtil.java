@@ -2,12 +2,11 @@ package dbrighthd.elytratrails.util;
 
 import com.mojang.blaze3d.vertex.PoseStack;
 import dbrighthd.elytratrails.compat.emf.EmfAnimationHooks;
+import dbrighthd.elytratrails.compat.emf.EmfGenericTrailSampler;
 import dbrighthd.elytratrails.compat.emf.EmfWingTipHooks;
 import dbrighthd.elytratrails.mixin.client.EquipmentElytraModelAccessor;
 import dbrighthd.elytratrails.mixin.client.ModelFeatureStorageAccessor;
 import dbrighthd.elytratrails.trailrendering.WingTipPos;
-import it.unimi.dsi.fastutil.ints.Int2LongOpenHashMap;
-import it.unimi.dsi.fastutil.ints.Int2ObjectOpenHashMap;
 import net.fabricmc.loader.api.FabricLoader;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.model.Model;
@@ -30,218 +29,321 @@ import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.phys.Vec3;
 import org.joml.Quaternionf;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
+
 import java.util.List;
 import java.util.Map;
 
 import static dbrighthd.elytratrails.ElytraTrailsClient.getConfig;
-import static dbrighthd.elytratrails.util.ModelTransformationUtil.*;
+import static dbrighthd.elytratrails.util.ModelTransformationUtil.computeWingOpenness;
+import static dbrighthd.elytratrails.util.ModelTransformationUtil.computeWingTipLocal;
+import static dbrighthd.elytratrails.util.ModelTransformationUtil.transformPoint;
 
 public final class WingTipSamplerUtil {
     private WingTipSamplerUtil() {}
 
-
-    private static final Int2ObjectOpenHashMap<net.minecraft.client.renderer.entity.state.EntityRenderState> STATE_CACHE =
-            new Int2ObjectOpenHashMap<>();
-
-    private static final SubmitNodeStorage STORAGE = new SubmitNodeStorage();
-
+    private static final SubmitNodeStorage SUBMIT_STORAGE = new SubmitNodeStorage();
     private static final boolean EMF_LOADED = FabricLoader.getInstance().isModLoaded("entity_model_features");
 
     public static void sample(float partialTick) {
-        Minecraft mc = Minecraft.getInstance();
-        if (mc.level == null) return;
+        Minecraft minecraft = Minecraft.getInstance();
+        if (minecraft.level == null) return;
         if (ShaderChecksUtil.isShadowPass()) return;
 
-        EntityRenderDispatcher dispatcher = mc.getEntityRenderDispatcher();
-        Vec3 cameraWorldPos = mc.gameRenderer.getMainCamera().position();
-        long now = Util.getNanos();
+        EntityRenderDispatcher dispatcher = minecraft.getEntityRenderDispatcher();
+        Vec3 cameraWorldPos = minecraft.gameRenderer.getMainCamera().position();
+        long nowNanos = Util.getNanos();
 
-        CameraRenderState camState = new CameraRenderState();
-        camState.pos = cameraWorldPos;
-        camState.entityPos = cameraWorldPos;
-        camState.blockPos = BlockPos.containing(cameraWorldPos);
-        camState.initialized = true;
-        camState.orientation = new Quaternionf(mc.gameRenderer.getMainCamera().rotation());
+        CameraRenderState cameraState = buildCameraState(minecraft, cameraWorldPos);
+        double cameraX = -cameraWorldPos.x;
+        double cameraY = -cameraWorldPos.y;
+        double cameraZ = -cameraWorldPos.z;
 
-        double camX = -cameraWorldPos.x;
-        double camY = -cameraWorldPos.y;
-        double camZ = -cameraWorldPos.z;
+        // -------- Players (elytra) --------
+        for (Player player : minecraft.level.players()) {
+            samplePlayerElytra(
+                    player,
+                    dispatcher,
+                    cameraState,
+                    cameraX,
+                    cameraY,
+                    cameraZ,
+                    partialTick,
+                    cameraWorldPos,
+                    nowNanos
+            );
+        }
 
-        for (Player player : mc.level.players()) {
-            int entityId = player.getId();
-
-            AvatarRenderState state = new AvatarRenderState();
-            @SuppressWarnings("unchecked")
-            var renderer = (EntityRenderer<@NotNull Avatar, @NotNull AvatarRenderState>) dispatcher.getRenderer(state);
-
-            renderer.extractRenderState(player, state, partialTick);
-
-            STORAGE.clear();
-            dispatcher.submit(state, camState, camX, camY, camZ, new PoseStack(), STORAGE);
-
-            SubmitNodeStorage.ModelSubmit<?> elytraSubmit = findElytraModelSubmit(STORAGE);
-            if (elytraSubmit == null) continue;
-
-            Model rawModel = elytraSubmit.model();
-            Object submitState = elytraSubmit.state();
-
-            rawModel.setupAnim(submitState);
-
-            if (!(rawModel instanceof ElytraModel elytraModel)) continue;
-            if (!(submitState instanceof HumanoidRenderState)) continue;
-
-            EquipmentElytraModelAccessor elytraAccessor = (EquipmentElytraModelAccessor) elytraModel;
-            ModelPart leftWingRoot = elytraAccessor.elytratrails$getLeftWing();
-            ModelPart rightWingRoot = elytraAccessor.elytratrails$getRightWing();
-
-            ModelPart elytraRoot = null;
-
-            PoseStack base = new PoseStack();
-            base.last().set(elytraSubmit.pose());
-
-            if (EMF_LOADED && getConfig().emfSupport) {
-                ModelPart emfRoot = EmfAnimationHooks.applyManualAnimationAndGetRoot(rawModel, player);
-                if (emfRoot != null) {
-                    elytraRoot = emfRoot;
-                }
-            }
-
-            EmfWingTipHooks.TipPaths tips = EmfWingTipHooks.findTipPaths(leftWingRoot, rightWingRoot);
-
-
-            Vec3 leftTipCamRelative;
-            Vec3 rightTipCamRelative;
-
-            if (tips != null) {
-                ModelPart leftRootForTip = (tips.leftRoot() == EmfWingTipHooks.WhichRoot.LEFT_WING) ? leftWingRoot : rightWingRoot;
-                ModelPart rightRootForTip = (tips.rightRoot() == EmfWingTipHooks.WhichRoot.LEFT_WING) ? leftWingRoot : rightWingRoot;
-
-                Vec3 l = transformLocalPointThroughElytraRootAndChildPath(base, elytraRoot, leftRootForTip, tips.leftPath(), new Vec3(0, 0, 0));
-                Vec3 r = transformLocalPointThroughElytraRootAndChildPath(base, elytraRoot, rightRootForTip, tips.rightPath(), new Vec3(0, 0, 0));
-
-
-                if (l != null && r != null) {
-                    leftTipCamRelative = l;
-                    rightTipCamRelative = r;
-                } else {
-                    leftTipCamRelative = fallbackWingTip(base, elytraRoot, leftWingRoot, true);
-                    rightTipCamRelative = fallbackWingTip(base, elytraRoot, rightWingRoot, false);
-                }
-            } else {
-                leftTipCamRelative = fallbackWingTip(base, elytraRoot, leftWingRoot, true);
-                rightTipCamRelative = fallbackWingTip(base, elytraRoot, rightWingRoot, false);
-            }
-
-            Vec3 entityWorldPos = new Vec3(state.x, state.y, state.z);
-
-            Vec3 leftTipWorld = cameraWorldPos.add(leftTipCamRelative).add(entityWorldPos);
-            Vec3 rightTipWorld = cameraWorldPos.add(rightTipCamRelative).add(entityWorldPos);
-
-
-            WingTipPos.put(entityId, leftTipWorld, rightTipWorld, now);
+        // -------- Non-player EMF entities --------
+        if (EMF_LOADED && getConfig().emfSupport) {
+            EmfGenericTrailSampler.sampleNonPlayerEntities(
+                    minecraft, dispatcher, cameraState, cameraX, cameraY, cameraZ, partialTick, cameraWorldPos, nowNanos
+            );
         }
     }
 
+    private static CameraRenderState buildCameraState(Minecraft minecraft, Vec3 cameraWorldPos) {
+        CameraRenderState cameraState = new CameraRenderState();
+        cameraState.pos = cameraWorldPos;
+        cameraState.entityPos = cameraWorldPos;
+        cameraState.blockPos = BlockPos.containing(cameraWorldPos);
+        cameraState.initialized = true;
+        cameraState.orientation = new Quaternionf(minecraft.gameRenderer.getMainCamera().rotation());
+        return cameraState;
+    }
 
-    private static Vec3 fallbackWingTip(PoseStack base, ModelPart elytraRoot, ModelPart wingRoot, boolean left) {
-        Vec3 wingTipLocal = computeWingTipLocal(wingRoot, left);
+    private static void samplePlayerElytra(
+            Player player,
+            EntityRenderDispatcher dispatcher,
+            CameraRenderState cameraState,
+            double cameraX,
+            double cameraY,
+            double cameraZ,
+            float partialTick,
+            Vec3 cameraWorldPos,
+            long nowNanos
+    ) {
+        int entityId = player.getId();
+
+        AvatarRenderState renderState = new AvatarRenderState();
+
+        @SuppressWarnings("unchecked")
+        EntityRenderer<@NotNull Avatar, @NotNull AvatarRenderState> renderer =
+                (EntityRenderer<@NotNull Avatar, @NotNull AvatarRenderState>) dispatcher.getRenderer(renderState);
+
+        renderer.extractRenderState(player, renderState, partialTick);
+
+        SUBMIT_STORAGE.clear();
+        dispatcher.submit(renderState, cameraState, cameraX, cameraY, cameraZ, new PoseStack(), SUBMIT_STORAGE);
+
+        SubmitNodeStorage.ModelSubmit<?> elytraSubmit = findElytraModelSubmit();
+        if (elytraSubmit == null) return;
+
+        Model<?> model = elytraSubmit.model();
+        Object submitState = elytraSubmit.state();
+
+        @SuppressWarnings("unchecked")
+        Model<Object> typed = (Model<Object>) model;
+        typed.setupAnim(submitState);
+
+        if (!(model instanceof ElytraModel elytraModel)) return;
+        if (!(submitState instanceof HumanoidRenderState)) return;
+
+        EquipmentElytraModelAccessor elytraAccessor = (EquipmentElytraModelAccessor) elytraModel;
+        ModelPart leftWingRoot = elytraAccessor.elytratrails$getLeftWing();
+        ModelPart rightWingRoot = elytraAccessor.elytratrails$getRightWing();
+
+        PoseStack basePose = new PoseStack();
+        basePose.last().set(elytraSubmit.pose());
+
+        @Nullable ModelPart elytraRoot = resolveAnimatedElytraRootIfAvailable(model, player);
+
+        Vec3 entityWorldOffset = new Vec3(renderState.x, renderState.y, renderState.z);
+
+        List<EmfWingTipHooks.SpawnerPath> spawners = List.of();
+        if (EMF_LOADED && getConfig().emfSupport) {
+            spawners = EmfWingTipHooks.findAllSpawnerPaths(leftWingRoot, rightWingRoot);
+        }
+
+        if (!spawners.isEmpty()) {
+            sampleSpawnerBones(
+                    entityId,
+                    spawners,
+                    basePose,
+                    elytraRoot,
+                    leftWingRoot,
+                    rightWingRoot,
+                    cameraWorldPos,
+                    entityWorldOffset,
+                    nowNanos
+            );
+        } else {
+            sampleVanillaWingTips(
+                    entityId,
+                    basePose,
+                    elytraRoot,
+                    leftWingRoot,
+                    rightWingRoot,
+                    cameraWorldPos,
+                    entityWorldOffset,
+                    nowNanos
+            );
+        }
+    }
+
+    private static @Nullable ModelPart resolveAnimatedElytraRootIfAvailable(Model<?> model, Player player) {
+        if (!EMF_LOADED || !getConfig().emfSupport) return null;
+        try {
+            return EmfAnimationHooks.applyManualAnimationAndGetRoot(model, player);
+        } catch (Throwable ignored) {
+            return null;
+        }
+    }
+
+    private static void sampleSpawnerBones(
+            int entityId,
+            List<EmfWingTipHooks.SpawnerPath> spawners,
+            PoseStack basePose,
+            @Nullable ModelPart elytraRoot,
+            ModelPart leftWingRoot,
+            ModelPart rightWingRoot,
+            Vec3 cameraWorldPos,
+            Vec3 entityWorldOffset,
+            long nowNanos
+    ) {
+        Vec3[] pointsWorld = new Vec3[spawners.size()];
+        String[] boneNames = new String[spawners.size()];
+
+        for (int i = 0; i < spawners.size(); i++) {
+            EmfWingTipHooks.SpawnerPath spawner = spawners.get(i);
+            ModelPart wingRoot = (spawner.where() == EmfWingTipHooks.WhichRoot.LEFT_WING) ? leftWingRoot : rightWingRoot;
+
+            boneNames[i] = lastPathSegment(spawner.path());
+
+            Vec3 cameraRelative = transformLocalPointThroughElytraRootAndChildPath(
+                    basePose, elytraRoot, wingRoot, spawner.path()
+            );
+            if (cameraRelative == null) continue;
+
+            pointsWorld[i] = cameraWorldPos.add(cameraRelative).add(entityWorldOffset);
+        }
+
+        // Player elytra "model name" isn't stable across skins/mods; keep null here.
+        WingTipPos.put(entityId, pointsWorld, nowNanos, null, boneNames);
+    }
+
+    private static void sampleVanillaWingTips(
+            int entityId,
+            PoseStack basePose,
+            @Nullable ModelPart elytraRoot,
+            ModelPart leftWingRoot,
+            ModelPart rightWingRoot,
+            Vec3 cameraWorldPos,
+            Vec3 entityWorldOffset,
+            long nowNanos
+    ) {
+        Vec3 leftTipCameraRelative = fallbackWingTip(basePose, elytraRoot, leftWingRoot, true);
+        Vec3 rightTipCameraRelative = fallbackWingTip(basePose, elytraRoot, rightWingRoot, false);
+
+        Vec3[] pointsWorld = new Vec3[]{
+                cameraWorldPos.add(leftTipCameraRelative).add(entityWorldOffset),
+                cameraWorldPos.add(rightTipCameraRelative).add(entityWorldOffset)
+        };
+
+        WingTipPos.put(entityId, pointsWorld, nowNanos, "elytra", new String[]{"left", "right"});
+    }
+
+    private static Vec3 fallbackWingTip(PoseStack basePose, @Nullable ModelPart elytraRoot, ModelPart wingRoot, boolean left) {
+        Vec3 wingTipLocal = computeWingTipLocal(left);
 
         float wingOpenness = computeWingOpenness(wingRoot);
         float localTipXScale = 1.0f;
+
         if (getConfig().trailMovesWithElytraAngle) {
             localTipXScale = Mth.lerp(wingOpenness, 0.33f, 1.0f);
         }
 
-        wingTipLocal = new Vec3(wingTipLocal.x * localTipXScale, wingTipLocal.y, wingTipLocal.z);
-
-        return transformLocalPointThroughElytraRootAndWing(base, elytraRoot, wingRoot, wingTipLocal);
+        Vec3 scaledLocalTip = new Vec3(wingTipLocal.x * localTipXScale, wingTipLocal.y, wingTipLocal.z);
+        return transformLocalPointThroughElytraRootAndWing(basePose, elytraRoot, wingRoot, scaledLocalTip);
     }
 
-    private static Vec3 transformLocalPointThroughElytraRootAndWing(PoseStack basePoseStack, ModelPart elytraRoot, ModelPart wingRoot, Vec3 localPoint) {
-        basePoseStack.pushPose();
-        try {
-            if (elytraRoot != null && elytraRoot != wingRoot) {
-                elytraRoot.translateAndRotate(basePoseStack);
-            }
-            wingRoot.translateAndRotate(basePoseStack);
-            return transformPoint(basePoseStack.last().pose(), localPoint);
-        } finally {
-            basePoseStack.popPose();
-        }
-    }
-
-
-    private static Vec3 transformLocalPointThroughElytraRootAndChildPath(
-            PoseStack basePoseStack,
-            ModelPart elytraRoot,
+    private static Vec3 transformLocalPointThroughElytraRootAndWing(
+            PoseStack basePose,
+            @Nullable ModelPart elytraRoot,
             ModelPart wingRoot,
-            String childOnlyPath,
             Vec3 localPoint
     ) {
-        if (wingRoot == null || childOnlyPath == null || childOnlyPath.isEmpty()) return null;
-
-        basePoseStack.pushPose();
+        basePose.pushPose();
         try {
             if (elytraRoot != null && elytraRoot != wingRoot) {
-                elytraRoot.translateAndRotate(basePoseStack);
+                elytraRoot.translateAndRotate(basePose);
             }
-
-            wingRoot.translateAndRotate(basePoseStack);
-
-            ModelPart cur = wingRoot;
-            int start = 0;
-            while (start < childOnlyPath.length()) {
-                int slash = childOnlyPath.indexOf('/', start);
-                String key = (slash == -1) ? childOnlyPath.substring(start) : childOnlyPath.substring(start, slash);
-
-                Map<String, ModelPart> kids = cur.children;
-                ModelPart next = kids.get(key);
-
-                if (next == null) {
-                    for (var e : kids.entrySet()) {
-                        if (e.getKey().equalsIgnoreCase(key)) {
-                            next = e.getValue();
-                            break;
-                        }
-                    }
-                }
-                if (next == null) return null;
-
-                next.translateAndRotate(basePoseStack);
-                cur = next;
-
-                if (slash == -1) break;
-                start = slash + 1;
-            }
-
-            return transformPoint(basePoseStack.last().pose(), localPoint);
+            wingRoot.translateAndRotate(basePose);
+            return transformPoint(basePose.last().pose(), localPoint);
         } finally {
-            basePoseStack.popPose();
+            basePose.popPose();
         }
     }
 
-    private static SubmitNodeStorage.ModelSubmit<?> findElytraModelSubmit(SubmitNodeStorage storage) {
-        for (SubmitNodeCollection collection : storage.getSubmitsPerOrder().values()) {
-            ModelFeatureRenderer.Storage modelStorage = collection.getModelSubmits();
-            ModelFeatureStorageAccessor access = (ModelFeatureStorageAccessor) (Object) modelStorage;
+    private static @Nullable Vec3 transformLocalPointThroughElytraRootAndChildPath(
+            PoseStack basePose,
+            @Nullable ModelPart elytraRoot,
+            ModelPart wingRoot,
+            String childOnlyPath
+    ) {
+        if (childOnlyPath == null || childOnlyPath.isEmpty()) return null;
 
-            Map<RenderType, List<SubmitNodeStorage.ModelSubmit<?>>> opaque = access.elytratrails$getOpaqueModelSubmits();
-            for (List<SubmitNodeStorage.ModelSubmit<?>> submits : opaque.values()) {
-                for (SubmitNodeStorage.ModelSubmit<?> s : submits) {
-                    if (s.model() instanceof ElytraModel) return s;
-                }
+        basePose.pushPose();
+        try {
+            if (elytraRoot != null && elytraRoot != wingRoot) {
+                elytraRoot.translateAndRotate(basePose);
             }
 
-            List<SubmitNodeStorage.TranslucentModelSubmit<?>> translucent = access.elytratrails$getTranslucentModelSubmits();
-            for (SubmitNodeStorage.TranslucentModelSubmit<?> t : translucent) {
-                SubmitNodeStorage.ModelSubmit<?> s = t.modelSubmit();
-                if (s.model() instanceof ElytraModel) return s;
+            wingRoot.translateAndRotate(basePose);
+
+            ModelPart current = wingRoot;
+            int segmentStartIndex = 0;
+
+            while (segmentStartIndex < childOnlyPath.length()) {
+                int nextSlashIndex = childOnlyPath.indexOf('/', segmentStartIndex);
+                String segmentName = (nextSlashIndex == -1)
+                        ? childOnlyPath.substring(segmentStartIndex)
+                        : childOnlyPath.substring(segmentStartIndex, nextSlashIndex);
+
+                ModelPart child = findChildIgnoreCase(current, segmentName);
+                if (child == null) return null;
+
+                child.translateAndRotate(basePose);
+                current = child;
+
+                if (nextSlashIndex == -1) break;
+                segmentStartIndex = nextSlashIndex + 1;
+            }
+
+            return transformPoint(basePose.last().pose(), Vec3.ZERO);
+        } finally {
+            basePose.popPose();
+        }
+    }
+
+    private static @Nullable ModelPart findChildIgnoreCase(ModelPart parent, String name) {
+        ModelPart direct = parent.children.get(name);
+        if (direct != null) return direct;
+
+        for (var entry : parent.children.entrySet()) {
+            if (entry.getKey().equalsIgnoreCase(name)) {
+                return entry.getValue();
             }
         }
         return null;
     }
 
-    public static void removeEntity(int entityId) {
-        STATE_CACHE.remove(entityId);
+    private static @Nullable String lastPathSegment(@Nullable String path) {
+        if (path == null) return null;
+        int idx = path.lastIndexOf('/');
+        return (idx == -1) ? path : path.substring(idx + 1);
+    }
+
+    private static SubmitNodeStorage.@Nullable ModelSubmit<?> findElytraModelSubmit() {
+        for (SubmitNodeCollection collection : WingTipSamplerUtil.SUBMIT_STORAGE.getSubmitsPerOrder().values()) {
+            ModelFeatureRenderer.Storage modelStorage = collection.getModelSubmits();
+            ModelFeatureStorageAccessor accessor = (ModelFeatureStorageAccessor) modelStorage;
+
+            Map<RenderType, List<SubmitNodeStorage.ModelSubmit<?>>> opaqueByType =
+                    accessor.elytratrails$getOpaqueModelSubmits();
+            for (List<SubmitNodeStorage.ModelSubmit<?>> submits : opaqueByType.values()) {
+                for (SubmitNodeStorage.ModelSubmit<?> submit : submits) {
+                    if (submit.model() instanceof ElytraModel) return submit;
+                }
+            }
+
+            List<SubmitNodeStorage.TranslucentModelSubmit<?>> translucentSubmits =
+                    accessor.elytratrails$getTranslucentModelSubmits();
+            for (SubmitNodeStorage.TranslucentModelSubmit<?> translucent : translucentSubmits) {
+                SubmitNodeStorage.ModelSubmit<?> submit = translucent.modelSubmit();
+                if (submit.model() instanceof ElytraModel) return submit;
+            }
+        }
+        return null;
     }
 }

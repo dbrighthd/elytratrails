@@ -37,6 +37,14 @@ public class ModConfig implements ConfigData {
     @ConfigEntry.Gui.Tooltip
     public double endRampDistance = 4.0;
 
+    /**
+     * Hex color for the trail.
+     * Accepts: RRGGBB, #RRGGBB, AARRGGBB, or #AARRGGBB.
+     * If alpha is provided, it is multiplied with the trail's fade alpha.
+     */
+    @ConfigEntry.Gui.Tooltip
+    public String color = "#FFFFFF";
+
 
 
     @ConfigEntry.Gui.Tooltip

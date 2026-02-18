@@ -29,12 +29,12 @@ public final class ContinuousTwirlController {
     private static boolean active = false;
 
     private static boolean keyDown = false;
-    private static int pendingMode = +1;
+    private static int pendingMode = 1;
 
-    private static int holdMode = +1;
+    private static int holdMode = 1;
 
-    private static int currentDir = +1;
-    private static int nextAltDir = +1;
+    private static int currentDir = 1;
+    private static int nextAltDir = 1;
 
     public static void tickContinuousTwirlKey(boolean isDown, int desiredMode) {
         boolean wasDown = keyDown;

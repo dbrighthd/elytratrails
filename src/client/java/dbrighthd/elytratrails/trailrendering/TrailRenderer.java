@@ -3,7 +3,9 @@ package dbrighthd.elytratrails.trailrendering;
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.blaze3d.vertex.VertexConsumer;
 import dbrighthd.elytratrails.config.ModConfig;
-import it.unimi.dsi.fastutil.ints.Int2ObjectMap;
+import dbrighthd.elytratrails.config.pack.TrailPackConfigManager;
+import dbrighthd.elytratrails.config.pack.TrailPackConfigManager.ResolvedTrailSettings;
+import it.unimi.dsi.fastutil.longs.Long2ObjectMap;
 import me.shedaniel.autoconfig.AutoConfig;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.LightTexture;
@@ -22,7 +24,7 @@ import static dbrighthd.elytratrails.ElytraTrailsClient.getConfig;
 public class TrailRenderer implements SubmitNodeCollector.CustomGeometryRenderer {
 
     public static final Identifier TRAIL_TEX = Identifier.parse("elytratrails:textures/misc/trail.png");
-    private final Int2ObjectMap<Deque<TrailStore.TrailPoint>> trails;
+    private final Long2ObjectMap<Deque<TrailStore.TrailPoint>> trails;
 
     private static final float SEAM_OVERLAP = 1.02f;
     private static final float THICKNESS_POWER = 0.9f;
@@ -30,7 +32,7 @@ public class TrailRenderer implements SubmitNodeCollector.CustomGeometryRenderer
     private static final float CAMERA_FADE_ZERO = 0.3f;
     private static final float CAMERA_FADE_FULL = 0.5f;
 
-    public TrailRenderer(Int2ObjectMap<Deque<TrailStore.TrailPoint>> trails) {
+    public TrailRenderer(Long2ObjectMap<Deque<TrailStore.TrailPoint>> trails) {
         this.trails = trails;
     }
 
@@ -42,7 +44,7 @@ public class TrailRenderer implements SubmitNodeCollector.CustomGeometryRenderer
         long nowNanos = Util.getNanos();
         TrailStore.cleanup(nowNanos);
 
-        float maxWidthBlocks = (float) AutoConfig.getConfigHolder(ModConfig.class).getConfig().maxWidth;
+        ModConfig cfg = AutoConfig.getConfigHolder(ModConfig.class).getConfig();
         Vec3 cameraWorldPos = minecraft.gameRenderer.getMainCamera().position();
 
         int packedOverlay = OverlayTexture.NO_OVERLAY;
@@ -53,34 +55,52 @@ public class TrailRenderer implements SubmitNodeCollector.CustomGeometryRenderer
         boolean isFirstPerson = minecraft.options.getCameraType().isFirstPerson();
         int localId = (minecraft.player == null) ? Integer.MIN_VALUE : minecraft.player.getId();
 
-        renderTrailStore(vertexBuilder, cameraWorldPos, nowNanos, maxWidthBlocks, isFirstPerson, localId);
+        renderTrailStore(vertexBuilder, cameraWorldPos, nowNanos, cfg, isFirstPerson, localId);
     }
 
     private void renderTrailStore(VertexBuilder vertexBuilder,
                                   Vec3 cameraWorldPos,
                                   long nowNanos,
-                                  float maxWidthBlocks,
+                                  ModConfig baseCfg,
                                   boolean isFirstPerson,
                                   int localPlayerId) {
-        for (Int2ObjectMap.Entry<Deque<TrailStore.TrailPoint>> entityTrailEntry : trails.int2ObjectEntrySet()) {
-            int entityId = entityTrailEntry.getIntKey();
+        for (Long2ObjectMap.Entry<Deque<TrailStore.TrailPoint>> entityTrailEntry : trails.long2ObjectEntrySet()) {
+            int entityId = TrailStore.entityId(entityTrailEntry.getLongKey());
+            int trailIndex = TrailStore.trailIndex(entityTrailEntry.getLongKey());
             Deque<TrailStore.TrailPoint> trailPoints = entityTrailEntry.getValue();
             if (trailPoints.size() < 2) continue;
 
             boolean applyFirstPersonNearFade = isFirstPerson && entityId == localPlayerId;
 
+            TrailContextStore.BoneCtx ctx = TrailContextStore.get(entityId, trailIndex);
+            String modelName = ctx == null ? null : ctx.modelName();
+            String boneName = ctx == null ? null : ctx.boneName();
+
+            ResolvedTrailSettings settings = TrailPackConfigManager.resolve(modelName, boneName, baseCfg);
+            float maxWidthBlocks = (float) settings.maxWidth();
+
+            int argb = parseHexColor(settings.color() == null ? baseCfg.color : settings.color(), 0xFFFFFFFF);
+            int colorR = (argb >>> 16) & 0xFF;
+            int colorG = (argb >>> 8) & 0xFF;
+            int colorB = (argb) & 0xFF;
+            int colorA = (argb >>> 24) & 0xFF;
+
+            long lifetimeNanos = (long) (settings.trailLifetime() * 1_000_000_000L);
+
             java.util.ArrayList<TrailStore.TrailPoint> run = new java.util.ArrayList<>();
 
             for (TrailStore.TrailPoint p : trailPoints) {
                 if (p.breakHere()) {
-                    renderRun(vertexBuilder, run, cameraWorldPos, nowNanos, maxWidthBlocks, applyFirstPersonNearFade);
+                    renderRun(vertexBuilder, run, cameraWorldPos, nowNanos, settings, lifetimeNanos, maxWidthBlocks, applyFirstPersonNearFade, colorR, colorG, colorB, colorA);
                     run.clear();
                     continue;
                 }
+
+                if (lifetimeNanos > 0 && nowNanos - p.timeNanos() > lifetimeNanos) continue;
                 run.add(p);
             }
 
-            renderRun(vertexBuilder, run, cameraWorldPos, nowNanos, maxWidthBlocks, applyFirstPersonNearFade);
+            renderRun(vertexBuilder, run, cameraWorldPos, nowNanos, settings, lifetimeNanos, maxWidthBlocks, applyFirstPersonNearFade, colorR, colorG, colorB, colorA);
         }
     }
 
@@ -88,14 +108,20 @@ public class TrailRenderer implements SubmitNodeCollector.CustomGeometryRenderer
                            java.util.ArrayList<TrailStore.TrailPoint> run,
                            Vec3 cameraWorldPos,
                            long nowNanos,
+                           ResolvedTrailSettings settings,
+                           long lifetimeNanos,
                            float maxWidthBlocks,
-                           boolean applyFirstPersonNearFade) {
+                           boolean applyFirstPersonNearFade,
+                           int colorR,
+                           int colorG,
+                           int colorB,
+                           int colorA) {
         if (run.size() < 2) return;
 
-        if (getConfig().useSplineTrail) {
-            renderRunSplineAuto(vertexBuilder, run, cameraWorldPos, nowNanos, maxWidthBlocks, applyFirstPersonNearFade);
+        if (settings.useSplineTrail()) {
+            renderRunSplineAuto(vertexBuilder, run, cameraWorldPos, nowNanos, settings, lifetimeNanos, maxWidthBlocks, applyFirstPersonNearFade, colorR, colorG, colorB, colorA);
         } else {
-            renderRunLinear(vertexBuilder, run, cameraWorldPos, nowNanos, maxWidthBlocks, applyFirstPersonNearFade);
+            renderRunLinear(vertexBuilder, run, cameraWorldPos, nowNanos, settings, lifetimeNanos, maxWidthBlocks, applyFirstPersonNearFade, colorR, colorG, colorB, colorA);
         }
     }
 
@@ -103,8 +129,14 @@ public class TrailRenderer implements SubmitNodeCollector.CustomGeometryRenderer
                                  java.util.ArrayList<TrailStore.TrailPoint> run,
                                  Vec3 cameraWorldPos,
                                  long nowNanos,
+                                 ResolvedTrailSettings settings,
+                                 long lifetimeNanos,
                                  float maxWidthBlocks,
-                                 boolean applyFirstPersonNearFade) {
+                                 boolean applyFirstPersonNearFade,
+                                 int colorR,
+                                 int colorG,
+                                 int colorB,
+                                 int colorA) {
         int count = run.size();
 
         double[] dist = new double[count];
@@ -136,9 +168,12 @@ public class TrailRenderer implements SubmitNodeCollector.CustomGeometryRenderer
                     nowNanos,
                     stitchedScaledSideAtStart,
                     maxWidthBlocks,
+                    settings,
+                    lifetimeNanos,
                     dFromStartA, dToEndA,
                     dFromStartB, dToEndB,
-                    applyFirstPersonNearFade
+                    applyFirstPersonNearFade,
+                    colorR, colorG, colorB, colorA
             );
         }
     }
@@ -147,8 +182,14 @@ public class TrailRenderer implements SubmitNodeCollector.CustomGeometryRenderer
                                      java.util.ArrayList<TrailStore.TrailPoint> run,
                                      Vec3 cameraWorldPos,
                                      long nowNanos,
+                                     ResolvedTrailSettings settings,
+                                     long lifetimeNanos,
                                      float maxWidthBlocks,
-                                     boolean applyFirstPersonNearFade) {
+                                     boolean applyFirstPersonNearFade,
+                                     int colorR,
+                                     int colorG,
+                                     int colorB,
+                                     int colorA) {
 
         int n = run.size();
 
@@ -209,9 +250,12 @@ public class TrailRenderer implements SubmitNodeCollector.CustomGeometryRenderer
                     nowNanos,
                     stitchedScaledSideAtStart,
                     maxWidthBlocks,
+                    settings,
+                    lifetimeNanos,
                     dFromStartA, dToEndA,
                     dFromStartB, dToEndB,
-                    applyFirstPersonNearFade
+                    applyFirstPersonNearFade,
+                    colorR, colorG, colorB, colorA
             );
         }
     }
@@ -240,15 +284,12 @@ public class TrailRenderer implements SubmitNodeCollector.CustomGeometryRenderer
         return new Vec3(x, y, z);
     }
 
-    // NEW: camera-distance fade factor (0..1)
     private static float cameraDistanceFade(float cameraDistBlocks) {
         float denom = (CAMERA_FADE_FULL - CAMERA_FADE_ZERO);
-        if (denom <= 1e-6f) return cameraDistBlocks >= CAMERA_FADE_FULL ? 1f : 0f;
 
         float t = (cameraDistBlocks - CAMERA_FADE_ZERO) / denom;
         t = Mth.clamp(t, 0f, 1f);
 
-        // smoothstep for nicer transition
         return t * t * (3f - 2f * t);
     }
 
@@ -260,9 +301,15 @@ public class TrailRenderer implements SubmitNodeCollector.CustomGeometryRenderer
             long nowNanos,
             Vec3 stitchedScaledSideAtStart,
             float maxWidthBlocks,
+            ResolvedTrailSettings settings,
+            long lifetimeNanos,
             float distFromStartA, float distToEndA,
             float distFromStartB, float distToEndB,
-            boolean applyFirstPersonNearFade
+            boolean applyFirstPersonNearFade,
+            int colorR,
+            int colorG,
+            int colorB,
+            int colorA
     ) {
         Vec3 startPosCamSpace = startTrailPoint.pos().subtract(cameraWorldPos);
         Vec3 endPosCamSpace   = endTrailPoint.pos().subtract(cameraWorldPos);
@@ -275,13 +322,14 @@ public class TrailRenderer implements SubmitNodeCollector.CustomGeometryRenderer
 
         float randStart = 1f;
         float randEnd = 1f;
-        if (getConfig().enableRandomWidth) {
-            randStart = randFromPoint(startTrailPoint);
-            randEnd = randFromPoint(endTrailPoint);
+        if (settings.enableRandomWidth()) {
+            float v = (float) settings.randomWidthVariation();
+            randStart = 1f + randFromPoint(startTrailPoint) * v;
+            randEnd = 1f + randFromPoint(endTrailPoint) * v;
         }
 
-        float thicknessStart = thicknessAtDistance(distFromStartA, distToEndA);
-        float thicknessEnd   = thicknessAtDistance(distFromStartB, distToEndB);
+        float thicknessStart = thicknessAtDistance(distFromStartA, distToEndA, settings);
+        float thicknessEnd   = thicknessAtDistance(distFromStartB, distToEndB, settings);
 
         float widthAtStart = maxWidthBlocks * randStart * thicknessStart * SEAM_OVERLAP;
         float widthAtEnd   = maxWidthBlocks * randEnd   * thicknessEnd   * SEAM_OVERLAP;
@@ -321,21 +369,27 @@ public class TrailRenderer implements SubmitNodeCollector.CustomGeometryRenderer
         Vec3 endOuterCorner   = endPosCamSpace.add(scaledSideAtEnd);
         Vec3 endInnerCorner   = endPosCamSpace.subtract(scaledSideAtEnd);
 
-        float ageAtStart = (float) ((nowNanos - startTrailPoint.timeNanos()) / (double) TrailStore.getLifetime());
-        float ageAtEnd   = (float) ((nowNanos - endTrailPoint.timeNanos())   / (double) TrailStore.getLifetime());
+        double denom = (lifetimeNanos <= 0) ? 1.0 : (double) lifetimeNanos;
+        float ageAtStart = (float) ((nowNanos - startTrailPoint.timeNanos()) / denom);
+        float ageAtEnd   = (float) ((nowNanos - endTrailPoint.timeNanos())   / denom);
 
         float fadeMulStart = alphaMultiplier(startTrailPoint, nowNanos, applyFirstPersonNearFade, thicknessStart);
         float fadeMulEnd   = alphaMultiplier(endTrailPoint,   nowNanos, applyFirstPersonNearFade, thicknessEnd);
 
-        if(getConfig().cameraDistanceFade)
+        if(settings.cameraDistanceFade())
         {
             fadeMulStart *= cameraDistanceFade((float) startPosCamSpace.length());
             fadeMulEnd   *= cameraDistanceFade((float) endPosCamSpace.length());
         }
 
-
         int alphaAtStart = (int) (clamp255((int) (255 * (1.0f - ageAtStart))) * fadeMulStart);
         int alphaAtEnd   = (int) (clamp255((int) (255 * (1.0f - ageAtEnd)))   * fadeMulEnd);
+
+        // Apply optional alpha from config (AARRGGBB). Multiply with the computed fade alpha.
+        if (colorA != 255) {
+            alphaAtStart = (alphaAtStart * colorA) / 255;
+            alphaAtEnd   = (alphaAtEnd   * colorA) / 255;
+        }
 
         float normalX = 0.0f, normalY = 1.0f, normalZ = 0.0f;
 
@@ -344,6 +398,7 @@ public class TrailRenderer implements SubmitNodeCollector.CustomGeometryRenderer
                 startInnerCorner,
                 endInnerCorner,
                 endOuterCorner,
+                colorR, colorG, colorB,
                 alphaAtStart,
                 alphaAtEnd,
                 normalX, normalY, normalZ
@@ -373,10 +428,9 @@ public class TrailRenderer implements SubmitNodeCollector.CustomGeometryRenderer
         return Mth.clamp(t, 0f, 1f);
     }
 
-    private static float thicknessAtDistance(float distFromStart, float distToEnd) {
-        var cfg = getConfig();
-        float startRamp = (float) cfg.startRampDistance;
-        float endRamp   = (float) cfg.endRampDistance;
+    private static float thicknessAtDistance(float distFromStart, float distToEnd, ResolvedTrailSettings settings) {
+        float endRamp = (float) settings.startRampDistance();
+        float startRamp   = (float) settings.endRampDistance();
 
         if (startRamp < 1e-6f) startRamp = 1e-6f;
         if (endRamp   < 1e-6f) endRamp   = 1e-6f;
@@ -397,13 +451,15 @@ public class TrailRenderer implements SubmitNodeCollector.CustomGeometryRenderer
         return mult;
     }
 
+    /**
+     * Deterministic per-point noise in [0,1). Caller applies variation scale.
+     */
     private static float randFromPoint(TrailStore.TrailPoint trailPoint) {
-        float randpoint = rand01FromPos(
+        return rand01FromPos(
                 (int) (trailPoint.pos().x * 10),
                 (int) (trailPoint.pos().y * 10),
                 (int) (trailPoint.pos().z * 10)
         );
-        return 1f + randpoint * (float) getConfig().randomWidthVariation;
     }
 
     private static float rand01FromPos(int x, int y, int z) {
@@ -416,5 +472,30 @@ public class TrailRenderer implements SubmitNodeCollector.CustomGeometryRenderer
     private static int clamp255(int a) {
         if (a < 0) return 0;
         return Math.min(a, 255);
+    }
+
+    /**
+     * parses hex colors like #RRGGBB or #AARRGGBB.
+     */
+    private static int parseHexColor(String s, int fallbackArgb) {
+        if (s == null) return fallbackArgb;
+        String t = s.trim();
+        if (t.isEmpty()) return fallbackArgb;
+        if (t.startsWith("#")) t = t.substring(1);
+        // allow 0x prefix too for nerds
+        if (t.startsWith("0x") || t.startsWith("0X")) t = t.substring(2);
+
+        try {
+            if (t.length() == 6) {
+                int rgb = Integer.parseUnsignedInt(t, 16);
+                return 0xFF000000 | rgb;
+            }
+            if (t.length() == 8) {
+                return (int) Long.parseLong(t, 16);
+            }
+        } catch (NumberFormatException ignored) {
+            // fall through
+        }
+        return fallbackArgb;
     }
 }
