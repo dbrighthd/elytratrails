@@ -1,5 +1,6 @@
 package dbrighthd.elytratrails.compat.emf;
 
+import dbrighthd.elytratrails.compat.ModStatuses;
 import it.unimi.dsi.fastutil.objects.Object2ObjectOpenHashMap;
 import it.unimi.dsi.fastutil.objects.ObjectOpenHashSet;
 import net.fabricmc.loader.api.FabricLoader;
@@ -15,8 +16,6 @@ import java.util.*;
 
 public final class EmfTrailSpawnerRegistry {
     private EmfTrailSpawnerRegistry() {}
-
-    private static final boolean EMF_LOADED = FabricLoader.getInstance().isModLoaded("entity_model_features");
 
     private static volatile boolean initialized = false;
 
@@ -43,7 +42,7 @@ public final class EmfTrailSpawnerRegistry {
     public record TypeDef(List<Locator> locators) {}
 
     public static void onResourceReload() {
-        if (!EMF_LOADED) return;
+        if (!ModStatuses.EMF_LOADED) return;
 
         TYPES_WITH_SPAWNERS.clear();
         TYPE_DEFS.clear();
@@ -53,7 +52,7 @@ public final class EmfTrailSpawnerRegistry {
     }
 
     public static void onEmfRootRegistered(String typeString, ModelPart root) {
-        if (!EMF_LOADED) return;
+        if (!ModStatuses.EMF_LOADED) return;
         if (typeString == null || root == null) return;
 
         REGISTERED_ROOTS_BY_TYPE.put(typeString, root);
@@ -77,7 +76,7 @@ public final class EmfTrailSpawnerRegistry {
     }
 
     public static void rebuildFromEmfManager() {
-        if (!EMF_LOADED) return;
+        if (!ModStatuses.EMF_LOADED) return;
 
         try {
             Map<String, Set<EMFModelPartRoot>> rootsByType =

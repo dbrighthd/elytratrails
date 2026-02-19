@@ -8,8 +8,8 @@ import org.joml.Matrix4f;
 import org.joml.Vector4f;
 public class ModelTransformationUtil {
 
-    public static Vec3 HARDCODED_LEFT_WING_TIP = new Vec3(-10.0 / 16.0, 21.0 / 16.0, 2.0 / 16.0);
-    public static Vec3 HARDCODED_RIGHT_WING_TIP = new Vec3( 10.0 / 16.0, 21.0 / 16.0, 2.0 / 16.0);
+    public static Vec3 VANILLA_LEFT_WING_TIP = new Vec3(-10.0 / 16.0, 21.0 / 16.0, 2.0 / 16.0);
+    public static Vec3 VANILLA_RIGHT_WING_TIP = new Vec3( 10.0 / 16.0, 21.0 / 16.0, 2.0 / 16.0);
     public static Vec3 transformLocalPointThroughPart(PoseStack basePoseStack, ModelPart part, Vec3 localPoint) {
         basePoseStack.pushPose();
         part.translateAndRotate(basePoseStack);
@@ -24,13 +24,10 @@ public class ModelTransformationUtil {
         return new Vec3(homogeneous.x(), homogeneous.y(), homogeneous.z());
     }
 
-
     public static Vec3 computeWingTipLocal(boolean isLeftWing) {
         return isLeftWing
-                ? HARDCODED_LEFT_WING_TIP
-                : HARDCODED_RIGHT_WING_TIP;
-
-
+                ? VANILLA_LEFT_WING_TIP
+                : VANILLA_RIGHT_WING_TIP;
     }
 
     public static float computeWingOpenness(ModelPart wingPart) {

@@ -1,6 +1,7 @@
 package dbrighthd.elytratrails.util;
 
 import com.mojang.blaze3d.vertex.PoseStack;
+import dbrighthd.elytratrails.compat.ModStatuses;
 import dbrighthd.elytratrails.compat.emf.EmfAnimationHooks;
 import dbrighthd.elytratrails.compat.emf.EmfGenericTrailSampler;
 import dbrighthd.elytratrails.compat.emf.EmfWingTipHooks;
@@ -46,7 +47,6 @@ public final class WingTipSamplerUtil {
     private WingTipSamplerUtil() {}
 
     private static final SubmitNodeStorage SUBMIT_STORAGE = new SubmitNodeStorage();
-    private static final boolean EMF_LOADED = FabricLoader.getInstance().isModLoaded("entity_model_features");
 
     public static void sample(float partialTick) {
         Minecraft minecraft = Minecraft.getInstance();
@@ -78,7 +78,7 @@ public final class WingTipSamplerUtil {
         }
 
         // -------- Non-player EMF entities --------
-        if (EMF_LOADED && getConfig().emfSupport) {
+        if (ModStatuses.EMF_LOADED && getConfig().emfSupport) {
             EmfGenericTrailSampler.sampleNonPlayerEntities(
                     minecraft, dispatcher, cameraState, cameraX, cameraY, cameraZ, partialTick, cameraWorldPos, nowNanos
             );
@@ -144,7 +144,7 @@ public final class WingTipSamplerUtil {
         Vec3 entityWorldOffset = new Vec3(renderState.x, renderState.y, renderState.z);
 
         List<EmfWingTipHooks.SpawnerPath> spawners = List.of();
-        if (EMF_LOADED && getConfig().emfSupport) {
+        if (ModStatuses.EMF_LOADED && getConfig().emfSupport) {
             spawners = EmfWingTipHooks.findAllSpawnerPaths(leftWingRoot, rightWingRoot);
         }
 
@@ -175,7 +175,7 @@ public final class WingTipSamplerUtil {
     }
 
     private static @Nullable ModelPart resolveAnimatedElytraRootIfAvailable(Model<?> model, Player player) {
-        if (!EMF_LOADED || !getConfig().emfSupport) return null;
+        if (!ModStatuses.EMF_LOADED || !getConfig().emfSupport) return null;
         try {
             return EmfAnimationHooks.applyManualAnimationAndGetRoot(model, player);
         } catch (Throwable ignored) {
