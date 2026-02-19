@@ -7,7 +7,6 @@
 		"ClientLevelEntityRemovalMixin",
 		"AvatarRendererMixin",
 		"EquipmentElytraModelAccessor",
-		"GameRendererMixin",
 		"ModelFeatureStorageAccessor",
 		"compat.EmfModelPartRootRegisterMixin"
 	],

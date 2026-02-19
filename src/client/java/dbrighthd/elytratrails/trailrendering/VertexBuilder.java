@@ -58,4 +58,28 @@ public final class VertexBuilder {
         vert(endInnerCorner,   1f, 1f, red, green, blue, alphaAtEnd,   normalX, normalY, normalZ);
         vert(endOuterCorner,   1f, 0f, red, green, blue, alphaAtEnd,   normalX, normalY, normalZ);
     }
+
+    public void quadQuadUV(
+            Vec3 startOuterCorner,
+            Vec3 startInnerCorner,
+            Vec3 endInnerCorner,
+            Vec3 endOuterCorner,
+            float u0,
+            float u1,
+            float vOuter,
+            float vInner,
+            int red,
+            int green,
+            int blue,
+            int alphaAtStart,
+            int alphaAtEnd,
+            float normalX,
+            float normalY,
+            float normalZ
+    ) {
+        vert(startOuterCorner, u0, vOuter, red, green, blue, alphaAtStart, normalX, normalY, normalZ);
+        vert(startInnerCorner, u0, vInner, red, green, blue, alphaAtStart, normalX, normalY, normalZ);
+        vert(endInnerCorner,   u1, vInner, red, green, blue, alphaAtEnd,   normalX, normalY, normalZ);
+        vert(endOuterCorner,   u1, vOuter, red, green, blue, alphaAtEnd,   normalX, normalY, normalZ);
+    }
 }

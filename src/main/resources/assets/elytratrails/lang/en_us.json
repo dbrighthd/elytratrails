@@ -10,6 +10,10 @@
   "text.autoconfig.elytratrails.option.enableAllTrails": "Enable All Trails",
   "text.autoconfig.elytratrails.option.enableAllTrails.@Tooltip": "Master toggle: enables/disables every trail type in the mod",
 
+  "text.autoconfig.elytratrails.option.translucentTrails": "Translucent Trails",
+  "text.autoconfig.elytratrails.option.translucentTrails.@Tooltip": "Lets trails use fading and alpha, but can cause issues with translucency sorting. (Always on when shaders are on)",
+
+
   "text.autoconfig.elytratrails.option.enableTrail": "Enable Elytra Trail",
   "text.autoconfig.elytratrails.option.enableTrail.@Tooltip": "Toggle if elytra trails render",
 
@@ -131,11 +135,11 @@
   "text.autoconfig.elytratrails.option.resourcePackOverride": "Resource Pack Override (Players)",
   "text.autoconfig.elytratrails.option.resourcePackOverride.@Tooltip": "If enabled, resource pack trail configs can override player trails too (falls back to synced/default settings if none exist).",
 
-  "text.autoconfig.elytratrails.option.prideTrail": "Pride Trail",
-  "text.autoconfig.elytratrails.option.prideTrail.@Tooltip": "Pride Lib flag id to render as horizontal stripes on the trail. Leave blank to disable. Example: rainbow, transgender",
+  "text.autoconfig.elytratrails.option.prideTrail": "Pride/Trail Texture",
+  "text.autoconfig.elytratrails.option.prideTrail.@Tooltip": "Pride flag/Trail texture. Leave blank to disable. Example: rainbow, transgender.  Add new ones into assets/elytratrails/textures/trails",
 
-  "text.autoconfig.elytratrails.option.prideTrailOthersDefault": "Other's Pride Trail",
-  "text.autoconfig.elytratrails.option.prideTrailOthersDefault.@Tooltip": "Default Pride Lib flag id for other players/entities when no per-player config is available. Leave blank to disable.",
+  "text.autoconfig.elytratrails.option.prideTrailOthersDefault": "Other's Pride/Trail Texture",
+  "text.autoconfig.elytratrails.option.prideTrailOthersDefault.@Tooltip": "Default Pride flag/Trail texture. Leave blank to disable. Example: rainbow, transgender.  Add new ones into assets/elytratrails/textures/trails",
 
 
   "text.autoconfig.elytratrails.category.general": "General Settings",

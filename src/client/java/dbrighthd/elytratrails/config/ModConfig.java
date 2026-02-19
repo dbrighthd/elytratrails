@@ -16,7 +16,20 @@ public class ModConfig implements ConfigData {
 
     @ConfigEntry.Category("general")
     @ConfigEntry.Gui.Tooltip
+    public boolean translucentTrails = false;
+
+    @ConfigEntry.Category("general")
+    @ConfigEntry.Gui.Tooltip
     public boolean resourcePackOverride = true;
+
+
+    @ConfigEntry.Category("general")
+    @ConfigEntry.Gui.Tooltip
+    public boolean emfSupport = true;
+
+    @ConfigEntry.Category("general")
+    @ConfigEntry.Gui.Tooltip
+    public boolean glowingTrails = true;
 
     //your trail stuff
     @ConfigEntry.Category("elytra")
@@ -26,7 +39,7 @@ public class ModConfig implements ConfigData {
 
     @ConfigEntry.Category("elytra")
     @ConfigEntry.Gui.Tooltip
-    public boolean enableRandomWidth = true;
+    public boolean enableRandomWidth = false;
 
     @ConfigEntry.Category("elytra")
     @ConfigEntry.Gui.Tooltip
@@ -46,10 +59,6 @@ public class ModConfig implements ConfigData {
 
     @ConfigEntry.Category("elytra")
     @ConfigEntry.Gui.Tooltip
-    public boolean emfSupport = true;
-
-    @ConfigEntry.Category("elytra")
-    @ConfigEntry.Gui.Tooltip
     public boolean cameraDistanceFade = true;
 
     @ConfigEntry.Category("elytra")
@@ -62,7 +71,7 @@ public class ModConfig implements ConfigData {
 
     @ConfigEntry.Category("elytra")
     @ConfigEntry.Gui.Tooltip
-    public double trailLifetime = 5.0;
+    public double trailLifetime = 2.5;
 
     @ConfigEntry.Category("elytra")
     @ConfigEntry.Gui.Tooltip
@@ -78,7 +87,7 @@ public class ModConfig implements ConfigData {
 
     @ConfigEntry.Category("elytra")
     @ConfigEntry.Gui.Tooltip
-    public double endRampDistance = 4.0;
+    public double endRampDistance = 10.0;
 
     @ConfigEntry.Category("elytra")
     @ConfigEntry.Gui.Tooltip
@@ -127,7 +136,7 @@ public class ModConfig implements ConfigData {
     @ConfigEntry.Category("others")
     @ConfigEntry.Gui.PrefixText
     @ConfigEntry.Gui.Tooltip
-    public boolean useSameDefaultsforOthers = true;
+    public boolean useSameDefaultsforOthers = false;
 
     @ConfigEntry.Category("others")
     @ConfigEntry.Gui.Tooltip
@@ -135,7 +144,7 @@ public class ModConfig implements ConfigData {
 
     @ConfigEntry.Category("others")
     @ConfigEntry.Gui.Tooltip
-    public boolean enableRandomWidthOthersDefault = true;
+    public boolean enableRandomWidthOthersDefault = false;
 
     @ConfigEntry.Category("others")
     @ConfigEntry.Gui.Tooltip
@@ -159,7 +168,7 @@ public class ModConfig implements ConfigData {
 
     @ConfigEntry.Category("others")
     @ConfigEntry.Gui.Tooltip
-    public double trailLifetimeOthersDefault = 5.0;
+    public double trailLifetimeOthersDefault = 2.5;
 
     @ConfigEntry.Category("others")
     @ConfigEntry.Gui.Tooltip
@@ -171,7 +180,7 @@ public class ModConfig implements ConfigData {
 
     @ConfigEntry.Category("others")
     @ConfigEntry.Gui.Tooltip
-    public double endRampDistanceOthersDefault = 4.0;
+    public double endRampDistanceOthersDefault = 10.0;
 
     @ConfigEntry.Category("others")
     @ConfigEntry.Gui.Tooltip
@@ -204,5 +213,14 @@ public class ModConfig implements ConfigData {
     }
 
     @ConfigEntry.Category("particles") @ConfigEntry.Gui.Tooltip
-    public int particleSpawnsPerTick = 1;
+    public int particleSpawnsPerTick = 3;
+
+    @ConfigEntry.Category("particles") @ConfigEntry.Gui.Tooltip
+    public double particlesBlockRadius = 10;
+
+    @ConfigEntry.Category("particles") @ConfigEntry.Gui.Tooltip
+    public double particlesVelocityAhead = 3;
+
+    @ConfigEntry.Category("particles") @ConfigEntry.Gui.Tooltip
+    public double particlesVelocityBackwards = 0;
 }

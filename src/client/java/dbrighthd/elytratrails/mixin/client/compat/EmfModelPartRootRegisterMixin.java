@@ -15,6 +15,7 @@ public abstract class EmfModelPartRootRegisterMixin {
     @SuppressWarnings("deprecation")
     @Inject(method = "registerModelRunnableWithEntityTypeContext", at = @At("TAIL"))
     private void elytratrails$onEmfRootRegistered(CallbackInfo ci) {
+
         var state = EMFAnimationEntityContext.getEmfState();
         if (state == null) return;
 

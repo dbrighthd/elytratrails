@@ -29,7 +29,6 @@ public class ElytraTrailsModMenu implements ModMenuApi {
 
                     var mc = Minecraft.getInstance();
                     if (mc.getConnection() != null && mc.player != null && mc.level != null) {
-                        //if showTrailToOtherPlayers is turned on, we need to share that to other clients or else they will see the default.
                         if(getConfig().shareTrail || !getConfig().showTrailToOtherPlayers)
                         {
                             ClientPlayNetworking.send(new PlayerConfigC2SPayload(getLocalPlayerConfigToSend()));

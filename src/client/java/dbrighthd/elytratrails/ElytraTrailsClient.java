@@ -34,20 +34,25 @@ public class ElytraTrailsClient implements ClientModInitializer {
 		WingTipSamplerHandler.init();
 		ParticleHandler.init();
 		RegisterPacketsClient.initClient();
-		ResourceManagerHelper.get(PackType.CLIENT_RESOURCES).registerReloadListener(
-				new SimpleSynchronousResourceReloadListener() {
-					@Override
-					public @NotNull Identifier getFabricId() {
-                        return Objects.requireNonNull(Identifier.tryParse("elytratrails:trail_pack_configs"));
-					}
 
-					@Override
-					public void onResourceManagerReload(@NotNull ResourceManager manager) {
-						onResourceReload();
-						TrailPackConfigManager.reload(manager);
-					}
-				}
-		);
+		ResourceManagerHelper.get(PackType.CLIENT_RESOURCES).registerReloadListener(
+						new SimpleSynchronousResourceReloadListener() {
+							@Override
+							public @NotNull Identifier getFabricId() {
+								return Objects.requireNonNull(Identifier.tryParse("elytratrails:trail_pack_configs"));
+							}
+
+							@Override
+							public void onResourceManagerReload(@NotNull ResourceManager manager) {
+								dbrighthd.elytratrails.trailrendering.TrailTextureRegistry
+										.reloadNow(manager);
+
+								onResourceReload();
+								TrailPackConfigManager.reload(manager);
+							}
+						}
+				);
+
 	}
 
 	public static ModConfig getConfig()

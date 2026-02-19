@@ -2,6 +2,8 @@ package dbrighthd.elytratrails.trailrendering;
 
 import dbrighthd.elytratrails.config.ModConfig;
 import dbrighthd.elytratrails.config.pack.TrailPackConfigManager;
+import it.unimi.dsi.fastutil.longs.Long2BooleanMap;
+import it.unimi.dsi.fastutil.longs.Long2BooleanOpenHashMap;
 import it.unimi.dsi.fastutil.longs.Long2ObjectMap;
 import it.unimi.dsi.fastutil.longs.Long2ObjectOpenHashMap;
 import me.shedaniel.autoconfig.AutoConfig;
@@ -27,6 +29,9 @@ public final class TrailStore {
      */
     public static final Long2ObjectMap<Deque<TrailPoint>> TRAILS = new Long2ObjectOpenHashMap<>();
 
+    /** Per-(entityId, trailIndex) cached left/right side for UV flipping. */
+    public static final Long2BooleanMap IS_LEFT_WING_BY_KEY = new Long2BooleanOpenHashMap();
+
     public static long key(int entityId, int trailIndex) {
         return (((long) entityId) << 32) | (trailIndex & 0xffffffffL);
     }
@@ -39,10 +44,21 @@ public final class TrailStore {
         return (int) key;
     }
 
-//    public static void add(int id, Vec3 left, Vec3 right, long now) {
-//        add(id, 0, left, now);
-//        add(id, 1, right, now);
-//    }
+    public static void setLeftWing(int entityId, int trailIndex, boolean isLeftWing) {
+        IS_LEFT_WING_BY_KEY.put(key(entityId, trailIndex), isLeftWing);
+    }
+
+    public static void setLeftWing(long packedKey, boolean isLeftWing) {
+        IS_LEFT_WING_BY_KEY.put(packedKey, isLeftWing);
+    }
+
+    public static boolean isLeftWing(long packedKey) {
+        return IS_LEFT_WING_BY_KEY.getOrDefault(packedKey, false);
+    }
+
+    public static void removeMeta(long packedKey) {
+        IS_LEFT_WING_BY_KEY.remove(packedKey);
+    }
 
     /**
      * New: add a single indexed trail point.
@@ -50,11 +66,6 @@ public final class TrailStore {
     public static void add(int entityId, int trailIndex, Vec3 worldPos, long now) {
         addOne(key(entityId, trailIndex), worldPos, now);
     }
-
-
-//    public static void breakTrail(int entityId, long now) {
-//        breakEntity(entityId, now);
-//    }
 
     /**
      * Break a specific trail index (optional).
@@ -146,27 +157,14 @@ public final class TrailStore {
             pruneOld(trailPoints, nowNanos);
 
             if (trailPoints.isEmpty()) {
-                // When the points are fully gone, also drop any cached model/bone context
+                // When the points are fully gone, also drop any cached model/bone context + wing-side meta
                 // so ids can be safely reused and we don't leak memory.
                 TrailContextStore.removeKey(packedKey);
+                removeMeta(packedKey);
                 entryIterator.remove();
             }
         }
     }
-
-//    /**
-//     * Back-compat name: clear ALL trails for entity (all indices).
-//     */
-//    public static void clear(int entityId) {
-//        var it = TRAILS.long2ObjectEntrySet().iterator();
-//        while (it.hasNext()) {
-//            var e = it.next();
-//            if (entityId(e.getLongKey()) == entityId) {
-//                TrailContextStore.removeKey(e.getLongKey());
-//                it.remove();
-//            }
-//        }
-//    }
 
     private TrailStore() {}
 }

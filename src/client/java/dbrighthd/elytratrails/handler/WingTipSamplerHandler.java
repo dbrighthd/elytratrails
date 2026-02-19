@@ -21,6 +21,7 @@ import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.phys.Vec3;
 
 import static dbrighthd.elytratrails.ElytraTrailsClient.getConfig;
+
 public class WingTipSamplerHandler {
     private static final Int2LongOpenHashMap lastSampleTimeByEntity = new Int2LongOpenHashMap();
     private static long lastGlobalSampleNanos = Long.MIN_VALUE;
@@ -40,6 +41,47 @@ public class WingTipSamplerHandler {
     // NEW: per-entity warmup to ignore "bad first frame" samples on async loads (often spikes to 0,0,0)
     private static final Int2LongOpenHashMap warmupUntilByEntity = new Int2LongOpenHashMap();
     private static final long ENTITY_WARMUP_NANOS = 20_000_000L; // 0.02s (tune 0.2–1.0s)
+
+    // ---- NEW: left/right inference cached into TrailStore ----
+    private static boolean containsWord(String haystackLower, String needleLower) {
+        int n = haystackLower.length();
+        int m = needleLower.length();
+        if (m == 0 || n < m) return false;
+
+        int from = 0;
+        while (true) {
+            int idx = haystackLower.indexOf(needleLower, from);
+            if (idx < 0) return false;
+
+            int before = idx - 1;
+            int after = idx + m;
+
+            boolean beforeOk = before < 0 || !Character.isLetterOrDigit(haystackLower.charAt(before));
+            boolean afterOk = after >= n || !Character.isLetterOrDigit(haystackLower.charAt(after));
+
+            if (beforeOk && afterOk) return true;
+            from = idx + 1;
+        }
+    }
+
+    private static boolean inferLeftWing(String modelName, String spawnerOrBoneName, int trailIndex) {
+        if (spawnerOrBoneName != null) {
+            String b = spawnerOrBoneName.toLowerCase(java.util.Locale.ROOT);
+
+            // Your rule: if it has "right", leftWing MUST be false (even if it also has "left")
+            if (containsWord(b, "right")) return false;
+            if (containsWord(b, "left")) return true;
+        }
+
+        // Vanilla-ish fallback if model is elytra: index 0 = left, 1 = right
+        if (modelName != null && modelName.equalsIgnoreCase("elytra")) {
+            return (trailIndex & 1) == 0;
+        }
+
+        // Generic fallback
+        return (trailIndex & 1) == 0;
+    }
+    // -----------------------------------------
 
     /**
      * Called when the client removes an entity (despawn/chunk unload/etc.).
@@ -108,12 +150,42 @@ public class WingTipSamplerHandler {
                     TrailContextStore.update(entityId, modelName, boneNames);
                 }
 
+                // NEW: cache left/right once per sample (NOT per render)
+                int n = (pointsWorld != null) ? pointsWorld.length : 0;
+                for (int i = 0; i < n; i++) {
+                    String bn = (boneNames != null && i < boneNames.length) ? boneNames[i] : null;
+                    boolean isLeft = inferLeftWing(modelName, bn, i);
+                    TrailStore.setLeftWing(entityId, i, isLeft);
+                }
+
                 if (skipLocalFirstPerson && entityId == localId) {
                     return;
                 }
 
                 Entity entity = mc.level.getEntity(entityId);
                 if (entity == null) return;
+
+                // HARD GATE:
+                // Only allow:
+                //  - Players (elytra), OR
+                //  - Non-player entities when the sampler provides EMF model data (known EMF model + bones).
+                //
+                // This uses sampler-provided data (no reflection) and leverages the fact that EMF compat
+                // is compileOnly + mixin-plugin driven: if EMF isn't present, those entries won't exist.
+                final boolean hasEmfModelData = (modelName != null && boneNames != null && boneNames.length > 0);
+                final boolean isPlayer = entity instanceof Player;
+
+                if (!isPlayer && !hasEmfModelData) {
+                    // Ensure any prior state for this entity id doesn't keep emitting.
+                    TrailStore.breakEntity(entityId, now);
+
+                    wasFallFlyingVanilla.put(entityId, false);
+                    fallFlyingStartTimeByEntity.remove(entityId);
+                    lastSampleTimeByEntity.remove(entityId);
+                    warmupUntilByEntity.remove(entityId);
+                    clearTrailShowState(entityId);
+                    return;
+                }
 
                 // Per-entity warmup to avoid "origin spike" samples for 1–2 frames.
                 long warmupUntil = warmupUntilByEntity.getOrDefault(entityId, Long.MIN_VALUE);
@@ -143,7 +215,8 @@ public class WingTipSamplerHandler {
 
                     entityEligible = flyingNow;
                 } else {
-                    entityEligible = true;
+                    // Non-players are only eligible if we have EMF sampler data.
+                    entityEligible = hasEmfModelData;
                 }
 
                 if (!entityEligible) {
@@ -256,8 +329,7 @@ public class WingTipSamplerHandler {
 
             PlayerConfig playerConfig = ClientPlayerConfigStore.getOrDefault(living.getId());
 
-            if (!playerConfig.enableTrail())
-            {
+            if (!playerConfig.enableTrail()) {
                 return false;
             }
             if (playerConfig.speedDependentTrail()) {
@@ -280,8 +352,8 @@ public class WingTipSamplerHandler {
 
             return true;
         }
-        if (!cfg.enableTrail())
-        {
+
+        if (!cfg.enableTrail()) {
             return false;
         }
         if (cfg.speedDependentTrail()) {
