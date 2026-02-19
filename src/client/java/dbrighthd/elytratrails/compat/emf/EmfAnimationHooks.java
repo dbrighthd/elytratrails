@@ -1,6 +1,7 @@
 package dbrighthd.elytratrails.compat.emf;
 
 import com.mojang.blaze3d.vertex.PoseStack;
+import dbrighthd.elytratrails.compat.ModStatuses;
 import net.fabricmc.loader.api.FabricLoader;
 import net.minecraft.client.model.Model;
 import net.minecraft.client.model.geom.ModelPart;
@@ -15,12 +16,9 @@ import traben.entity_model_features.utils.EMFEntity;
 public final class EmfAnimationHooks {
     private EmfAnimationHooks() {}
 
-    private static final boolean EMF_LOADED =
-            FabricLoader.getInstance().isModLoaded("entity_model_features");
-
     @SuppressWarnings("deprecation")
     public static @Nullable ModelPart applyManualAnimationAndGetRoot(Model<?> model, Entity entity) {
-        if (!EMF_LOADED || model == null || entity == null) return null;
+        if (!ModStatuses.EMF_LOADED || model == null || entity == null) return null;
         if (!(model instanceof IEMFModel emfModel)) return null;
 
         try {

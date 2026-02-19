@@ -1,7 +1,9 @@
 package dbrighthd.elytratrails.compat;
 
+import dbrighthd.elytratrails.rendering.TrailPipelines;
 import net.fabricmc.loader.api.FabricLoader;
 import net.irisshaders.iris.api.v0.IrisApi;
+import net.irisshaders.iris.api.v0.IrisProgram;
 
 public class IrisCompat {
     static{
@@ -10,6 +12,11 @@ public class IrisCompat {
             throw new RuntimeException("iris isn't loaded.");
         }
     }
+
+    public static void registerPipelines() {
+        IrisApi.getInstance().assignPipeline(TrailPipelines.PIPELINE_ENTITY_TRANSLUCENT_CULL, IrisProgram.ENTITIES_TRANSLUCENT);
+    }
+
     public static boolean isShadowPassing()
     {
         return IrisApi.getInstance().isRenderingShadowPass();
