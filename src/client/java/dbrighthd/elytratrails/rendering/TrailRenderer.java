@@ -69,11 +69,11 @@ public class TrailRenderer {
                 this.endOfTrail = 0f;
                 this.modConfig = getConfig();
                 this.isFirstperson = Minecraft.getInstance().options.getCameraType().isFirstPerson();
-                for (int i = 1; i < points.size() - 2; i++) {
-                    Trail.Point p0 = points.get(i - 1);
+                for (int i = 0; i < points.size() - 1; i++) {
+                    Trail.Point p0 = points.get(Math.max(i - 1, 0));
                     Trail.Point p1 = points.get(i);
                     Trail.Point p2 = points.get(i + 1);
-                    Trail.Point p3 = points.get(i + 2);
+                    Trail.Point p3 = points.get(Math.min(i + 2, points.size() - 1));
 
                     renderSubdividedSegment(pose, consumer, p0, p1, p2, p3, 0f, 1f, camera, trail, length, trail.config().color());
                 }
