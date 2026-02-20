@@ -58,7 +58,7 @@ public class TrailRenderer {
                     Trail.Point p2 = points.get(i + 1);
                     Trail.Point p3 = points.get(i + 2);
 
-                    renderSubdividedSegment(pose, consumer, p0, p1, p2, p3, 0f, 1f, camera, trail, length);
+                    renderSubdividedSegment(pose, consumer, p0, p1, p2, p3, 0f, 1f, camera, trail, length, trail.config().color());
                 }
             });
         }
@@ -70,7 +70,7 @@ public class TrailRenderer {
             PoseStack.Pose pose, VertexConsumer consumer,
             Trail.Point point0, Trail.Point point1, Trail.Point point2, Trail.Point point3,
             float tStart, float tEnd,
-            Camera camera, Trail trail, float totalTrailLength
+            Camera camera, Trail trail, float totalTrailLength,  int color
     ) {
         Vec3 p0 = point0.pos();
         Vec3 p1 = point1.pos();
@@ -96,8 +96,8 @@ public class TrailRenderer {
         }
 
         if (needsSplit) {
-            renderSubdividedSegment(pose, consumer, point0, point1, point2, point3, tStart, midT, camera, trail, totalTrailLength);
-            renderSubdividedSegment(pose, consumer, point0, point1, point2, point3, midT, tEnd, camera, trail, totalTrailLength);
+            renderSubdividedSegment(pose, consumer, point0, point1, point2, point3, tStart, midT, camera, trail, totalTrailLength, color);
+            renderSubdividedSegment(pose, consumer, point0, point1, point2, point3, midT, tEnd, camera, trail, totalTrailLength, color);
         } else {
             Vec3 startTan = SplineInterpolation.catmullRomTangent(p0, p1, p2, p3, tStart).normalize();
             Vec3 endTan = SplineInterpolation.catmullRomTangent(p0, p1, p2, p3, tEnd).normalize();
@@ -125,7 +125,7 @@ public class TrailRenderer {
             float halfWidthStart = (float) (trail.config().maxWidth() / 2f) * scaleStart;
             float halfWidthEnd = (float) (trail.config().maxWidth() / 2f) * scaleEnd;
 
-            quadBetweenPoints(pose, consumer, startPos, endPos, sideA, sideB, halfWidthStart, halfWidthEnd, v1, v2, alphaStart, alphaEnd, trail.flipUv());
+            quadBetweenPoints(pose, consumer, startPos, endPos, sideA, sideB, halfWidthStart, halfWidthEnd, v1, v2, alphaStart, alphaEnd, trail.flipUv(), color);
             this.accumDist += segmentLength;
         }
     }
@@ -195,7 +195,7 @@ public class TrailRenderer {
     private void quadBetweenPoints(
             PoseStack.Pose pose, VertexConsumer consumer,
             Vec3 a, Vec3 b, Vec3 sideA, Vec3 sideB,
-            float halfWidthStart, float halfWidthEnd, float v1, float v2, float alphaStart, float alphaEnd, boolean flipUv
+            float halfWidthStart, float halfWidthEnd, float v1, float v2, float alphaStart, float alphaEnd, boolean flipUv, int color
     ) {
         Vector3f p1 = a.add(sideA.scale(halfWidthStart)).toVector3f();
         Vector3f p2 = b.add(sideB.scale(halfWidthEnd)).toVector3f();
@@ -205,8 +205,8 @@ public class TrailRenderer {
         int overlay = OverlayTexture.NO_OVERLAY;
         int lightStart = computeLightTexture(a);
         int lightEnd = computeLightTexture(b);
-        int colorStart = ARGB.multiplyAlpha(0xFFFFFFFF, alphaStart);
-        int colorEnd = ARGB.multiplyAlpha(0xFFFFFFFF, alphaEnd);
+        int colorStart = ARGB.multiplyAlpha(color, alphaStart);
+        int colorEnd = ARGB.multiplyAlpha(color, alphaEnd);
 
         float normalX = 0, normalY = -1, normalZ = 0;
 

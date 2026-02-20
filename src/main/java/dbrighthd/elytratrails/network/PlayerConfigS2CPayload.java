@@ -29,7 +29,7 @@ public record PlayerConfigS2CPayload(int entityId, PlayerConfig playerConfig) im
                     Codec.DOUBLE.fieldOf("trailLifetime").forGetter(PlayerConfig::trailLifetime),
                     Codec.DOUBLE.fieldOf("startRampDistance").forGetter(PlayerConfig::startRampDistance),
                     Codec.DOUBLE.fieldOf("endRampDistance").forGetter(PlayerConfig::endRampDistance),
-                    Codec.STRING.fieldOf("color").forGetter(PlayerConfig::color),
+                    Codec.INT.fieldOf("color").forGetter(PlayerConfig::color),
                     Codec.DOUBLE.fieldOf("randomWidthVariation").forGetter(PlayerConfig::randomWidthVariation),
                     Codec.STRING.fieldOf("prideTrail").forGetter(PlayerConfig::prideTrail)
             ).apply(instance, PlayerConfig::new));

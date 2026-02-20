@@ -24,7 +24,7 @@ public record PlayerConfigC2SPayload(PlayerConfig playerConfig) implements Custo
                     Codec.DOUBLE.fieldOf("trailLifetime").forGetter(PlayerConfig::trailLifetime),
                     Codec.DOUBLE.fieldOf("startRampDistance").forGetter(PlayerConfig::startRampDistance),
                     Codec.DOUBLE.fieldOf("endRampDistance").forGetter(PlayerConfig::endRampDistance), // <-- add this
-                    Codec.STRING.fieldOf("color").forGetter(PlayerConfig::color),
+                    Codec.INT.fieldOf("color").forGetter(PlayerConfig::color),
                     Codec.DOUBLE.fieldOf("randomWidthVariation").forGetter(PlayerConfig::randomWidthVariation),
                     Codec.STRING.fieldOf("prideTrail").forGetter(PlayerConfig::prideTrail)
             ).apply(instance, PlayerConfig::new));

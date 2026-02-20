@@ -1,11 +1,13 @@
 package dbrighthd.elytratrails.network;
 
+import dbrighthd.elytratrails.config.pack.TrailPackConfigManager;
 import net.minecraft.client.Minecraft;
 import net.minecraft.world.entity.player.Player;
 
 import java.util.concurrent.ConcurrentHashMap;
 
 import static dbrighthd.elytratrails.ElytraTrailsClient.getConfig;
+import static dbrighthd.elytratrails.ElytraTrailsClient.setConfig;
 import static java.lang.Math.clamp;
 
 
@@ -13,9 +15,18 @@ public final class ClientPlayerConfigStore
 {
     public static final ConcurrentHashMap<Integer, PlayerConfig> CLIENT_PLAYER_CONFIGS = new ConcurrentHashMap<>();
 
-    public static PlayerConfig getLocalPlayerConfig() {
+    public static PlayerConfig CLIENT_CONFIG;
+
+    public static PlayerConfig CLIENT_OTHERS_CONFIG;
+
+    public static void refreshLocalConfigs()
+    {
+        setLocalPlayerConfig();
+        setClientOthersConfig();
+    }
+    public static void setLocalPlayerConfig() {
         var config = getConfig();
-        return new PlayerConfig(
+        CLIENT_CONFIG = new PlayerConfig(
                 config.enableTrail,
                 config.enableRandomWidth,
                 config.speedDependentTrail,
@@ -25,10 +36,37 @@ public final class ClientPlayerConfigStore
                 config.trailLifetime,
                 config.startRampDistance,
                 config.endRampDistance,
-                config.color,
+                TrailPackConfigManager.parseHexColor(config.color),
                 config.randomWidthVariation,
                 config.prideTrail
         );
+    }
+
+    public static void setClientOthersConfig ()
+    {
+        var config = getConfig();
+        CLIENT_OTHERS_CONFIG = new PlayerConfig(
+                config.enableTrailOthersDefault,
+                config.enableRandomWidthOthersDefault,
+                config.speedDependentTrailOthersDefault,
+                config.trailMinSpeedOthersDefault,
+                config.trailMovesWithElytraAngleOthersDefault,
+                config.maxWidthOthersDefault,
+                config.trailLifetimeOthersDefault,
+                config.startRampDistanceOthersDefault,
+                config.endRampDistanceOthersDefault,
+                TrailPackConfigManager.parseHexColor(config.colorOthersDefault),
+                config.randomWidthVariationOthersDefault,
+                config.prideTrailOthersDefault
+        );
+    }
+    public static PlayerConfig getLocalPlayerConfig() {
+        if(CLIENT_CONFIG != null)
+        {
+            return CLIENT_CONFIG;
+        }
+        setLocalPlayerConfig();
+        return CLIENT_CONFIG;
     }
 
     public static PlayerConfig getLocalPlayerConfigToSend()
@@ -50,7 +88,7 @@ public final class ClientPlayerConfigStore
                     0,
                     config.startRampDistance,
                     config.endRampDistance,
-                    config.color,
+                    0xFFFFFFFF,
                     config.randomWidthVariation,
                     ""
             );
@@ -64,20 +102,12 @@ public final class ClientPlayerConfigStore
             return getLocalPlayerConfig();
         }
 
-        return new PlayerConfig(
-                config.enableTrailOthersDefault,
-                config.enableRandomWidthOthersDefault,
-                config.speedDependentTrailOthersDefault,
-                config.trailMinSpeedOthersDefault,
-                config.trailMovesWithElytraAngleOthersDefault,
-                config.maxWidthOthersDefault,
-                config.trailLifetimeOthersDefault,
-                config.startRampDistanceOthersDefault,
-                config.endRampDistanceOthersDefault,
-                config.colorOthersDefault,
-                config.randomWidthVariationOthersDefault,
-                config.prideTrailOthersDefault
-        );
+        if(CLIENT_OTHERS_CONFIG != null)
+        {
+            return CLIENT_OTHERS_CONFIG;
+        }
+        setClientOthersConfig();
+        return CLIENT_OTHERS_CONFIG;
     }
 
     public static void putSafe(int entityId, PlayerConfig incoming) {
@@ -98,9 +128,7 @@ public final class ClientPlayerConfigStore
         double safeEndRamp = Math.max(0.0, incoming.endRampDistance());
         double safeRandVar = Math.max(0.0, incoming.randomWidthVariation());
 
-        String safeColor = incoming.color();
-        if (safeColor != null) safeColor = safeColor.trim();
-        if (safeColor != null && safeColor.isEmpty()) safeColor = null;
+        int safeColor = incoming.color();
 
         String safePride = incoming.prideTrail();
         if (safePride != null) safePride = safePride.trim();

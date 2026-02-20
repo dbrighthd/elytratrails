@@ -24,6 +24,7 @@ import org.jetbrains.annotations.NotNull;
 import java.util.Objects;
 
 import static dbrighthd.elytratrails.compat.emf.EmfTrailSpawnerRegistry.onResourceReload;
+import static dbrighthd.elytratrails.network.ClientPlayerConfigStore.refreshLocalConfigs;
 
 
 @SuppressWarnings("deprecation")
@@ -40,6 +41,7 @@ public class ElytraTrailsClient implements ClientModInitializer {
 		TrailSystem.init();
 //		WingTipSamplerHandler.init();
 		ParticleHandler.init();
+		refreshLocalConfigs();
 		RegisterPacketsClient.initClient();
 
 		ResourceManagerHelper.get(PackType.CLIENT_RESOURCES).registerReloadListener(

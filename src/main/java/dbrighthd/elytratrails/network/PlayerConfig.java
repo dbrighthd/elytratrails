@@ -16,7 +16,7 @@ public record PlayerConfig(
         double trailLifetime,
         double startRampDistance,
         double endRampDistance,
-        String color,
+        int color,
         double randomWidthVariation,
         String prideTrail
 ) {

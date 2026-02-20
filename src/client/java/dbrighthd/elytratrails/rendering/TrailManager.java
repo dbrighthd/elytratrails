@@ -23,24 +23,32 @@ import org.slf4j.LoggerFactory;
 import java.util.ArrayList;
 import java.util.List;
 
+import static dbrighthd.elytratrails.ElytraTrailsClient.getConfig;
+
 public class TrailManager {
     private static final Logger LOGGER = LoggerFactory.getLogger(TrailManager.class);
 
     private final Int2ObjectMap<EntityTrailGroup> activeTrails = new Int2ObjectOpenHashMap<>();
     private final List<Trail> trails = new ArrayList<>();
-
+    private float lastSample;
     private final WingTipSampler sampler;
 
     public TrailManager(WingTipSampler sampler) {
         this.sampler = sampler;
         ClientTickEvents.END_CLIENT_TICK.register(this::removeDeadPoints);
         WorldRenderEvents.AFTER_ENTITIES.register(cxt -> {
+            float now = Util.getMillis();
+            if((now - lastSample) < (1000f / getConfig().maxSamplePerSecond))
+            {
+                return;
+            }
+            lastSample = Util.getMillis();
             gatherPlayerTrails(Minecraft.getInstance());
         });
     }
 
     private void removeDeadPoints(Minecraft ctx) {
-        ModConfig config = ElytraTrailsClient.getConfig();
+        ModConfig config = getConfig();
 
         long currentTime = Util.getMillis();
         // note: this causes like "cycling"? I don't know how to describe it.

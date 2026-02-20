@@ -141,7 +141,7 @@ public class TrailRenderer implements SubmitNodeCollector.CustomGeometryRenderer
             if (settings == null) continue;
 
             float maxWidthBlocks = (float) settings.maxWidth();
-            int argb = parseHexColor(settings.color() == null ? baseCfg.color : settings.color(), 0xFFFFFFFF);
+            int argb = settings.color();
             int colorR = (argb >>> 16) & 0xFF;
             int colorG = (argb >>> 8) & 0xFF;
             int colorB = (argb) & 0xFF;

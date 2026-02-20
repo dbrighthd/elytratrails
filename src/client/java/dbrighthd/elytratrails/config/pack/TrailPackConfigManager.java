@@ -19,6 +19,7 @@ import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
 import static dbrighthd.elytratrails.ElytraTrailsClient.getConfig;
+import static dbrighthd.elytratrails.ElytraTrailsClient.setConfig;
 
 public final class TrailPackConfigManager {
     private TrailPackConfigManager() {}
@@ -294,7 +295,7 @@ public final class TrailPackConfigManager {
         @Nullable Double endRampDistance;
         @Nullable Double randomWidthVariation;
 
-        @Nullable String color;
+        @Nullable Integer color;
 
         @Nullable String prideTrail;
 
@@ -313,7 +314,7 @@ public final class TrailPackConfigManager {
             overrides.endRampDistance = baseConfig.endRampDistance;
             overrides.randomWidthVariation = baseConfig.randomWidthVariation;
 
-            overrides.color = baseConfig.color;
+            overrides.color = parseHexColor(baseConfig.color);
             overrides.prideTrail = baseConfig.prideTrail;
             return overrides;
         }
@@ -353,8 +354,8 @@ public final class TrailPackConfigManager {
                     && asNumber(startRampDistance) == s.startRampDistance()
                     && asNumber(endRampDistance) == s.endRampDistance()
                     && asNumber(randomWidthVariation) == s.randomWidthVariation()
-                    && ((color == null && s.color() == null) || (color != null && color.equals(s.color())))
-                    && ((prideTrail == null && s.prideTrail() == null) || (prideTrail != null && prideTrail.equals(s.prideTrail())));
+                    && (color != null && (color == s.color())
+                    && ((prideTrail == null && s.prideTrail() == null) || (prideTrail != null && prideTrail.equals(s.prideTrail()))));
         }
 
         static TrailOverrides fromOthersDefaults(ModConfig cfg) {
@@ -372,7 +373,7 @@ public final class TrailPackConfigManager {
             overrides.endRampDistance = cfg.endRampDistanceOthersDefault;
             overrides.randomWidthVariation = cfg.randomWidthVariationOthersDefault;
 
-            overrides.color = cfg.colorOthersDefault;
+            overrides.color = parseHexColor(cfg.colorOthersDefault);
             overrides.prideTrail = cfg.prideTrailOthersDefault;
             return overrides;
         }
@@ -395,7 +396,7 @@ public final class TrailPackConfigManager {
             overrides.speedDependentTrail = readBoolean(json, "speedDependentTrail", "speeddependant", "speedDependent");
             overrides.cameraDistanceFade = readBoolean(json, "cameraDistanceFade");
 
-            overrides.color = readString(json, "color");
+            overrides.color = parseHexColor(readString(json, "color"));
             overrides.prideTrail = readString(json, "prideTrail");
 
             return overrides;
@@ -505,7 +506,7 @@ public final class TrailPackConfigManager {
             double startRampDistance,
             double endRampDistance,
             double randomWidthVariation,
-            @Nullable String color,
+            int color,
             @Nullable String prideTrail
     ) {
         public static ResolvedTrailSettings defaults() {
@@ -521,12 +522,30 @@ public final class TrailPackConfigManager {
                     getConfig().startRampDistanceOthersDefault,
                     getConfig().endRampDistanceOthersDefault,
                     getConfig().randomWidthVariationOthersDefault,
-                    getConfig().colorOthersDefault,
+                    parseHexColor(getConfig().colorOthersDefault),
                     getConfig().prideTrailOthersDefault
             );
         }
     }
+    public static int parseHexColor(String s) {
+        if (s == null) return 16777215;
+        String t = s.trim();
+        if (t.isEmpty()) return 16777215;
+        if (t.startsWith("#")) t = t.substring(1);
+        if (t.startsWith("0x") || t.startsWith("0X")) t = t.substring(2);
 
+        try {
+            if (t.length() == 6) {
+                int rgb = Integer.parseUnsignedInt(t, 16);
+                return 0xFF000000 | rgb;
+            }
+            if (t.length() == 8) {
+                return (int) Long.parseLong(t, 16);
+            }
+        } catch (NumberFormatException ignored) {
+        }
+        return 16777215;
+    }
     public static ResolvedTrailSettings resolveFromPlayerConfig(@Nullable PlayerConfig playerConfig) {
         ResolvedTrailSettings defaults = ResolvedTrailSettings.defaults();
         if (playerConfig == null) return defaults;

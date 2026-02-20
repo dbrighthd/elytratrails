@@ -204,6 +204,10 @@ public class ModConfig implements ConfigData {
     @ConfigEntry.Gui.Tooltip
     public boolean enableParticles = false;
 
+
+
+
+
     @ConfigEntry.Category("particles")
     @ConfigEntry.Gui.Tooltip
     public ParticleChoice particle = ParticleChoice.CLOUD;

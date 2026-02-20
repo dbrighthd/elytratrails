@@ -3,6 +3,7 @@ package dbrighthd.elytratrails;
 import dbrighthd.elytratrails.config.ModConfig;
 import com.terraformersmc.modmenu.api.ConfigScreenFactory;
 import com.terraformersmc.modmenu.api.ModMenuApi;
+import dbrighthd.elytratrails.config.pack.TrailPackConfigManager;
 import dbrighthd.elytratrails.network.GetAllRequestC2SPayload;
 import dbrighthd.elytratrails.network.PlayerConfigC2SPayload;
 import dbrighthd.elytratrails.network.RemoveFromStoreC2SPayload;
@@ -22,15 +23,16 @@ public class ElytraTrailsModMenu implements ModMenuApi {
     @Override
     public ConfigScreenFactory<?> getModConfigScreenFactory() {
         return parent -> {
+
             Screen screen = AutoConfigClient.getConfigScreen(ModConfig.class, parent).get();
 
             if (screen instanceof AbstractConfigScreen cloth) {
                 cloth.setSavingRunnable(() -> {
                     AutoConfig.getConfigHolder(ModConfig.class).save();
-
                     var mc = Minecraft.getInstance();
                     if (mc.getConnection() != null && mc.player != null && mc.level != null) {
                         TrailSystem.getTrailManager().removeTrail(mc.player.getId());
+                        refreshLocalConfigs();
                         if(getConfig().shareTrail || !getConfig().showTrailToOtherPlayers)
                         {
                             ClientPlayNetworking.send(new PlayerConfigC2SPayload(getLocalPlayerConfigToSend()));
