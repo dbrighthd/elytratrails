@@ -1,6 +1,7 @@
 package dbrighthd.elytratrails.network;
 
 import dbrighthd.elytratrails.controller.EntityTwirlManager;
+import dbrighthd.elytratrails.rendering.TrailSystem;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 import net.fabricmc.fabric.api.client.networking.v1.ClientPlayConnectionEvents;
@@ -19,6 +20,7 @@ public class RegisterPacketsClient {
         });
         ClientPlayNetworking.registerGlobalReceiver(PlayerConfigS2CPayload.ID, (payload, context) ->
         {
+            TrailSystem.getTrailManager().removeTrail(payload.entityId());
             ClientPlayerConfigStore.putSafe(payload.entityId(),payload.playerConfig());
         });
         ClientPlayNetworking.registerGlobalReceiver(RemoveFromStoreS2CPayload.ID, (payload, context) ->

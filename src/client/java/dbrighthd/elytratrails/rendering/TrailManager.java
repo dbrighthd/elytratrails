@@ -2,11 +2,13 @@ package dbrighthd.elytratrails.rendering;
 
 import dbrighthd.elytratrails.ElytraTrailsClient;
 import dbrighthd.elytratrails.config.ModConfig;
+import dbrighthd.elytratrails.config.pack.TrailPackConfigManager;
 import dbrighthd.elytratrails.network.ClientPlayerConfigStore;
 import dbrighthd.elytratrails.trailrendering.TrailTextureRegistry;
 import it.unimi.dsi.fastutil.ints.Int2ObjectMap;
 import it.unimi.dsi.fastutil.ints.Int2ObjectOpenHashMap;
 import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents;
+import net.fabricmc.fabric.api.client.rendering.v1.world.WorldRenderEvents;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.player.AbstractClientPlayer;
 import net.minecraft.resources.Identifier;
@@ -32,7 +34,9 @@ public class TrailManager {
     public TrailManager(WingTipSampler sampler) {
         this.sampler = sampler;
         ClientTickEvents.END_CLIENT_TICK.register(this::removeDeadPoints);
-        ClientTickEvents.END_CLIENT_TICK.register(this::gatherPlayerTrails);
+        WorldRenderEvents.AFTER_ENTITIES.register(cxt -> {
+            gatherPlayerTrails(Minecraft.getInstance());
+        });
     }
 
     private void removeDeadPoints(Minecraft ctx) {
@@ -44,23 +48,30 @@ public class TrailManager {
         trails.removeIf(t -> t.points().isEmpty() || t.points().stream().allMatch(p -> currentTime - p.epoch() > config.trailLifetime * 1000));
     }
 
+    public void removeTrail(int entityId)
+    {
+        activeTrails.remove(entityId);
+    }
+
     private void gatherPlayerTrails(Minecraft ctx) {
-        ModConfig config = ElytraTrailsClient.getConfig();
+        //ModConfig config = ElytraTrailsClient.getConfig();
         if (ctx.level == null) return;
 
         List<AbstractClientPlayer> players = ctx.level.players();
         for (AbstractClientPlayer player : players) {
             int eid = player.getId();
+            TrailPackConfigManager.ResolvedTrailSettings config = getConfigFromPlayerId(eid);
             boolean valid = TrailManager.isEntityTrailValid(config, player);
 
             if (valid) {
-                List<Vec3> emitterPositions = sampler.getTrailEmitterPositions(player, 1.0f);
-                if (emitterPositions.isEmpty()) continue;
+                List<Emitter> emitters = sampler.getTrailEmitterPositions(player, ctx.getDeltaTracker().getGameTimeDeltaPartialTick(false));
+
+                if (emitters.isEmpty()) continue;
 
                 EntityTrailGroup trailGroup = activeTrails.computeIfAbsent(eid, id -> {
                     List<Trail> emittedTrails = new ArrayList<>();
-                    for (int i = 0; i < emitterPositions.size(); i++) {
-                        emittedTrails.add(Trail.fromPlayerConfig(player.getId()));
+                    for (Emitter emitter : emitters) {
+                        emittedTrails.add(Trail.fromPlayerConfig(player.getId(), emitter.flipUv()));
                     }
                     trails.addAll(emittedTrails);
                     LOGGER.info("Created new trail group with {} trails for entity {} (player)", emittedTrails.size(), id);
@@ -70,7 +81,7 @@ public class TrailManager {
                 });
                 for (int i = 0; i < trailGroup.trails().size(); i++)  {
                     Trail trail = trailGroup.trails().get(i);
-                    Vec3 emitter = emitterPositions.get(i);
+                    Vec3 emitter = emitters.get(i).position();
                     trail.points().add(new Trail.Point(emitter));
                 }
             } else {
@@ -78,13 +89,18 @@ public class TrailManager {
             }
         }
     }
+    public static TrailPackConfigManager.ResolvedTrailSettings getConfigFromPlayerId(int entityId)
+    {
+        return TrailPackConfigManager.resolveFromPlayerConfig(ClientPlayerConfigStore.getOrDefault(entityId));
+    }
 
-    public static boolean isEntityTrailValid(ModConfig config, Entity entity) {
+
+    public static boolean isEntityTrailValid(TrailPackConfigManager.ResolvedTrailSettings config, Entity entity) {
         if (entity instanceof Player player) {
             if (player.getPose() != Pose.FALL_FLYING) return false;
         }
 
-        return entity.getDeltaMovement().lengthSqr() > config.trailMinSpeed * config.trailMinSpeed;
+        return entity.getDeltaMovement().lengthSqr() > config.trailMinSpeed() * config.trailMinSpeed();
     }
 
     public List<Trail> trails() {

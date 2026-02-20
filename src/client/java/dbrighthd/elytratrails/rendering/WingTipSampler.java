@@ -39,7 +39,7 @@ import java.util.Map;
 public class WingTipSampler {
     private final SubmitNodeStorage submitStorage = new SubmitNodeStorage();
 
-    public @NotNull List<Vec3> getTrailEmitterPositions(Player player, float partialTick) {
+    public @NotNull List<Emitter> getTrailEmitterPositions(Player player, float partialTick) {
         ModConfig config = ElytraTrailsClient.getConfig();
         Minecraft mc = Minecraft.getInstance();
         if (mc.level == null || ShaderChecksUtil.isShadowPass()) return List.of();
@@ -70,12 +70,13 @@ public class WingTipSampler {
         return getVanillaTrailEmitters(basePose, animatedElytraRoot, elytraModel, camera.position(), entityWorldOffset);
     }
 
-    private @NotNull List<Vec3> getTrailEmittersFromBones(@NotNull PoseStack stack, @Nullable ModelPart elytraRoot, @NotNull ElytraModel model, @NotNull List<EmfWingTipHooks.SpawnerPath> spawners, @NotNull Vec3 cameraPos, @NotNull Vec3 entityWorldOffset) {
+    private @NotNull List<Emitter> getTrailEmittersFromBones(@NotNull PoseStack stack, @Nullable ModelPart elytraRoot, @NotNull ElytraModel model, @NotNull List<EmfWingTipHooks.SpawnerPath> spawners, @NotNull Vec3 cameraPos, @NotNull Vec3 entityWorldOffset) {
         EquipmentElytraModelAccessor accessor = (EquipmentElytraModelAccessor) model;
         ModelPart leftWing = accessor.elytratrails$getLeftWing();
         ModelPart rightWing = accessor.elytratrails$getRightWing();
 
-        List<Vec3> emitterPoints = new ArrayList<>();
+
+        List<Emitter> emitters = new ArrayList<>();
         for (EmfWingTipHooks.SpawnerPath spawner : spawners) {
             ModelPart wingRoot = (spawner.where() == EmfWingTipHooks.WhichRoot.LEFT_WING) ? leftWing : rightWing;
 
@@ -84,12 +85,23 @@ public class WingTipSampler {
             );
             if (cameraRelative == null) continue;
 
-            emitterPoints.add(cameraPos.add(cameraRelative).add(entityWorldOffset));
+            emitters.add(new Emitter(cameraPos.add(cameraRelative).add(entityWorldOffset), inferLeftWing(spawner.where(), spawner.path())));
         }
-        return emitterPoints;
+        return emitters;
+    }
+    private static boolean inferLeftWing(EmfWingTipHooks.WhichRoot modelRoot, String spawnerOrBoneName) {
+        if (spawnerOrBoneName != null) {
+            String b = spawnerOrBoneName.toLowerCase(java.util.Locale.ROOT);
+
+            // Your rule: if it has "right", leftWing MUST be false (even if it also has "left")
+            if (containsWord(b, "right")) return false;
+            if (containsWord(b, "left")) return true;
+        }
+
+        return (modelRoot == EmfWingTipHooks.WhichRoot.LEFT_WING);
     }
 
-    private @NotNull List<Vec3> getVanillaTrailEmitters(@NotNull PoseStack stack, @Nullable ModelPart elytraRoot, @NotNull ElytraModel model, @NotNull Vec3 cameraPos, @NotNull Vec3 entityWorldOffset) {
+    private @NotNull List<Emitter> getVanillaTrailEmitters(@NotNull PoseStack stack, @Nullable ModelPart elytraRoot, @NotNull ElytraModel model, @NotNull Vec3 cameraPos, @NotNull Vec3 entityWorldOffset) {
         EquipmentElytraModelAccessor accessor = (EquipmentElytraModelAccessor) model;
         ModelPart leftWing = accessor.elytratrails$getLeftWing();
         ModelPart rightWing = accessor.elytratrails$getRightWing();
@@ -98,8 +110,8 @@ public class WingTipSampler {
         Vec3 rightTip = computeTransformedWingTip(stack, elytraRoot, rightWing, ModelTransformationUtil.VANILLA_RIGHT_WING_TIP);
 
         return List.of(
-                cameraPos.add(leftTip).add(entityWorldOffset),
-                cameraPos.add(rightTip).add(entityWorldOffset)
+                new Emitter(cameraPos.add(leftTip).add(entityWorldOffset), true),
+                new Emitter (cameraPos.add(rightTip).add(entityWorldOffset), false)
         );
     }
 
@@ -220,5 +232,25 @@ public class WingTipSampler {
             }
         }
         return null;
+    }
+    private static boolean containsWord(String haystackLower, String needleLower) {
+        int n = haystackLower.length();
+        int m = needleLower.length();
+        if (m == 0 || n < m) return false;
+
+        int from = 0;
+        while (true) {
+            int idx = haystackLower.indexOf(needleLower, from);
+            if (idx < 0) return false;
+
+            int before = idx - 1;
+            int after = idx + m;
+
+            boolean beforeOk = before < 0 || !Character.isLetterOrDigit(haystackLower.charAt(before));
+            boolean afterOk = after >= n || !Character.isLetterOrDigit(haystackLower.charAt(after));
+
+            if (beforeOk && afterOk) return true;
+            from = idx + 1;
+        }
     }
 }

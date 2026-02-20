@@ -7,6 +7,7 @@ import dbrighthd.elytratrails.network.GetAllRequestC2SPayload;
 import dbrighthd.elytratrails.network.PlayerConfigC2SPayload;
 import dbrighthd.elytratrails.network.RemoveFromStoreC2SPayload;
 import dbrighthd.elytratrails.network.RemoveFromStoreS2CPayload;
+import dbrighthd.elytratrails.rendering.TrailSystem;
 import me.shedaniel.autoconfig.AutoConfig;
 import me.shedaniel.autoconfig.AutoConfigClient;
 import me.shedaniel.clothconfig2.gui.AbstractConfigScreen;
@@ -29,6 +30,7 @@ public class ElytraTrailsModMenu implements ModMenuApi {
 
                     var mc = Minecraft.getInstance();
                     if (mc.getConnection() != null && mc.player != null && mc.level != null) {
+                        TrailSystem.getTrailManager().removeTrail(mc.player.getId());
                         if(getConfig().shareTrail || !getConfig().showTrailToOtherPlayers)
                         {
                             ClientPlayNetworking.send(new PlayerConfigC2SPayload(getLocalPlayerConfigToSend()));
