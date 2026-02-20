@@ -88,7 +88,13 @@ public class TrailManager {
                     );
                 });
                 for (int i = 0; i < trailGroup.trails().size(); i++)  {
+
                     Trail trail = trailGroup.trails().get(i);
+                    if (i >= emitters.size())
+                    {
+                        removeAllTrails();
+                        return;
+                    }
                     Vec3 emitter = emitters.get(i).position();
                     trail.points().add(new Trail.Point(emitter));
                 }
@@ -113,5 +119,9 @@ public class TrailManager {
 
     public List<Trail> trails() {
         return trails;
+    }
+    public void removeAllTrails()
+    {
+        activeTrails.clear();
     }
 }
