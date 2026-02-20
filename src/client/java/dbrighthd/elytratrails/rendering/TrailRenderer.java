@@ -5,11 +5,13 @@ import com.mojang.blaze3d.vertex.VertexConsumer;
 import dbrighthd.elytratrails.config.ModConfig;
 import dbrighthd.elytratrails.config.pack.TrailPackConfigManager;
 import dbrighthd.elytratrails.rendering.math.SplineInterpolation;
+import dbrighthd.elytratrails.util.ShaderChecksUtil;
 import net.fabricmc.fabric.api.client.rendering.v1.world.WorldRenderContext;
 import net.minecraft.client.Camera;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.LightTexture;
 import net.minecraft.client.renderer.rendertype.RenderType;
+import net.minecraft.client.renderer.rendertype.RenderTypes;
 import net.minecraft.client.renderer.texture.OverlayTexture;
 import net.minecraft.core.BlockPos;
 import net.minecraft.resources.Identifier;
@@ -22,6 +24,8 @@ import org.jetbrains.annotations.NotNull;
 import org.joml.Vector3f;
 
 import java.util.List;
+
+import static dbrighthd.elytratrails.ElytraTrailsClient.getConfig;
 
 public class TrailRenderer {
 
@@ -37,6 +41,7 @@ public class TrailRenderer {
 
     @SuppressWarnings("resource")
     public void renderAllTrails(@NotNull WorldRenderContext ctx) {
+        ModConfig config = getConfig();
         PoseStack stack = ctx.matrices();
         stack.pushPose();
         stack.translate(ctx.gameRenderer().getMainCamera().position().scale(-1f));
@@ -45,7 +50,8 @@ public class TrailRenderer {
             if (points.size() < 4) continue; // splines :3
 
             float length = trail.length();
-            RenderType renderType = TrailPipelines.entityTranslucentCull(trail.texture());
+            RenderType renderType = getRenderType(config,trail.texture());
+
 
             ctx.commandQueue().order(1).submitCustomGeometry(stack, renderType, (pose, consumer) -> {
                 Camera camera = ctx.gameRenderer().getMainCamera();
@@ -65,7 +71,38 @@ public class TrailRenderer {
 
         stack.popPose();
     }
-
+    private RenderType getRenderType(ModConfig config, Identifier texture)
+    {
+        if(config.glowingTrails)
+        {
+            if(ShaderChecksUtil.isUsingShaders())
+            {
+                return RenderTypes.entityTranslucentEmissive(texture);
+            }
+            else
+            {
+                if(config.translucentTrails)
+                {
+                    return TrailPipelines.entityTranslucentEmissiveUnlit(texture);
+                }
+                else
+                {
+                    return TrailPipelines.entityCutoutEmissiveUnlit(texture);
+                }
+            }
+        }
+        else
+        {
+            if(config.translucentTrails)
+            {
+                return TrailPipelines.entityTranslucentCull(texture);
+            }
+            else
+            {
+                return TrailPipelines.entityCutoutLit(texture);
+            }
+        }
+    }
     private void renderSubdividedSegment(
             PoseStack.Pose pose, VertexConsumer consumer,
             Trail.Point point0, Trail.Point point1, Trail.Point point2, Trail.Point point3,

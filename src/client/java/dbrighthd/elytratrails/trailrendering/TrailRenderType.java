@@ -19,9 +19,6 @@ public class TrailRenderType {
         RenderPipelines.register(PIPELINE_ENTITY_CUTOUT_LIT);
     }
 
-    /**
-     * Translucent: supports smooth alpha fade (blended), does NOT write depth.
-     */
     public static final RenderPipeline PIPELINE_ENTITY_TRANSLUCENT_EMISSIVE_UNLIT =
             RenderPipeline.builder(RenderPipelines.ENTITY_EMISSIVE_SNIPPET)
                     .withLocation(Identifier.parse("elytratrails:pipeline/entity_translucent_emissive_unlit"))
@@ -33,9 +30,6 @@ public class TrailRenderType {
                     .withDepthWrite(false)
                     .build();
 
-    /**
-     * Cutout emissive/unlit: no blending, writes depth. Alpha below cutout threshold gets discarded.
-     */
     public static final RenderPipeline PIPELINE_ENTITY_CUTOUT_EMISSIVE_UNLIT =
             RenderPipeline.builder(RenderPipelines.ENTITY_EMISSIVE_SNIPPET)
                     .withLocation(Identifier.parse("elytratrails:pipeline/entity_cutout_emissive_unlit"))
@@ -46,10 +40,6 @@ public class TrailRenderType {
                     .withDepthWrite(true)
                     .build();
 
-    /**
-     * New: non-glowing, non-translucent cutout (lit).
-     * Uses the normal entity snippet (NOT emissive) and writes depth, no blending.
-     */
     public static final RenderPipeline PIPELINE_ENTITY_CUTOUT_LIT =
             RenderPipeline.builder(RenderPipelines.ENTITY_SNIPPET)
                     .withLocation(Identifier.parse("elytratrails:pipeline/entity_cutout_lit"))
@@ -104,9 +94,6 @@ public class TrailRenderType {
         return RENDER_TYPE_ENTITY_CUTOUT_EMISSIVE_UNLIT.apply(texture, false);
     }
 
-    /**
-     * New: non-glowing + non-translucent cutout (lit).
-     */
     public static RenderType entityCutoutLit(Identifier texture) {
         return RENDER_TYPE_ENTITY_CUTOUT_LIT.apply(texture, false);
     }
