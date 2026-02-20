@@ -125,9 +125,9 @@ public class WingTipSamplerHandler {
             final boolean firstPersonNow = mc.options.getCameraType().isFirstPerson();
             final Player localPlayer = mc.player;
             final int localId = (localPlayer == null) ? Integer.MIN_VALUE : localPlayer.getId();
-            final boolean skipLocalFirstPerson = firstPersonNow && !getConfig().firstPersonTrail;
+            //final boolean skipLocalFirstPerson = firstPersonNow && !getConfig().firstPersonTrail;
 
-            if (skipLocalFirstPerson && localPlayer != null) {
+            if (localPlayer != null) {
                 TrailStore.breakEntity(localId, now);
 
                 wasFallFlyingVanilla.put(localId, false);
@@ -158,9 +158,6 @@ public class WingTipSamplerHandler {
                     TrailStore.setLeftWing(entityId, i, isLeft);
                 }
 
-                if (skipLocalFirstPerson && entityId == localId) {
-                    return;
-                }
 
                 Entity entity = mc.level.getEntity(entityId);
                 if (entity == null) return;
