@@ -24,9 +24,7 @@ public record Trail(Identifier texture, List<Point> points, TrailPackConfigManag
 
     public float length() {
         if(points.size() < 4)
-        {
             return 0;
-        }
         float length = 0;
         for (int i = 1; i < points.size() - 2; i++) {
             length += (float) points.get(i).pos().distanceTo(points.get(i + 1).pos());

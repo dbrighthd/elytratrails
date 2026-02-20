@@ -35,6 +35,14 @@ public class TrailRenderer {
     private final @NotNull TrailManager manager;
 
     private float accumDist = 0.0f;
+    private float endOfTrail = 0.0f;
+    private ModConfig modConfig;
+    private final PerlinNoise perlinNoise =  PerlinNoise.create(RandomSource.create(), List.of(1));
+    boolean isFirstperson;
+    private static final float FP_CAMERA_FADE_ZERO = 0.3f;
+    private static final float FP_CAMERA_FADE_FULL = 0.5f;
+    private static final float CAMERA_FADE_ZERO = 0.3f;
+    private static final float CAMERA_FADE_FULL = 0.5f;
 
     public TrailRenderer(@NotNull TrailManager manager) {
         this.manager = manager;
@@ -58,7 +66,9 @@ public class TrailRenderer {
                 Camera camera = ctx.gameRenderer().getMainCamera();
 
                 this.accumDist = 0f;
-
+                this.endOfTrail = 0f;
+                this.modConfig = getConfig();
+                this.isFirstperson = Minecraft.getInstance().options.getCameraType().isFirstPerson();
                 for (int i = 1; i < points.size() - 2; i++) {
                     Trail.Point p0 = points.get(i - 1);
                     Trail.Point p1 = points.get(i);
@@ -180,7 +190,14 @@ public class TrailRenderer {
             float halfWidthStart = (float) (trail.config().maxWidth() / 2f) * scaleStart;
             float halfWidthEnd = (float) (trail.config().maxWidth() / 2f) * scaleEnd;
 
-            quadBetweenPoints(pose, consumer, startPos, endPos, sideA, sideB, halfWidthStart, halfWidthEnd, v1, v2, alphaStart, alphaEnd, trail.flipUv(), color);
+            if ((scaleStart != 0 || scaleEnd != 0) && (alphaEnd != 0 || alphaStart != 0)) {
+                if(!modConfig.translucentTrails)
+                {
+                    alphaEnd = 1;
+                    alphaStart = 1;
+                }
+                quadBetweenPoints(pose, consumer, startPos, endPos, sideA, sideB, halfWidthStart, halfWidthEnd, v1, v2, alphaStart, alphaEnd, trail.flipUv(), color);
+            }
             this.accumDist += segmentLength;
         }
     }
@@ -287,6 +304,7 @@ public class TrailRenderer {
         int overlay = OverlayTexture.NO_OVERLAY;
         int lightStart = computeLightTexture(a);
         int lightEnd = computeLightTexture(b);
+
         int colorStart = ARGB.multiplyAlpha(color, alphaStart);
         int colorEnd = ARGB.multiplyAlpha(color, alphaEnd);
 
