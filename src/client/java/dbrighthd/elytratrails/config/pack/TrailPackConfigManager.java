@@ -19,7 +19,6 @@ import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
 import static dbrighthd.elytratrails.ElytraTrailsClient.getConfig;
-import static dbrighthd.elytratrails.ElytraTrailsClient.setConfig;
 
 public final class TrailPackConfigManager {
     private TrailPackConfigManager() {}
@@ -303,11 +302,10 @@ public final class TrailPackConfigManager {
             TrailOverrides overrides = new TrailOverrides();
             overrides.enableTrail = baseConfig.enableTrail;
             overrides.enableRandomWidth = baseConfig.enableRandomWidth;
-            overrides.useSplineTrail = baseConfig.useSplineTrail;
             overrides.speedDependentTrail = baseConfig.speedDependentTrail;
             overrides.cameraDistanceFade = baseConfig.cameraDistanceFade;
 
-            overrides.maxWidth = baseConfig.maxWidth;
+            overrides.maxWidth = baseConfig.width;
             overrides.trailLifetime = baseConfig.trailLifetime;
             overrides.trailMinSpeed = baseConfig.trailMinSpeed;
             overrides.startRampDistance = baseConfig.startRampDistance;
@@ -323,7 +321,6 @@ public final class TrailPackConfigManager {
             // base is "fully resolved", so treat everything as non-null base values
             o.enableTrail = s.enableTrail();
             o.enableRandomWidth = s.enableRandomWidth();
-            o.useSplineTrail = s.useSplineTrail();
             o.speedDependentTrail = s.speedDependentTrail();
             o.cameraDistanceFade = s.cameraDistanceFade();
 
@@ -345,7 +342,6 @@ public final class TrailPackConfigManager {
         boolean isSameAs(ResolvedTrailSettings s) {
             return asTrue(enableTrail) == s.enableTrail()
                     && asTrue(enableRandomWidth) == s.enableRandomWidth()
-                    && asTrue(useSplineTrail) == s.useSplineTrail()
                     && asTrue(speedDependentTrail) == s.speedDependentTrail()
                     && asTrue(cameraDistanceFade) == s.cameraDistanceFade()
                     && asNumber(maxWidth) == s.maxWidth()
@@ -362,11 +358,10 @@ public final class TrailPackConfigManager {
             TrailOverrides overrides = new TrailOverrides();
             overrides.enableTrail = cfg.enableTrailOthersDefault;
             overrides.enableRandomWidth = cfg.enableRandomWidthOthersDefault;
-            overrides.useSplineTrail = cfg.useSplineTrailOthersDefault;
             overrides.speedDependentTrail = cfg.speedDependentTrailOthersDefault;
             overrides.cameraDistanceFade = cfg.cameraDistanceFadeOthersDefault;
 
-            overrides.maxWidth = cfg.maxWidthOthersDefault;
+            overrides.maxWidth = cfg.widthOthersDefault;
             overrides.trailLifetime = cfg.trailLifetimeOthersDefault;
             overrides.trailMinSpeed = cfg.trailMinSpeedOthersDefault;
             overrides.startRampDistance = cfg.startRampDistanceOthersDefault;
@@ -446,7 +441,6 @@ public final class TrailPackConfigManager {
             return new ResolvedTrailSettings(
                     asTrue(enableTrail),
                     asTrue(enableRandomWidth),
-                    asTrue(useSplineTrail),
                     asTrue(speedDependentTrail),
                     asTrue(cameraDistanceFade),
                     asNumber(maxWidth),
@@ -497,7 +491,6 @@ public final class TrailPackConfigManager {
     public record ResolvedTrailSettings(
             boolean enableTrail,
             boolean enableRandomWidth,
-            boolean useSplineTrail,
             boolean speedDependentTrail,
             boolean cameraDistanceFade,
             double maxWidth,
@@ -513,10 +506,9 @@ public final class TrailPackConfigManager {
             return new ResolvedTrailSettings(
                     getConfig().enableTrailOthersDefault,
                     getConfig().enableRandomWidthOthersDefault,
-                    getConfig().useSplineTrailOthersDefault,
                     getConfig().speedDependentTrailOthersDefault,
                     getConfig().cameraDistanceFadeOthersDefault,
-                    getConfig().maxWidthOthersDefault,
+                    getConfig().widthOthersDefault,
                     getConfig().trailLifetimeOthersDefault,
                     getConfig().trailMinSpeedOthersDefault,
                     getConfig().startRampDistanceOthersDefault,
@@ -560,8 +552,7 @@ public final class TrailPackConfigManager {
 
         return new ResolvedTrailSettings(
                 enableTrail,
-                playerConfig.enableRandomWidth(),
-                defaults.useSplineTrail(),              // not in PlayerConfig
+                playerConfig.enableRandomWidth(),  // not in PlayerConfig
                 playerConfig.speedDependentTrail(),
                 defaults.cameraDistanceFade(),          // not in PlayerConfig
                 playerConfig.maxWidth(),

@@ -62,9 +62,6 @@
   "text.autoconfig.elytratrails.option.firstPersonFadeTime": "First Person Trail Fade Time",
   "text.autoconfig.elytratrails.option.firstPersonFadeTime.@Tooltip": "Time for first person trails to fade in",
 
-  "text.autoconfig.elytratrails.option.firstPersonTrail": "First Person Trail",
-  "text.autoconfig.elytratrails.option.firstPersonTrail.@Tooltip": "Trails appear from you in first person",
-
   "text.autoconfig.elytratrails.option.emfSupport": "EMF Model Support",
   "text.autoconfig.elytratrails.option.emfSupport.@Tooltip": "Having this on tries to make it work with EMF models, can cause issues",
 

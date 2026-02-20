@@ -41,9 +41,6 @@ public class ModConfig implements ConfigData {
     @ConfigEntry.Gui.Tooltip
     public boolean enableRandomWidth = false;
 
-    @ConfigEntry.Category("elytra")
-    @ConfigEntry.Gui.Tooltip
-    public boolean useSplineTrail = true;
 
     @ConfigEntry.Category("elytra")
     @ConfigEntry.Gui.Tooltip
@@ -51,7 +48,7 @@ public class ModConfig implements ConfigData {
 
     @ConfigEntry.Category("elytra")
     @ConfigEntry.Gui.Tooltip
-    public boolean firstPersonTrail = true;
+    public boolean fadeFirstPersonTrail = true;
 
     @ConfigEntry.Category("elytra")
     @ConfigEntry.Gui.Tooltip
@@ -63,7 +60,7 @@ public class ModConfig implements ConfigData {
 
     @ConfigEntry.Category("elytra")
     @ConfigEntry.Gui.Tooltip
-    public double maxWidth = 0.04;
+    public double width = 0.075;
 
     @ConfigEntry.Category("elytra")
     @ConfigEntry.Gui.Tooltip
@@ -148,10 +145,6 @@ public class ModConfig implements ConfigData {
 
     @ConfigEntry.Category("others")
     @ConfigEntry.Gui.Tooltip
-    public boolean useSplineTrailOthersDefault = true;
-
-    @ConfigEntry.Category("others")
-    @ConfigEntry.Gui.Tooltip
     public boolean speedDependentTrailOthersDefault = true;
 
     @ConfigEntry.Category("others")
@@ -164,7 +157,7 @@ public class ModConfig implements ConfigData {
 
     @ConfigEntry.Category("others")
     @ConfigEntry.Gui.Tooltip
-    public double maxWidthOthersDefault = 0.04;
+    public double widthOthersDefault = 0.075;
 
     @ConfigEntry.Category("others")
     @ConfigEntry.Gui.Tooltip

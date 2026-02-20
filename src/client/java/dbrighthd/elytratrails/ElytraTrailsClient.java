@@ -19,6 +19,7 @@ import net.fabricmc.loader.api.FabricLoader;
 import net.minecraft.resources.Identifier;
 import net.minecraft.server.packs.PackType;
 import net.minecraft.server.packs.resources.ResourceManager;
+import net.minecraft.world.level.levelgen.synth.PerlinNoise;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.Objects;

@@ -15,7 +15,6 @@ public record Trail(Identifier texture, List<Point> points, TrailPackConfigManag
 
     public static Trail fromPlayerConfig(int playerId, boolean flipUv) {
         PlayerConfig config = ClientPlayerConfigStore.getOrDefault(playerId);
-
         // add other fields to this record and populate them from the config here
 
         Identifier texture = TrailTextureRegistry.resolveTextureOrNull(config.prideTrail());

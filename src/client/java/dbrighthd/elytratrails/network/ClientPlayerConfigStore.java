@@ -2,12 +2,10 @@ package dbrighthd.elytratrails.network;
 
 import dbrighthd.elytratrails.config.pack.TrailPackConfigManager;
 import net.minecraft.client.Minecraft;
-import net.minecraft.world.entity.player.Player;
 
 import java.util.concurrent.ConcurrentHashMap;
 
 import static dbrighthd.elytratrails.ElytraTrailsClient.getConfig;
-import static dbrighthd.elytratrails.ElytraTrailsClient.setConfig;
 import static java.lang.Math.clamp;
 
 
@@ -32,7 +30,7 @@ public final class ClientPlayerConfigStore
                 config.speedDependentTrail,
                 config.trailMinSpeed,
                 config.trailMovesWithElytraAngle,
-                config.maxWidth,
+                config.width,
                 config.trailLifetime,
                 config.startRampDistance,
                 config.endRampDistance,
@@ -51,7 +49,7 @@ public final class ClientPlayerConfigStore
                 config.speedDependentTrailOthersDefault,
                 config.trailMinSpeedOthersDefault,
                 config.trailMovesWithElytraAngleOthersDefault,
-                config.maxWidthOthersDefault,
+                config.widthOthersDefault,
                 config.trailLifetimeOthersDefault,
                 config.startRampDistanceOthersDefault,
                 config.endRampDistanceOthersDefault,
@@ -84,7 +82,7 @@ public final class ClientPlayerConfigStore
                     config.speedDependentTrail,
                     config.trailMinSpeed,
                     config.trailMovesWithElytraAngle,
-                    config.maxWidth,
+                    config.width,
                     0,
                     config.startRampDistance,
                     config.endRampDistance,

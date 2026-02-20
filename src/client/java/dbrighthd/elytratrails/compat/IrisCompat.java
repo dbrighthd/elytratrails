@@ -15,6 +15,7 @@ public class IrisCompat {
 
     public static void registerPipelines() {
         IrisApi.getInstance().assignPipeline(TrailPipelines.PIPELINE_ENTITY_TRANSLUCENT_CULL, IrisProgram.ENTITIES_TRANSLUCENT);
+        IrisApi.getInstance().assignPipeline(TrailPipelines.PIPELINE_ENTITY_CUTOUT_LIT, IrisProgram.ENTITIES_TRANSLUCENT);
     }
 
     public static boolean isShadowPassing()

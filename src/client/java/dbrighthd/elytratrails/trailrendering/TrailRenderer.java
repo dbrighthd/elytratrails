@@ -215,17 +215,10 @@ public class TrailRenderer implements SubmitNodeCollector.CustomGeometryRenderer
                            boolean isLeftWing) {
         if (run.size() < 2) return;
 
-        if (settings.useSplineTrail()) {
-            renderRunSplineAuto(vertexBuilder, run, cameraWorldPos, cameraForwardWorld, cameraUpWorld,
-                    nowNanos, settings, lifetimeNanos,
-                    maxWidthBlocks, fadeOverLifetime, applyFirstPersonNearFade,
-                    colorR, colorG, colorB, colorA, isLeftWing);
-        } else {
-            renderRunLinear(vertexBuilder, run, cameraWorldPos, cameraForwardWorld, cameraUpWorld,
-                    nowNanos, settings, lifetimeNanos,
-                    maxWidthBlocks, fadeOverLifetime, applyFirstPersonNearFade,
-                    colorR, colorG, colorB, colorA, isLeftWing);
-        }
+        renderRunSplineAuto(vertexBuilder, run, cameraWorldPos, cameraForwardWorld, cameraUpWorld,
+                nowNanos, settings, lifetimeNanos,
+                maxWidthBlocks, fadeOverLifetime, applyFirstPersonNearFade,
+                colorR, colorG, colorB, colorA, isLeftWing);
     }
 
     private static ResolvedTrailSettings getResolvedSettingsCached(long packedKey, int entityId, String modelName, String boneName) {

@@ -1,5 +1,4 @@
 package dbrighthd.elytratrails.rendering;
-
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.blaze3d.vertex.VertexConsumer;
 import dbrighthd.elytratrails.config.ModConfig;
@@ -17,8 +16,10 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.resources.Identifier;
 import net.minecraft.util.ARGB;
 import net.minecraft.util.Mth;
+import net.minecraft.util.RandomSource;
 import net.minecraft.util.Util;
 import net.minecraft.world.level.LightLayer;
+import net.minecraft.world.level.levelgen.synth.PerlinNoise;
 import net.minecraft.world.phys.Vec3;
 import org.jetbrains.annotations.NotNull;
 import org.joml.Vector3f;
@@ -93,14 +94,7 @@ public class TrailRenderer {
         }
         else
         {
-            if(config.translucentTrails)
-            {
-                return TrailPipelines.entityTranslucentCull(texture);
-            }
-            else
-            {
-                return TrailPipelines.entityCutoutLit(texture);
-            }
+            return TrailPipelines.entityTranslucentCull(texture);
         }
     }
     private void renderSubdividedSegment(
@@ -153,18 +147,63 @@ public class TrailRenderer {
             double start = Mth.lerp(tStart, epoch0, epoch1);
             double end = Mth.lerp(tEnd, epoch0, epoch1);
 
+
+
             float alphaStart = computeLifetimeFadeout(start, currentTime, (long) (trail.config().trailLifetime() * 1000));
             float alphaEnd = computeLifetimeFadeout(end, currentTime, (long) (trail.config().trailLifetime() * 1000));
 
-            float scaleStart = computeWidthScalingButGood(v1, totalTrailLength- v1, trail.config());
-            float scaleEnd = computeWidthScalingButGood(v2, totalTrailLength- v2, trail.config());
 
+            if(alphaEnd <= 0)
+            {
+                if (v1 > endOfTrail)
+                {
+                    endOfTrail = v1;
+                }
+            }
+
+            float scaleStart = computeWidthScalingButGood(totalTrailLength- v1, -(endOfTrail - v1), trail.config());
+            float scaleEnd = computeWidthScalingButGood(totalTrailLength- v2, -(endOfTrail - v2), trail.config());
+
+            if(isFirstperson && modConfig.fadeFirstPersonTrail)
+            {
+                scaleStart *= firstPersonWidthFadeFactor(start, currentTime);
+                scaleEnd *= firstPersonWidthFadeFactor(end, currentTime);
+            }
+
+
+            if(trail.config().enableRandomWidth())
+            {
+                scaleStart = scaleStart * (float)trail.config().randomWidthVariation() *((float)( perlinNoise.getValue(v1,0,0)) + 1);
+                scaleEnd = scaleEnd * (float)trail.config().randomWidthVariation() *((float)( perlinNoise.getValue(v2,0,0)) + 1);
+
+            }
             float halfWidthStart = (float) (trail.config().maxWidth() / 2f) * scaleStart;
             float halfWidthEnd = (float) (trail.config().maxWidth() / 2f) * scaleEnd;
 
             quadBetweenPoints(pose, consumer, startPos, endPos, sideA, sideB, halfWidthStart, halfWidthEnd, v1, v2, alphaStart, alphaEnd, trail.flipUv(), color);
             this.accumDist += segmentLength;
         }
+    }
+
+    private static float cameraDistanceFade(float cameraDistBlocks) {
+        float denom = (CAMERA_FADE_FULL - CAMERA_FADE_ZERO);
+        float t = (cameraDistBlocks - CAMERA_FADE_ZERO) / denom;
+        t = Mth.clamp(t, 0f, 1f);
+        return t * t * (3f - 2f * t);
+    }
+
+    static float firstPersonWidthFadeFactor(double epoch, long currentTime) {
+        float fadeAmount = ((float)(currentTime - epoch))/1000;
+
+        float fadeRange = FP_CAMERA_FADE_FULL - FP_CAMERA_FADE_ZERO;
+        if (fadeRange <= 1e-6f) {
+            return (fadeAmount >= FP_CAMERA_FADE_FULL) ? 1.0f : 0.0f;
+        }
+
+        float normalizedFade = (fadeAmount - FP_CAMERA_FADE_ZERO) / fadeRange;
+        if (normalizedFade < 0f) normalizedFade = 0f;
+        if (normalizedFade > 1f) normalizedFade = 1f;
+        return normalizedFade;
     }
 
     private float computeWidthScaling(float distFromStart, float distToEnd, ModConfig config) {
@@ -216,6 +255,12 @@ public class TrailRenderer {
         return (float) Math.sin(distToEnd / ((config.endRampDistance()) * (2 / Math.PI)));
     }
     private float computeLifetimeFadeout(double epoch, long currentTime, long maxLifetime) {
+        long age = (long) (currentTime - epoch);
+        if (age >= maxLifetime) return 0.0f;
+        else return 1.0f - (age / (float) maxLifetime);
+    }
+
+    private float computeEnd(double epoch, long currentTime, long maxLifetime) {
         long age = (long) (currentTime - epoch);
         if (age >= maxLifetime) return 0.0f;
         else return 1.0f - (age / (float) maxLifetime);

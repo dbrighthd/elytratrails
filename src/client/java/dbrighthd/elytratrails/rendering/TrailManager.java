@@ -108,7 +108,7 @@ public class TrailManager {
             if (player.getPose() != Pose.FALL_FLYING) return false;
         }
 
-        return entity.getDeltaMovement().lengthSqr() > config.trailMinSpeed() * config.trailMinSpeed();
+        return !config.speedDependentTrail() || (entity.getDeltaMovement().lengthSqr() > config.trailMinSpeed() * config.trailMinSpeed());
     }
 
     public List<Trail> trails() {
