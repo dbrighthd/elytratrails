@@ -60,7 +60,7 @@ public class ModConfig implements ConfigData {
 
     @ConfigEntry.Category("elytra")
     @ConfigEntry.Gui.Tooltip
-    public double width = 0.08;
+    public double width = 0.1;
 
     @ConfigEntry.Category("elytra")
     @ConfigEntry.Gui.Tooltip
@@ -76,7 +76,7 @@ public class ModConfig implements ConfigData {
 
     @ConfigEntry.Category("elytra")
     @ConfigEntry.Gui.Tooltip
-    public double trailMinSpeed = 0.7;
+    public double trailMinSpeed = 0.75;
 
     @ConfigEntry.Category("elytra")
     @ConfigEntry.Gui.Tooltip
@@ -157,7 +157,7 @@ public class ModConfig implements ConfigData {
 
     @ConfigEntry.Category("others")
     @ConfigEntry.Gui.Tooltip
-    public double widthOthersDefault = 0.08;
+    public double widthOthersDefault = 0.1;
 
     @ConfigEntry.Category("others")
     @ConfigEntry.Gui.Tooltip
@@ -165,7 +165,7 @@ public class ModConfig implements ConfigData {
 
     @ConfigEntry.Category("others")
     @ConfigEntry.Gui.Tooltip
-    public double trailMinSpeedOthersDefault = 0.7;
+    public double trailMinSpeedOthersDefault = 0.75;
 
     @ConfigEntry.Category("others")
     @ConfigEntry.Gui.Tooltip

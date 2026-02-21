@@ -175,8 +175,8 @@ public class TrailRenderer {
                 }
             }
 
-            float scaleStart = computeWidthScalingButGood(totalTrailLength- v1, -(endOfTrail - v1), trail.config());
-            float scaleEnd = computeWidthScalingButGood(totalTrailLength- v2, -(endOfTrail - v2), trail.config());
+            float scaleStart = computeWidthScaling(totalTrailLength- v1, -(endOfTrail - v1), trail.config());
+            float scaleEnd = computeWidthScaling(totalTrailLength- v2, -(endOfTrail - v2), trail.config());
 
             if(isFirstperson && modConfig.fadeFirstPersonTrail && modConfig.firstPersonFadeTime > 0)
             {
@@ -229,9 +229,9 @@ public class TrailRenderer {
         return normalizedFade;
     }
 
-    private float computeWidthScaling(float distFromStart, float distToEnd, ModConfig config) {
-        float endRamp = (float) config.startRampDistance;
-        float startRamp = (float) config.endRampDistance;
+    private float computeWidthScaling(float distFromStart, float distToEnd, TrailPackConfigManager.ResolvedTrailSettings config) {
+        float endRamp = (float) config.endRampDistance();
+        float startRamp = (float) config.startRampDistance();
 
         if (startRamp < 1e-6f) startRamp = 1e-6f;
         if (endRamp < 1e-6f) endRamp = 1e-6f;
@@ -291,7 +291,7 @@ public class TrailRenderer {
 
     private int computeLightTexture(Vec3 pos) { // note: I really hate this method, but I don't feel like managing the state that's required to do this in a better way
         Minecraft mc = Minecraft.getInstance();
-        if (mc.level == null) return LightTexture.FULL_BRIGHT;
+        if (mc.level == null || modConfig.glowingTrails) return LightTexture.FULL_BRIGHT;
 
         BlockPos blockPos = BlockPos.containing(pos);
         return LightTexture.pack(mc.level.getBrightness(LightLayer.BLOCK, blockPos), mc.level.getBrightness(LightLayer.SKY, blockPos));
