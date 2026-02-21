@@ -13,12 +13,15 @@
   "text.autoconfig.elytratrails.option.translucentTrails": "Translucent Trails",
   "text.autoconfig.elytratrails.option.translucentTrails.@Tooltip": "Lets trails use fading and alpha, but can cause issues with translucency sorting. (Always on when shaders are on)",
 
+  "text.autoconfig.elytratrails.option.glowingTrails": "Glowing Trails",
+  "text.autoconfig.elytratrails.option.glowingTrails.@Tooltip": "Makes trails glow",
+
 
   "text.autoconfig.elytratrails.option.enableTrail": "Enable Elytra Trail",
   "text.autoconfig.elytratrails.option.enableTrail.@Tooltip": "Toggle if elytra trails render",
 
-  "text.autoconfig.elytratrails.option.maxWidth": "Trail Width",
-  "text.autoconfig.elytratrails.option.maxWidth.@Tooltip": "Max trail width (blocks)",
+  "text.autoconfig.elytratrails.option.width": "Trail Width",
+  "text.autoconfig.elytratrails.option.width.@Tooltip": "Max trail width (blocks)",
 
   "text.autoconfig.elytratrails.option.trailLifetime": "Trail Duration",
   "text.autoconfig.elytratrails.option.trailLifetime.@Tooltip": "How long the trail should stay for (seconds)",
@@ -37,6 +40,16 @@
 
   "text.autoconfig.elytratrails.option.enableParticles": "Enable Particles During Flight",
   "text.autoconfig.elytratrails.option.enableParticles.@Tooltip": "Spawns particles around the player during flight, to show speed",
+
+  "text.autoconfig.elytratrails.option.particlesBlockRadius": "Particle Spawn Range",
+  "text.autoconfig.elytratrails.option.particlesBlockRadius.@Tooltip": "Range in blocks to spawn particles",
+
+  "text.autoconfig.elytratrails.option.particlesVelocityAhead": "Particle Spawn Ahead",
+  "text.autoconfig.elytratrails.option.particlesVelocityAhead.@Tooltip": "Amount \"ahead\" of you to particles in front of you",
+
+  "text.autoconfig.elytratrails.option.particlesVelocityBackwards": "Particle Backwards Speed",
+  "text.autoconfig.elytratrails.option.particlesVelocityBackwards.@Tooltip": "Multiple of player velocity to make particles move backwards",
+
 
   "text.autoconfig.elytratrails.option.particle": "Particle Shown",
   "text.autoconfig.elytratrails.option.particle.@Tooltip": "Which particle should appear during flight",
@@ -60,7 +73,11 @@
   "text.autoconfig.elytratrails.option.useSplineTrail.@Tooltip": "Should the trail interpolate between points to make it smoother?",
 
   "text.autoconfig.elytratrails.option.firstPersonFadeTime": "First Person Trail Fade Time",
-  "text.autoconfig.elytratrails.option.firstPersonFadeTime.@Tooltip": "Time for first person trails to fade in",
+  "text.autoconfig.elytratrails.option.firstPersonFadeTime.@Tooltip": "Time for first person trails to fade in (seconds)",
+
+  "text.autoconfig.elytratrails.option.fadeFirstPersonTrail": "Delay First Person Trail",
+  "text.autoconfig.elytratrails.option.fadeFirstPersonTrail.@Tooltip": "First person trails fade in with a delay to prevent annoyance",
+
 
   "text.autoconfig.elytratrails.option.emfSupport": "EMF Model Support",
   "text.autoconfig.elytratrails.option.emfSupport.@Tooltip": "Having this on tries to make it work with EMF models, can cause issues",
@@ -108,8 +125,8 @@
   "text.autoconfig.elytratrails.option.cameraDistanceFadeOthersDefault": "Other's Camera Fade",
   "text.autoconfig.elytratrails.option.cameraDistanceFadeOthersDefault.@Tooltip": "Default: fade other trails when close to your camera",
 
-  "text.autoconfig.elytratrails.option.maxWidthOthersDefault": "Other's Trail Width",
-  "text.autoconfig.elytratrails.option.maxWidthOthersDefault.@Tooltip": "Default max width for other trails (blocks)",
+  "text.autoconfig.elytratrails.option.widthOthersDefault": "Other's Trail Width",
+  "text.autoconfig.elytratrails.option.widthOthersDefault.@Tooltip": "Default max width for other trails (blocks)",
 
   "text.autoconfig.elytratrails.option.trailLifetimeOthersDefault": "Other's Trail Duration",
   "text.autoconfig.elytratrails.option.trailLifetimeOthersDefault.@Tooltip": "Default lifetime for other trails (seconds)",

@@ -60,11 +60,11 @@ public class ModConfig implements ConfigData {
 
     @ConfigEntry.Category("elytra")
     @ConfigEntry.Gui.Tooltip
-    public double width = 0.1;
+    public double width = 0.08;
 
     @ConfigEntry.Category("elytra")
     @ConfigEntry.Gui.Tooltip
-    public double firstPersonFadeTime = 0.1;
+    public double firstPersonFadeTime = 0.3;
 
     @ConfigEntry.Category("elytra")
     @ConfigEntry.Gui.Tooltip
@@ -102,7 +102,7 @@ public class ModConfig implements ConfigData {
 
     @ConfigEntry.Category("elytra")
     @ConfigEntry.Gui.Tooltip
-    public double randomWidthVariation = 0.5;
+    public double randomWidthVariation = 1;
 
 
     //server stuff
@@ -157,7 +157,7 @@ public class ModConfig implements ConfigData {
 
     @ConfigEntry.Category("others")
     @ConfigEntry.Gui.Tooltip
-    public double widthOthersDefault = 0.1;
+    public double widthOthersDefault = 0.08;
 
     @ConfigEntry.Category("others")
     @ConfigEntry.Gui.Tooltip
@@ -189,7 +189,7 @@ public class ModConfig implements ConfigData {
 
     @ConfigEntry.Category("others")
     @ConfigEntry.Gui.Tooltip
-    public double randomWidthVariationOthersDefault = 0.5;
+    public double randomWidthVariationOthersDefault = 1;
 
     //particles
     @ConfigEntry.Category("particles")

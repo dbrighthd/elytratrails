@@ -39,8 +39,8 @@ public class TrailRenderer {
     private ModConfig modConfig;
     private final PerlinNoise perlinNoise =  PerlinNoise.create(RandomSource.create(), List.of(1));
     boolean isFirstperson;
-    private static final float FP_CAMERA_FADE_ZERO = 0.3f;
-    private static final float FP_CAMERA_FADE_FULL = 0.5f;
+    //private static final float FP_CAMERA_FADE_ZERO = 0.3f;
+    //private static final float FP_CAMERA_FADE_FULL = 0.5f;
     private static final float CAMERA_FADE_ZERO = 0.3f;
     private static final float CAMERA_FADE_FULL = 0.5f;
 
@@ -178,7 +178,7 @@ public class TrailRenderer {
             float scaleStart = computeWidthScalingButGood(totalTrailLength- v1, -(endOfTrail - v1), trail.config());
             float scaleEnd = computeWidthScalingButGood(totalTrailLength- v2, -(endOfTrail - v2), trail.config());
 
-            if(isFirstperson && modConfig.fadeFirstPersonTrail)
+            if(isFirstperson && modConfig.fadeFirstPersonTrail && modConfig.firstPersonFadeTime > 0)
             {
                 scaleStart *= firstPersonWidthFadeFactor(start, currentTime);
                 scaleEnd *= firstPersonWidthFadeFactor(end, currentTime);
@@ -187,8 +187,8 @@ public class TrailRenderer {
 
             if(trail.config().enableRandomWidth())
             {
-                scaleStart = scaleStart * (float)trail.config().randomWidthVariation() *((float)( perlinNoise.getValue(v1,0,0)) + 1);
-                scaleEnd = scaleEnd * (float)trail.config().randomWidthVariation() *((float)( perlinNoise.getValue(v2,0,0)) + 1);
+                scaleStart = scaleStart * (float)trail.config().randomWidthVariation() *((float)( perlinNoise.getValue(startPos.x,startPos.y,startPos.z)) + 1);
+                scaleEnd = scaleEnd * (float)trail.config().randomWidthVariation() *((float)( perlinNoise.getValue(endPos.x,endPos.y,endPos.z)) + 1);
 
             }
             float halfWidthStart = (float) (trail.config().maxWidth() / 2f) * scaleStart;
@@ -213,15 +213,17 @@ public class TrailRenderer {
         return t * t * (3f - 2f * t);
     }
 
-    static float firstPersonWidthFadeFactor(double epoch, long currentTime) {
+    private float firstPersonWidthFadeFactor(double epoch, long currentTime) {
         float fadeAmount = ((float)(currentTime - epoch))/1000;
 
-        float fadeRange = FP_CAMERA_FADE_FULL - FP_CAMERA_FADE_ZERO;
+        float fpCameraFadeFull = (float)modConfig.firstPersonFadeTime + 0.2f;
+        float fpCameraFadeZero = (float)modConfig.firstPersonFadeTime;
+        float fadeRange = fpCameraFadeFull - (float)modConfig.firstPersonFadeTime;
         if (fadeRange <= 1e-6f) {
-            return (fadeAmount >= FP_CAMERA_FADE_FULL) ? 1.0f : 0.0f;
+            return (fadeAmount >= fpCameraFadeFull) ? 1.0f : 0.0f;
         }
 
-        float normalizedFade = (fadeAmount - FP_CAMERA_FADE_ZERO) / fadeRange;
+        float normalizedFade = (fadeAmount - fpCameraFadeZero) / fadeRange;
         if (normalizedFade < 0f) normalizedFade = 0f;
         if (normalizedFade > 1f) normalizedFade = 1f;
         return normalizedFade;
