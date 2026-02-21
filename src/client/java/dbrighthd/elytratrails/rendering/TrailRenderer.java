@@ -104,6 +104,10 @@ public class TrailRenderer {
         }
         else
         {
+            if(ShaderChecksUtil.isUsingShaders())
+            {
+                return RenderTypes.entityCutoutNoCull(texture);
+            }
             return TrailPipelines.entityTranslucentCull(texture);
         }
     }

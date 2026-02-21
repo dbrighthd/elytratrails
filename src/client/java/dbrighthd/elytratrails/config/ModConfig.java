@@ -60,7 +60,7 @@ public class ModConfig implements ConfigData {
 
     @ConfigEntry.Category("elytra")
     @ConfigEntry.Gui.Tooltip
-    public double width = 0.075;
+    public double width = 0.1;
 
     @ConfigEntry.Category("elytra")
     @ConfigEntry.Gui.Tooltip
@@ -157,7 +157,7 @@ public class ModConfig implements ConfigData {
 
     @ConfigEntry.Category("others")
     @ConfigEntry.Gui.Tooltip
-    public double widthOthersDefault = 0.075;
+    public double widthOthersDefault = 0.1;
 
     @ConfigEntry.Category("others")
     @ConfigEntry.Gui.Tooltip
