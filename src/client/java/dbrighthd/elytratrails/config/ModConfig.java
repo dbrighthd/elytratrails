@@ -20,6 +20,7 @@ public class ModConfig implements ConfigData {
 
     @ConfigEntry.Category("general")
     @ConfigEntry.Gui.Tooltip
+    @ConfigEntry.Gui.Excluded
     public boolean resourcePackOverride = true;
 
 
@@ -101,7 +102,6 @@ public class ModConfig implements ConfigData {
 
     /**
      * Optional pride flag id (from Pride Lib / mod id "pride").
-     *
      * When non-empty and Pride Lib is present, the trail will be colored as horizontal stripes
      * across its width (like a texture), while still respecting width variation.
      */
