@@ -67,7 +67,7 @@ dependencies {
 	modApi(modApi "me.shedaniel.cloth:cloth-config-fabric:21.11.153") {
 		exclude(group: "net.fabricmc.fabric-api")
 	}
-	modImplementation(include("io.github.queerbric:pridelib:${pridelib_version}"))
+	//modImplementation(include("io.github.queerbric:pridelib:${pridelib_version}"))
 
 }
 
