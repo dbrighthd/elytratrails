@@ -11,7 +11,7 @@
   "text.autoconfig.elytratrails.option.enableAllTrails.@Tooltip": "Master toggle: enables/disables every trail type in the mod",
 
   "text.autoconfig.elytratrails.option.translucentTrails": "Translucent Trails",
-  "text.autoconfig.elytratrails.option.translucentTrails.@Tooltip": "Lets trails use fading and alpha, but can cause issues with translucency sorting. (Always on when shaders are on)",
+  "text.autoconfig.elytratrails.option.translucentTrails.@Tooltip": "Lets trails use fading and alpha, but can cause issues with translucency sorting",
 
   "text.autoconfig.elytratrails.option.glowingTrails": "Glowing Trails",
   "text.autoconfig.elytratrails.option.glowingTrails.@Tooltip": "Makes trails glow",
@@ -19,6 +19,13 @@
 
   "text.autoconfig.elytratrails.option.enableTrail": "Enable Elytra Trail",
   "text.autoconfig.elytratrails.option.enableTrail.@Tooltip": "Toggle if elytra trails render",
+
+  "text.autoconfig.elytratrails.option.enableTwirls": "Enable Twirling",
+  "text.autoconfig.elytratrails.option.enableTwirls.@Tooltip": "If turned on, you can twirl with the keybinds (look for them in Controls!)",
+
+  "text.autoconfig.elytratrails.option.alwaysShowTrailDuringTwirl": "Ignore Speed For Trail When Twirling",
+  "text.autoconfig.elytratrails.option.alwaysShowTrailDuringTwirl.@Tooltip": "If turned on, trails will always show when twirling (ignores \"speed dependent trail\" settings)",
+
 
   "text.autoconfig.elytratrails.option.width": "Trail Width",
   "text.autoconfig.elytratrails.option.width.@Tooltip": "Max trail width (blocks)",
@@ -171,9 +178,9 @@
 
   "key.category.elytratrails.skibidi": "Elytra Contrails Keybinds",
   "key.elytratrails.toggle": "Toggle Elytra Contrails",
-  "key.elytratrails.twirl_l": "Lil Twirl Left",
-  "key.elytratrails.twirl_r": "Lil Twirl Right",
-  "key.elytratrails.continuous_twirl_r": "Hold Twirl Left",
-  "key.elytratrails.continuous_twirl_l": "Hold Twirl Right",
+  "key.elytratrails.twirl_l": "One Twirl Left",
+  "key.elytratrails.twirl_r": "One Twirl Right",
+  "key.elytratrails.continuous_twirl_r": "Continuous Twirl Left",
+  "key.elytratrails.continuous_twirl_l": "Continuous Twirl Right",
   "key.elytratrails.twirl_random": "Lil Twirl Alternating"
 }

@@ -3,8 +3,12 @@ package dbrighthd.elytratrails.controller;
 import dbrighthd.elytratrails.network.TwirlStateC2SPayload;
 import it.unimi.dsi.fastutil.ints.Int2ObjectOpenHashMap;
 import net.fabricmc.fabric.api.client.networking.v1.ClientPlayNetworking;
+import net.minecraft.client.Minecraft;
 import net.minecraft.util.Mth;
 import net.minecraft.util.Util;
+import net.minecraft.world.entity.vehicle.minecart.Minecart;
+
+import static dbrighthd.elytratrails.ElytraTrailsClient.getConfig;
 
 public final class EntityTwirlManager {
     private static final double TAU = Math.PI * 2.0;
@@ -207,5 +211,19 @@ public final class EntityTwirlManager {
         ClientPlayNetworking.send(payload);
     }
 
+    public static boolean isRolling(int entityId)
+    {
+        if(!getConfig().enableTwirls)
+        {
+            return false;
+        }
+        if(Minecraft.getInstance().player != null && entityId == Minecraft.getInstance().player.getId())
+        {
+            return TwirlRoll.isAnyActive();
+        }
+        TwirlData data = BY_ENTITY.get(entityId);
+        return data != null && data.active;
+
+    }
     private EntityTwirlManager() {}
 }

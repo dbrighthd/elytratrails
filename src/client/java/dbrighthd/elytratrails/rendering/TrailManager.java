@@ -25,6 +25,7 @@ import java.util.IdentityHashMap;
 import java.util.List;
 
 import static dbrighthd.elytratrails.ElytraTrailsClient.getConfig;
+import static dbrighthd.elytratrails.controller.EntityTwirlManager.isRolling;
 
 public class TrailManager {
     private static final Logger LOGGER = LoggerFactory.getLogger(TrailManager.class);
@@ -126,7 +127,7 @@ public class TrailManager {
             if (player.getPose() != Pose.FALL_FLYING) return false;
         }
 
-        return !config.speedDependentTrail() || (entity.getDeltaMovement().lengthSqr() > config.trailMinSpeed() * config.trailMinSpeed());
+        return (isRolling(entity.getId()) && getConfig().alwaysShowTrailDuringTwirl) || !config.speedDependentTrail() || (entity.getDeltaMovement().lengthSqr() > config.trailMinSpeed() * config.trailMinSpeed());
     }
 
     public List<Trail> trails() {

@@ -12,6 +12,8 @@ import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
+import static dbrighthd.elytratrails.ElytraTrailsClient.getConfig;
+
 @Mixin(AvatarRenderer.class)
 public abstract class AvatarRendererMixin {
 
@@ -20,6 +22,10 @@ public abstract class AvatarRendererMixin {
             at = @At("TAIL")
     )
     private void elytratrails$addSpinRoll(AvatarRenderState state, PoseStack poseStack, float f, float g, CallbackInfo ci) {
+        if (!getConfig().enableTwirls)
+        {
+            return;
+        }
         if (!state.isFallFlying) return;
 
         var mc = Minecraft.getInstance();

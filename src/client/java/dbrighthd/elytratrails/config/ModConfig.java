@@ -31,6 +31,15 @@ public class ModConfig implements ConfigData {
     @ConfigEntry.Gui.Tooltip
     public boolean glowingTrails = true;
 
+    @ConfigEntry.Category("general")
+    @ConfigEntry.Gui.Tooltip
+    public boolean enableTwirls = true;
+
+    @ConfigEntry.Category("general")
+    @ConfigEntry.Gui.Tooltip
+    public boolean alwaysShowTrailDuringTwirl = false;
+
+
     //your trail stuff
     @ConfigEntry.Category("elytra")
     @ConfigEntry.Gui.PrefixText
