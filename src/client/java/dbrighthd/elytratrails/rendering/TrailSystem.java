@@ -21,4 +21,9 @@ public class TrailSystem {
     {
         return manager;
     }
+    public static WingTipSampler getWingtipSampler()
+    {
+        return sampler;
+    }
+
 }

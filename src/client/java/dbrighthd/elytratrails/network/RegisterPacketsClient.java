@@ -1,6 +1,7 @@
 package dbrighthd.elytratrails.network;
 
 import dbrighthd.elytratrails.controller.EntityTwirlManager;
+import dbrighthd.elytratrails.rendering.Trail;
 import dbrighthd.elytratrails.rendering.TrailSystem;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
@@ -29,6 +30,7 @@ public class RegisterPacketsClient {
             {
                 ClientPlayerConfigStore.CLIENT_PLAYER_CONFIGS.remove(payload.entityId());
             }
+            TrailSystem.getWingtipSampler().removeFromEmfCache(payload.entityId());
         });
         ClientPlayConnectionEvents.JOIN.register((handler, sender, client) -> {
             //if showTrailToOtherPlayers is turned on, we need to share that to other clients or else they will see the default.
@@ -37,6 +39,9 @@ public class RegisterPacketsClient {
                 ClientPlayNetworking.send(new PlayerConfigC2SPayload(getLocalPlayerConfigToSend()));
             }
             ClientPlayNetworking.send(new GetAllRequestC2SPayload());
+        });
+        ClientPlayConnectionEvents.DISCONNECT.register((handler, sender) -> {
+            TrailSystem.getWingtipSampler().removeAllEmfCache();
         });
     }
 }

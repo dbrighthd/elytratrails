@@ -61,6 +61,14 @@ public final class EmfModelNameUtil {
 
     }
 
+    public static int getModelVariantFromModel(ModelPart emfRoot)
+    {
+        int variant = 1;
+        if (emfRoot instanceof EMFModelPartWithState withState) {
+            variant = Math.max(1, withState.currentModelVariant);
+        }
+        return variant;
+    }
     private static @Nullable String sanitizeModelName(@Nullable String raw) {
         if (raw == null) return null;
 

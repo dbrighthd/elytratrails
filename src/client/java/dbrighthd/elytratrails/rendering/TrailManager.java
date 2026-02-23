@@ -21,6 +21,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.ArrayList;
+import java.util.IdentityHashMap;
 import java.util.List;
 
 import static dbrighthd.elytratrails.ElytraTrailsClient.getConfig;
@@ -32,6 +33,7 @@ public class TrailManager {
     private final List<Trail> trails = new ArrayList<>();
     private float lastSample;
     private final WingTipSampler sampler;
+    private final IdentityHashMap<Trail, Float> cachedLengths = new IdentityHashMap<>();
 
     public TrailManager(WingTipSampler sampler) {
         this.sampler = sampler;
@@ -46,6 +48,7 @@ public class TrailManager {
             gatherPlayerTrails(Minecraft.getInstance());
         });
     }
+
 
     private void removeDeadPoints(Minecraft ctx) {
         ModConfig config = getConfig();
@@ -74,32 +77,42 @@ public class TrailManager {
             if (valid) {
                 List<Emitter> emitters = sampler.getTrailEmitterPositions(player, ctx.getDeltaTracker().getGameTimeDeltaPartialTick(false));
 
-                if (emitters.isEmpty()) continue;
+                if (emitters.isEmpty())
+                {
+                    activeTrails.remove(eid);
+                    continue;
+                }
 
                 EntityTrailGroup trailGroup = activeTrails.computeIfAbsent(eid, id -> {
                     List<Trail> emittedTrails = new ArrayList<>();
                     for (Emitter emitter : emitters) {
                         emittedTrails.add(Trail.fromPlayerConfig(player.getId(), emitter.flipUv()));
                     }
+
                     trails.addAll(emittedTrails);
                     LOGGER.info("Created new trail group with {} trails for entity {} (player)", emittedTrails.size(), id);
                     return new EntityTrailGroup(
                             emittedTrails
                     );
                 });
+                if (trailGroup.trails().size() != emitters.size()) {
+                    activeTrails.remove(eid);
+                    //trails.removeAll(trailGroup.trails());
+                    return;
+                }
                 for (int i = 0; i < trailGroup.trails().size(); i++)  {
 
                     Trail trail = trailGroup.trails().get(i);
-                    if (i >= emitters.size())
-                    {
-                        removeAllTrails();
-                        return;
-                    }
+//                    if (i >= emitters.size())
+//                    {
+//                        activeTrails.remove(eid);
+//                        continue;
+//                    }
                     Vec3 emitter = emitters.get(i).position();
                     trail.points().add(new Trail.Point(emitter));
                 }
             } else {
-                activeTrails.remove(eid);
+                removeTrail(eid);
             }
         }
     }
@@ -107,7 +120,6 @@ public class TrailManager {
     {
         return TrailPackConfigManager.resolveFromPlayerConfig(ClientPlayerConfigStore.getOrDefault(entityId));
     }
-
 
     public static boolean isEntityTrailValid(TrailPackConfigManager.ResolvedTrailSettings config, Entity entity) {
         if (entity instanceof Player player) {

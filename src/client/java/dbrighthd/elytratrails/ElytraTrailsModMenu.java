@@ -33,7 +33,7 @@ public class ElytraTrailsModMenu implements ModMenuApi {
                     refreshLocalConfigs();
                     if (mc.getConnection() != null && mc.player != null && mc.level != null) {
                         TrailSystem.getTrailManager().removeTrail(mc.player.getId());
-
+                        TrailSystem.getWingtipSampler().removeAllEmfCache();
                         if(getConfig().shareTrail || !getConfig().showTrailToOtherPlayers)
                         {
                             ClientPlayNetworking.send(new PlayerConfigC2SPayload(getLocalPlayerConfigToSend()));

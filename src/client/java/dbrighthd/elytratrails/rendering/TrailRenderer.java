@@ -38,6 +38,7 @@ public class TrailRenderer {
     private float endOfTrail = 0.0f;
     private ModConfig modConfig;
     private final PerlinNoise perlinNoise =  PerlinNoise.create(RandomSource.create(), List.of(1));
+    private float totalTrailLength;
     boolean isFirstperson;
     //private static final float FP_CAMERA_FADE_ZERO = 0.3f;
     //private static final float FP_CAMERA_FADE_FULL = 0.5f;
@@ -58,13 +59,22 @@ public class TrailRenderer {
             List<Trail.Point> points = trail.points();
             if (points.size() < 4) continue; // splines :3
 
-            float length = trail.length();
+            //float length = trail.length();
             RenderType renderType = getRenderType(config,trail.texture());
 
 
             ctx.commandQueue().order(1).submitCustomGeometry(stack, renderType, (pose, consumer) -> {
                 Camera camera = ctx.gameRenderer().getMainCamera();
 
+                totalTrailLength = 0f;
+                for (int i = 0; i < points.size() - 1; i++) {
+                    Trail.Point p0 = points.get(Math.max(i - 1, 0));
+                    Trail.Point p1 = points.get(i);
+                    Trail.Point p2 = points.get(i + 1);
+                    Trail.Point p3 = points.get(Math.min(i + 2, points.size() - 1));
+
+                    calculateSubdivideLength(p0, p1, p2, p3, 0f, 1f);
+                }
                 this.accumDist = 0f;
                 this.endOfTrail = 0f;
                 this.modConfig = getConfig();
@@ -75,7 +85,7 @@ public class TrailRenderer {
                     Trail.Point p2 = points.get(i + 1);
                     Trail.Point p3 = points.get(Math.min(i + 2, points.size() - 1));
 
-                    renderSubdividedSegment(pose, consumer, p0, p1, p2, p3, 0f, 1f, camera, trail, length, trail.config().color());
+                    renderSubdividedSegment(pose, consumer, p0, p1, p2, p3, 0f, 1f, camera, trail, trail.config().color());
                 }
             });
         }
@@ -115,7 +125,7 @@ public class TrailRenderer {
             PoseStack.Pose pose, VertexConsumer consumer,
             Trail.Point point0, Trail.Point point1, Trail.Point point2, Trail.Point point3,
             float tStart, float tEnd,
-            Camera camera, Trail trail, float totalTrailLength,  int color
+            Camera camera, Trail trail,  int color
     ) {
         Vec3 p0 = point0.pos();
         Vec3 p1 = point1.pos();
@@ -141,8 +151,8 @@ public class TrailRenderer {
         }
 
         if (needsSplit) {
-            renderSubdividedSegment(pose, consumer, point0, point1, point2, point3, tStart, midT, camera, trail, totalTrailLength, color);
-            renderSubdividedSegment(pose, consumer, point0, point1, point2, point3, midT, tEnd, camera, trail, totalTrailLength, color);
+            renderSubdividedSegment(pose, consumer, point0, point1, point2, point3, tStart, midT, camera, trail, color);
+            renderSubdividedSegment(pose, consumer, point0, point1, point2, point3, midT, tEnd, camera, trail, color);
         } else {
             Vec3 startTan = SplineInterpolation.catmullRomTangent(p0, p1, p2, p3, tStart).normalize();
             Vec3 endTan = SplineInterpolation.catmullRomTangent(p0, p1, p2, p3, tEnd).normalize();
@@ -177,6 +187,8 @@ public class TrailRenderer {
 
             float scaleStart = computeWidthScaling(totalTrailLength- v1, -(endOfTrail - v1), trail.config());
             float scaleEnd = computeWidthScaling(totalTrailLength- v2, -(endOfTrail - v2), trail.config());
+            //float scaleStart = 1f;
+            // scaleEnd = 1f;
 
             if(isFirstperson && modConfig.fadeFirstPersonTrail && modConfig.firstPersonFadeTime > 0)
             {
@@ -340,5 +352,39 @@ public class TrailRenderer {
                 .setLight(lightStart)
                 .setColor(colorStart)
                 .setUv(v1, flipUv ? 1 : -1);
+    }
+
+    private void calculateSubdivideLength( Trail.Point point0, Trail.Point point1, Trail.Point point2, Trail.Point point3,
+            float tStart, float tEnd
+    ) {
+        Vec3 p0 = point0.pos();
+        Vec3 p1 = point1.pos();
+        Vec3 p2 = point2.pos();
+        Vec3 p3 = point3.pos();
+
+        Vec3 startPos = SplineInterpolation.catmullRom(p0, p1, p2, p3, tStart);
+        Vec3 endPos = SplineInterpolation.catmullRom(p0, p1, p2, p3, tEnd);
+        float midT = (tStart + tEnd) / 2f;
+        Vec3 midPos = SplineInterpolation.catmullRom(p0, p1, p2, p3, midT);
+
+        Vec3 chord = endPos.subtract(startPos);
+        double chordLenSq = chord.length();
+
+        boolean needsSplit = false;
+        if (chordLenSq > 0.01) {
+            Vec3 toMid = midPos.subtract(startPos);
+            double distFromChord = toMid.cross(chord).length() / chordLenSq;
+
+            if (distFromChord > 0.02 && (tEnd - tStart) > 0.05) {
+                needsSplit = true;
+            }
+        }
+
+        if (needsSplit) {
+            calculateSubdivideLength(point0, point1, point2, point3, tStart, midT);
+            calculateSubdivideLength(point0, point1, point2, point3, midT, tEnd);
+        } else {
+            this.totalTrailLength += (float) startPos.distanceTo(endPos);
+        }
     }
 }

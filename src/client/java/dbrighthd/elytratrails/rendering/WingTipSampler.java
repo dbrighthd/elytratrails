@@ -4,6 +4,7 @@ import com.mojang.blaze3d.vertex.PoseStack;
 import dbrighthd.elytratrails.ElytraTrailsClient;
 import dbrighthd.elytratrails.compat.ModStatuses;
 import dbrighthd.elytratrails.compat.emf.EmfAnimationHooks;
+import dbrighthd.elytratrails.compat.emf.EmfModelNameUtil;
 import dbrighthd.elytratrails.compat.emf.EmfWingTipHooks;
 import dbrighthd.elytratrails.config.ModConfig;
 import dbrighthd.elytratrails.mixin.client.EquipmentElytraModelAccessor;
@@ -33,12 +34,15 @@ import org.jetbrains.annotations.Nullable;
 import org.joml.Quaternionf;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import static dbrighthd.elytratrails.compat.emf.EmfModelNameUtil.getModelVariantFromModel;
+
 public class WingTipSampler {
     private final SubmitNodeStorage submitStorage = new SubmitNodeStorage();
-
+    private final Map<Integer, Integer> emfModelVariantCache = new HashMap<>();
     public @NotNull List<Emitter> getTrailEmitterPositions(Player player, float partialTick) {
         ModConfig config = ElytraTrailsClient.getConfig();
         Minecraft mc = Minecraft.getInstance();
@@ -63,11 +67,28 @@ public class WingTipSampler {
         ModelPart animatedElytraRoot = tryGetAnimatedElytraRoot(elytraModel, player);
 
         if (ModStatuses.EMF_LOADED && config.emfSupport) {
+            int eid = player.getId();
+            int variant = getModelVariantFromModel(animatedElytraRoot);
+            if (!emfModelVariantCache.containsKey(eid) || !(emfModelVariantCache.get(eid) == variant))
+            {
+                System.out.println("MODEL REGISTERED OR CHANGED");
+                emfModelVariantCache.put(eid,variant);
+                return List.of();
+            }
             List<EmfWingTipHooks.SpawnerPath> spawners = EmfWingTipHooks.findAllSpawnerPaths(leftWing, rightWing);
             if (!spawners.isEmpty()) return getTrailEmittersFromBones(basePose, animatedElytraRoot, elytraModel, spawners, camera.position(), entityWorldOffset);
         }
 
         return getVanillaTrailEmitters(basePose, animatedElytraRoot, elytraModel, camera.position(), entityWorldOffset);
+    }
+
+    public void removeFromEmfCache(int eid)
+    {
+        emfModelVariantCache.remove(eid);
+    }
+    public void removeAllEmfCache()
+    {
+        emfModelVariantCache.clear();
     }
 
     private @NotNull List<Emitter> getTrailEmittersFromBones(@NotNull PoseStack stack, @Nullable ModelPart elytraRoot, @NotNull ElytraModel model, @NotNull List<EmfWingTipHooks.SpawnerPath> spawners, @NotNull Vec3 cameraPos, @NotNull Vec3 entityWorldOffset) {

@@ -16,6 +16,7 @@ import net.fabricmc.api.ClientModInitializer;
 import net.fabricmc.fabric.api.resource.ResourceManagerHelper;
 import net.fabricmc.fabric.api.resource.SimpleSynchronousResourceReloadListener;
 import net.fabricmc.loader.api.FabricLoader;
+import net.minecraft.client.Minecraft;
 import net.minecraft.resources.Identifier;
 import net.minecraft.server.packs.PackType;
 import net.minecraft.server.packs.resources.ResourceManager;
@@ -57,7 +58,7 @@ public class ElytraTrailsClient implements ClientModInitializer {
 					dbrighthd.elytratrails.trailrendering.TrailTextureRegistry
 							.reloadNow(manager);
 
-
+					TrailSystem.getWingtipSampler().removeAllEmfCache();
 					if (FabricLoader.getInstance().isModLoaded("entity_model_features")) {
 						onResourceReload();
 					}
