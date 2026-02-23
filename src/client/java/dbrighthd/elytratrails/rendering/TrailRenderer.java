@@ -116,7 +116,7 @@ public class TrailRenderer {
         {
             if(ShaderChecksUtil.isUsingShaders())
             {
-                return RenderTypes.entityCutoutNoCull(texture);
+                return RenderTypes.entityTranslucent(texture);
             }
             return TrailPipelines.entityTranslucentCull(texture);
         }
