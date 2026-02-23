@@ -1,7 +1,6 @@
 package dbrighthd.elytratrails.network;
 
 import dbrighthd.elytratrails.controller.EntityTwirlManager;
-import dbrighthd.elytratrails.rendering.Trail;
 import dbrighthd.elytratrails.rendering.TrailSystem;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
@@ -16,9 +15,7 @@ public class RegisterPacketsClient {
     @Environment(EnvType.CLIENT)
     public static void initClient() {
         ClientPlayNetworking.registerGlobalReceiver(TwirlStateS2CPayload.ID, (payload, context) ->
-        {
-            EntityTwirlManager.setEntityTwirlState(payload.entityId(), payload.twirlState());
-        });
+                EntityTwirlManager.setEntityTwirlState(payload.entityId(), payload.twirlState()));
         ClientPlayNetworking.registerGlobalReceiver(PlayerConfigS2CPayload.ID, (payload, context) ->
         {
             TrailSystem.getTrailManager().removeTrail(payload.entityId());
@@ -40,8 +37,6 @@ public class RegisterPacketsClient {
             }
             ClientPlayNetworking.send(new GetAllRequestC2SPayload());
         });
-        ClientPlayConnectionEvents.DISCONNECT.register((handler, sender) -> {
-            TrailSystem.getWingtipSampler().removeAllEmfCache();
-        });
+        ClientPlayConnectionEvents.DISCONNECT.register((handler, sender) -> TrailSystem.getWingtipSampler().removeAllEmfCache());
     }
 }

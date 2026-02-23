@@ -1,4 +1,3 @@
-// EmfWingTipHooks.java
 package dbrighthd.elytratrails.compat.emf;
 
 import net.minecraft.client.model.geom.ModelPart;
@@ -64,12 +63,8 @@ public final class EmfWingTipHooks {
 
     private record Found(WhichRoot where, String path, String key, ModelPart part) {}
 
-    private static Found findFirstByNameInEitherTree(ModelPart a, ModelPart b, String[] aliases) {
-        Found inA = findFirstByName(a, aliases, WhichRoot.LEFT_WING);
-        if (inA != null) return inA;
-        return findFirstByName(b, aliases, WhichRoot.RIGHT_WING);
-    }
 
+    @SuppressWarnings("unused")
     private static Found findFirstByName(ModelPart root, String[] aliases, WhichRoot where) {
         Deque<Node> stack = new ArrayDeque<>();
         stack.push(new Node(root, ""));

@@ -18,6 +18,7 @@ public class ModConfig implements ConfigData {
     @ConfigEntry.Gui.Tooltip
     public boolean translucentTrails = false;
 
+    @SuppressWarnings("unused")
     @ConfigEntry.Category("general")
     @ConfigEntry.Gui.Tooltip
     @ConfigEntry.Gui.Excluded
@@ -100,11 +101,7 @@ public class ModConfig implements ConfigData {
     @ConfigEntry.Gui.Tooltip
     public String color = "#FFFFFF";
 
-    /**
-     * Optional pride flag id (from Pride Lib / mod id "pride").
-     * When non-empty and Pride Lib is present, the trail will be colored as horizontal stripes
-     * across its width (like a texture), while still respecting width variation.
-     */
+
     @ConfigEntry.Category("elytra")
     @ConfigEntry.Gui.Tooltip
     public String prideTrail = "";

@@ -4,23 +4,19 @@ import dbrighthd.elytratrails.compat.Compatibility;
 import dbrighthd.elytratrails.config.ModConfig;
 import dbrighthd.elytratrails.config.pack.TrailPackConfigManager;
 import dbrighthd.elytratrails.handler.ParticleHandler;
-import dbrighthd.elytratrails.handler.TrailRenderHandler;
-import dbrighthd.elytratrails.handler.WingTipSamplerHandler;
 import dbrighthd.elytratrails.network.RegisterPacketsClient;
 import dbrighthd.elytratrails.rendering.TrailPipelines;
 import dbrighthd.elytratrails.rendering.TrailSystem;
-import dbrighthd.elytratrails.trailrendering.TrailRenderType;
+import dbrighthd.elytratrails.rendering.TrailTextureRegistry;
 import me.shedaniel.autoconfig.AutoConfig;
 import me.shedaniel.autoconfig.serializer.GsonConfigSerializer;
 import net.fabricmc.api.ClientModInitializer;
 import net.fabricmc.fabric.api.resource.ResourceManagerHelper;
 import net.fabricmc.fabric.api.resource.SimpleSynchronousResourceReloadListener;
 import net.fabricmc.loader.api.FabricLoader;
-import net.minecraft.client.Minecraft;
 import net.minecraft.resources.Identifier;
 import net.minecraft.server.packs.PackType;
 import net.minecraft.server.packs.resources.ResourceManager;
-import net.minecraft.world.level.levelgen.synth.PerlinNoise;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.Objects;
@@ -37,11 +33,8 @@ public class ElytraTrailsClient implements ClientModInitializer {
 		Compatibility.init();
 		AutoConfig.register(ModConfig.class, GsonConfigSerializer::new);
 		ElytraTrailsKeybind.init();
-//		TrailRenderType.init();
-//		TrailRenderHandler.init();
 		TrailPipelines.init();
 		TrailSystem.init();
-//		WingTipSamplerHandler.init();
 		ParticleHandler.init();
 		refreshLocalConfigs();
 		RegisterPacketsClient.initClient();
@@ -55,7 +48,7 @@ public class ElytraTrailsClient implements ClientModInitializer {
 
 				@Override
 				public void onResourceManagerReload(@NotNull ResourceManager manager) {
-					dbrighthd.elytratrails.trailrendering.TrailTextureRegistry
+					TrailTextureRegistry
 							.reloadNow(manager);
 
 					TrailSystem.getWingtipSampler().removeAllEmfCache();

@@ -218,6 +218,7 @@ public class TrailRenderer {
         }
     }
 
+    @SuppressWarnings("unused")
     private static float cameraDistanceFade(float cameraDistBlocks) {
         float denom = (CAMERA_FADE_FULL - CAMERA_FADE_ZERO);
         float t = (cameraDistBlocks - CAMERA_FADE_ZERO) / denom;
@@ -261,6 +262,7 @@ public class TrailRenderer {
         float mult = Math.min(up, down);
         return (float) Math.pow(mult, 0.9f);
     }
+    @SuppressWarnings("unused")
     private float computeWidthScalingButGood(float distFromStart, float distToEnd, TrailPackConfigManager.ResolvedTrailSettings config)
     {
         return computeWidthScalingStart(distFromStart, config) * computeWidthScalingEnd(distToEnd, config);
@@ -295,6 +297,7 @@ public class TrailRenderer {
         else return 1.0f - (age / (float) maxLifetime);
     }
 
+    @SuppressWarnings("unused")
     private float computeEnd(double epoch, long currentTime, long maxLifetime) {
         long age = (long) (currentTime - epoch);
         if (age >= maxLifetime) return 0.0f;

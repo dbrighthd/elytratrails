@@ -1,4 +1,4 @@
-package dbrighthd.elytratrails.trailrendering;
+package dbrighthd.elytratrails.rendering;
 
 import net.minecraft.resources.Identifier;
 import net.minecraft.server.packs.resources.ResourceManager;
@@ -11,10 +11,8 @@ import java.util.Set;
 /**
  * Resolves custom trail textures from:
  *   assets/elytratrails/textures/trails/*.png
- *
  * Users can specify a string like "genderfluid" (case-insensitive) and it maps to:
  *   elytratrails:textures/trails/genderfluid.png
- *
  * If the texture doesn't exist, resolveTextureOrNull returns null so the caller can
  * fall back to the default TRAIL_TEX.
  */
@@ -26,7 +24,6 @@ public final class TrailTextureRegistry {
     /**
      * Synchronously reload available trail textures from the current ResourceManager.
      * Intended to be called from your existing SimpleSynchronousResourceReloadListener.
-     *
      * Scans:
      *   assets/elytratrails/textures/trails/*.png
      */
@@ -52,9 +49,7 @@ public final class TrailTextureRegistry {
     /**
      * Returns a texture Identifier if present in assets/elytratrails/textures/trails/,
      * otherwise returns null (caller should use default trail texture).
-     *
      * Case-insensitive.
-     *
      * Accepts:
      *  - "genderfluid"
      *  - "ELYTRATRAILS:genderfluid" (namespace ignored; path used)

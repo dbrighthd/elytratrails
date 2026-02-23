@@ -11,10 +11,10 @@ public final class TwirlController {
     private static boolean active = false;
 
     private static boolean keyDown = false;
-    private static int pendingMode = +1;
+    private static int pendingMode = 1;
 
-    private static int currentDir = +1;
-    private static int nextAltDir = +1;
+    private static int currentDir = 1;
+    private static int nextAltDir = 1;
 
     public static void tickTwirlKey(boolean isDown, int desiredMode) {
         boolean wasDown = keyDown;
@@ -45,7 +45,7 @@ public final class TwirlController {
         EntityTwirlManager.sendStatePacket(currentDir);
     }
 
-    public static float getExtraRollRadians(float partialTick) {
+    public static float getExtraRollRadians() {
         if (!active) return 0f;
 
         long now = Util.getNanos();
@@ -54,11 +54,10 @@ public final class TwirlController {
         if (t >= 1.0) {
             if (keyDown) {
                 startSpin();
-                return 0f;
             } else {
                 active = false;
-                return 0f;
             }
+            return 0f;
         }
 
         t = Mth.clamp(t, 0.0, 1.0);

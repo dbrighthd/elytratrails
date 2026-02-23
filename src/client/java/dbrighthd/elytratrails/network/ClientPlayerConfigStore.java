@@ -155,7 +155,7 @@ public final class ClientPlayerConfigStore
 
     public static PlayerConfig getOrDefault(int entityId)
     {
-        if(Minecraft.getInstance().player.getId() == entityId)
+        if(Minecraft.getInstance().player != null && Minecraft.getInstance().player.getId() == entityId)
         {
             return getLocalPlayerConfig();
         }

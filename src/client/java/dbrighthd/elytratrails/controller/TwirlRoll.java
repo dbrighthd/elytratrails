@@ -8,10 +8,10 @@ public final class TwirlRoll {
         return TwirlController.isActive() || ContinuousTwirlController.isActive();
     }
 
-    public static float getExtraRollRadians(float partialTick) {
+    public static float getExtraRollRadians() {
         if (ContinuousTwirlController.isActive()) {
-            return -ContinuousTwirlController.getExtraRollRadians(partialTick);
+            return -ContinuousTwirlController.getExtraRollRadians();
         }
-        return TwirlController.getExtraRollRadians(partialTick);
+        return TwirlController.getExtraRollRadians();
     }
 }

@@ -4,7 +4,6 @@ import com.mojang.blaze3d.vertex.PoseStack;
 import dbrighthd.elytratrails.ElytraTrailsClient;
 import dbrighthd.elytratrails.compat.ModStatuses;
 import dbrighthd.elytratrails.compat.emf.EmfAnimationHooks;
-import dbrighthd.elytratrails.compat.emf.EmfModelNameUtil;
 import dbrighthd.elytratrails.compat.emf.EmfWingTipHooks;
 import dbrighthd.elytratrails.config.ModConfig;
 import dbrighthd.elytratrails.mixin.client.EquipmentElytraModelAccessor;
@@ -38,7 +37,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import static dbrighthd.elytratrails.compat.emf.EmfModelNameUtil.getModelVariantFromModel;
+import static dbrighthd.elytratrails.compat.emf.EmfTrailSpawnerRegistry.getModelVariantFromModel;
 
 public class WingTipSampler {
     private final SubmitNodeStorage submitStorage = new SubmitNodeStorage();
@@ -234,7 +233,7 @@ public class WingTipSampler {
         EntityRenderDispatcher dispatcher = mc.getEntityRenderDispatcher();
         AvatarRenderState state = new AvatarRenderState();
 
-        EntityRenderer<Avatar, AvatarRenderState> renderer = (EntityRenderer<Avatar, AvatarRenderState>) dispatcher.getRenderer(state);
+        EntityRenderer<@NotNull Avatar, @NotNull AvatarRenderState> renderer = (EntityRenderer<@NotNull Avatar, @NotNull AvatarRenderState>) dispatcher.getRenderer(state);
         renderer.extractRenderState(player, state, partialTick);
 
         submitStorage.clear();
@@ -264,25 +263,5 @@ public class WingTipSampler {
             }
         }
         return null;
-    }
-    private static boolean containsWord(String haystackLower, String needleLower) {
-        int n = haystackLower.length();
-        int m = needleLower.length();
-        if (m == 0 || n < m) return false;
-
-        int from = 0;
-        while (true) {
-            int idx = haystackLower.indexOf(needleLower, from);
-            if (idx < 0) return false;
-
-            int before = idx - 1;
-            int after = idx + m;
-
-            boolean beforeOk = before < 0 || !Character.isLetterOrDigit(haystackLower.charAt(before));
-            boolean afterOk = after >= n || !Character.isLetterOrDigit(haystackLower.charAt(after));
-
-            if (beforeOk && afterOk) return true;
-            from = idx + 1;
-        }
     }
 }

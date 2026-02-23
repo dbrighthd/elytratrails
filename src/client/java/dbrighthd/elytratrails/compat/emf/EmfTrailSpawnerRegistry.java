@@ -3,7 +3,6 @@ package dbrighthd.elytratrails.compat.emf;
 import dbrighthd.elytratrails.compat.ModStatuses;
 import it.unimi.dsi.fastutil.objects.Object2ObjectOpenHashMap;
 import it.unimi.dsi.fastutil.objects.ObjectOpenHashSet;
-import net.fabricmc.loader.api.FabricLoader;
 import net.minecraft.client.model.Model;
 import net.minecraft.client.model.geom.ModelPart;
 import net.minecraft.client.renderer.SubmitNodeStorage;
@@ -11,6 +10,7 @@ import org.jetbrains.annotations.Nullable;
 import traben.entity_model_features.EMFManager;
 import traben.entity_model_features.models.IEMFModel;
 import traben.entity_model_features.models.parts.EMFModelPartRoot;
+import traben.entity_model_features.models.parts.EMFModelPartWithState;
 
 import java.util.*;
 
@@ -37,6 +37,15 @@ public final class EmfTrailSpawnerRegistry {
         public static Locator forRegisteredRoot(Model<?> poseModel, String typeString, String childPath) {
             return new Locator(poseModel, typeString, childPath);
         }
+    }
+
+    public static int getModelVariantFromModel(ModelPart emfRoot)
+    {
+        int variant = 1;
+        if (emfRoot instanceof EMFModelPartWithState withState) {
+            variant = Math.max(1, withState.currentModelVariant);
+        }
+        return variant;
     }
 
     public record TypeDef(List<Locator> locators) {}
@@ -126,12 +135,14 @@ public final class EmfTrailSpawnerRegistry {
      * If EMF isn't initialized yet (or failed), this returns true so we don't accidentally
      * disable trail sampling for unknown types.
      */
+    @SuppressWarnings("unused")
     public static boolean typeHasSpawners(@Nullable String typeString) {
         ensureInitialized();
         if (!initialized) return true;
         return typeString != null && TYPES_WITH_SPAWNERS.contains(typeString);
     }
 
+    @SuppressWarnings("unused")
     public static @Nullable TypeDef getOrBuildTypeDef(
             @Nullable String typeString,
             @Nullable List<SubmitNodeStorage.ModelSubmit<?>> submits
@@ -205,6 +216,7 @@ public final class EmfTrailSpawnerRegistry {
         return false;
     }
 
+    @SuppressWarnings("unused")
     private static @Nullable TypeDef tryBuildTypeDefFromSubmits(
             String typeString,
             List<SubmitNodeStorage.ModelSubmit<?>> submits

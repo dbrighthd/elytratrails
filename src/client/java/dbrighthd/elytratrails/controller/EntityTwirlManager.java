@@ -6,7 +6,6 @@ import net.fabricmc.fabric.api.client.networking.v1.ClientPlayNetworking;
 import net.minecraft.client.Minecraft;
 import net.minecraft.util.Mth;
 import net.minecraft.util.Util;
-import net.minecraft.world.entity.vehicle.minecart.Minecart;
 
 import static dbrighthd.elytratrails.ElytraTrailsClient.getConfig;
 
@@ -76,17 +75,7 @@ public final class EntityTwirlManager {
                 data.baseAngleRad = 0.0;
             }
 
-            case CONTINUOUS_MIDDLE -> {
-                // Keepalive / loop boundary ping.
-                // IMPORTANT: don't snap phases or restart time; that changes the visible feel.
-                // We'll only ensure we're not accidentally in NORMAL.
-                data.kind = Kind.CONTINUOUS;
-
-                // If they weren't already continuous, do nothing else.
-                // If they are already in CONSTANT_360, no action needed.
-                // If they are in EASE_OUT (shouldn't happen unless packets reorder),
-                // we also leave it alone to avoid "restarting" visuals.
-            }
+            case CONTINUOUS_MIDDLE -> data.kind = Kind.CONTINUOUS;
 
             case CONTINUOUS_END -> {
                 data.kind = Kind.CONTINUOUS;
@@ -102,7 +91,7 @@ public final class EntityTwirlManager {
         }
     }
 
-    public static float getExtraRollRadians(int entityId, float partialTick) {
+    public static float getExtraRollRadians(int entityId) {
         TwirlData data = BY_ENTITY.get(entityId);
         if (data == null || !data.active) return 0f;
 
@@ -142,7 +131,6 @@ public final class EntityTwirlManager {
                 }
 
                 case CONSTANT_360 -> {
-                    // FIX: loop forever; only END packet moves to EASE_OUT_180.
                     while (elapsedS >= TURN360_DURATION_S) {
                         data.baseAngleRad += data.dir * TAU;
                         data.phaseStartNanos += (long) (TURN360_DURATION_S * 1_000_000_000.0);
@@ -193,10 +181,12 @@ public final class EntityTwirlManager {
         };
     }
 
+    @SuppressWarnings("unused")
     public static void clearEntity(int entityId) {
         BY_ENTITY.remove(entityId);
     }
 
+    @SuppressWarnings("unused")
     public static void clearAll() {
         BY_ENTITY.clear();
     }

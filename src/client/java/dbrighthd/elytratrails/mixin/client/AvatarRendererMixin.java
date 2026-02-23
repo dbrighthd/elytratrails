@@ -34,10 +34,10 @@ public abstract class AvatarRendererMixin {
         float extra;
         if (state.id == localId) {
             // local: old feel
-            extra = TwirlRoll.getExtraRollRadians(g);
+            extra = TwirlRoll.getExtraRollRadians();
         } else {
             // remote: packet-driven per-entity timeline
-            extra = -EntityTwirlManager.getExtraRollRadians(state.id, g);
+            extra = -EntityTwirlManager.getExtraRollRadians(state.id);
         }
 
         if (extra != 0f) {

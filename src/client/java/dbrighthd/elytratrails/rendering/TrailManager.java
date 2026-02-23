@@ -1,17 +1,14 @@
 package dbrighthd.elytratrails.rendering;
 
-import dbrighthd.elytratrails.ElytraTrailsClient;
 import dbrighthd.elytratrails.config.ModConfig;
 import dbrighthd.elytratrails.config.pack.TrailPackConfigManager;
 import dbrighthd.elytratrails.network.ClientPlayerConfigStore;
-import dbrighthd.elytratrails.trailrendering.TrailTextureRegistry;
 import it.unimi.dsi.fastutil.ints.Int2ObjectMap;
 import it.unimi.dsi.fastutil.ints.Int2ObjectOpenHashMap;
 import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents;
 import net.fabricmc.fabric.api.client.rendering.v1.world.WorldRenderEvents;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.player.AbstractClientPlayer;
-import net.minecraft.resources.Identifier;
 import net.minecraft.util.Util;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.Pose;
@@ -21,7 +18,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.ArrayList;
-import java.util.IdentityHashMap;
 import java.util.List;
 
 import static dbrighthd.elytratrails.ElytraTrailsClient.getConfig;
@@ -34,7 +30,6 @@ public class TrailManager {
     private final List<Trail> trails = new ArrayList<>();
     private float lastSample;
     private final WingTipSampler sampler;
-    private final IdentityHashMap<Trail, Float> cachedLengths = new IdentityHashMap<>();
 
     public TrailManager(WingTipSampler sampler) {
         this.sampler = sampler;
@@ -133,6 +128,8 @@ public class TrailManager {
     public List<Trail> trails() {
         return trails;
     }
+
+    @SuppressWarnings("unused")
     public void removeAllTrails()
     {
         activeTrails.clear();

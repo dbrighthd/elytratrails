@@ -97,7 +97,7 @@ public final class ContinuousTwirlController {
         }
     }
 
-    public static float getExtraRollRadians(float partialTick) {
+    public static float getExtraRollRadians() {
         if (!active) return 0f;
 
         long now = Util.getNanos();

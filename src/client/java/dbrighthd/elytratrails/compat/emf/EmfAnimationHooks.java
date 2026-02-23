@@ -2,7 +2,6 @@ package dbrighthd.elytratrails.compat.emf;
 
 import com.mojang.blaze3d.vertex.PoseStack;
 import dbrighthd.elytratrails.compat.ModStatuses;
-import net.fabricmc.loader.api.FabricLoader;
 import net.minecraft.client.model.Model;
 import net.minecraft.client.model.geom.ModelPart;
 import net.minecraft.world.entity.Entity;

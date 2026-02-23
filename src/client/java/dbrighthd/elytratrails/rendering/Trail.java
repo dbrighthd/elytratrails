@@ -3,7 +3,6 @@ package dbrighthd.elytratrails.rendering;
 import dbrighthd.elytratrails.config.pack.TrailPackConfigManager;
 import dbrighthd.elytratrails.network.ClientPlayerConfigStore;
 import dbrighthd.elytratrails.network.PlayerConfig;
-import dbrighthd.elytratrails.trailrendering.TrailTextureRegistry;
 import net.minecraft.resources.Identifier;
 import net.minecraft.util.Util;
 import net.minecraft.world.phys.Vec3;
@@ -22,6 +21,7 @@ public record Trail(Identifier texture, List<Point> points, TrailPackConfigManag
         return new Trail(texture, new ArrayList<>(), TrailPackConfigManager.resolveFromPlayerConfig(config), flipUv);
     }
 
+    @SuppressWarnings("unused")
     public float length() {
 //        if(points.size() < 4)
 //            return 0;

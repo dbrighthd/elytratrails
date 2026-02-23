@@ -111,6 +111,7 @@ public class TrailPipelines {
         return RENDER_TYPE_ENTITY_CUTOUT_EMISSIVE_UNLIT.apply(texture, false);
     }
 
+    @SuppressWarnings("unused")
     public static RenderType entityCutoutLit(Identifier texture) {
         return RENDER_TYPE_ENTITY_CUTOUT_LIT.apply(texture, false);
     }
