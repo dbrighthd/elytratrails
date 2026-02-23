@@ -42,7 +42,11 @@ import static dbrighthd.elytratrails.compat.emf.EmfModelNameUtil.getModelVariant
 
 public class WingTipSampler {
     private final SubmitNodeStorage submitStorage = new SubmitNodeStorage();
-    private final Map<Integer, Integer> emfModelVariantCache = new HashMap<>();
+    private final Map<Integer, emfInfo> emfCache = new HashMap<>();
+
+    private record emfInfo(int variant, List<spawnerInfo> spawners){}
+    private record spawnerInfo(EmfWingTipHooks.SpawnerPath spawner, boolean isLeftWing){}
+
     public @NotNull List<Emitter> getTrailEmitterPositions(Player player, float partialTick) {
         ModConfig config = ElytraTrailsClient.getConfig();
         Minecraft mc = Minecraft.getInstance();
@@ -69,13 +73,13 @@ public class WingTipSampler {
         if (ModStatuses.EMF_LOADED && config.emfSupport) {
             int eid = player.getId();
             int variant = getModelVariantFromModel(animatedElytraRoot);
-            if (!emfModelVariantCache.containsKey(eid) || !(emfModelVariantCache.get(eid) == variant))
+
+            if (!emfCache.containsKey(eid) || !(emfCache.get(eid).variant() == variant))
             {
-                System.out.println("MODEL REGISTERED OR CHANGED");
-                emfModelVariantCache.put(eid,variant);
+                emfCache.put(eid,new emfInfo(variant, getSpawnersInfo(EmfWingTipHooks.findAllSpawnerPaths(leftWing, rightWing))));
                 return List.of();
             }
-            List<EmfWingTipHooks.SpawnerPath> spawners = EmfWingTipHooks.findAllSpawnerPaths(leftWing, rightWing);
+            List<spawnerInfo> spawners = emfCache.get(eid).spawners();
             if (!spawners.isEmpty()) return getTrailEmittersFromBones(basePose, animatedElytraRoot, elytraModel, spawners, camera.position(), entityWorldOffset);
         }
 
@@ -84,39 +88,46 @@ public class WingTipSampler {
 
     public void removeFromEmfCache(int eid)
     {
-        emfModelVariantCache.remove(eid);
+        emfCache.remove(eid);
     }
     public void removeAllEmfCache()
     {
-        emfModelVariantCache.clear();
+        emfCache.clear();
+    }
+    private List<spawnerInfo> getSpawnersInfo(List<EmfWingTipHooks.SpawnerPath> spawners)
+    {
+        ArrayList<spawnerInfo> spawnerInfos = new ArrayList<>();
+        for(EmfWingTipHooks.SpawnerPath spawner : spawners)
+        {
+            spawnerInfos.add(new spawnerInfo(spawner, inferLeftWing(spawner.where(), spawner.path())));
+        }
+        return spawnerInfos;
     }
 
-    private @NotNull List<Emitter> getTrailEmittersFromBones(@NotNull PoseStack stack, @Nullable ModelPart elytraRoot, @NotNull ElytraModel model, @NotNull List<EmfWingTipHooks.SpawnerPath> spawners, @NotNull Vec3 cameraPos, @NotNull Vec3 entityWorldOffset) {
+    private @NotNull List<Emitter> getTrailEmittersFromBones(@NotNull PoseStack stack, @Nullable ModelPart elytraRoot, @NotNull ElytraModel model, @NotNull List<spawnerInfo> spawners, @NotNull Vec3 cameraPos, @NotNull Vec3 entityWorldOffset) {
         EquipmentElytraModelAccessor accessor = (EquipmentElytraModelAccessor) model;
         ModelPart leftWing = accessor.elytratrails$getLeftWing();
         ModelPart rightWing = accessor.elytratrails$getRightWing();
 
 
         List<Emitter> emitters = new ArrayList<>();
-        for (EmfWingTipHooks.SpawnerPath spawner : spawners) {
-            ModelPart wingRoot = (spawner.where() == EmfWingTipHooks.WhichRoot.LEFT_WING) ? leftWing : rightWing;
+        for (spawnerInfo spawner : spawners) {
+            ModelPart wingRoot = (spawner.spawner.where() == EmfWingTipHooks.WhichRoot.LEFT_WING) ? leftWing : rightWing;
 
             Vec3 cameraRelative = transformLocalPointThroughPath(
-                    stack, elytraRoot, wingRoot, spawner.path()
+                    stack, elytraRoot, wingRoot, spawner.spawner.path()
             );
             if (cameraRelative == null) continue;
 
-            emitters.add(new Emitter(cameraPos.add(cameraRelative).add(entityWorldOffset), inferLeftWing(spawner.where(), spawner.path())));
+            emitters.add(new Emitter(cameraPos.add(cameraRelative).add(entityWorldOffset), spawner.isLeftWing));
         }
         return emitters;
     }
     private static boolean inferLeftWing(EmfWingTipHooks.WhichRoot modelRoot, String spawnerOrBoneName) {
-        if (spawnerOrBoneName != null) {
-            String b = spawnerOrBoneName.toLowerCase(java.util.Locale.ROOT);
 
-            // Your rule: if it has "right", leftWing MUST be false (even if it also has "left")
-            if (containsWord(b, "right")) return false;
-            if (containsWord(b, "left")) return true;
+        if (spawnerOrBoneName != null) {
+            String bone = spawnerOrBoneName.substring(spawnerOrBoneName.lastIndexOf('/')).toLowerCase();
+            return bone.contains("left");
         }
 
         return (modelRoot == EmfWingTipHooks.WhichRoot.LEFT_WING);
