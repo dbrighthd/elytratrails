@@ -17,7 +17,7 @@ public class ClientLevelEntityRemovalMixin {
 
     @Inject(method = "removeEntity(ILnet/minecraft/world/entity/Entity$RemovalReason;)V", at = @At("HEAD"), require = 0)
     private void elytraTrails$onRemoveEntity(int entityId, Entity.RemovalReason reason, CallbackInfo ci) {
-        //TrailSystem.getTrailManager().removeTrail(entityId);
+        TrailSystem.getTrailManager().removeTrail(entityId);
         //WingTipSamplerHandler.onEntityRemoved(entityId);
     }
 }
