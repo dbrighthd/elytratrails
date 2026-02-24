@@ -42,7 +42,7 @@ public class TrailPipelines {
                     .withShaderDefine("ALPHA_CUTOUT", 0.1F)
                     .withShaderDefine("NO_CARDINAL_LIGHTING")
                     .withSampler("Sampler1")
-                    .withBlend(com.mojang.blaze3d.pipeline.BlendFunction.TRANSLUCENT)
+                    .withBlend(BlendFunction.TRANSLUCENT)
                     .withCull(false)
                     .withDepthWrite(false)
                     .build());

@@ -4,14 +4,13 @@ import net.minecraft.util.Mth;
 import net.minecraft.util.Util;
 
 public final class ContinuousTwirlController {
-    private static final double TAU = Math.PI * 2.0;
     private static final double HALF_TURN = Math.PI;
 
     private static final double DURATION_S = 0.5;
     private static final double HALF_DURATION_S = DURATION_S * 0.5;
 
     private static final double OMEGA_RAD_S = (Math.PI * Math.PI) / DURATION_S;
-    private static final double TURN360_DURATION_S = TAU / OMEGA_RAD_S;
+    private static final double TURN360_DURATION_S = Math.TAU / OMEGA_RAD_S;
 
     private enum Phase {
         EASE_IN_180,
@@ -81,7 +80,7 @@ public final class ContinuousTwirlController {
 
     private static double rollConstant360(double elapsedS) {
         double a = OMEGA_RAD_S * elapsedS;
-        return Mth.clamp(a, 0.0, TAU);
+        return Mth.clamp(a, 0.0, Math.TAU);
     }
 
     private static double rollLast180(double elapsedS) {
@@ -127,7 +126,7 @@ public final class ContinuousTwirlController {
 
                 case CONSTANT_360: {
                     while (elapsedS >= TURN360_DURATION_S) {
-                        baseAngleRad += currentDir * TAU;
+                        baseAngleRad += currentDir * Math.TAU;
                         phaseStartNanos += (long) (TURN360_DURATION_S * 1_000_000_000.0);
 
                         // NEW: completed a 360 while still holding => keepalive/loop ping

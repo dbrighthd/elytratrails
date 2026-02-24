@@ -4,7 +4,6 @@ import net.minecraft.util.Mth;
 import net.minecraft.util.Util;
 
 public final class TwirlController {
-    private static final double TAU = Math.PI * 2.0;
     private static final double DURATION_S = 0.5;
 
     private static long startNanos = 0L;
@@ -62,7 +61,7 @@ public final class TwirlController {
 
         t = Mth.clamp(t, 0.0, 1.0);
         double eased = 0.5 - 0.5 * Math.cos(Math.PI * t);
-        return (float) (currentDir * eased * TAU);
+        return (float) (currentDir * eased * Math.TAU);
     }
 
     public static boolean isActive() {

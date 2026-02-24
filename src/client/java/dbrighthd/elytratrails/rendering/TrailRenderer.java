@@ -1,4 +1,5 @@
 package dbrighthd.elytratrails.rendering;
+
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.blaze3d.vertex.VertexConsumer;
 import dbrighthd.elytratrails.config.ModConfig;
@@ -44,7 +45,7 @@ public class TrailRenderer {
     private final PerlinNoise perlinNoise =  PerlinNoise.create(RandomSource.create(), List.of(1));
     private float totalTrailLength;
     private ClientPlayerConfigStore.TrailRenderSettings trailRenderSettings;
-    boolean isFirstperson;
+    boolean isFirstPerson;
     //private static final float FP_CAMERA_FADE_ZERO = 0.3f;
     //private static final float FP_CAMERA_FADE_FULL = 0.5f;
     private static final float CAMERA_FADE_ZERO = 0.3f;
@@ -84,7 +85,7 @@ public class TrailRenderer {
                 this.modConfig = getConfig();
                 this.trailRenderSettings = ClientPlayerConfigStore.decodeTrailType(trail.config().trailType());
 
-                this.isFirstperson = ((Minecraft.getInstance().player != null) && trail.entityId() == Minecraft.getInstance().player.getId()) && Minecraft.getInstance().options.getCameraType().isFirstPerson();
+                this.isFirstPerson = ((Minecraft.getInstance().player != null) && trail.entityId() == Minecraft.getInstance().player.getId()) && Minecraft.getInstance().options.getCameraType().isFirstPerson();
                 for (int i = 0; i < points.size() - 1; i++) {
                     Trail.Point p0 = points.get(max(i - 1, 0));
                     Trail.Point p1 = points.get(i);
@@ -132,7 +133,7 @@ public class TrailRenderer {
             PoseStack.Pose pose, VertexConsumer consumer,
             Trail.Point point0, Trail.Point point1, Trail.Point point2, Trail.Point point3,
             float tStart, float tEnd,
-            Camera camera, Trail trail,  int color
+            Camera camera, Trail trail, int color
     ) {
         Vec3 p0 = point0.pos();
         Vec3 p1 = point1.pos();
@@ -178,8 +179,6 @@ public class TrailRenderer {
             double start = Mth.lerp(tStart, epoch0, epoch1);
             double end = Mth.lerp(tEnd, epoch0, epoch1);
 
-
-
             float alphaEnd = computeLifetimeFadeout(end, currentTime, (long) (trail.config().trailLifetime() * 1000));
             float alphaStart = trail.config().fadeEnd() || alphaEnd <= 0 ? computeLifetimeFadeout(start, currentTime, (long) (trail.config().trailLifetime() * 1000)) : 1f;
             if(alphaEnd <= 0)
@@ -197,12 +196,7 @@ public class TrailRenderer {
             float scaleStart = computeWidthScaling(totalTrailLength- v1, -(endOfTrail - v1), trail.config());
             float scaleEnd = computeWidthScaling(totalTrailLength- v2, -(endOfTrail - v2), trail.config());
 
-
-
-            //float scaleStart = 1f;
-            // scaleEnd = 1f;
-
-            if(isFirstperson && modConfig.fadeFirstPersonTrail && modConfig.firstPersonFadeTime > 0)
+            if(isFirstPerson && modConfig.fadeFirstPersonTrail && modConfig.firstPersonFadeTime > 0)
             {
                 scaleStart *= firstPersonWidthFadeFactor(start, currentTime);
                 scaleEnd *= firstPersonWidthFadeFactor(end, currentTime);
@@ -366,33 +360,37 @@ public class TrailRenderer {
 
         float normalX = 0, normalY = -1, normalZ = 0;
 
+        float widthStart = halfWidthStart <= 0 ? 0.5f : 1f;
+        float widthEnd = halfWidthEnd <= 0 ? 0.5f : 1f;
+
         consumer.addVertex(pose, p1)
                 .setNormal(normalX, normalY, normalZ)
                 .setOverlay(overlay)
                 .setLight(lightStart)
                 .setColor(colorStart)
-                .setUv(v1, 0);
+                .setUv(v1, flipUv ? 1f - widthStart : -(1f - widthStart));
         consumer.addVertex(pose, p2)
                 .setNormal(normalX, normalY, normalZ)
                 .setOverlay(overlay)
                 .setLight(lightEnd)
                 .setColor(colorEnd)
-                .setUv(v2, 0);
+                .setUv(v2, 0f);
         consumer.addVertex(pose, p3)
                 .setNormal(normalX, normalY, normalZ)
                 .setOverlay(overlay)
                 .setLight(lightEnd)
                 .setColor(colorEnd)
-                .setUv(v2, flipUv ? 1 : -1);
+                .setUv(v2, flipUv ? widthEnd : -widthEnd);
         consumer.addVertex(pose, p4)
                 .setNormal(normalX, normalY, normalZ)
                 .setOverlay(overlay)
                 .setLight(lightStart)
                 .setColor(colorStart)
-                .setUv(v1, flipUv ? 1 : -1);
+                .setUv(v1, flipUv ? widthStart : -widthStart);
     }
 
-    private void calculateSubdivideLength( Trail.Point point0, Trail.Point point1, Trail.Point point2, Trail.Point point3,
+    private void calculateSubdivideLength(
+            Trail.Point point0, Trail.Point point1, Trail.Point point2, Trail.Point point3,
             float tStart, float tEnd
     ) {
         Vec3 p0 = point0.pos();

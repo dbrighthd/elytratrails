@@ -10,14 +10,13 @@ import net.minecraft.util.Util;
 import static dbrighthd.elytratrails.ElytraTrailsClient.getConfig;
 
 public final class EntityTwirlManager {
-    private static final double TAU = Math.PI * 2.0;
     private static final double HALF_TURN = Math.PI;
 
     private static final double DURATION_S = 0.5;
     private static final double HALF_DURATION_S = DURATION_S * 0.5;
 
     private static final double OMEGA_RAD_S = (Math.PI * Math.PI) / DURATION_S;
-    private static final double TURN360_DURATION_S = TAU / OMEGA_RAD_S;
+    private static final double TURN360_DURATION_S = Math.TAU / OMEGA_RAD_S;
 
     private enum Kind { NORMAL, CONTINUOUS }
     private enum Phase { EASE_IN_180, CONSTANT_360, EASE_OUT_180 }
@@ -109,7 +108,7 @@ public final class EntityTwirlManager {
 
         t = Mth.clamp(t, 0.0, 1.0);
         double eased = 0.5 - 0.5 * Math.cos(Math.PI * t);
-        return -(float) (data.dir * eased * TAU);
+        return -(float) (data.dir * eased * Math.TAU);
     }
 
     private static float computeContinuous(TwirlData data, long now) {
@@ -132,12 +131,12 @@ public final class EntityTwirlManager {
 
                 case CONSTANT_360 -> {
                     while (elapsedS >= TURN360_DURATION_S) {
-                        data.baseAngleRad += data.dir * TAU;
+                        data.baseAngleRad += data.dir * Math.TAU;
                         data.phaseStartNanos += (long) (TURN360_DURATION_S * 1_000_000_000.0);
                         elapsedS = (now - data.phaseStartNanos) / 1_000_000_000.0;
                     }
 
-                    double a = Mth.clamp(OMEGA_RAD_S * elapsedS, 0.0, TAU);
+                    double a = Mth.clamp(OMEGA_RAD_S * elapsedS, 0.0, Math.TAU);
                     return (float) (data.baseAngleRad + data.dir * a);
                 }
 
@@ -170,7 +169,7 @@ public final class EntityTwirlManager {
                 yield data.baseAngleRad + data.dir * roll;
             }
             case CONSTANT_360 -> {
-                double a = Mth.clamp(OMEGA_RAD_S * elapsedS, 0.0, TAU);
+                double a = Mth.clamp(OMEGA_RAD_S * elapsedS, 0.0, Math.TAU);
                 yield data.baseAngleRad + data.dir * a;
             }
             case EASE_OUT_180 -> {
