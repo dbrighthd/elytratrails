@@ -4,8 +4,9 @@
 	"plugin": "dbrighthd.elytratrails.compat.CompatMixinPlugin",
 	"compatibilityLevel": "JAVA_21",
 	"client": [
-		"ClientLevelEntityRemovalMixin",
 		"AvatarRendererMixin",
+		"ClientLevelEntityRemovalMixin",
+		"ClientPacketListenerRemoveEntitiesMixin",
 		"EquipmentElytraModelAccessor",
 		"ModelFeatureStorageAccessor",
 		"compat.EmfModelPartRootRegisterMixin"
