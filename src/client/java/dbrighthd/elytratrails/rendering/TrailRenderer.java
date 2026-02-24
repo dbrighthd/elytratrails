@@ -3,6 +3,7 @@ import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.blaze3d.vertex.VertexConsumer;
 import dbrighthd.elytratrails.config.ModConfig;
 import dbrighthd.elytratrails.config.pack.TrailPackConfigManager;
+import dbrighthd.elytratrails.network.ClientPlayerConfigStore;
 import dbrighthd.elytratrails.rendering.math.SplineInterpolation;
 import dbrighthd.elytratrails.util.ShaderChecksUtil;
 import net.fabricmc.fabric.api.client.rendering.v1.world.WorldRenderContext;
@@ -14,7 +15,6 @@ import net.minecraft.client.renderer.rendertype.RenderTypes;
 import net.minecraft.client.renderer.texture.OverlayTexture;
 import net.minecraft.core.BlockPos;
 import net.minecraft.resources.Identifier;
-import net.minecraft.util.ARGB;
 import net.minecraft.util.Mth;
 import net.minecraft.util.RandomSource;
 import net.minecraft.util.Util;
@@ -27,6 +27,10 @@ import org.joml.Vector3f;
 import java.util.List;
 
 import static dbrighthd.elytratrails.ElytraTrailsClient.getConfig;
+import static java.lang.Math.max;
+import static java.lang.Math.min;
+import static net.minecraft.util.ARGB.alphaFloat;
+import static net.minecraft.util.ARGB.color;
 
 public class TrailRenderer {
 
@@ -39,6 +43,7 @@ public class TrailRenderer {
     private ModConfig modConfig;
     private final PerlinNoise perlinNoise =  PerlinNoise.create(RandomSource.create(), List.of(1));
     private float totalTrailLength;
+    private ClientPlayerConfigStore.TrailRenderSettings trailRenderSettings;
     boolean isFirstperson;
     //private static final float FP_CAMERA_FADE_ZERO = 0.3f;
     //private static final float FP_CAMERA_FADE_FULL = 0.5f;
@@ -60,7 +65,7 @@ public class TrailRenderer {
             if (points.size() < 4) continue; // splines :3
 
             //float length = trail.length();
-            RenderType renderType = getRenderType(config,trail.texture());
+            RenderType renderType = getRenderType(trail);
 
 
             ctx.commandQueue().order(1).submitCustomGeometry(stack, renderType, (pose, consumer) -> {
@@ -68,22 +73,24 @@ public class TrailRenderer {
 
                 totalTrailLength = 0f;
                 for (int i = 0; i < points.size() - 1; i++) {
-                    Trail.Point p0 = points.get(Math.max(i - 1, 0));
+                    Trail.Point p0 = points.get(max(i - 1, 0));
                     Trail.Point p1 = points.get(i);
                     Trail.Point p2 = points.get(i + 1);
-                    Trail.Point p3 = points.get(Math.min(i + 2, points.size() - 1));
+                    Trail.Point p3 = points.get(min(i + 2, points.size() - 1));
 
                     calculateSubdivideLength(p0, p1, p2, p3, 0f, 1f);
                 }
                 this.accumDist = 0f;
                 this.endOfTrail = 0f;
                 this.modConfig = getConfig();
+                this.trailRenderSettings = ClientPlayerConfigStore.decodeTrailType(trail.config().trailType());
+
                 this.isFirstperson = Minecraft.getInstance().options.getCameraType().isFirstPerson();
                 for (int i = 0; i < points.size() - 1; i++) {
-                    Trail.Point p0 = points.get(Math.max(i - 1, 0));
+                    Trail.Point p0 = points.get(max(i - 1, 0));
                     Trail.Point p1 = points.get(i);
                     Trail.Point p2 = points.get(i + 1);
-                    Trail.Point p3 = points.get(Math.min(i + 2, points.size() - 1));
+                    Trail.Point p3 = points.get(min(i + 2, points.size() - 1));
 
                     renderSubdividedSegment(pose, consumer, p0, p1, p2, p3, 0f, 1f, camera, trail, trail.config().color());
                 }
@@ -92,23 +99,24 @@ public class TrailRenderer {
 
         stack.popPose();
     }
-    private RenderType getRenderType(ModConfig config, Identifier texture)
+    private RenderType getRenderType(Trail trail)
     {
-        if(config.glowingTrails)
+        ClientPlayerConfigStore.TrailRenderSettings trailRenderSettings = ClientPlayerConfigStore.decodeTrailType(trail.config().trailType());
+        if(trailRenderSettings.glowing())
         {
             if(ShaderChecksUtil.isUsingShaders())
             {
-                return RenderTypes.entityTranslucentEmissive(texture);
+                return RenderTypes.entityTranslucentEmissive(trail.texture());
             }
             else
             {
-                if(config.translucentTrails)
+                if(trailRenderSettings.translucent())
                 {
-                    return TrailPipelines.entityTranslucentEmissiveUnlit(texture);
+                    return TrailPipelines.entityTranslucentEmissiveUnlit(trail.texture());
                 }
                 else
                 {
-                    return TrailPipelines.entityCutoutEmissiveUnlit(texture);
+                    return TrailPipelines.entityCutoutEmissiveUnlit(trail.texture());
                 }
             }
         }
@@ -116,9 +124,9 @@ public class TrailRenderer {
         {
             if(ShaderChecksUtil.isUsingShaders())
             {
-                return RenderTypes.entityTranslucent(texture);
+                return RenderTypes.entityTranslucent(trail.texture());
             }
-            return TrailPipelines.entityTranslucentCull(texture);
+            return TrailPipelines.entityTranslucentCull(trail.texture());
         }
     }
     private void renderSubdividedSegment(
@@ -173,10 +181,8 @@ public class TrailRenderer {
 
 
 
-            float alphaStart = computeLifetimeFadeout(start, currentTime, (long) (trail.config().trailLifetime() * 1000));
             float alphaEnd = computeLifetimeFadeout(end, currentTime, (long) (trail.config().trailLifetime() * 1000));
-
-
+            float alphaStart = trail.config().fadeEnd() || alphaEnd <= 0 ? computeLifetimeFadeout(start, currentTime, (long) (trail.config().trailLifetime() * 1000)) : 1f;
             if(alphaEnd <= 0)
             {
                 if (v1 > endOfTrail)
@@ -184,9 +190,16 @@ public class TrailRenderer {
                     endOfTrail = v1;
                 }
             }
+            else if(!trail.config().fadeEnd())
+            {
+                alphaEnd = 1f;
 
+            }
             float scaleStart = computeWidthScaling(totalTrailLength- v1, -(endOfTrail - v1), trail.config());
             float scaleEnd = computeWidthScaling(totalTrailLength- v2, -(endOfTrail - v2), trail.config());
+
+
+
             //float scaleStart = 1f;
             // scaleEnd = 1f;
 
@@ -203,11 +216,17 @@ public class TrailRenderer {
                 scaleEnd = scaleEnd * (float)trail.config().randomWidthVariation() *((float)( perlinNoise.getValue(endPos.x,endPos.y,endPos.z)) + 1);
 
             }
+
+            if(trail.config().fadeStart() && trailRenderSettings.translucent())
+            {
+                alphaStart *= computeStartFade(totalTrailLength- v1, trail.config());
+                alphaEnd *= computeStartFade(totalTrailLength- v2, trail.config());
+            }
             float halfWidthStart = (float) (trail.config().maxWidth() / 2f) * scaleStart;
             float halfWidthEnd = (float) (trail.config().maxWidth() / 2f) * scaleEnd;
 
             if ((scaleStart != 0 || scaleEnd != 0) && (alphaEnd != 0 || alphaStart != 0)) {
-                if(!modConfig.translucentTrails)
+                if(!trailRenderSettings.translucent())
                 {
                     alphaEnd = 1;
                     alphaStart = 1;
@@ -245,23 +264,40 @@ public class TrailRenderer {
     private float computeWidthScaling(float distFromStart, float distToEnd, TrailPackConfigManager.ResolvedTrailSettings config) {
         float endRamp = (float) config.endRampDistance();
         float startRamp = (float) config.startRampDistance();
-
-        if (startRamp < 1e-6f) startRamp = 1e-6f;
-        if (endRamp < 1e-6f) endRamp = 1e-6f;
-
         float up;
-        if (distFromStart <= 0f) up = 0f;
-        else if (distFromStart >= startRamp) up = 1f;
-        else up = (float) Math.sin((distFromStart / startRamp) * (Math.PI / 2.0));
-
+        if (startRamp < 1e-6f){
+            up = 1f;
+        }
+        else
+        {
+            if (distFromStart <= 0f) up = 0f;
+            else if (distFromStart >= startRamp) up = 1f;
+            else up = (float) Math.sin((distFromStart / startRamp) * (Math.PI / 2.0));
+        }
         float down;
         if (distToEnd <= 0f) down = 0f;
         else if (distToEnd >= endRamp) down = 1f;
         else down = (float) Math.sin((distToEnd / endRamp) * (Math.PI / 2.0));
 
-        float mult = Math.min(up, down);
+        float mult = min(up, down);
         return (float) Math.pow(mult, 0.9f);
     }
+
+    private float computeStartFade(float distFromStart, TrailPackConfigManager.ResolvedTrailSettings cfg) {
+        float startRamp = (float) cfg.fadeStartDistance();
+        float up;
+        if (startRamp < 1e-6f){
+            up = 1f;
+        }
+        else
+        {
+            if (distFromStart <= 0f) up = 0f;
+            else if (distFromStart >= startRamp) up = 1f;
+            else up = (float) Math.sin((distFromStart / startRamp) * (Math.PI / 2.0));
+        }
+        return (float) Math.pow(up, 0.9f);
+    }
+
     @SuppressWarnings("unused")
     private float computeWidthScalingButGood(float distFromStart, float distToEnd, TrailPackConfigManager.ResolvedTrailSettings config)
     {
@@ -306,7 +342,7 @@ public class TrailRenderer {
 
     private int computeLightTexture(Vec3 pos) { // note: I really hate this method, but I don't feel like managing the state that's required to do this in a better way
         Minecraft mc = Minecraft.getInstance();
-        if (mc.level == null || modConfig.glowingTrails) return LightTexture.FULL_BRIGHT;
+        if (mc.level == null || trailRenderSettings.glowing()) return LightTexture.FULL_BRIGHT;
 
         BlockPos blockPos = BlockPos.containing(pos);
         return LightTexture.pack(mc.level.getBrightness(LightLayer.BLOCK, blockPos), mc.level.getBrightness(LightLayer.SKY, blockPos));
@@ -326,8 +362,8 @@ public class TrailRenderer {
         int lightStart = computeLightTexture(a);
         int lightEnd = computeLightTexture(b);
 
-        int colorStart = ARGB.multiplyAlpha(color, alphaStart);
-        int colorEnd = ARGB.multiplyAlpha(color, alphaEnd);
+        int colorStart = multiplyAlpha(color, alphaStart);
+        int colorEnd = multiplyAlpha(color, alphaEnd);
 
         float normalX = 0, normalY = -1, normalZ = 0;
 
@@ -389,5 +425,11 @@ public class TrailRenderer {
         } else {
             this.totalTrailLength += (float) startPos.distanceTo(endPos);
         }
+    }
+
+    // minecraft's alpha multiply function sets color to 0 when alpha is 0, which breaks with our interpolation. this function does the same but just sets alpha to be min 0
+    private int multiplyAlpha(int color, float alpha)
+    {
+        return alpha >= 1.0F ? color : color(alphaFloat(color) * max(0,alpha), color);
     }
 }

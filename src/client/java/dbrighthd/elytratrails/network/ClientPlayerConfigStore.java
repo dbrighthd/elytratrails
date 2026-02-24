@@ -13,6 +13,8 @@ public final class ClientPlayerConfigStore
 {
     public static final ConcurrentHashMap<Integer, PlayerConfig> CLIENT_PLAYER_CONFIGS = new ConcurrentHashMap<>();
 
+    public static final record TrailRenderSettings(boolean glowing, boolean translucent){}
+
     public static PlayerConfig CLIENT_CONFIG;
 
     public static PlayerConfig CLIENT_OTHERS_CONFIG;
@@ -36,10 +38,24 @@ public final class ClientPlayerConfigStore
                 config.endRampDistance,
                 TrailPackConfigManager.parseHexColor(config.color),
                 config.randomWidthVariation,
-                config.prideTrail
+                config.prideTrail,
+                config.fadeStart,
+                config.fadeStartDistance,
+                config.fadeEnd,
+                encodeTrailType(config.glowingTrails, config.translucentTrails)
         );
     }
 
+
+    public static int encodeTrailType(boolean glow, boolean translucent)
+    {
+        return (glow ? 2 : 1) * (translucent ? 3 : 1);
+    }
+
+    public static TrailRenderSettings decodeTrailType(int n)
+    {
+        return new TrailRenderSettings((n%2==0),(n%3==0));
+    }
     public static void setClientOthersConfig ()
     {
         var config = getConfig();
@@ -55,7 +71,11 @@ public final class ClientPlayerConfigStore
                 config.endRampDistanceOthersDefault,
                 TrailPackConfigManager.parseHexColor(config.colorOthersDefault),
                 config.randomWidthVariationOthersDefault,
-                config.prideTrailOthersDefault
+                config.prideTrailOthersDefault,
+                config.fadeStartOthersDefault,
+                config.fadeStartDistanceOthersDefault,
+                config.fadeEndOthersDefault,
+                encodeTrailType(config.glowingTrailsOthersDefault, config.translucentTrailsOthersDefault)
         );
     }
     public static PlayerConfig getLocalPlayerConfig() {
@@ -88,7 +108,11 @@ public final class ClientPlayerConfigStore
                     config.endRampDistance,
                     0xFFFFFFFF,
                     config.randomWidthVariation,
-                    ""
+                    "",
+                    config.fadeStart,
+                    config.fadeStartDistance,
+                    config.fadeEnd,
+                    1
             );
         }
     }
@@ -126,6 +150,7 @@ public final class ClientPlayerConfigStore
         double safeEndRamp = Math.max(0.0, incoming.endRampDistance());
         double safeRandVar = Math.max(0.0, incoming.randomWidthVariation());
 
+
         int safeColor = incoming.color();
 
         String safePride = incoming.prideTrail();
@@ -145,7 +170,11 @@ public final class ClientPlayerConfigStore
                 safeEndRamp,
                 safeColor,
                 safeRandVar,
-                safePride
+                safePride,
+                incoming.fadeStart(),
+                incoming.fadeStartDistance(),
+                incoming.fadeEnd(),
+                incoming.trailType()
         );
 
         CLIENT_PLAYER_CONFIGS.put(entityId, safe);

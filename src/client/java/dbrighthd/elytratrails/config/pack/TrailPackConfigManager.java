@@ -5,10 +5,12 @@ import com.google.gson.GsonBuilder;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import dbrighthd.elytratrails.config.ModConfig;
+import dbrighthd.elytratrails.network.ClientPlayerConfigStore;
 import dbrighthd.elytratrails.network.PlayerConfig;
 import net.minecraft.resources.Identifier;
 import net.minecraft.server.packs.resources.Resource;
 import net.minecraft.server.packs.resources.ResourceManager;
+import net.minecraft.world.level.block.entity.vault.VaultBlockEntity;
 import org.jetbrains.annotations.Nullable;
 
 import java.io.BufferedReader;
@@ -298,6 +300,11 @@ public final class TrailPackConfigManager {
 
         @Nullable String prideTrail;
 
+        @Nullable Boolean fadeStart;
+        @Nullable Double fadeStartDistance;
+        @Nullable Boolean fadeEnd;
+        @Nullable Integer trailType;
+
         static TrailOverrides fromBase(ModConfig baseConfig) {
             TrailOverrides overrides = new TrailOverrides();
             overrides.enableTrail = baseConfig.enableTrail;
@@ -314,6 +321,7 @@ public final class TrailPackConfigManager {
 
             overrides.color = parseHexColor(baseConfig.color);
             overrides.prideTrail = baseConfig.prideTrail;
+            overrides.trailType = ClientPlayerConfigStore.encodeTrailType(baseConfig.glowingTrails, baseConfig.translucentTrails);
             return overrides;
         }
         static TrailOverrides fromResolved(ResolvedTrailSettings s) {
@@ -333,6 +341,7 @@ public final class TrailPackConfigManager {
 
             o.color = s.color();
             o.prideTrail = s.prideTrail();
+            o.trailType = s.trailType();
             return o;
         }
 
@@ -370,6 +379,9 @@ public final class TrailPackConfigManager {
 
             overrides.color = parseHexColor(cfg.colorOthersDefault);
             overrides.prideTrail = cfg.prideTrailOthersDefault;
+            overrides.fadeStart = cfg.fadeStartOthersDefault;
+            overrides.fadeStartDistance = cfg.fadeStartDistanceOthersDefault;
+            overrides.fadeEnd = cfg.fadeEndOthersDefault;
             return overrides;
         }
 
@@ -393,7 +405,10 @@ public final class TrailPackConfigManager {
 
             overrides.color = parseHexColor(readString(json, "color"));
             overrides.prideTrail = readString(json, "prideTrail");
-
+            overrides.fadeStart = readBoolean(json, "fadeStart");
+            overrides.fadeStartDistance = readDouble(json,"fadeStartDistance");
+            overrides.fadeEnd = readBoolean(json,"fadeEnd");
+            overrides.trailType = ClientPlayerConfigStore.encodeTrailType(Boolean.TRUE.equals(readBoolean(json, "glowingTrail")), Boolean.TRUE.equals(readBoolean(json, "translucentTrail")));
             return overrides;
         }
 
@@ -433,7 +448,6 @@ public final class TrailPackConfigManager {
 
             merged.color = (other.color != null) ? other.color : this.color;
             merged.prideTrail = (other.prideTrail != null) ? other.prideTrail : this.prideTrail;
-
             return merged;
         }
 
@@ -450,7 +464,11 @@ public final class TrailPackConfigManager {
                     asNumber(endRampDistance),
                     asNumber(randomWidthVariation),
                     color,
-                    prideTrail
+                    prideTrail,
+                    asTrue(fadeStart),
+                    asNumber(fadeStartDistance),
+                    asTrue(fadeEnd),
+                    trailType
             );
         }
 
@@ -500,7 +518,11 @@ public final class TrailPackConfigManager {
             double endRampDistance,
             double randomWidthVariation,
             int color,
-            @Nullable String prideTrail
+            @Nullable String prideTrail,
+            boolean fadeStart,
+            double fadeStartDistance,
+            boolean fadeEnd,
+            int trailType
     ) {
         public static ResolvedTrailSettings defaults() {
             return new ResolvedTrailSettings(
@@ -515,7 +537,11 @@ public final class TrailPackConfigManager {
                     getConfig().endRampDistanceOthersDefault,
                     getConfig().randomWidthVariationOthersDefault,
                     parseHexColor(getConfig().colorOthersDefault),
-                    getConfig().prideTrailOthersDefault
+                    getConfig().prideTrailOthersDefault,
+                    getConfig().fadeStart,
+                    getConfig().fadeStartDistance,
+                    getConfig().fadeEnd,
+                    ClientPlayerConfigStore.encodeTrailType(getConfig().glowingTrails, getConfig().translucentTrails)
             );
         }
     }
@@ -562,7 +588,11 @@ public final class TrailPackConfigManager {
                 playerConfig.endRampDistance(),
                 playerConfig.randomWidthVariation(),
                 playerConfig.color(),
-                safePride(playerConfig, defaults)
+                safePride(playerConfig, defaults),
+                playerConfig.fadeStart(),
+                playerConfig.fadeStartDistance(),
+                playerConfig.fadeEnd(),
+                playerConfig.trailType()
         );
     }
 

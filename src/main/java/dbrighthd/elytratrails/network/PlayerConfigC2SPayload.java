@@ -23,11 +23,15 @@ public record PlayerConfigC2SPayload(PlayerConfig playerConfig) implements Custo
                     Codec.DOUBLE.fieldOf("maxWidth").forGetter(PlayerConfig::maxWidth),
                     Codec.DOUBLE.fieldOf("trailLifetime").forGetter(PlayerConfig::trailLifetime),
                     Codec.DOUBLE.fieldOf("startRampDistance").forGetter(PlayerConfig::startRampDistance),
-                    Codec.DOUBLE.fieldOf("endRampDistance").forGetter(PlayerConfig::endRampDistance), // <-- add this
+                    Codec.DOUBLE.fieldOf("endRampDistance").forGetter(PlayerConfig::endRampDistance),
                     Codec.INT.fieldOf("color").forGetter(PlayerConfig::color),
                     Codec.DOUBLE.fieldOf("randomWidthVariation").forGetter(PlayerConfig::randomWidthVariation),
-                    Codec.STRING.fieldOf("prideTrail").forGetter(PlayerConfig::prideTrail)
-            ).apply(instance, PlayerConfig::new));
+                    Codec.STRING.fieldOf("prideTrail").forGetter(PlayerConfig::prideTrail),
+                    Codec.BOOL.fieldOf("fadeStart").forGetter(PlayerConfig::fadeStart),
+                    Codec.DOUBLE.fieldOf("fadeStartDistance").forGetter(PlayerConfig::fadeStartDistance),
+                    Codec.BOOL.fieldOf("fadeEnd").forGetter(PlayerConfig::fadeEnd),
+                    Codec.INT.fieldOf("trailType").forGetter(PlayerConfig::trailType)
+                    ).apply(instance, PlayerConfig::new));
     public static final StreamCodec<RegistryFriendlyByteBuf, PlayerConfigC2SPayload> CODEC =
             ByteBufCodecs.fromCodecWithRegistries(PLAYER_CONFIG_CODEC)
                     .map(PlayerConfigC2SPayload::new, PlayerConfigC2SPayload::playerConfig);

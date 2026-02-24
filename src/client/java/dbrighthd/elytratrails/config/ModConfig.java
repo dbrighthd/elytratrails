@@ -14,9 +14,7 @@ public class ModConfig implements ConfigData {
     @ConfigEntry.Gui.Tooltip
     public boolean enableAllTrails = true;
 
-    @ConfigEntry.Category("general")
-    @ConfigEntry.Gui.Tooltip
-    public boolean translucentTrails = false;
+
 
     @SuppressWarnings("unused")
     @ConfigEntry.Category("general")
@@ -25,13 +23,11 @@ public class ModConfig implements ConfigData {
     public boolean resourcePackOverride = true;
 
 
+
     @ConfigEntry.Category("general")
     @ConfigEntry.Gui.Tooltip
     public boolean emfSupport = true;
 
-    @ConfigEntry.Category("general")
-    @ConfigEntry.Gui.Tooltip
-    public boolean glowingTrails = true;
 
     @ConfigEntry.Category("general")
     @ConfigEntry.Gui.Tooltip
@@ -47,6 +43,14 @@ public class ModConfig implements ConfigData {
     @ConfigEntry.Gui.PrefixText
     @ConfigEntry.Gui.Tooltip
     public boolean enableTrail = true;
+
+    @ConfigEntry.Category("elytra")
+    @ConfigEntry.Gui.Tooltip
+    public boolean translucentTrails = true;
+
+    @ConfigEntry.Category("elytra")
+    @ConfigEntry.Gui.Tooltip
+    public boolean glowingTrails = true;
 
     @ConfigEntry.Category("elytra")
     @ConfigEntry.Gui.Tooltip
@@ -110,6 +114,18 @@ public class ModConfig implements ConfigData {
     @ConfigEntry.Gui.Tooltip
     public double randomWidthVariation = 1;
 
+    @ConfigEntry.Category("elytra")
+    @ConfigEntry.Gui.Tooltip
+    public boolean fadeStart = true;
+
+    @ConfigEntry.Category("elytra")
+    @ConfigEntry.Gui.Tooltip
+    public double fadeStartDistance = 4.0;
+
+    @ConfigEntry.Category("elytra")
+    @ConfigEntry.Gui.Tooltip
+    public boolean fadeEnd = true;
+
 
     //server stuff
     @ConfigEntry.Category("server")
@@ -144,6 +160,15 @@ public class ModConfig implements ConfigData {
     @ConfigEntry.Category("others")
     @ConfigEntry.Gui.Tooltip
     public boolean enableTrailOthersDefault = true;
+
+    @ConfigEntry.Category("others")
+    @ConfigEntry.Gui.Tooltip
+    public boolean translucentTrailsOthersDefault = true;
+
+    @ConfigEntry.Category("others")
+    @ConfigEntry.Gui.Tooltip
+    public boolean glowingTrailsOthersDefault = true;
+
 
     @ConfigEntry.Category("others")
     @ConfigEntry.Gui.Tooltip
@@ -196,6 +221,19 @@ public class ModConfig implements ConfigData {
     @ConfigEntry.Category("others")
     @ConfigEntry.Gui.Tooltip
     public double randomWidthVariationOthersDefault = 1;
+
+    @ConfigEntry.Category("others")
+    @ConfigEntry.Gui.Tooltip
+    public boolean fadeStartOthersDefault = true;
+
+    @ConfigEntry.Category("others")
+    @ConfigEntry.Gui.Tooltip
+    public double fadeStartDistanceOthersDefault = 4.0;
+
+    @ConfigEntry.Category("others")
+    @ConfigEntry.Gui.Tooltip
+    public boolean fadeEndOthersDefault = true;
+
 
     //particles
     @ConfigEntry.Category("particles")

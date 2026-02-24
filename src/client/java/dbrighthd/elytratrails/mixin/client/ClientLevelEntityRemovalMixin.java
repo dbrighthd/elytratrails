@@ -1,5 +1,6 @@
 package dbrighthd.elytratrails.mixin.client;
 
+import dbrighthd.elytratrails.rendering.TrailSystem;
 import net.minecraft.client.multiplayer.ClientLevel;
 import net.minecraft.world.entity.Entity;
 import org.spongepowered.asm.mixin.Mixin;
@@ -16,6 +17,7 @@ public class ClientLevelEntityRemovalMixin {
 
     @Inject(method = "removeEntity(ILnet/minecraft/world/entity/Entity$RemovalReason;)V", at = @At("HEAD"), require = 0)
     private void elytraTrails$onRemoveEntity(int entityId, Entity.RemovalReason reason, CallbackInfo ci) {
+        //TrailSystem.getTrailManager().removeTrail(entityId);
         //WingTipSamplerHandler.onEntityRemoved(entityId);
     }
 }

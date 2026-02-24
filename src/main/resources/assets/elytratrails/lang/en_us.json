@@ -17,6 +17,10 @@
   "text.autoconfig.elytratrails.option.glowingTrails.@Tooltip": "Makes trails glow",
 
 
+  "text.autoconfig.elytratrails.option.constantWidthOnlyAlpha": "Constant Width, use Alpha",
+  "text.autoconfig.elytratrails.option.constantWidthOnlyAlpha.@Tooltip": "Makes width always the maxwidth, and applies width changes to transparency. ONLY WORKS WHEN TRANSLUCENT TRAILS IS TURNED ON",
+
+
   "text.autoconfig.elytratrails.option.enableTrail": "Enable Elytra Trail",
   "text.autoconfig.elytratrails.option.enableTrail.@Tooltip": "Toggle if elytra trails render",
 

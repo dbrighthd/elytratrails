@@ -31,7 +31,11 @@ public record PlayerConfigS2CPayload(int entityId, PlayerConfig playerConfig) im
                     Codec.DOUBLE.fieldOf("endRampDistance").forGetter(PlayerConfig::endRampDistance),
                     Codec.INT.fieldOf("color").forGetter(PlayerConfig::color),
                     Codec.DOUBLE.fieldOf("randomWidthVariation").forGetter(PlayerConfig::randomWidthVariation),
-                    Codec.STRING.fieldOf("prideTrail").forGetter(PlayerConfig::prideTrail)
+                    Codec.STRING.fieldOf("prideTrail").forGetter(PlayerConfig::prideTrail),
+                    Codec.BOOL.fieldOf("fadeStart").forGetter(PlayerConfig::fadeStart),
+                    Codec.DOUBLE.fieldOf("fadeStartDistance").forGetter(PlayerConfig::fadeStartDistance),
+                    Codec.BOOL.fieldOf("fadeEnd").forGetter(PlayerConfig::fadeEnd),
+                    Codec.INT.fieldOf("trailType").forGetter(PlayerConfig::trailType)
             ).apply(instance, PlayerConfig::new));
 
     private static final StreamCodec<RegistryFriendlyByteBuf, PlayerConfig> PLAYER_CONFIG_STREAM_CODEC =

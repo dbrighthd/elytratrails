@@ -18,6 +18,10 @@ public record PlayerConfig(
         double endRampDistance,
         int color,
         double randomWidthVariation,
-        String prideTrail
+        String prideTrail,
+        boolean fadeStart,
+        double fadeStartDistance,
+        boolean fadeEnd,
+        int trailType
 ) {
 }
