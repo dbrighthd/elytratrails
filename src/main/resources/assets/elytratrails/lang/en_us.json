@@ -80,6 +80,18 @@
   "text.autoconfig.elytratrails.option.randomWidthVariation": "Width Variation Amount",
   "text.autoconfig.elytratrails.option.randomWidthVariation.@Tooltip": "How much should width change based on randomness?",
 
+  "text.autoconfig.elytratrails.option.fadeStart": "Trail Fade-in at Start",
+  "text.autoconfig.elytratrails.option.fadeStart.@Tooltip": "Should the trail fade in at the start? (REQUIRES TRANSLUCENT TRAILS)",
+
+
+  "text.autoconfig.elytratrails.option.fadeStartDistance": "Fade-in Distance",
+  "text.autoconfig.elytratrails.option.fadeStartDistance.@Tooltip": "How long should it take for the trail to fade in? (REQUIRES TRANSLUCENT TRAILS)",
+
+  "text.autoconfig.elytratrails.option.fadeEnd": "Trail Fades Away",
+  "text.autoconfig.elytratrails.option.fadeEnd.@Tooltip": "Should the trail fade away at the end? (REQUIRES TRANSLUCENT TRAILS)",
+
+
+
   "text.autoconfig.elytratrails.option.useSplineTrail": "Trail Spline Smoothing",
   "text.autoconfig.elytratrails.option.useSplineTrail.@Tooltip": "Should the trail interpolate between points to make it smoother?",
 
@@ -121,11 +133,15 @@
   "text.autoconfig.elytratrails.option.enableTrailOthersDefault": "Enable Other's Trails",
   "text.autoconfig.elytratrails.option.enableTrailOthersDefault.@Tooltip": "Default: whether trails render for other entities/players",
 
+  "text.autoconfig.elytratrails.option.translucentTrailsOthersDefault": "Other's Translucent Trails",
+  "text.autoconfig.elytratrails.option.translucentTrailsOthersDefault.@Tooltip": "Default: Lets trails use fading and alpha, but can cause issues with translucency sorting",
+
+  "text.autoconfig.elytratrails.option.glowingTrailsOthersDefault": "Other's Glowing Trails",
+  "text.autoconfig.elytratrails.option.glowingTrailsOthersDefault.@Tooltip": "Default: Makes trails glow",
+
+
   "text.autoconfig.elytratrails.option.enableRandomWidthOthersDefault": "Other's Width Variation",
   "text.autoconfig.elytratrails.option.enableRandomWidthOthersDefault.@Tooltip": "Default: should other trails have random width variation?",
-
-  "text.autoconfig.elytratrails.option.useSplineTrailOthersDefault": "Other's Spline Smoothing",
-  "text.autoconfig.elytratrails.option.useSplineTrailOthersDefault.@Tooltip": "Default: smooth other trails by interpolating points",
 
   "text.autoconfig.elytratrails.option.speedDependentTrailOthersDefault": "Other's Speed Dependent Trail",
   "text.autoconfig.elytratrails.option.speedDependentTrailOthersDefault.@Tooltip": "Default: only show other trails when they are moving fast enough",
@@ -156,6 +172,17 @@
 
   "text.autoconfig.elytratrails.option.randomWidthVariationOthersDefault": "Other's Width Variation Amount",
   "text.autoconfig.elytratrails.option.randomWidthVariationOthersDefault.@Tooltip": "Default amount randomness affects other trail width",
+
+  "text.autoconfig.elytratrails.option.fadeStartOthersDefault": "Other's Trails Fade-in at Start",
+  "text.autoconfig.elytratrails.option.fadeStartOthersDefault.@Tooltip": "Should the trail fade in at the start? (REQUIRES TRANSLUCENT TRAILS)",
+
+
+  "text.autoconfig.elytratrails.option.fadeStartDistanceOthersDefault": "Other's Fade-in Distance",
+  "text.autoconfig.elytratrails.option.fadeStartDistanceOthersDefault.@Tooltip": "Default: How long should it take for the trail to fade in? (REQUIRES TRANSLUCENT TRAILS)",
+
+  "text.autoconfig.elytratrails.option.fadeEndOthersDefault": "Other's Trails Fade Away",
+  "text.autoconfig.elytratrails.option.fadeEndOthersDefault.@Tooltip": "Defaut: Should the trail fade away at the end? (REQUIRES TRANSLUCENT TRAILS)",
+
 
   "text.autoconfig.elytratrails.option.resourcePackOverride": "Resource Pack Override (Players)",
   "text.autoconfig.elytratrails.option.resourcePackOverride.@Tooltip": "If enabled, resource pack trail configs can override player trails too (falls back to synced/default settings if none exist).",
