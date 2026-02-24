@@ -56,7 +56,6 @@ public class TrailRenderer {
 
     @SuppressWarnings("resource")
     public void renderAllTrails(@NotNull WorldRenderContext ctx) {
-        ModConfig config = getConfig();
         PoseStack stack = ctx.matrices();
         stack.pushPose();
         stack.translate(ctx.gameRenderer().getMainCamera().position().scale(-1f));
@@ -85,7 +84,7 @@ public class TrailRenderer {
                 this.modConfig = getConfig();
                 this.trailRenderSettings = ClientPlayerConfigStore.decodeTrailType(trail.config().trailType());
 
-                this.isFirstperson = Minecraft.getInstance().options.getCameraType().isFirstPerson();
+                this.isFirstperson = ((Minecraft.getInstance().player != null) && trail.entityId() == Minecraft.getInstance().player.getId()) && Minecraft.getInstance().options.getCameraType().isFirstPerson();
                 for (int i = 0; i < points.size() - 1; i++) {
                     Trail.Point p0 = points.get(max(i - 1, 0));
                     Trail.Point p1 = points.get(i);

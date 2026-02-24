@@ -1,6 +1,6 @@
 package dbrighthd.elytratrails.rendering;
 
-import dbrighthd.elytratrails.config.ModConfig;
+
 import dbrighthd.elytratrails.config.pack.TrailPackConfigManager;
 import dbrighthd.elytratrails.network.ClientPlayerConfigStore;
 import it.unimi.dsi.fastutil.ints.Int2ObjectMap;
@@ -47,12 +47,8 @@ public class TrailManager {
 
 
     private void removeDeadPoints(Minecraft ctx) {
-        ModConfig config = getConfig();
-
         long currentTime = Util.getMillis();
-        // note: this causes like "cycling"? I don't know how to describe it.
-//        trails.forEach(t -> t.points().removeIf(p -> currentTime - p.epoch() > config.trailLifetime * 1000));
-        trails.removeIf(t -> t.points().isEmpty() || t.points().stream().allMatch(p -> currentTime - p.epoch() > config.trailLifetime * 1000));
+        trails.removeIf(t -> t.points().isEmpty() || t.points().stream().allMatch(p -> currentTime - p.epoch() > t.config().trailLifetime() * 1000));
     }
 
     public void removeTrail(int entityId)

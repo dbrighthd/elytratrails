@@ -10,7 +10,7 @@ import net.minecraft.world.phys.Vec3;
 import java.util.ArrayList;
 import java.util.List;
 
-public record Trail(Identifier texture, List<Point> points, TrailPackConfigManager.ResolvedTrailSettings config, boolean flipUv) {
+public record Trail(Identifier texture, List<Point> points, TrailPackConfigManager.ResolvedTrailSettings config, boolean flipUv, int entityId) {
 
     public static Trail fromPlayerConfig(int playerId, boolean flipUv) {
         PlayerConfig config = ClientPlayerConfigStore.getOrDefault(playerId);
@@ -18,7 +18,7 @@ public record Trail(Identifier texture, List<Point> points, TrailPackConfigManag
 
         Identifier texture = TrailTextureRegistry.resolveTextureOrNull(config.prideTrail());
         if (texture == null) texture = TrailRenderer.DEFAULT_TEXTURE;
-        return new Trail(texture, new ArrayList<>(), TrailPackConfigManager.resolveFromPlayerConfig(config), flipUv);
+        return new Trail(texture, new ArrayList<>(), TrailPackConfigManager.resolveFromPlayerConfig(config), flipUv, playerId);
     }
 
     @SuppressWarnings("unused")
