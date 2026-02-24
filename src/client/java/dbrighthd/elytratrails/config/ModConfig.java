@@ -52,6 +52,8 @@ public class ModConfig implements ConfigData {
     @ConfigEntry.Gui.Tooltip
     public boolean glowingTrails = true;
 
+
+
     @ConfigEntry.Category("elytra")
     @ConfigEntry.Gui.Tooltip
     public boolean enableRandomWidth = false;
@@ -126,6 +128,10 @@ public class ModConfig implements ConfigData {
     @ConfigEntry.Gui.Tooltip
     public boolean fadeEnd = true;
 
+
+    @ConfigEntry.Category("elytra")
+    @ConfigEntry.Gui.Tooltip
+    public boolean wireframeTrails = false;
 
     //server stuff
     @ConfigEntry.Category("server")
@@ -235,14 +241,15 @@ public class ModConfig implements ConfigData {
     public boolean fadeEndOthersDefault = true;
 
 
+    @ConfigEntry.Category("others")
+    @ConfigEntry.Gui.Tooltip
+    public boolean wireframeTrailsOthersDefault = false;
+
     //particles
     @ConfigEntry.Category("particles")
     @ConfigEntry.Gui.PrefixText
     @ConfigEntry.Gui.Tooltip
     public boolean enableParticles = false;
-
-
-
 
 
     @ConfigEntry.Category("particles")

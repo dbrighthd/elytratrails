@@ -1,10 +1,9 @@
 package dbrighthd.elytratrails.compat;
 
-//import dbrighthd.elytratrails.rendering.TrailPipelines;
+import dbrighthd.elytratrails.rendering.TrailPipelines;
 import net.fabricmc.loader.api.FabricLoader;
 import net.irisshaders.iris.api.v0.IrisApi;
-//import net.irisshaders.iris.api.v0.IrisProgram;
-
+import net.irisshaders.iris.api.v0.IrisProgram;
 
 public class IrisCompat {
     static{
@@ -15,8 +14,12 @@ public class IrisCompat {
     }
 
     public static void registerPipelines() {
-        //IrisApi.getInstance().assignPipeline(TrailPipelines.PIPELINE_ENTITY_TRANSLUCENT_CULL, IrisProgram.ENTITIES_TRANSLUCENT);
-        //IrisApi.getInstance().assignPipeline(TrailPipelines.PIPELINE_ENTITY_CUTOUT_LIT, IrisProgram.ENTITIES_TRANSLUCENT);
+        IrisApi.getInstance().assignPipeline(TrailPipelines.PIPELINE_ENTITY_TRANSLUCENT_CULL, IrisProgram.ENTITIES_TRANSLUCENT);
+        IrisApi.getInstance().assignPipeline(TrailPipelines.PIPELINE_ENTITY_CUTOUT_EMISSIVE_UNLIT, IrisProgram.EMISSIVE_ENTITIES);
+        IrisApi.getInstance().assignPipeline(TrailPipelines.PIPELINE_ENTITY_TRANSLUCENT_EMISSIVE_UNLIT, IrisProgram.EMISSIVE_ENTITIES);
+        IrisApi.getInstance().assignPipeline(TrailPipelines.PIPELINE_ENTITY_TRANSLUCENT_CULL_WIREFRAME, IrisProgram.ENTITIES_TRANSLUCENT);
+        IrisApi.getInstance().assignPipeline(TrailPipelines.PIPELINE_ENTITY_CUTOUT_EMISSIVE_UNLIT_WIREFRAME, IrisProgram.EMISSIVE_ENTITIES);
+        IrisApi.getInstance().assignPipeline(TrailPipelines.PIPELINE_ENTITY_TRANSLUCENT_EMISSIVE_UNLIT_WIREFRAME, IrisProgram.EMISSIVE_ENTITIES);
     }
 
     public static boolean isShadowPassing()

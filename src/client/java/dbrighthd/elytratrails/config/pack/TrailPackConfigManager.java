@@ -321,7 +321,7 @@ public final class TrailPackConfigManager {
 
             overrides.color = parseHexColor(baseConfig.color);
             overrides.prideTrail = baseConfig.prideTrail;
-            overrides.trailType = ClientPlayerConfigStore.encodeTrailType(baseConfig.glowingTrails, baseConfig.translucentTrails);
+            overrides.trailType = ClientPlayerConfigStore.encodeTrailType(baseConfig.glowingTrails, baseConfig.translucentTrails, baseConfig.wireframeTrails);
             return overrides;
         }
         static TrailOverrides fromResolved(ResolvedTrailSettings s) {
@@ -408,7 +408,7 @@ public final class TrailPackConfigManager {
             overrides.fadeStart = readBoolean(json, "fadeStart");
             overrides.fadeStartDistance = readDouble(json,"fadeStartDistance");
             overrides.fadeEnd = readBoolean(json,"fadeEnd");
-            overrides.trailType = ClientPlayerConfigStore.encodeTrailType(Boolean.TRUE.equals(readBoolean(json, "glowingTrail")), Boolean.TRUE.equals(readBoolean(json, "translucentTrail")));
+            overrides.trailType = ClientPlayerConfigStore.encodeTrailType(Boolean.TRUE.equals(readBoolean(json, "glowingTrail")), Boolean.TRUE.equals(readBoolean(json, "translucentTrail")), Boolean.TRUE.equals(readBoolean(json, "wireframeTrail")));
             return overrides;
         }
 
@@ -541,7 +541,7 @@ public final class TrailPackConfigManager {
                     getConfig().fadeStart,
                     getConfig().fadeStartDistance,
                     getConfig().fadeEnd,
-                    ClientPlayerConfigStore.encodeTrailType(getConfig().glowingTrails, getConfig().translucentTrails)
+                    ClientPlayerConfigStore.encodeTrailType(getConfig().glowingTrails, getConfig().translucentTrails, getConfig().wireframeTrails)
             );
         }
     }

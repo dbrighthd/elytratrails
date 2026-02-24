@@ -104,29 +104,37 @@ public class TrailRenderer {
         ClientPlayerConfigStore.TrailRenderSettings trailRenderSettings = ClientPlayerConfigStore.decodeTrailType(trail.config().trailType());
         if(trailRenderSettings.glowing())
         {
-            if(ShaderChecksUtil.isUsingShaders())
+            if(trailRenderSettings.translucent())
             {
-                return RenderTypes.entityTranslucentEmissive(trail.texture());
+                if(trailRenderSettings.wireframe())
+                {
+                    return TrailPipelines.entityTranslucentEmissiveWireFrame(trail.texture());
+                }
+                return TrailPipelines.entityTranslucentEmissiveUnlit(trail.texture());
             }
             else
             {
-                if(trailRenderSettings.translucent())
+                if(trailRenderSettings.wireframe())
                 {
-                    return TrailPipelines.entityTranslucentEmissiveUnlit(trail.texture());
+                    return TrailPipelines.entityCutoutEmissiveUnlitWireframe(trail.texture());
                 }
                 else
                 {
                     return TrailPipelines.entityCutoutEmissiveUnlit(trail.texture());
+
                 }
             }
         }
         else
         {
-            if(ShaderChecksUtil.isUsingShaders())
+            if(trailRenderSettings.wireframe())
             {
-                return RenderTypes.entityTranslucent(trail.texture());
+                return TrailPipelines.entityTranslucentCullWireFrame(trail.texture());
             }
-            return TrailPipelines.entityTranslucentCull(trail.texture());
+            else
+            {
+                return TrailPipelines.entityTranslucentCull(trail.texture());
+            }
         }
     }
     private void renderSubdividedSegment(

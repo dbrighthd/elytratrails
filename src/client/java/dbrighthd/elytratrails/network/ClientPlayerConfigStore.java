@@ -13,7 +13,7 @@ public final class ClientPlayerConfigStore
 {
     public static final ConcurrentHashMap<Integer, PlayerConfig> CLIENT_PLAYER_CONFIGS = new ConcurrentHashMap<>();
 
-    public static final record TrailRenderSettings(boolean glowing, boolean translucent){}
+    public static final record TrailRenderSettings(boolean glowing, boolean translucent, boolean wireframe){}
 
     public static PlayerConfig CLIENT_CONFIG;
 
@@ -42,19 +42,19 @@ public final class ClientPlayerConfigStore
                 config.fadeStart,
                 config.fadeStartDistance,
                 config.fadeEnd,
-                encodeTrailType(config.glowingTrails, config.translucentTrails)
+                encodeTrailType(config.glowingTrails, config.translucentTrails, config.wireframeTrails)
         );
     }
 
 
-    public static int encodeTrailType(boolean glow, boolean translucent)
+    public static int encodeTrailType(boolean glow, boolean translucent, boolean wireframe)
     {
-        return (glow ? 2 : 1) * (translucent ? 3 : 1);
+        return (glow ? 2 : 1) * (translucent ? 3 : 1) * (wireframe? 5 : 1);
     }
 
     public static TrailRenderSettings decodeTrailType(int n)
     {
-        return new TrailRenderSettings((n%2==0),(n%3==0));
+        return new TrailRenderSettings((n%2==0),(n%3==0),(n%5==0));
     }
     public static void setClientOthersConfig ()
     {
@@ -75,7 +75,7 @@ public final class ClientPlayerConfigStore
                 config.fadeStartOthersDefault,
                 config.fadeStartDistanceOthersDefault,
                 config.fadeEndOthersDefault,
-                encodeTrailType(config.glowingTrailsOthersDefault, config.translucentTrailsOthersDefault)
+                encodeTrailType(config.glowingTrailsOthersDefault, config.translucentTrailsOthersDefault, config.wireframeTrailsOthersDefault)
         );
     }
     public static PlayerConfig getLocalPlayerConfig() {

@@ -16,6 +16,8 @@
   "text.autoconfig.elytratrails.option.glowingTrails": "Glowing Trails",
   "text.autoconfig.elytratrails.option.glowingTrails.@Tooltip": "Makes trails glow",
 
+  "text.autoconfig.elytratrails.option.wireframeTrails": "Wireframe Trails",
+  "text.autoconfig.elytratrails.option.wireframeTrails.@Tooltip": "Makes trails wireframe (Is very thin!)",
 
   "text.autoconfig.elytratrails.option.constantWidthOnlyAlpha": "Constant Width, use Alpha",
   "text.autoconfig.elytratrails.option.constantWidthOnlyAlpha.@Tooltip": "Makes width always the maxwidth, and applies width changes to transparency. ONLY WORKS WHEN TRANSLUCENT TRAILS IS TURNED ON",
@@ -29,7 +31,6 @@
 
   "text.autoconfig.elytratrails.option.alwaysShowTrailDuringTwirl": "Ignore Speed For Trail When Twirling",
   "text.autoconfig.elytratrails.option.alwaysShowTrailDuringTwirl.@Tooltip": "If turned on, trails will always show when twirling (ignores \"speed dependent trail\" settings)",
-
 
   "text.autoconfig.elytratrails.option.width": "Trail Width",
   "text.autoconfig.elytratrails.option.width.@Tooltip": "Max trail width (blocks)",
@@ -61,7 +62,6 @@
   "text.autoconfig.elytratrails.option.particlesVelocityBackwards": "Particle Backwards Speed",
   "text.autoconfig.elytratrails.option.particlesVelocityBackwards.@Tooltip": "Multiple of player velocity to make particles move backwards",
 
-
   "text.autoconfig.elytratrails.option.particle": "Particle Shown",
   "text.autoconfig.elytratrails.option.particle.@Tooltip": "Which particle should appear during flight",
 
@@ -83,14 +83,11 @@
   "text.autoconfig.elytratrails.option.fadeStart": "Trail Fade-in at Start",
   "text.autoconfig.elytratrails.option.fadeStart.@Tooltip": "Should the trail fade in at the start? (REQUIRES TRANSLUCENT TRAILS)",
 
-
   "text.autoconfig.elytratrails.option.fadeStartDistance": "Fade-in Distance",
   "text.autoconfig.elytratrails.option.fadeStartDistance.@Tooltip": "How long should it take for the trail to fade in? (REQUIRES TRANSLUCENT TRAILS)",
 
   "text.autoconfig.elytratrails.option.fadeEnd": "Trail Fades Away",
   "text.autoconfig.elytratrails.option.fadeEnd.@Tooltip": "Should the trail fade away at the end? (REQUIRES TRANSLUCENT TRAILS)",
-
-
 
   "text.autoconfig.elytratrails.option.useSplineTrail": "Trail Spline Smoothing",
   "text.autoconfig.elytratrails.option.useSplineTrail.@Tooltip": "Should the trail interpolate between points to make it smoother?",
@@ -100,7 +97,6 @@
 
   "text.autoconfig.elytratrails.option.fadeFirstPersonTrail": "Delay First Person Trail",
   "text.autoconfig.elytratrails.option.fadeFirstPersonTrail.@Tooltip": "First person trails fade in with a delay to prevent annoyance",
-
 
   "text.autoconfig.elytratrails.option.emfSupport": "EMF Model Support",
   "text.autoconfig.elytratrails.option.emfSupport.@Tooltip": "Having this on tries to make it work with EMF models, can cause issues",
@@ -139,6 +135,8 @@
   "text.autoconfig.elytratrails.option.glowingTrailsOthersDefault": "Other's Glowing Trails",
   "text.autoconfig.elytratrails.option.glowingTrailsOthersDefault.@Tooltip": "Default: Makes trails glow",
 
+  "text.autoconfig.elytratrails.option.wireframeTrailsOthersDefault": "Other's Wireframe Trails",
+  "text.autoconfig.elytratrails.option.wireframeTrailsOthersDefault.@Tooltip": "Default: Makes trails wireframe (Is very thin!)",
 
   "text.autoconfig.elytratrails.option.enableRandomWidthOthersDefault": "Other's Width Variation",
   "text.autoconfig.elytratrails.option.enableRandomWidthOthersDefault.@Tooltip": "Default: should other trails have random width variation?",
