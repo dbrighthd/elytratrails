@@ -56,6 +56,7 @@ public class ElytraTrailsClient implements ClientModInitializer {
 						onResourceReload();
 					}
 					TrailPackConfigManager.reload(manager);
+					TrailPackConfigManager.reloadPresets(manager);
 				}
 			}
 		);

@@ -8,34 +8,6 @@ import me.shedaniel.autoconfig.annotation.ConfigEntry;
 public class ModConfig implements ConfigData {
 
 
-    //general
-    @ConfigEntry.Category("general")
-    @ConfigEntry.Gui.PrefixText
-    @ConfigEntry.Gui.Tooltip
-    public boolean enableAllTrails = true;
-
-
-
-    @SuppressWarnings("unused")
-    @ConfigEntry.Category("general")
-    @ConfigEntry.Gui.Tooltip
-    @ConfigEntry.Gui.Excluded
-    public boolean resourcePackOverride = true;
-
-
-
-    @ConfigEntry.Category("general")
-    @ConfigEntry.Gui.Tooltip
-    public boolean emfSupport = true;
-
-
-    @ConfigEntry.Category("general")
-    @ConfigEntry.Gui.Tooltip
-    public boolean enableTwirls = true;
-
-    @ConfigEntry.Category("general")
-    @ConfigEntry.Gui.Tooltip
-    public boolean alwaysShowTrailDuringTwirl = false;
 
 
     //your trail stuff
@@ -51,7 +23,6 @@ public class ModConfig implements ConfigData {
     @ConfigEntry.Category("elytra")
     @ConfigEntry.Gui.Tooltip
     public boolean glowingTrails = true;
-
 
 
     @ConfigEntry.Category("elytra")
@@ -105,8 +76,10 @@ public class ModConfig implements ConfigData {
 
     @ConfigEntry.Category("elytra")
     @ConfigEntry.Gui.Tooltip
-    public String color = "#FFFFFF";
+    public String color = "#FFFFFFFF";
 
+    public int justColor = 0xFFFFFF;
+    public int justAlpha = 255;
 
     @ConfigEntry.Category("elytra")
     @ConfigEntry.Gui.Tooltip
@@ -118,7 +91,7 @@ public class ModConfig implements ConfigData {
 
     @ConfigEntry.Category("elytra")
     @ConfigEntry.Gui.Tooltip
-    public boolean fadeStart = true;
+    public boolean fadeStart = false;
 
     @ConfigEntry.Category("elytra")
     @ConfigEntry.Gui.Tooltip
@@ -133,6 +106,38 @@ public class ModConfig implements ConfigData {
     @ConfigEntry.Gui.Tooltip
     public boolean wireframeTrails = false;
 
+    public boolean exportPreset = false;
+    public String exportPresetName = "";
+    //general
+    @ConfigEntry.Category("general")
+    @ConfigEntry.Gui.PrefixText
+    @ConfigEntry.Gui.Tooltip
+    public boolean enableAllTrails = true;
+
+
+
+    @SuppressWarnings("unused")
+    @ConfigEntry.Category("general")
+    @ConfigEntry.Gui.Tooltip
+    @ConfigEntry.Gui.Excluded
+    public boolean resourcePackOverride = true;
+
+
+
+    @ConfigEntry.Category("general")
+    @ConfigEntry.Gui.Tooltip
+    public boolean emfSupport = true;
+
+
+    @ConfigEntry.Category("general")
+    @ConfigEntry.Gui.Tooltip
+    public boolean enableTwirls = true;
+
+    @ConfigEntry.Category("general")
+    @ConfigEntry.Gui.Tooltip
+    public boolean alwaysShowTrailDuringTwirl = false;
+
+    public ClearTrails clearTrailsOption = ClearTrails.NO;
     //server stuff
     @ConfigEntry.Category("server")
     @ConfigEntry.Gui.PrefixText
@@ -216,6 +221,10 @@ public class ModConfig implements ConfigData {
     @ConfigEntry.Gui.Tooltip
     public String colorOthersDefault = "#FFFFFF";
 
+    public int justAlphaOthersDefault = 255;
+
+    public int justColorOthersDefault = 0xFFFFFF;
+
     /**
      * Optional pride flag id (from Pride Lib / mod id "pride") used for other players when no
      * per-player config is available.
@@ -255,6 +264,8 @@ public class ModConfig implements ConfigData {
     @ConfigEntry.Category("particles")
     @ConfigEntry.Gui.Tooltip
     public ParticleChoice particle = ParticleChoice.CLOUD;
+    public String Preset = "";
+    public String PresetOthers = "";
 
     public enum ParticleChoice {
         CLOUD, END_ROD, HAPPY_VILLAGER, FIREWORK, ASH,
@@ -271,4 +282,8 @@ public class ModConfig implements ConfigData {
 
     @ConfigEntry.Category("particles") @ConfigEntry.Gui.Tooltip
     public double particlesVelocityBackwards = 0;
+}
+enum ClearTrails {
+    NO,
+    CLEAR,
 }

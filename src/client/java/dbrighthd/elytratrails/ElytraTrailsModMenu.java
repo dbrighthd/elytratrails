@@ -1,5 +1,6 @@
 package dbrighthd.elytratrails;
 
+import dbrighthd.elytratrails.config.ConfigScreenBuilder;
 import dbrighthd.elytratrails.config.ModConfig;
 import com.terraformersmc.modmenu.api.ConfigScreenFactory;
 import com.terraformersmc.modmenu.api.ModMenuApi;
@@ -22,34 +23,35 @@ public class ElytraTrailsModMenu implements ModMenuApi {
     public ConfigScreenFactory<?> getModConfigScreenFactory() {
         return parent -> {
 
-            Screen screen = AutoConfigClient.getConfigScreen(ModConfig.class, parent).get();
-
-            if (screen instanceof AbstractConfigScreen cloth) {
-                cloth.setSavingRunnable(() -> {
-                    AutoConfig.getConfigHolder(ModConfig.class).save();
-                    var mc = Minecraft.getInstance();
-                    refreshLocalConfigs();
-                    if (mc.getConnection() != null && mc.player != null && mc.level != null) {
-                        TrailSystem.getTrailManager().removeTrail(mc.player.getId());
-                        TrailSystem.getWingtipSampler().removeAllEmfCache();
-                        if(getConfig().shareTrail || !getConfig().showTrailToOtherPlayers)
-                        {
-                            ClientPlayNetworking.send(new PlayerConfigC2SPayload(getLocalPlayerConfigToSend()));
-                        }
-                        else
-                        {
-                            ClientPlayNetworking.send(new RemoveFromStoreC2SPayload());
-                        }
-                        if (!getConfig().syncWithServer) {
-                            CLIENT_PLAYER_CONFIGS.clear();
-                        } else if (CLIENT_PLAYER_CONFIGS.isEmpty()) {
-                            ClientPlayNetworking.send(new GetAllRequestC2SPayload());
-                        }
-                    }
-                });
-            }
-
-            return screen;
+            return ConfigScreenBuilder.buildConfigScreen(parent,getConfig());
+//            Screen screen = AutoConfigClient.getConfigScreen(ModConfig.class, parent).get();
+//
+//            if (screen instanceof AbstractConfigScreen cloth) {
+//                cloth.setSavingRunnable(() -> {
+//                    AutoConfig.getConfigHolder(ModConfig.class).save();
+//                    var mc = Minecraft.getInstance();
+//                    refreshLocalConfigs();
+//                    if (mc.getConnection() != null && mc.player != null && mc.level != null) {
+//                        TrailSystem.getTrailManager().removeTrail(mc.player.getId());
+//                        TrailSystem.getWingtipSampler().removeAllEmfCache();
+//                        if(getConfig().shareTrail || !getConfig().showTrailToOtherPlayers)
+//                        {
+//                            ClientPlayNetworking.send(new PlayerConfigC2SPayload(getLocalPlayerConfigToSend()));
+//                        }
+//                        else
+//                        {
+//                            ClientPlayNetworking.send(new RemoveFromStoreC2SPayload());
+//                        }
+//                        if (!getConfig().syncWithServer) {
+//                            CLIENT_PLAYER_CONFIGS.clear();
+//                        } else if (CLIENT_PLAYER_CONFIGS.isEmpty()) {
+//                            ClientPlayNetworking.send(new GetAllRequestC2SPayload());
+//                        }
+//                    }
+//                });
+//            }
+//
+//            return screen;
         };
     }
 

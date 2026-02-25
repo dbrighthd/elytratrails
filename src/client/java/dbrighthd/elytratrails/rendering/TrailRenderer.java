@@ -63,7 +63,6 @@ public class TrailRenderer {
         for (Trail trail : manager.trails()) {
             List<Trail.Point> points = trail.points();
             if (points.size() < 4) continue; // splines :3
-
             //float length = trail.length();
             RenderType renderType = getRenderType(trail);
 
@@ -187,8 +186,9 @@ public class TrailRenderer {
             double start = Mth.lerp(tStart, epoch0, epoch1);
             double end = Mth.lerp(tEnd, epoch0, epoch1);
 
-            float alphaEnd = computeLifetimeFadeout(end, currentTime, (long) (trail.config().trailLifetime() * 1000));
-            float alphaStart = trail.config().fadeEnd() || alphaEnd <= 0 ? computeLifetimeFadeout(start, currentTime, (long) (trail.config().trailLifetime() * 1000)) : 1f;
+            double trailLifetime = trail.config().enableTrail() ? trail.config().trailLifetime() : 0;
+            float alphaEnd = computeLifetimeFadeout(end, currentTime, (long) (trailLifetime * 1000));
+            float alphaStart = trail.config().fadeEnd() || alphaEnd <= 0 ? computeLifetimeFadeout(start, currentTime, (long) (trailLifetime * 1000)) : 1f;
             if(alphaEnd <= 0)
             {
                 if (v1 > endOfTrail)

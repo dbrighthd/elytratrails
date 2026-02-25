@@ -1,0 +1,23 @@
+{
+  "enableTrail": true,
+  "glowingTrails" : false,
+  "translucentTrails" : true,
+  "wireframeTrails" : false,
+  "enableRandomWidth": false,
+  "speedDependentTrail": false,
+  "fadeFirstPersonTrail": true,
+  "trailMovesWithElytraAngle": true,
+  "width": 0.07,
+  "firstPersonFadeTime": 0.3,
+  "trailLifetime": 0.6,
+  "maxSamplePerSecond": 60,
+  "trailMinSpeed": 0.75,
+  "startRampDistance": 0.0,
+  "endRampDistance": 10.0,
+  "color": "#AAFFFFFF",
+  "prideTrail": "",
+  "randomWidthVariation": 1.0,
+  "fadeStart": true,
+  "fadeStartDistance": 5.0,
+  "fadeEnd": false
+}

@@ -125,9 +125,9 @@ public class TrailManager {
         return trails;
     }
 
-    @SuppressWarnings("unused")
     public void removeAllTrails()
     {
         activeTrails.clear();
+        trails.clear();
     }
 }
