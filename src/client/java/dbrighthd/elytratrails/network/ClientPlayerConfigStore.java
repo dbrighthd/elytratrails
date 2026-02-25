@@ -13,7 +13,7 @@ public final class ClientPlayerConfigStore
 {
     public static final ConcurrentHashMap<Integer, PlayerConfig> CLIENT_PLAYER_CONFIGS = new ConcurrentHashMap<>();
 
-    public static final record TrailRenderSettings(boolean glowing, boolean translucent, boolean wireframe){}
+    public record TrailRenderSettings(boolean glowing, boolean translucent, boolean wireframe){}
 
     public static PlayerConfig CLIENT_CONFIG;
 

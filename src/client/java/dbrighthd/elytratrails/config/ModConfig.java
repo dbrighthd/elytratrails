@@ -3,8 +3,6 @@ package dbrighthd.elytratrails.config;
 import me.shedaniel.autoconfig.ConfigData;
 import me.shedaniel.autoconfig.annotation.Config;
 import me.shedaniel.autoconfig.annotation.ConfigEntry;
-import net.minecraft.core.particles.ParticleType;
-import net.minecraft.core.particles.ParticleTypes;
 
 @Config(name = "elytratrails")
 public class ModConfig implements ConfigData {
@@ -142,6 +140,10 @@ public class ModConfig implements ConfigData {
     public boolean logTrails = false;
 
     public ClearTrails clearTrailsOption = ClearTrails.NO;
+    public enum ClearTrails {
+        NO,
+        CLEAR,
+    }
     //server stuff
     @ConfigEntry.Category("server")
     @ConfigEntry.Gui.PrefixText
@@ -382,8 +384,4 @@ public class ModConfig implements ConfigData {
 
     @ConfigEntry.Category("particles") @ConfigEntry.Gui.Tooltip
     public double particlesVelocityBackwards = 0;
-}
-enum ClearTrails {
-    NO,
-    CLEAR,
 }

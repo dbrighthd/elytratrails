@@ -4,7 +4,6 @@ import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
-import com.terraformersmc.modmenu.util.mod.Mod;
 import dbrighthd.elytratrails.config.ModConfig;
 import dbrighthd.elytratrails.network.ClientPlayerConfigStore;
 import dbrighthd.elytratrails.network.PlayerConfig;
@@ -12,7 +11,6 @@ import net.fabricmc.loader.api.FabricLoader;
 import net.minecraft.resources.Identifier;
 import net.minecraft.server.packs.resources.Resource;
 import net.minecraft.server.packs.resources.ResourceManager;
-import net.minecraft.world.level.block.entity.vault.VaultBlockEntity;
 import org.jetbrains.annotations.Nullable;
 
 import java.io.BufferedReader;
@@ -22,6 +20,7 @@ import java.io.Writer;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.nio.file.StandardOpenOption;
 import java.util.Locale;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
@@ -186,6 +185,7 @@ public final class TrailPackConfigManager {
         String fileName = normalizedPath.substring((PRESETS_FOLDER + "/").length());
         if (fileName.contains("/")) return null;
 
+
         String withoutExt = fileName.substring(0, fileName.length() - ".json".length());
         String trimmed = withoutExt.trim();
         if (trimmed.isEmpty()) return null;
@@ -251,9 +251,13 @@ public final class TrailPackConfigManager {
             root.addProperty("fadeStartDistance", config.fadeStartDistance);
             root.addProperty("fadeEnd", config.fadeEnd);
 
+            // Overwrite if the file already exists, so people can actually update their presets instead of living with the endless suffering if they accidentally made their trail slightly too thin
             try (Writer writer = Files.newBufferedWriter(
                     outFile,
-                    StandardCharsets.UTF_8
+                    StandardCharsets.UTF_8,
+                    StandardOpenOption.CREATE,
+                    StandardOpenOption.TRUNCATE_EXISTING,
+                    StandardOpenOption.WRITE
             )) {
                 new GsonBuilder().setPrettyPrinting().create().toJson(root, writer);
             }
@@ -265,13 +269,10 @@ public final class TrailPackConfigManager {
     }
 
     private static String sanitizePresetFileName(String raw) {
-        // Replace invalid filename chars on Windows/macOS/Linux-ish cases
         String s = raw.replaceAll("[\\\\/:*?\"<>|]", "_").trim();
 
-        // Avoid weird trailing dots/spaces
-        s = s.replaceAll("[\\.\\s]+$", "");
+        s = s.replaceAll("[.\\s]+$", "");
 
-        // Optional: cap length
         if (s.length() > 100) s = s.substring(0, 100).trim();
 
         return s;
@@ -308,13 +309,13 @@ public final class TrailPackConfigManager {
             String fallbackName = fileName.substring(0, fileName.length() - ".json".length()).trim();
             if (fallbackName.isEmpty()) return;
 
-            // Prevent duplicates (resource-pack + disk, or disk + disk)
-            CONFIG_PRESETS.putIfAbsent(fallbackName, overrides);
+            CONFIG_PRESETS.put(fallbackName, overrides);
         } catch (Throwable ignored) {
         }
     }
 
 
+    @SuppressWarnings("unused")
     public static double getMaxLifetimeSeconds(double configDefaultSeconds) {
         if (maxLifetimeOverrideSeconds > 0.0) {
             return Math.max(configDefaultSeconds, maxLifetimeOverrideSeconds);
@@ -322,9 +323,7 @@ public final class TrailPackConfigManager {
         return configDefaultSeconds;
     }
 
-    /**
-     * ORIGINAL behavior: base overrides come from the "elytra" (non-others) fields.
-     */
+    @SuppressWarnings("unused")
     public static ResolvedTrailSettings resolve(@Nullable String modelName, @Nullable String boneName, @Nullable ModConfig baseConfig) {
         if (baseConfig == null) return ResolvedTrailSettings.defaults();
 
@@ -350,6 +349,7 @@ public final class TrailPackConfigManager {
         return mergedOverrides.resolve();
     }
 
+    @SuppressWarnings("unused")
     public static ResolvedTrailSettings resolveOnTop(@Nullable String modelName,
                                                      @Nullable String boneName,
                                                      @Nullable ResolvedTrailSettings base) {
@@ -376,12 +376,12 @@ public final class TrailPackConfigManager {
             }
         }
 
-        // If the pack entry existed but it contributed nothing, keep base unchanged.
-        // (This is rare, but safe.)
         if (merged.isSameAs(base)) return base;
 
         return merged.resolve();
     }
+
+    @SuppressWarnings("unused")
 
     public static ResolvedTrailSettings resolveOthers(@Nullable String modelName, @Nullable String boneName, @Nullable ModConfig baseConfig) {
         if (baseConfig == null) return ResolvedTrailSettings.defaults();
@@ -437,6 +437,7 @@ public final class TrailPackConfigManager {
         } catch (Throwable ignored) {
         }
     }
+    @SuppressWarnings("unused")
     private static void loadAndCachePresets(String modelKey, Resource resource) {
         try (BufferedReader reader = new BufferedReader(new InputStreamReader(resource.open(), StandardCharsets.UTF_8))) {
             JsonElement rootElement = GSON.fromJson(reader, JsonElement.class);
@@ -544,6 +545,9 @@ public final class TrailPackConfigManager {
     public static Map<String, TrailOverrides> getPresets() {
         return Map.copyOf(CONFIG_PRESETS);
     }
+
+    @SuppressWarnings("unused")
+
     private static @Nullable TrailOverrides getPresetOverrides(@Nullable String name) {
         if (name == null) return null;
         String key = name.trim().toLowerCase(Locale.ROOT);
@@ -731,12 +735,12 @@ public final class TrailPackConfigManager {
                     asNumber(startRampDistance),
                     asNumber(endRampDistance),
                     asNumber(randomWidthVariation),
-                    color,
+                    color != null ? color : 0xFFFFFFFF,
                     prideTrail,
                     asTrue(fadeStart),
                     asNumber(fadeStartDistance),
                     asTrue(fadeEnd),
-                    trailType
+                    trailType != null ? trailType : 1
             );
         }
 
@@ -833,19 +837,17 @@ public final class TrailPackConfigManager {
         return 16777215;
     }
     public static String toHexColorString(int color) {
-        int rgb = color;
-        return String.format("#%06X", rgb);
+        return String.format("#%06X", color);
     }
     public static int getAlpha(int argb) {
         return (argb >>> 24) & 0xFF;
     }
 
-    /** Returns RGB color only (0xRRGGBB) from ARGB int. */
     public static int getColorRgb(int argb) {
         return argb & 0xFFFFFF;
     }
 
-    /** Combines separate alpha (0-255) + RGB (0xRRGGBB) into ARGB int. */
+    @SuppressWarnings("unused")
     public static int withAlphaAndColor(int alpha, int rgb) {
         int a = alpha & 0xFF;
         int c = rgb & 0xFFFFFF;
@@ -861,7 +863,6 @@ public final class TrailPackConfigManager {
         ResolvedTrailSettings defaults = ResolvedTrailSettings.defaults();
         if (playerConfig == null) return defaults;
 
-        // If PlayerConfig has enableTrail(), use it. Otherwise fall back to defaults.enableTrail().
         boolean enableTrail;
         try {
             enableTrail = playerConfig.enableTrail();

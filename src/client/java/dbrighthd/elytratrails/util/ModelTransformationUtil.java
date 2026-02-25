@@ -10,6 +10,7 @@ public class ModelTransformationUtil {
 
     public static Vec3 VANILLA_LEFT_WING_TIP = new Vec3(-10.0 / 16.0, 21.0 / 16.0, 2.0 / 16.0);
     public static Vec3 VANILLA_RIGHT_WING_TIP = new Vec3( 10.0 / 16.0, 21.0 / 16.0, 2.0 / 16.0);
+    @SuppressWarnings("unused")
     public static Vec3 transformLocalPointThroughPart(PoseStack basePoseStack, ModelPart part, Vec3 localPoint) {
         basePoseStack.pushPose();
         part.translateAndRotate(basePoseStack);
@@ -23,7 +24,7 @@ public class ModelTransformationUtil {
         homogeneous.mul(matrix);
         return new Vec3(homogeneous.x(), homogeneous.y(), homogeneous.z());
     }
-
+    @SuppressWarnings("unused")
     public static Vec3 computeWingTipLocal(boolean isLeftWing) {
         return isLeftWing
                 ? VANILLA_LEFT_WING_TIP

@@ -10,6 +10,7 @@ public final class ShaderChecksUtil {
         if (!FabricLoader.getInstance().isModLoaded("iris")) return false;
         return IrisCompat.isShadowPassing();
     }
+    @SuppressWarnings("unused")
     public static boolean isUsingShaders() {
         if (!FabricLoader.getInstance().isModLoaded("iris")) return false;
         return IrisCompat.isUsingShaders();

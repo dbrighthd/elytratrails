@@ -4,7 +4,6 @@ import dbrighthd.elytratrails.config.pack.TrailPackConfigManager;
 import dbrighthd.elytratrails.network.GetAllRequestC2SPayload;
 import dbrighthd.elytratrails.network.PlayerConfigC2SPayload;
 import dbrighthd.elytratrails.network.RemoveFromStoreC2SPayload;
-import dbrighthd.elytratrails.rendering.Trail;
 import dbrighthd.elytratrails.rendering.TrailSystem;
 import me.shedaniel.autoconfig.AutoConfig;
 import me.shedaniel.clothconfig2.api.ConfigBuilder;
@@ -78,11 +77,11 @@ public class ConfigScreenBuilder {
 
         general.addEntry(entryBuilder.startEnumSelector(
                         Component.translatable("text.elytratrails.option.clearTrails"),
-                        ClearTrails.class,
+                        ModConfig.ClearTrails.class,
                         config.clearTrailsOption)
                 .setTooltip(Component.translatable("text.elytratrails.option.clearTrails.@Tooltip"))
                 .setSaveConsumer(newValue -> {
-                    if(newValue == ClearTrails.CLEAR)
+                    if(newValue == ModConfig.ClearTrails.CLEAR)
                         TrailSystem.getTrailManager().removeAllTrails();
                 })
                 .build());
@@ -386,7 +385,7 @@ public class ConfigScreenBuilder {
                                 },
                                 v -> Component.nullToEmpty(v.name())
                         ),
-                        DropdownMenuBuilder.CellCreatorBuilder.of(14,160, 8, v -> Component.nullToEmpty(((ModConfig.ParticleChoice) v).name())
+                        DropdownMenuBuilder.CellCreatorBuilder.of(14,160, 8, v -> Component.nullToEmpty((v).name())
                         )
                 )
                 .setDefaultValue(ModConfig.ParticleChoice.POOF)
