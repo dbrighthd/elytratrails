@@ -8,31 +8,18 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
-/**
- * Resolves custom trail textures from:
- *   assets/elytratrails/textures/trails/*.png
- * Users can specify a string like "genderfluid" (case-insensitive) and it maps to:
- *   elytratrails:textures/trails/genderfluid.png
- * If the texture doesn't exist, resolveTextureOrNull returns null so the caller can
- * fall back to the default TRAIL_TEX.
- */
+
 public final class TrailTextureRegistry {
     private TrailTextureRegistry() {}
 
     private static volatile Set<String> AVAILABLE = Collections.emptySet();
 
-    /**
-     * Synchronously reload available trail textures from the current ResourceManager.
-     * Intended to be called from your existing SimpleSynchronousResourceReloadListener.
-     * Scans:
-     *   assets/elytratrails/textures/trails/*.png
-     */
+
     public static void reloadNow(ResourceManager manager) {
         Map<Identifier, ?> found = manager.listResources("textures/trails", id -> id.getPath().endsWith(".png"));
 
         Set<String> out = new HashSet<>();
         for (Identifier id : found.keySet()) {
-            // Only our namespace
             if (!"elytratrails".equals(id.getNamespace())) continue;
 
             String path = id.getPath(); // textures/trails/<name>.png
@@ -46,14 +33,7 @@ public final class TrailTextureRegistry {
         AVAILABLE = Collections.unmodifiableSet(out);
     }
 
-    /**
-     * Returns a texture Identifier if present in assets/elytratrails/textures/trails/,
-     * otherwise returns null (caller should use default trail texture).
-     * Case-insensitive.
-     * Accepts:
-     *  - "genderfluid"
-     *  - "ELYTRATRAILS:genderfluid" (namespace ignored; path used)
-     */
+
     public static Identifier resolveTextureOrNull(String trailTextureName) {
         String name = normalizeFromUserString(trailTextureName);
         if (name == null) return null;
@@ -68,7 +48,6 @@ public final class TrailTextureRegistry {
         String s = in.trim();
         if (s.isEmpty()) return null;
 
-        // Allow "namespace:path" but ignore namespace (use path)
         if (s.contains(":")) {
             Identifier id = Identifier.tryParse(s);
             if (id == null) return null;

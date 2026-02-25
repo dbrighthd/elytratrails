@@ -9,15 +9,15 @@ import dbrighthd.elytratrails.rendering.TrailSystem;
 import me.shedaniel.autoconfig.AutoConfig;
 import me.shedaniel.clothconfig2.api.ConfigBuilder;
 import me.shedaniel.clothconfig2.api.ConfigCategory;
+import me.shedaniel.clothconfig2.impl.builders.DropdownMenuBuilder;
 import net.fabricmc.fabric.api.client.networking.v1.ClientPlayNetworking;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.network.chat.Component;
 import me.shedaniel.clothconfig2.api.ConfigEntryBuilder;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
+import java.util.*;
+import java.util.stream.Collectors;
 
 import static dbrighthd.elytratrails.ElytraTrailsClient.getConfig;
 import static dbrighthd.elytratrails.config.pack.TrailPackConfigManager.exportTrailPresetToDisk;
@@ -373,12 +373,25 @@ public class ConfigScreenBuilder {
                 .setSaveConsumer(newValue -> config.enableParticles = newValue)
                 .build());
 
-        particles.addEntry(entryBuilder.startEnumSelector(
+        particles.addEntry(entryBuilder.startDropdownMenu(
                         Component.translatable("text.elytratrails.option.particle"),
-                        ModConfig.ParticleChoice.class,
-                        config.particle)
-                        .setDefaultValue(ModConfig.ParticleChoice.CLOUD)
+                        DropdownMenuBuilder.TopCellElementBuilder.of(
+                                config.particle,
+                                s -> {
+                                    try {
+                                        return ModConfig.ParticleChoice.valueOf(s.trim().toUpperCase(Locale.ROOT));
+                                    } catch (IllegalArgumentException ignored) {
+                                        return null;
+                                    }
+                                },
+                                v -> Component.nullToEmpty(v.name())
+                        ),
+                        DropdownMenuBuilder.CellCreatorBuilder.of(14,160, 8, v -> Component.nullToEmpty(((ModConfig.ParticleChoice) v).name())
+                        )
+                )
+                .setDefaultValue(ModConfig.ParticleChoice.POOF)
                 .setTooltip(Component.translatable("text.elytratrails.option.particle.@Tooltip"))
+                .setSelections(Arrays.stream(ModConfig.ParticleChoice.values()).collect(Collectors.toSet()))
                 .setSaveConsumer(newValue -> config.particle = newValue)
                 .build());
 
