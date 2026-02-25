@@ -29,6 +29,7 @@ public class ConfigScreenBuilder {
         TrailPackConfigManager.reloadDiskPresets();
         String presetDefault = "";
         config.Preset = presetDefault;
+        config.PresetOthers = presetDefault;
         List<String> presetNames = new ArrayList<>(TrailPackConfigManager.getPresets().keySet());
         Collections.sort(presetNames);
         presetNames.addFirst(presetDefault);
@@ -74,7 +75,12 @@ public class ConfigScreenBuilder {
                 .setTooltip(Component.translatable("text.elytratrails.option.logTrails.@Tooltip"))
                 .setSaveConsumer(newValue -> config.logTrails = newValue)
                 .build());
-
+        general.addEntry(entryBuilder.startBooleanToggle(Component.translatable("text.elytratrails.option.shaderOverride"), config.alwaysGlowWhenShaderTranslucent)
+                .setDefaultValue(true)
+                .setTooltip(Component.translatable("text.elytratrails.option.shaderOverride.@Tooltip"))
+                .setSaveConsumer(newValue -> config.alwaysGlowWhenShaderTranslucent = newValue)
+                .requireRestart()
+                .build());
         general.addEntry(entryBuilder.startEnumSelector(
                         Component.translatable("text.elytratrails.option.clearTrails"),
                         ModConfig.ClearTrails.class,
@@ -85,6 +91,7 @@ public class ConfigScreenBuilder {
                         TrailSystem.getTrailManager().removeAllTrails();
                 })
                 .build());
+
 
         elytra.addEntry(entryBuilder.startTextDescription(
                         Component.translatable("text.elytratrails.category.elytra.desc"))
@@ -124,11 +131,6 @@ public class ConfigScreenBuilder {
                 .setTooltip(Component.translatable("text.elytratrails.option.trailMovesWithElytraAngle.@Tooltip"))
                 .setSaveConsumer(newValue -> config.trailMovesWithElytraAngle = newValue)
                 .build());
-//        elytra.addEntry(entryBuilder.startBooleanToggle(Component.translatable("text.elytratrails.option.cameraDistanceFade"), config.cameraDistanceFade)
-//                .setDefaultValue(true)
-//                .setTooltip(Component.translatable("text.elytratrails.option.cameraDistanceFade.@Tooltip"))
-//                .setSaveConsumer(newValue -> config.cameraDistanceFade = newValue)
-//                .build());
         elytra.addEntry(entryBuilder.startDoubleField(Component.translatable("text.elytratrails.option.width"), config.width)
                 .setDefaultValue(0.05)
                 .setTooltip(Component.translatable("text.elytratrails.option.width.@Tooltip"))
@@ -286,7 +288,7 @@ public class ConfigScreenBuilder {
                 .build());
 
         others.addEntry(entryBuilder.startDoubleField(Component.translatable("text.elytratrails.option.widthOthersDefault"), config.widthOthersDefault)
-                .setDefaultValue(0.1)
+                .setDefaultValue(0.05)
                 .setTooltip(Component.translatable("text.elytratrails.option.widthOthersDefault.@Tooltip"))
                 .setSaveConsumer(newValue -> config.widthOthersDefault = newValue)
                 .build());
@@ -431,6 +433,22 @@ public class ConfigScreenBuilder {
                         .setSaveConsumer(newValue -> config.Preset = newValue)
                         .build()
         );
+        presets.addEntry(entryBuilder.startTextDescription(
+                        Component.translatable("text.elytratrails.category.presets.desc.others"))
+                .build());
+        presets.addEntry(
+                entryBuilder.startDropdownMenu(
+                                Component.translatable("text.elytratrails.option.PresetOthers"),
+                                config.PresetOthers,
+                                s -> s,
+                                Component::nullToEmpty
+                        )
+                        .setSelections(presetNames)
+                        .setDefaultValue(presetDefault)
+                        .setTooltip(Component.translatable("text.elytratrails.option.PresetOthers.@Tooltip"))
+                        .setSaveConsumer(newValue -> config.PresetOthers = newValue)
+                        .build()
+        );
 
         builder.setSavingRunnable(() -> {
             encodeColors(config);
@@ -479,13 +497,19 @@ public class ConfigScreenBuilder {
         config.justColor = TrailPackConfigManager.getColorRgb(parseHexColor(config.color));
         config.justAlpha = TrailPackConfigManager.getAlpha(parseHexColor(config.color));
     }
+    private static void decodeColorsOthers(ModConfig config)
+    {
+        config.justColorOthersDefault = TrailPackConfigManager.getColorRgb(parseHexColor(config.colorOthersDefault));
+        config.justAlphaOthersDefault = TrailPackConfigManager.getAlpha(parseHexColor(config.colorOthersDefault));
+    }
     private  static void applyPresetsToConfig(ModConfig config)
     {
-        //
-//                if(!config.PresetOthers.isEmpty())
-//                {
-//                    TrailPackConfigManager.applyPreset(false, config.PresetOthers,config);
-//                }
+
+        if(!config.PresetOthers.isEmpty())
+        {
+            TrailPackConfigManager.applyPreset(false, config.PresetOthers,config);
+            decodeColorsOthers(config);
+        }
         if(!config.Preset.isEmpty())
         {
             TrailPackConfigManager.applyPreset(true, config.Preset,config);

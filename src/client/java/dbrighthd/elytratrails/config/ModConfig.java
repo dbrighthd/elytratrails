@@ -143,7 +143,15 @@ public class ModConfig implements ConfigData {
     public enum ClearTrails {
         NO,
         CLEAR,
+
+
     }
+
+    @ConfigEntry.Category("general")
+    @ConfigEntry.Gui.Tooltip
+    public boolean alwaysGlowWhenShaderTranslucent = true;
+
+
     //server stuff
     @ConfigEntry.Category("server")
     @ConfigEntry.Gui.PrefixText
@@ -204,7 +212,7 @@ public class ModConfig implements ConfigData {
 
     @ConfigEntry.Category("others")
     @ConfigEntry.Gui.Tooltip
-    public double widthOthersDefault = 0.1;
+    public double widthOthersDefault = 0.05;
 
     @ConfigEntry.Category("others")
     @ConfigEntry.Gui.Tooltip

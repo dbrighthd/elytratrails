@@ -20,7 +20,11 @@
   "text.elytratrails.option.wireframeTrails.@Tooltip": "Makes trails wireframe (Is very thin!)",
 
   "text.elytratrails.option.Preset": "Selected Preset",
-  "text.elytratrails.option.Preset.@Tooltip": "Preset that is selected will override settings upon saving config",
+  "text.elytratrails.option.Preset.@Tooltip": "Preset that is selected will override \"Your Trails\" settings upon saving config",
+
+  "text.elytratrails.option.PresetOthers": "Other's Selected Preset",
+  "text.elytratrails.option.PresetOthers.@Tooltip": "Preset that is selected will override \"Other's Trails\" settings upon saving config",
+
 
 
   "text.elytratrails.option.export": "Export as Preset",
@@ -193,6 +197,9 @@
   "text.elytratrails.option.logTrails.@Tooltip" : "Logs trail creation/deletion",
 
 
+  "text.elytratrails.option.shaderOverride": "Shader Forces Glowing",
+  "text.elytratrails.option.shaderOverride.@Tooltip" : "Shaders on makes certain translucent trails glow, to prevent weird visuals",
+
   "text.elytratrails.option.randomWidthVariationOthersDefault": "Other's Width Variation Amount",
   "text.elytratrails.option.randomWidthVariationOthersDefault.@Tooltip": "Default: amount randomness affects other trail width",
 
@@ -231,7 +238,8 @@
   "text.elytratrails.category.server.desc": "Server syncing (only works if the mod exists on the server!)",
   "text.elytratrails.category.others.desc": "Defaults for other entities/players (Defaults for players unless synced with the server)",
   "text.elytratrails.category.particles.desc": "Optional particle effects while flying. (Fun fact: this was the original intention of this mod)",
-  "text.elytratrails.category.presets.desc": "Load presets for trails. If a preset is selected, it will override your settings when you save this config.",
+  "text.elytratrails.category.presets.desc": "Load presets for YOUR trails. If a preset is selected below, it will override \"Your Trails\" settings when you save this config.",
+  "text.elytratrails.category.presets.desc.others": "Load presets for OTHER's trails. If a preset is selected below, it will override \"Other's Trails\" settings when you save this config.",
 
 
   "key.category.elytratrails.skibidi": "Elytra Contrails Keybinds",

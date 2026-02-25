@@ -30,8 +30,8 @@ public class ElytraTrailsClient implements ClientModInitializer {
 	@Override
 	public void onInitializeClient()
 	{
-		Compatibility.init();
 		AutoConfig.register(ModConfig.class, GsonConfigSerializer::new);
+		Compatibility.init();
 		ElytraTrailsKeybind.init();
 		TrailPipelines.init();
 		TrailSystem.init();
