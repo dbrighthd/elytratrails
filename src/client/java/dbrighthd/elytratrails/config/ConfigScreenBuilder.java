@@ -66,9 +66,14 @@ public class ConfigScreenBuilder {
                 .setSaveConsumer(newValue -> config.enableTwirls = newValue)
                 .build());
         general.addEntry(entryBuilder.startBooleanToggle(Component.translatable("text.elytratrails.option.alwaysShowTrailDuringTwirl"), config.alwaysShowTrailDuringTwirl)
-                .setDefaultValue(true)
+                .setDefaultValue(false)
                 .setTooltip(Component.translatable("text.elytratrails.option.alwaysShowTrailDuringTwirl.@Tooltip"))
                 .setSaveConsumer(newValue -> config.alwaysShowTrailDuringTwirl = newValue)
+                .build());
+        general.addEntry(entryBuilder.startBooleanToggle(Component.translatable("text.elytratrails.option.logTrails"), config.logTrails)
+                .setDefaultValue(false)
+                .setTooltip(Component.translatable("text.elytratrails.option.logTrails.@Tooltip"))
+                .setSaveConsumer(newValue -> config.logTrails = newValue)
                 .build());
 
         general.addEntry(entryBuilder.startEnumSelector(

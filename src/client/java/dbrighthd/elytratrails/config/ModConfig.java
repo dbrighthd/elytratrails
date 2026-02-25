@@ -137,6 +137,8 @@ public class ModConfig implements ConfigData {
     @ConfigEntry.Gui.Tooltip
     public boolean alwaysShowTrailDuringTwirl = false;
 
+    public boolean logTrails = false;
+
     public ClearTrails clearTrailsOption = ClearTrails.NO;
     //server stuff
     @ConfigEntry.Category("server")
@@ -159,7 +161,6 @@ public class ModConfig implements ConfigData {
     @ConfigEntry.Category("server")
     @ConfigEntry.Gui.Tooltip
     public double maxOnlineLifetime = 120.0;
-
 
     //others
 

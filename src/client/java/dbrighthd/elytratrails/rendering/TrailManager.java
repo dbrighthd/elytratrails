@@ -1,6 +1,8 @@
 package dbrighthd.elytratrails.rendering;
 
 
+import dbrighthd.elytratrails.ElytraTrailsClient;
+import dbrighthd.elytratrails.config.ModConfig;
 import dbrighthd.elytratrails.config.pack.TrailPackConfigManager;
 import dbrighthd.elytratrails.network.ClientPlayerConfigStore;
 import it.unimi.dsi.fastutil.ints.Int2ObjectMap;
@@ -48,16 +50,36 @@ public class TrailManager {
 
     private void removeDeadPoints(Minecraft ctx) {
         long currentTime = Util.getMillis();
+        if(getConfig().logTrails)
+        {
+            for (Trail trail : trails)
+            {
+                if (trail.points().isEmpty())
+                {
+                    LOGGER.info("Removed trail from entity {}, no trail points.", trail.entityId());
+                    continue;
+                }
+                if (trail.points().stream().allMatch(p -> currentTime - p.epoch() > trail.config().trailLifetime() * 1000))
+                {
+                    LOGGER.info("Removed trail from entity {}, all trail points exceeded lifetime {}", trail.entityId(), trail.config().trailLifetime());
+                }
+
+            }
+        }
         trails.removeIf(t -> t.points().isEmpty() || t.points().stream().allMatch(p -> currentTime - p.epoch() > t.config().trailLifetime() * 1000));
     }
 
     public void removeTrail(int entityId)
     {
+        if(getConfig().logTrails && activeTrails.containsKey(entityId))
+        {
+            LOGGER.info("Stopped trail for entity {}", entityId);
+        }
         activeTrails.remove(entityId);
     }
 
     private void gatherPlayerTrails(Minecraft ctx) {
-        //ModConfig config = ElytraTrailsClient.getConfig();
+        ModConfig modConfig = ElytraTrailsClient.getConfig();
         if (ctx.level == null) return;
 
         List<AbstractClientPlayer> players = ctx.level.players();
@@ -82,7 +104,10 @@ public class TrailManager {
                     }
 
                     trails.addAll(emittedTrails);
-                    LOGGER.info("Created new trail group with {} trails for entity {} (player)", emittedTrails.size(), id);
+                    if(modConfig.logTrails)
+                    {
+                        LOGGER.info("Created new trail group with {} trails for entity {} (player)", emittedTrails.size(), id);
+                    }
                     return new EntityTrailGroup(
                             emittedTrails
                     );
@@ -127,6 +152,10 @@ public class TrailManager {
 
     public void removeAllTrails()
     {
+        if(getConfig().logTrails)
+        {
+            LOGGER.info("Cleared {} trails, of which {} were active.", trails.size(), activeTrails.size());
+        }
         activeTrails.clear();
         trails.clear();
     }

@@ -189,6 +189,10 @@
   "text.elytratrails.option.clearTrails" : "Clear All Trails",
   "text.elytratrails.option.clearTrails.@Tooltip" : "Clears all trails on config saving",
 
+  "text.elytratrails.option.logTrails" : "Log Trails",
+  "text.elytratrails.option.logTrails.@Tooltip" : "Logs trail creation/deletion",
+
+
   "text.elytratrails.option.randomWidthVariationOthersDefault": "Other's Width Variation Amount",
   "text.elytratrails.option.randomWidthVariationOthersDefault.@Tooltip": "Default: amount randomness affects other trail width",
 

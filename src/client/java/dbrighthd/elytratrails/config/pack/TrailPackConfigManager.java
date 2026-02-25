@@ -833,7 +833,6 @@ public final class TrailPackConfigManager {
         return 16777215;
     }
     public static String toHexColorString(int color) {
-        // Keep only RGB, ignore alpha
         int rgb = color;
         return String.format("#%06X", rgb);
     }
