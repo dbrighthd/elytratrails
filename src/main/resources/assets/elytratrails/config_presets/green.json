@@ -1,7 +1,7 @@
 {
   "enableTrail": true,
-  "glowingTrails": false,
-  "translucentTrails": true,
+  "glowingTrails": true,
+  "translucentTrails": false,
   "wireframeTrails": false,
   "enableRandomWidth": false,
   "speedDependentTrail": true,
@@ -14,7 +14,7 @@
   "trailMinSpeed": 0.75,
   "startRampDistance": 4.0,
   "endRampDistance": 10.0,
-  "color": "#FF00FF00",
+  "color": "#FF29E078",
   "prideTrail": "",
   "randomWidthVariation": 1.0,
   "fadeStart": false,

@@ -14,7 +14,7 @@
   "trailMinSpeed": 0.75,
   "startRampDistance": 0.0,
   "endRampDistance": 10.0,
-  "color": "#AAFFFFFF",
+  "color": "#99FFFFFF",
   "prideTrail": "",
   "randomWidthVariation": 1.0,
   "fadeStart": true,

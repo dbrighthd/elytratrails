@@ -1,7 +1,7 @@
 {
   "enableTrail": true,
   "glowingTrails": true,
-  "translucentTrails": true,
+  "translucentTrails": false,
   "wireframeTrails": true,
   "enableRandomWidth": false,
   "speedDependentTrail": true,
