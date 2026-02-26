@@ -214,7 +214,7 @@ public class ModConfig implements ConfigData {
 
     @ConfigEntry.Category("others")
     @ConfigEntry.Gui.Tooltip
-    public double widthOthersDefault = 0.1;
+    public double widthOthersDefault = 0.05;
 
     @ConfigEntry.Category("others")
     @ConfigEntry.Gui.Tooltip
