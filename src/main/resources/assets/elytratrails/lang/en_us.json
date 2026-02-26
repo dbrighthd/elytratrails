@@ -46,6 +46,13 @@
   "text.elytratrails.option.alwaysShowTrailDuringTwirl": "Ignore Speed For Trail When Twirling",
   "text.elytratrails.option.alwaysShowTrailDuringTwirl.@Tooltip": "If turned on, trails will always show when twirling (ignores \"speed dependent trail\" settings)",
 
+  "text.elytratrails.option.firstPersonTwirlCamera": "Camera Twirling First Person",
+  "text.elytratrails.option.firstPersonTwirlCamera.@Tooltip": "!!THIS OPTION CAN CAUSE MOTION SICKNESS!! Twirls Camera in first person when twirling",
+
+
+  "text.elytratrails.option.thirdPersonTwirlCamera": "Camera Twirling Third Person",
+  "text.elytratrails.option.thirdPersonTwirlCamera.@Tooltip": "!!THIS OPTION CAN CAUSE MOTION SICKNESS!! Twirls Camera in third person when twirling",
+
   "text.elytratrails.option.width": "Trail Width",
   "text.elytratrails.option.width.@Tooltip": "Max trail width (blocks)",
 

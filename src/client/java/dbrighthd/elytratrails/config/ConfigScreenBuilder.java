@@ -70,6 +70,16 @@ public class ConfigScreenBuilder {
                 .setTooltip(Component.translatable("text.elytratrails.option.alwaysShowTrailDuringTwirl.@Tooltip"))
                 .setSaveConsumer(newValue -> config.alwaysShowTrailDuringTwirl = newValue)
                 .build());
+        general.addEntry(entryBuilder.startBooleanToggle(Component.translatable("text.elytratrails.option.firstPersonTwirlCamera"), config.fishysStupidCameraRoll)
+                .setDefaultValue(false)
+                .setTooltip(Component.translatable("text.elytratrails.option.firstPersonTwirlCamera.@Tooltip"))
+                .setSaveConsumer(newValue -> config.fishysStupidCameraRoll = newValue)
+                .build());
+        general.addEntry(entryBuilder.startBooleanToggle(Component.translatable("text.elytratrails.option.thirdPersonTwirlCamera"), config.fishysStupidThirdPersonCameraRoll)
+                .setDefaultValue(false)
+                .setTooltip(Component.translatable("text.elytratrails.option.thirdPersonTwirlCamera.@Tooltip"))
+                .setSaveConsumer(newValue -> config.fishysStupidThirdPersonCameraRoll = newValue)
+                .build());
         general.addEntry(entryBuilder.startBooleanToggle(Component.translatable("text.elytratrails.option.logTrails"), config.logTrails)
                 .setDefaultValue(false)
                 .setTooltip(Component.translatable("text.elytratrails.option.logTrails.@Tooltip"))

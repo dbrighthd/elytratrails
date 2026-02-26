@@ -122,7 +122,9 @@ public class ModConfig implements ConfigData {
     @ConfigEntry.Gui.Excluded
     public boolean resourcePackOverride = true;
 
+    public boolean fishysStupidCameraRoll = false;
 
+    public boolean fishysStupidThirdPersonCameraRoll = false;
 
     @ConfigEntry.Category("general")
     @ConfigEntry.Gui.Tooltip
