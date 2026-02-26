@@ -147,7 +147,7 @@ public class ConfigScreenBuilder {
                 .setSaveConsumer(newValue -> config.width = newValue)
                 .build());
         elytra.addEntry(entryBuilder.startDoubleField(Component.translatable("text.elytratrails.option.firstPersonFadeTime"), config.firstPersonFadeTime)
-                .setDefaultValue(0.3)
+                .setDefaultValue(0.2)
                 .setTooltip(Component.translatable("text.elytratrails.option.firstPersonFadeTime.@Tooltip"))
                 .setSaveConsumer(newValue -> config.firstPersonFadeTime = newValue)
                 .build());

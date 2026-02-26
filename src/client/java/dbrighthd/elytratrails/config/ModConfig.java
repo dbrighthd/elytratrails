@@ -52,7 +52,7 @@ public class ModConfig implements ConfigData {
 
     @ConfigEntry.Category("elytra")
     @ConfigEntry.Gui.Tooltip
-    public double firstPersonFadeTime = 0.3;
+    public double firstPersonFadeTime = 0.2;
 
     @ConfigEntry.Category("elytra")
     @ConfigEntry.Gui.Tooltip

@@ -8,7 +8,7 @@
   "fadeFirstPersonTrail": true,
   "trailMovesWithElytraAngle": true,
   "width": 1.0,
-  "firstPersonFadeTime": 0.3,
+  "firstPersonFadeTime": 0.2,
   "trailLifetime": 2.5,
   "maxSamplePerSecond": 60,
   "trailMinSpeed": 0.75,

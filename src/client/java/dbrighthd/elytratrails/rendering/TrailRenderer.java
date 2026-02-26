@@ -84,7 +84,7 @@ public class TrailRenderer {
                 this.modConfig = getConfig();
                 this.trailRenderSettings = ClientPlayerConfigStore.decodeTrailType(trail.config().trailType());
 
-                this.isFirstPerson = ((Minecraft.getInstance().player != null) && trail.entityId() == Minecraft.getInstance().player.getId()) && Minecraft.getInstance().options.getCameraType().isFirstPerson();
+                this.isFirstPerson = ((Minecraft.getInstance().player != null) && trail.entityId() == Minecraft.getInstance().player.getId()) && Minecraft.getInstance().options.getCameraType().isFirstPerson() && Minecraft.getInstance().getCameraEntity() == Minecraft.getInstance().player;
                 for (int i = 0; i < points.size() - 1; i++) {
                     Trail.Point p0 = points.get(max(i - 1, 0));
                     Trail.Point p1 = points.get(i);
