@@ -298,7 +298,7 @@ public class ConfigScreenBuilder {
                 .build());
 
         others.addEntry(entryBuilder.startDoubleField(Component.translatable("text.elytratrails.option.widthOthersDefault"), config.widthOthersDefault)
-                .setDefaultValue(0.05)
+                .setDefaultValue(0.1)
                 .setTooltip(Component.translatable("text.elytratrails.option.widthOthersDefault.@Tooltip"))
                 .setSaveConsumer(newValue -> config.widthOthersDefault = newValue)
                 .build());
