@@ -7,6 +7,7 @@ import dbrighthd.elytratrails.config.pack.TrailPackConfigManager;
 import dbrighthd.elytratrails.network.ClientPlayerConfigStore;
 import dbrighthd.elytratrails.rendering.math.SplineInterpolation;
 import dbrighthd.elytratrails.util.ShaderChecksUtil;
+import dbrighthd.elytratrails.util.TimeUtil;
 import net.fabricmc.fabric.api.client.rendering.v1.world.WorldRenderContext;
 import net.minecraft.client.Camera;
 import net.minecraft.client.Minecraft;
@@ -18,7 +19,6 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.resources.Identifier;
 import net.minecraft.util.Mth;
 import net.minecraft.util.RandomSource;
-import net.minecraft.util.Util;
 import net.minecraft.world.level.LightLayer;
 import net.minecraft.world.level.levelgen.synth.PerlinNoise;
 import net.minecraft.world.phys.Vec3;
@@ -180,7 +180,7 @@ public class TrailRenderer {
             long epoch0 = point1.epoch();
             long epoch1 = point2.epoch();
 
-            long currentTime = Util.getMillis();
+            long currentTime = TimeUtil.currentMillis();
             double start = Mth.lerp(tStart, epoch0, epoch1);
             double end = Mth.lerp(tEnd, epoch0, epoch1);
 

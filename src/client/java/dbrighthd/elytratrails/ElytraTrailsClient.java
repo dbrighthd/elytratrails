@@ -8,6 +8,7 @@ import dbrighthd.elytratrails.network.RegisterPacketsClient;
 import dbrighthd.elytratrails.rendering.TrailPipelines;
 import dbrighthd.elytratrails.rendering.TrailSystem;
 import dbrighthd.elytratrails.rendering.TrailTextureRegistry;
+import dbrighthd.elytratrails.util.TimeUtil;
 import me.shedaniel.autoconfig.AutoConfig;
 import me.shedaniel.autoconfig.serializer.GsonConfigSerializer;
 import net.fabricmc.api.ClientModInitializer;
@@ -31,6 +32,7 @@ public class ElytraTrailsClient implements ClientModInitializer {
 	public void onInitializeClient()
 	{
 		AutoConfig.register(ModConfig.class, GsonConfigSerializer::new);
+		TimeUtil.init();
 		Compatibility.init();
 		ElytraTrailsKeybind.init();
 		TrailPipelines.init();

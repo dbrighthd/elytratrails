@@ -1,11 +1,11 @@
 package dbrighthd.elytratrails.controller;
 
 import dbrighthd.elytratrails.network.TwirlStateC2SPayload;
+import dbrighthd.elytratrails.util.TimeUtil;
 import it.unimi.dsi.fastutil.ints.Int2ObjectOpenHashMap;
 import net.fabricmc.fabric.api.client.networking.v1.ClientPlayNetworking;
 import net.minecraft.client.Minecraft;
 import net.minecraft.util.Mth;
-import net.minecraft.util.Util;
 
 import static dbrighthd.elytratrails.ElytraTrailsClient.getConfig;
 
@@ -59,7 +59,7 @@ public final class EntityTwirlManager {
         data.active = true;
         data.dir = dir;
 
-        long now = Util.getNanos();
+        long now = TimeUtil.currentNanos();
 
         switch (state) {
             case NORMAL -> {
@@ -94,7 +94,7 @@ public final class EntityTwirlManager {
         TwirlData data = BY_ENTITY.get(entityId);
         if (data == null || !data.active) return 0f;
 
-        long now = Util.getNanos();
+        long now = TimeUtil.currentNanos();
         return (data.kind == Kind.NORMAL) ? computeNormal(data, now) : computeContinuous(data, now);
     }
 

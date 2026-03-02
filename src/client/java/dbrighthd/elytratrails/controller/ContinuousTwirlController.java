@@ -1,7 +1,7 @@
 package dbrighthd.elytratrails.controller;
 
+import dbrighthd.elytratrails.util.TimeUtil;
 import net.minecraft.util.Mth;
-import net.minecraft.util.Util;
 
 public final class ContinuousTwirlController {
     private static final double HALF_TURN = Math.PI;
@@ -52,7 +52,7 @@ public final class ContinuousTwirlController {
     private static void startSpin() {
         active = true;
         phase = Phase.EASE_IN_180;
-        phaseStartNanos = Util.getNanos();
+        phaseStartNanos = TimeUtil.currentNanos();
         baseAngleRad = 0.0;
 
         holdMode = pendingMode;
@@ -99,7 +99,7 @@ public final class ContinuousTwirlController {
     public static float getExtraRollRadians() {
         if (!active) return 0f;
 
-        long now = Util.getNanos();
+        long now = TimeUtil.currentNanos();
 
         for (int guard = 0; guard < 6; guard++) {
             double elapsedS = (now - phaseStartNanos) / 1_000_000_000.0;

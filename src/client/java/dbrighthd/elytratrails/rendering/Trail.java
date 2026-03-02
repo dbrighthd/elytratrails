@@ -3,6 +3,7 @@ package dbrighthd.elytratrails.rendering;
 import dbrighthd.elytratrails.config.pack.TrailPackConfigManager;
 import dbrighthd.elytratrails.network.ClientPlayerConfigStore;
 import dbrighthd.elytratrails.network.PlayerConfig;
+import dbrighthd.elytratrails.util.TimeUtil;
 import net.minecraft.resources.Identifier;
 import net.minecraft.util.Util;
 import net.minecraft.world.phys.Vec3;
@@ -39,7 +40,7 @@ public record Trail(Identifier texture, List<Point> points, TrailPackConfigManag
      */
     public record Point(Vec3 pos, long epoch) {
         public Point(Vec3 pos) {
-            this(pos, Util.getMillis());
+            this(pos, TimeUtil.currentMillis());
         }
     }
 }

@@ -1,7 +1,7 @@
 package dbrighthd.elytratrails.controller;
 
+import dbrighthd.elytratrails.util.TimeUtil;
 import net.minecraft.util.Mth;
-import net.minecraft.util.Util;
 
 public final class TwirlController {
     private static final double DURATION_S = 0.5;
@@ -30,7 +30,7 @@ public final class TwirlController {
 
     private static void startSpin() {
         active = true;
-        startNanos = Util.getNanos();
+        startNanos = TimeUtil.currentNanos();
 
         if (pendingMode == 0) {
             currentDir = nextAltDir;
@@ -47,7 +47,7 @@ public final class TwirlController {
     public static float getExtraRollRadians() {
         if (!active) return 0f;
 
-        long now = Util.getNanos();
+        long now = TimeUtil.currentNanos();
         double t = (now - startNanos) / (DURATION_S * 1_000_000_000.0);
 
         if (t >= 1.0) {

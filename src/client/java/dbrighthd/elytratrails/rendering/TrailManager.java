@@ -5,13 +5,13 @@ import dbrighthd.elytratrails.ElytraTrailsClient;
 import dbrighthd.elytratrails.config.ModConfig;
 import dbrighthd.elytratrails.config.pack.TrailPackConfigManager;
 import dbrighthd.elytratrails.network.ClientPlayerConfigStore;
+import dbrighthd.elytratrails.util.TimeUtil;
 import it.unimi.dsi.fastutil.ints.Int2ObjectMap;
 import it.unimi.dsi.fastutil.ints.Int2ObjectOpenHashMap;
 import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents;
 import net.fabricmc.fabric.api.client.rendering.v1.world.WorldRenderEvents;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.player.AbstractClientPlayer;
-import net.minecraft.util.Util;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.Pose;
 import net.minecraft.world.entity.player.Player;
@@ -37,19 +37,19 @@ public class TrailManager {
         this.sampler = sampler;
         ClientTickEvents.END_CLIENT_TICK.register(this::removeDeadPoints);
         WorldRenderEvents.AFTER_ENTITIES.register(cxt -> {
-            float now = Util.getMillis();
+            float now = TimeUtil.currentMillis();
             if((now - lastSample) < (1000f / getConfig().maxSamplePerSecond))
             {
                 return;
             }
-            lastSample = Util.getMillis();
+            lastSample = TimeUtil.currentMillis();
             gatherPlayerTrails(Minecraft.getInstance());
         });
     }
 
 
     private void removeDeadPoints(Minecraft ctx) {
-        long currentTime = Util.getMillis();
+        long currentTime = TimeUtil.currentMillis();
         if(getConfig().logTrails)
         {
             for (Trail trail : trails)
