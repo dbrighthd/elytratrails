@@ -44,7 +44,7 @@ public class TrailRenderer {
     private ModConfig modConfig;
     private final PerlinNoise perlinNoise =  PerlinNoise.create(RandomSource.create(), List.of(1));
     private float totalTrailLength;
-    private ClientPlayerConfigStore.TrailRenderSettings trailRenderSettings;
+    private TrailPackConfigManager.ResolvedTrailSettings trailSettings;
     boolean isFirstPerson;
     //private static final float FP_CAMERA_FADE_ZERO = 0.3f;
     //private static final float FP_CAMERA_FADE_FULL = 0.5f;
@@ -82,8 +82,7 @@ public class TrailRenderer {
                 this.accumDist = 0f;
                 this.endOfTrail = 0f;
                 this.modConfig = getConfig();
-                this.trailRenderSettings = ClientPlayerConfigStore.decodeTrailType(trail.config().trailType());
-
+                this.trailSettings = trail.config();
                 this.isFirstPerson = ((Minecraft.getInstance().player != null) && trail.entityId() == Minecraft.getInstance().player.getId()) && Minecraft.getInstance().options.getCameraType().isFirstPerson() && Minecraft.getInstance().getCameraEntity() == Minecraft.getInstance().player;
                 for (int i = 0; i < points.size() - 1; i++) {
                     Trail.Point p0 = points.get(max(i - 1, 0));
@@ -100,12 +99,11 @@ public class TrailRenderer {
     }
     private RenderType getRenderType(Trail trail)
     {
-        ClientPlayerConfigStore.TrailRenderSettings trailRenderSettings = ClientPlayerConfigStore.decodeTrailType(trail.config().trailType());
-        if(trailRenderSettings.glowing())
+        if(trail.config().glowingTrails())
         {
-            if(trailRenderSettings.translucent())
+            if(trail.config().translucentTrails())
             {
-                if(trailRenderSettings.wireframe())
+                if(trail.config().wireframeTrails())
                 {
                     return TrailPipelines.entityTranslucentEmissiveWireFrame(trail.texture());
                 }
@@ -113,7 +111,7 @@ public class TrailRenderer {
             }
             else
             {
-                if(trailRenderSettings.wireframe())
+                if(trail.config().wireframeTrails())
                 {
                     return TrailPipelines.entityCutoutEmissiveUnlitWireframe(trail.texture());
                 }
@@ -126,7 +124,7 @@ public class TrailRenderer {
         }
         else
         {
-            if(trailRenderSettings.wireframe())
+            if(trail.config().wireframeTrails())
             {
                 return TrailPipelines.entityTranslucentCullWireFrame(trail.texture());
             }
@@ -218,7 +216,7 @@ public class TrailRenderer {
 
             }
 
-            if(trail.config().fadeStart() && trailRenderSettings.translucent())
+            if(trail.config().fadeStart() && trail.config().translucentTrails())
             {
                 alphaStart *= computeStartFade(totalTrailLength- v1, trail.config());
                 alphaEnd *= computeStartFade(totalTrailLength- v2, trail.config());
@@ -227,7 +225,7 @@ public class TrailRenderer {
             float halfWidthEnd = (float) (trail.config().maxWidth() / 2f) * scaleEnd;
 
             if ((scaleStart != 0 || scaleEnd != 0) && (alphaEnd != 0 || alphaStart != 0)) {
-                if(!trailRenderSettings.translucent())
+                if(!trail.config().translucentTrails())
                 {
                     alphaEnd = 1;
                     alphaStart = 1;
@@ -343,7 +341,7 @@ public class TrailRenderer {
 
     private int computeLightTexture(Vec3 pos) { // note: I really hate this method, but I don't feel like managing the state that's required to do this in a better way
         Minecraft mc = Minecraft.getInstance();
-        if (mc.level == null || trailRenderSettings.glowing()) return LightTexture.FULL_BRIGHT;
+        if (mc.level == null || trailSettings.glowingTrails()) return LightTexture.FULL_BRIGHT;
 
         BlockPos blockPos = BlockPos.containing(pos);
         return LightTexture.pack(mc.level.getBrightness(LightLayer.BLOCK, blockPos), mc.level.getBrightness(LightLayer.SKY, blockPos));

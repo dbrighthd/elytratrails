@@ -100,7 +100,7 @@ public class TrailManager {
                 EntityTrailGroup trailGroup = activeTrails.computeIfAbsent(eid, id -> {
                     List<Trail> emittedTrails = new ArrayList<>();
                     for (Emitter emitter : emitters) {
-                        emittedTrails.add(Trail.fromPlayerConfig(player.getId(), emitter.flipUv()));
+                        emittedTrails.add(Trail.fromPlayerConfig(player.getId(), emitter));
                     }
 
                     trails.addAll(emittedTrails);

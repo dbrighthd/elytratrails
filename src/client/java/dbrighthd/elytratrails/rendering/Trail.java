@@ -6,18 +6,20 @@ import dbrighthd.elytratrails.network.PlayerConfig;
 import net.minecraft.resources.Identifier;
 import net.minecraft.util.Util;
 import net.minecraft.world.phys.Vec3;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.ArrayList;
 import java.util.List;
 
 public record Trail(Identifier texture, List<Point> points, TrailPackConfigManager.ResolvedTrailSettings config, boolean flipUv, int entityId) {
 
-    public static Trail fromPlayerConfig(int playerId, boolean flipUv) {
+    public static Trail fromPlayerConfig(int playerId, Emitter emitter) {
         PlayerConfig config = ClientPlayerConfigStore.getOrDefault(playerId);
+        TrailPackConfigManager.ResolvedTrailSettings resolvedTrailSettings =  TrailPackConfigManager.resolve(emitter.modelName(), emitter.boneName(), config);
 
-        Identifier texture = TrailTextureRegistry.resolveTextureOrNull(config.prideTrail());
+        Identifier texture = TrailTextureRegistry.resolveTextureOrNull(resolvedTrailSettings.prideTrail());
         if (texture == null) texture = TrailRenderer.DEFAULT_TEXTURE;
-        return new Trail(texture, new ArrayList<>(), TrailPackConfigManager.resolveFromPlayerConfig(config), flipUv, playerId);
+        return new Trail(texture, new ArrayList<>(), resolvedTrailSettings, emitter.flipUv(), playerId);
     }
 
     @SuppressWarnings("unused")

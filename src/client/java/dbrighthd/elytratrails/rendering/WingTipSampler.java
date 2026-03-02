@@ -6,6 +6,7 @@ import dbrighthd.elytratrails.compat.ModStatuses;
 import dbrighthd.elytratrails.compat.emf.EmfAnimationHooks;
 import dbrighthd.elytratrails.compat.emf.EmfWingTipHooks;
 import dbrighthd.elytratrails.config.ModConfig;
+import dbrighthd.elytratrails.config.pack.TrailPackConfigManager;
 import dbrighthd.elytratrails.mixin.client.EquipmentElytraModelAccessor;
 import dbrighthd.elytratrails.mixin.client.ModelFeatureStorageAccessor;
 import dbrighthd.elytratrails.util.ModelTransformationUtil;
@@ -118,7 +119,7 @@ public class WingTipSampler {
             );
             if (cameraRelative == null) continue;
 
-            emitters.add(new Emitter(cameraPos.add(cameraRelative).add(entityWorldOffset), spawner.isLeftWing));
+            emitters.add(new Emitter(cameraPos.add(cameraRelative).add(entityWorldOffset), spawner.isLeftWing, "elytra" + getModelVariantFromModel(elytraRoot),spawner.spawner.path().substring(spawner.spawner.path().lastIndexOf('/')+5)));
         }
         return emitters;
     }
@@ -141,10 +142,12 @@ public class WingTipSampler {
         Vec3 rightTip = computeTransformedWingTip(stack, elytraRoot, rightWing, ModelTransformationUtil.VANILLA_RIGHT_WING_TIP);
 
         return List.of(
-                new Emitter(cameraPos.add(leftTip).add(entityWorldOffset), true),
-                new Emitter (cameraPos.add(rightTip).add(entityWorldOffset), false)
+                new Emitter(cameraPos.add(leftTip).add(entityWorldOffset), true, "elytra","leftWingTip"),
+                new Emitter (cameraPos.add(rightTip).add(entityWorldOffset), false, "elytra","rightWingTip")
         );
     }
+
+
 
     private @NotNull Vec3 computeTransformedWingTip(@NotNull PoseStack stack, @Nullable ModelPart elytraRoot, @NotNull ModelPart wingRoot, @NotNull Vec3 localPos) {
         float wingspread = ModelTransformationUtil.computeWingOpenness(wingRoot);
