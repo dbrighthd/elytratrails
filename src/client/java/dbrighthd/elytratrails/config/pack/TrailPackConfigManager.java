@@ -647,6 +647,9 @@ public final class TrailPackConfigManager {
             overrides.glowingTrails = baseTrailRenderSettings.glowing();
             overrides.translucentTrails = baseTrailRenderSettings.translucent();
             overrides.wireframeTrails = baseTrailRenderSettings.wireframe();
+            overrides.fadeStart = baseConfig.fadeStart();
+            overrides.fadeStartDistance = baseConfig.fadeStartDistance();
+            overrides.fadeEnd = baseConfig.fadeEnd();
             return overrides;
         }
         public static TrailOverrides fromResolved(ResolvedTrailSettings s) {
