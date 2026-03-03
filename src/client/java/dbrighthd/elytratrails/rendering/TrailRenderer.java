@@ -4,16 +4,13 @@ import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.blaze3d.vertex.VertexConsumer;
 import dbrighthd.elytratrails.config.ModConfig;
 import dbrighthd.elytratrails.config.pack.TrailPackConfigManager;
-import dbrighthd.elytratrails.network.ClientPlayerConfigStore;
 import dbrighthd.elytratrails.rendering.math.SplineInterpolation;
-import dbrighthd.elytratrails.util.ShaderChecksUtil;
 import dbrighthd.elytratrails.util.TimeUtil;
 import net.fabricmc.fabric.api.client.rendering.v1.world.WorldRenderContext;
 import net.minecraft.client.Camera;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.LightTexture;
 import net.minecraft.client.renderer.rendertype.RenderType;
-import net.minecraft.client.renderer.rendertype.RenderTypes;
 import net.minecraft.client.renderer.texture.OverlayTexture;
 import net.minecraft.core.BlockPos;
 import net.minecraft.resources.Identifier;
@@ -46,8 +43,6 @@ public class TrailRenderer {
     private float totalTrailLength;
     private TrailPackConfigManager.ResolvedTrailSettings trailSettings;
     boolean isFirstPerson;
-    //private static final float FP_CAMERA_FADE_ZERO = 0.3f;
-    //private static final float FP_CAMERA_FADE_FULL = 0.5f;
     private static final float CAMERA_FADE_ZERO = 0.3f;
     private static final float CAMERA_FADE_FULL = 0.5f;
 
@@ -189,15 +184,11 @@ public class TrailRenderer {
             float alphaStart = trail.config().fadeEnd() || alphaEnd <= 0 ? computeLifetimeFadeout(start, currentTime, (long) (trailLifetime * 1000)) : 1f;
             if(alphaEnd <= 0)
             {
-                if (v1 > endOfTrail)
-                {
-                    endOfTrail = v1;
-                }
+                endOfTrail = v2;
             }
             else if(!trail.config().fadeEnd())
             {
                 alphaEnd = 1f;
-
             }
             float scaleStart = computeWidthScaling(totalTrailLength- v1, -(endOfTrail - v1), trail.config());
             float scaleEnd = computeWidthScaling(totalTrailLength- v2, -(endOfTrail - v2), trail.config());
