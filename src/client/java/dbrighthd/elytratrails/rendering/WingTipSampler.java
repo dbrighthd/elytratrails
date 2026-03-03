@@ -6,7 +6,6 @@ import dbrighthd.elytratrails.compat.ModStatuses;
 import dbrighthd.elytratrails.compat.emf.EmfAnimationHooks;
 import dbrighthd.elytratrails.compat.emf.EmfWingTipHooks;
 import dbrighthd.elytratrails.config.ModConfig;
-import dbrighthd.elytratrails.config.pack.TrailPackConfigManager;
 import dbrighthd.elytratrails.mixin.client.EquipmentElytraModelAccessor;
 import dbrighthd.elytratrails.mixin.client.ModelFeatureStorageAccessor;
 import dbrighthd.elytratrails.util.ModelTransformationUtil;
@@ -42,10 +41,10 @@ import static dbrighthd.elytratrails.compat.emf.EmfTrailSpawnerRegistry.getModel
 
 public class WingTipSampler {
     private final SubmitNodeStorage submitStorage = new SubmitNodeStorage();
-    private final Map<Integer, emfInfo> emfCache = new HashMap<>();
+    private final Map<Integer, EmfInfo> emfCache = new HashMap<>();
 
-    private record emfInfo(int variant, List<spawnerInfo> spawners){}
-    private record spawnerInfo(EmfWingTipHooks.SpawnerPath spawner, boolean isLeftWing){}
+    private record EmfInfo(int variant, List<SpawnerInfo> spawners){}
+    private record SpawnerInfo(EmfWingTipHooks.SpawnerPath spawner, boolean isLeftWing){}
 
     public @NotNull List<Emitter> getTrailEmitterPositions(Player player, float partialTick) {
         ModConfig config = ElytraTrailsClient.getConfig();
@@ -76,11 +75,11 @@ public class WingTipSampler {
 
             if (!emfCache.containsKey(eid) || !(emfCache.get(eid).variant() == variant))
             {
-                emfCache.put(eid,new emfInfo(variant, getSpawnersInfo(EmfWingTipHooks.findAllSpawnerPaths(leftWing, rightWing))));
+                emfCache.put(eid,new EmfInfo(variant, getSpawnersInfo(EmfWingTipHooks.findAllSpawnerPaths(leftWing, rightWing))));
                 return List.of();
             }
-            List<spawnerInfo> spawners = emfCache.get(eid).spawners();
-            if (!spawners.isEmpty()) return getTrailEmittersFromBones(basePose, animatedElytraRoot, elytraModel, spawners, camera.position(), entityWorldOffset);
+            EmfInfo emfInfo = emfCache.get(eid);
+            if (!emfInfo.spawners.isEmpty()) return getTrailEmittersFromBones(basePose, animatedElytraRoot, elytraModel, camera.position(), entityWorldOffset, emfInfo);
         }
 
         return getVanillaTrailEmitters(basePose, animatedElytraRoot, elytraModel, camera.position(), entityWorldOffset);
@@ -94,24 +93,24 @@ public class WingTipSampler {
     {
         emfCache.clear();
     }
-    private List<spawnerInfo> getSpawnersInfo(List<EmfWingTipHooks.SpawnerPath> spawners)
+    private List<SpawnerInfo> getSpawnersInfo(List<EmfWingTipHooks.SpawnerPath> spawners)
     {
-        ArrayList<spawnerInfo> spawnerInfos = new ArrayList<>();
+        ArrayList<SpawnerInfo> spawnerInfos = new ArrayList<>();
         for(EmfWingTipHooks.SpawnerPath spawner : spawners)
         {
-            spawnerInfos.add(new spawnerInfo(spawner, inferLeftWing(spawner.where(), spawner.path())));
+            spawnerInfos.add(new SpawnerInfo(spawner, inferLeftWing(spawner.where(), spawner.path())));
         }
         return spawnerInfos;
     }
 
-    private @NotNull List<Emitter> getTrailEmittersFromBones(@NotNull PoseStack stack, @Nullable ModelPart elytraRoot, @NotNull ElytraModel model, @NotNull List<spawnerInfo> spawners, @NotNull Vec3 cameraPos, @NotNull Vec3 entityWorldOffset) {
+    private @NotNull List<Emitter> getTrailEmittersFromBones(@NotNull PoseStack stack, @Nullable ModelPart elytraRoot, @NotNull ElytraModel model, @NotNull Vec3 cameraPos, @NotNull Vec3 entityWorldOffset, EmfInfo emfInfo) {
         EquipmentElytraModelAccessor accessor = (EquipmentElytraModelAccessor) model;
         ModelPart leftWing = accessor.elytratrails$getLeftWing();
         ModelPart rightWing = accessor.elytratrails$getRightWing();
-
+        List<SpawnerInfo> spawners = emfInfo.spawners;
 
         List<Emitter> emitters = new ArrayList<>();
-        for (spawnerInfo spawner : spawners) {
+        for (SpawnerInfo spawner : spawners) {
             ModelPart wingRoot = (spawner.spawner.where() == EmfWingTipHooks.WhichRoot.LEFT_WING) ? leftWing : rightWing;
 
             Vec3 cameraRelative = transformLocalPointThroughPath(
@@ -119,7 +118,7 @@ public class WingTipSampler {
             );
             if (cameraRelative == null) continue;
 
-            emitters.add(new Emitter(cameraPos.add(cameraRelative).add(entityWorldOffset), spawner.isLeftWing, "elytra" + getModelVariantFromModel(elytraRoot),spawner.spawner.path().substring(spawner.spawner.path().lastIndexOf('/')+5)));
+            emitters.add(new Emitter(cameraPos.add(cameraRelative).add(entityWorldOffset), spawner.isLeftWing, "elytra" + emfInfo.variant,spawner.spawner.path()));
         }
         return emitters;
     }
@@ -142,8 +141,8 @@ public class WingTipSampler {
         Vec3 rightTip = computeTransformedWingTip(stack, elytraRoot, rightWing, ModelTransformationUtil.VANILLA_RIGHT_WING_TIP);
 
         return List.of(
-                new Emitter(cameraPos.add(leftTip).add(entityWorldOffset), true, "elytra","leftWingTip"),
-                new Emitter (cameraPos.add(rightTip).add(entityWorldOffset), false, "elytra","rightWingTip")
+                new Emitter(cameraPos.add(leftTip).add(entityWorldOffset), true, "elytra","/leftWingTip"),
+                new Emitter (cameraPos.add(rightTip).add(entityWorldOffset), false, "elytra","/rightWingTip")
         );
     }
 

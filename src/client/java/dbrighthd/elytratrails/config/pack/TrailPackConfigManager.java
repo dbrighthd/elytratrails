@@ -371,7 +371,12 @@ public final class TrailPackConfigManager {
     }
 
     public static ResolvedTrailSettings resolve(@Nullable String modelName, @Nullable String boneName, @Nullable PlayerConfig baseConfig) {
+
         if (baseConfig == null) return ResolvedTrailSettings.defaults();
+        if (boneName != null)
+        {
+            boneName = boneName.substring(boneName.lastIndexOf('/')+1).replace("EMF_","");
+        }
         ModConfig mainConfig = getConfig();
         String normalizedModelKey = normalizeModelKey(modelName);
         ModelTrailConfig modelConfig = (normalizedModelKey == null) ? null : MODEL_TRAIL_CONFIGS.get(normalizedModelKey);
