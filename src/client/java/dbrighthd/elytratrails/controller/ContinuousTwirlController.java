@@ -1,16 +1,20 @@
 package dbrighthd.elytratrails.controller;
 
+import dbrighthd.elytratrails.config.ModConfig;
 import dbrighthd.elytratrails.util.TimeUtil;
 import net.minecraft.util.Mth;
+
+import static dbrighthd.elytratrails.ElytraTrailsClient.getConfig;
+import static dbrighthd.elytratrails.controller.EasingUtil.*;
 
 public final class ContinuousTwirlController {
     private static final double HALF_TURN = Math.PI;
 
-    private static final double DURATION_S = 0.5;
-    private static final double HALF_DURATION_S = DURATION_S * 0.5;
+    private static double DURATION_S;
+    private static double HALF_DURATION_S;
 
-    private static final double OMEGA_RAD_S = (Math.PI * Math.PI) / DURATION_S;
-    private static final double TURN360_DURATION_S = Math.TAU / OMEGA_RAD_S;
+    private static double OMEGA_RAD_S;
+    private static double TURN360_DURATION_S;
 
     private enum Phase {
         EASE_IN_180,
@@ -35,6 +39,24 @@ public final class ContinuousTwirlController {
 
     // NEW: make sure we only send END once per spin
     private static boolean endSent = false;
+
+    public static void setDurations()
+    {
+        DURATION_S = Math.max(getConfig().twirlTime,0.1);
+        HALF_DURATION_S = DURATION_S * 0.5;
+        OMEGA_RAD_S = (Math.PI * Math.PI) / DURATION_S;
+        TURN360_DURATION_S = Math.TAU / OMEGA_RAD_S;
+        if(getConfig().easeType == ModConfig.EaseType.Back)
+        {
+            DURATION_S *= 4;
+            HALF_DURATION_S *= 4;
+        }
+        if(getConfig().easeType == ModConfig.EaseType.None)
+        {
+            DURATION_S /= 1.5;
+            HALF_DURATION_S /= 1.5;
+        }
+    }
 
     public static void tickContinuousTwirlKey(boolean isDown, int desiredMode) {
         boolean wasDown = keyDown;
@@ -75,7 +97,7 @@ public final class ContinuousTwirlController {
 
     private static double rollFirst180(double elapsedS) {
         double u = Mth.clamp(elapsedS / HALF_DURATION_S, 0.0, 1.0);
-        return HALF_TURN * (1.0 - Math.cos((Math.PI * 0.5) * u));
+        return HALF_TURN * easeIn(u, getConfig().easeType);
     }
 
     private static double rollConstant360(double elapsedS) {
@@ -85,7 +107,7 @@ public final class ContinuousTwirlController {
 
     private static double rollLast180(double elapsedS) {
         double u = Mth.clamp(elapsedS / HALF_DURATION_S, 0.0, 1.0);
-        return HALF_TURN * Math.sin((Math.PI * 0.5) * u);
+        return HALF_TURN * easeOut(u, getConfig().easeType);
     }
 
     private static void sendEndOnce() {

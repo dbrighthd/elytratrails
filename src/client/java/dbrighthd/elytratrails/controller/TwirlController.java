@@ -1,14 +1,17 @@
 package dbrighthd.elytratrails.controller;
 
+import dbrighthd.elytratrails.config.ModConfig;
 import dbrighthd.elytratrails.util.TimeUtil;
 import net.minecraft.util.Mth;
 
-public final class TwirlController {
-    private static final double DURATION_S = 0.5;
+import static dbrighthd.elytratrails.ElytraTrailsClient.getConfig;
+import static dbrighthd.elytratrails.controller.EasingUtil.easeBoth;
+import static dbrighthd.elytratrails.controller.EasingUtil.easeBothBack;
 
+public final class TwirlController {
     private static long startNanos = 0L;
     private static boolean active = false;
-
+    private static double DURATION_S;
     private static boolean keyDown = false;
     private static int pendingMode = 1;
 
@@ -60,10 +63,18 @@ public final class TwirlController {
         }
 
         t = Mth.clamp(t, 0.0, 1.0);
-        double eased = 0.5 - 0.5 * Math.cos(Math.PI * t);
+        double eased = easeBoth(t, getConfig().easeType);
         return (float) (currentDir * eased * Math.TAU);
     }
 
+    public static void setDurations()
+    {
+        DURATION_S = Math.max(getConfig().twirlTime,0.1);
+        if(getConfig().easeType == ModConfig.EaseType.Back)
+        {
+            DURATION_S *= 4;
+        }
+    }
     public static boolean isActive() {
         return active;
     }

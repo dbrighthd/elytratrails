@@ -2,31 +2,32 @@ package dbrighthd.elytratrails.rendering;
 
 import dbrighthd.elytratrails.config.pack.TrailPackConfigManager;
 import dbrighthd.elytratrails.network.ClientPlayerConfigStore;
+import dbrighthd.elytratrails.network.CompiledPlayerConfig;
 import dbrighthd.elytratrails.network.PlayerConfig;
 import dbrighthd.elytratrails.util.TimeUtil;
 import net.minecraft.resources.Identifier;
-import net.minecraft.util.Util;
 import net.minecraft.world.phys.Vec3;
-import org.jetbrains.annotations.Nullable;
+
 
 import java.util.ArrayList;
 import java.util.List;
 
-public record Trail(Identifier texture, List<Point> points, TrailPackConfigManager.ResolvedTrailSettings config, boolean flipUv, int entityId) {
+public record Trail(Identifier texture, List<Point> points, TrailPackConfigManager.ResolvedTrailSettings config, boolean flipUv, int entityId, int emitterIndex) {
 
-    public static Trail fromPlayerConfig(int playerId, Emitter emitter) {
-        PlayerConfig config = ClientPlayerConfigStore.getOrDefault(playerId);
+    public static Trail fromPlayerConfig(int playerId, Emitter emitter, int index) {
+        CompiledPlayerConfig config = ClientPlayerConfigStore.getOrDefault(playerId);
         TrailPackConfigManager.ResolvedTrailSettings resolvedTrailSettings =  TrailPackConfigManager.resolve(emitter.modelName(), emitter.boneName(), config);
 
         Identifier texture = TrailTextureRegistry.resolveTextureOrNull(resolvedTrailSettings.prideTrail());
+        if(!emitter.flipUv() && (!(resolvedTrailSettings.prideTrailRight() == null || resolvedTrailSettings.prideTrailRight().isEmpty())))
+        {
+            texture = TrailTextureRegistry.resolveTextureOrNull(resolvedTrailSettings.prideTrailRight());
+        }
         if (texture == null) texture = TrailRenderer.DEFAULT_TEXTURE;
-        return new Trail(texture, new ArrayList<>(), resolvedTrailSettings, emitter.flipUv(), playerId);
+        return new Trail(texture, new ArrayList<>(), resolvedTrailSettings, emitter.flipUv(), playerId,index);
     }
-
     @SuppressWarnings("unused")
     public float length() {
-//        if(points.size() < 4)
-//            return 0;
         float length = 0;
         for (int i = 0; i < points.size() - 1; i++) {
             length += (float) points.get(i).pos().distanceTo(points.get(i + 1).pos());

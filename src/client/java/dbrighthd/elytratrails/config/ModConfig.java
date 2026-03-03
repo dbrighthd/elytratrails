@@ -22,7 +22,7 @@ public class ModConfig implements ConfigData {
 
     @ConfigEntry.Category("elytra")
     @ConfigEntry.Gui.Tooltip
-    public boolean glowingTrails = true;
+    public boolean glowingTrails = false;
 
 
     @ConfigEntry.Category("elytra")
@@ -44,11 +44,7 @@ public class ModConfig implements ConfigData {
 
     @ConfigEntry.Category("elytra")
     @ConfigEntry.Gui.Tooltip
-    public boolean cameraDistanceFade = true;
-
-    @ConfigEntry.Category("elytra")
-    @ConfigEntry.Gui.Tooltip
-    public double width = 0.1;
+    public double width = 0.05;
 
     @ConfigEntry.Category("elytra")
     @ConfigEntry.Gui.Tooltip
@@ -106,6 +102,22 @@ public class ModConfig implements ConfigData {
     @ConfigEntry.Gui.Tooltip
     public boolean wireframeTrails = false;
 
+
+    public boolean alwaysShowTrailDuringTwirl = false;
+
+    public String prideTrailRight = "";
+
+    public double twirlTime = 0.5;
+
+    public boolean increaseWidthOverTime = false;
+
+    public double startingWidthMultiplier = 1.0;
+
+    public double endingWidthMultiplier = 5.0;
+
+    public double distanceTillTrailStart = 0.0;
+
+
     public boolean exportPreset = false;
     public String exportPresetName = "";
     //general
@@ -135,9 +147,15 @@ public class ModConfig implements ConfigData {
     @ConfigEntry.Gui.Tooltip
     public boolean enableTwirls = true;
 
-    @ConfigEntry.Category("general")
-    @ConfigEntry.Gui.Tooltip
-    public boolean alwaysShowTrailDuringTwirl = false;
+    public EaseType easeType = EaseType.Sine;
+
+    public enum EaseType {
+        Sine,
+        Back,
+        None,
+    }
+
+    public boolean alwaysSnapTrail = false;
 
     public boolean logTrails = false;
 
@@ -145,14 +163,11 @@ public class ModConfig implements ConfigData {
     public enum ClearTrails {
         NO,
         CLEAR,
-
-
     }
 
     @ConfigEntry.Category("general")
     @ConfigEntry.Gui.Tooltip
     public boolean alwaysGlowWhenShaderTranslucent = true;
-
 
     //server stuff
     @ConfigEntry.Category("server")
@@ -177,7 +192,6 @@ public class ModConfig implements ConfigData {
     public double maxOnlineLifetime = 120.0;
 
     //others
-
     @ConfigEntry.Category("others")
     @ConfigEntry.Gui.PrefixText
     @ConfigEntry.Gui.Tooltip
@@ -193,7 +207,7 @@ public class ModConfig implements ConfigData {
 
     @ConfigEntry.Category("others")
     @ConfigEntry.Gui.Tooltip
-    public boolean glowingTrailsOthersDefault = true;
+    public boolean glowingTrailsOthersDefault = false;
 
 
     @ConfigEntry.Category("others")
@@ -240,10 +254,6 @@ public class ModConfig implements ConfigData {
 
     public int justColorOthersDefault = 0xFFFFFF;
 
-    /**
-     * Optional pride flag id (from Pride Lib / mod id "pride") used for other players when no
-     * per-player config is available.
-     */
     @ConfigEntry.Category("others")
     @ConfigEntry.Gui.Tooltip
     public String prideTrailOthersDefault = "";
@@ -269,6 +279,21 @@ public class ModConfig implements ConfigData {
     @ConfigEntry.Gui.Tooltip
     public boolean wireframeTrailsOthersDefault = false;
 
+    public boolean alwaysShowTrailDuringTwirlOthersDefault = false;
+
+    public String prideTrailRightOthersDefault = "";
+
+    public double twirlTimeOthersDefault = 0.5;
+
+    public boolean increaseWidthOverTimeOthersDefault = false;
+
+    public double startingWidthMultiplierOthersDefault = 1.0;
+
+    public double endingWidthMultiplierOthersDefault = 5.0;
+
+    public double distanceTillTrailStartOthersDefault = 0.0;
+
+    public EaseType easeTypeOthersDefault = EaseType.Sine;
     //particles
     @ConfigEntry.Category("particles")
     @ConfigEntry.Gui.PrefixText
@@ -282,7 +307,7 @@ public class ModConfig implements ConfigData {
     public String Preset = "";
     public String PresetOthers = "";
 
-    // "god i wish there was an easier way to do this"
+    // "god I wish there was an easier way to do this"
     public enum ParticleChoice {
         ANGRY_VILLAGER,
         ASH,

@@ -22,13 +22,14 @@ import net.minecraft.world.phys.Vec3;
 import org.jetbrains.annotations.NotNull;
 import org.joml.Vector3f;
 
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 import static dbrighthd.elytratrails.ElytraTrailsClient.getConfig;
 import static java.lang.Math.max;
 import static java.lang.Math.min;
-import static net.minecraft.util.ARGB.alphaFloat;
-import static net.minecraft.util.ARGB.color;
+import static net.minecraft.util.ARGB.*;
 
 public class TrailRenderer {
 
@@ -43,6 +44,7 @@ public class TrailRenderer {
     private float totalTrailLength;
     private TrailPackConfigManager.ResolvedTrailSettings trailSettings;
     boolean isFirstPerson;
+    boolean atEnd;
     private static final float CAMERA_FADE_ZERO = 0.3f;
     private static final float CAMERA_FADE_FULL = 0.5f;
 
@@ -51,21 +53,28 @@ public class TrailRenderer {
     }
 
     @SuppressWarnings("resource")
-    public void renderAllTrails(@NotNull WorldRenderContext ctx) {
+    public void renderAllTrails(@NotNull WorldRenderContext ctx, Map<Integer,List<Emitter>> gatheredThisFrame) {
         PoseStack stack = ctx.matrices();
         stack.pushPose();
         stack.translate(ctx.gameRenderer().getMainCamera().position().scale(-1f));
         for (Trail trail : manager.trails()) {
-            List<Trail.Point> points = trail.points();
+            List<Trail.Point> points = new ArrayList<>(trail.points());
             if (points.size() < 4) continue; // splines :3
-            //float length = trail.length();
             RenderType renderType = getRenderType(trail);
 
 
             ctx.commandQueue().order(1).submitCustomGeometry(stack, renderType, (pose, consumer) -> {
                 Camera camera = ctx.gameRenderer().getMainCamera();
-
+                this.modConfig = getConfig();
                 totalTrailLength = 0f;
+                if(modConfig.alwaysSnapTrail && (!gatheredThisFrame.isEmpty() && gatheredThisFrame.containsKey(trail.entityId())) && manager.isActiveTrail(trail) && points.size() > 4)
+                {
+
+                    Trail.Point newLast = copyTrailPointNewPos(points.getLast(), gatheredThisFrame.get(trail.entityId()).get(trail.emitterIndex()).position());
+                    points.removeLast();
+                    points.addLast(newLast);
+
+                }
                 for (int i = 0; i < points.size() - 1; i++) {
                     Trail.Point p0 = points.get(max(i - 1, 0));
                     Trail.Point p1 = points.get(i);
@@ -74,10 +83,13 @@ public class TrailRenderer {
 
                     calculateSubdivideLength(p0, p1, p2, p3, 0f, 1f);
                 }
+                totalTrailLength -= (float) trail.config().distanceTillTrailStart();
+                totalTrailLength = max(totalTrailLength,0);
                 this.accumDist = 0f;
                 this.endOfTrail = 0f;
-                this.modConfig = getConfig();
+
                 this.trailSettings = trail.config();
+                this.atEnd = false;
                 this.isFirstPerson = ((Minecraft.getInstance().player != null) && trail.entityId() == Minecraft.getInstance().player.getId()) && Minecraft.getInstance().options.getCameraType().isFirstPerson() && Minecraft.getInstance().getCameraEntity() == Minecraft.getInstance().player;
                 for (int i = 0; i < points.size() - 1; i++) {
                     Trail.Point p0 = points.get(max(i - 1, 0));
@@ -91,6 +103,10 @@ public class TrailRenderer {
         }
 
         stack.popPose();
+    }
+    private Trail.Point copyTrailPointNewPos(Trail.Point point, Vec3 newPos)
+    {
+        return new Trail.Point(newPos, point.epoch());
     }
     private RenderType getRenderType(Trail trail)
     {
@@ -139,7 +155,6 @@ public class TrailRenderer {
         Vec3 p1 = point1.pos();
         Vec3 p2 = point2.pos();
         Vec3 p3 = point3.pos();
-
         Vec3 startPos = SplineInterpolation.catmullRom(p0, p1, p2, p3, tStart);
         Vec3 endPos = SplineInterpolation.catmullRom(p0, p1, p2, p3, tEnd);
         float midT = (tStart + tEnd) / 2f;
@@ -192,7 +207,20 @@ public class TrailRenderer {
             }
             float scaleStart = computeWidthScaling(totalTrailLength- v1, -(endOfTrail - v1), trail.config());
             float scaleEnd = computeWidthScaling(totalTrailLength- v2, -(endOfTrail - v2), trail.config());
-
+            if(trail.config().startRampDistance() == 0)
+            {
+                if(scaleEnd == 0)
+                {
+                    scaleStart =0;
+                }
+            }
+            if(trail.config().endRampDistance() == 0)
+            {
+                if(scaleStart == 0)
+                {
+                    scaleEnd  =0;
+                }
+            }
             if(isFirstPerson && modConfig.fadeFirstPersonTrail && modConfig.firstPersonFadeTime > 0)
             {
                 scaleStart *= firstPersonWidthFadeFactor(start, currentTime);
@@ -206,7 +234,11 @@ public class TrailRenderer {
                 scaleEnd = scaleEnd * (float)trail.config().randomWidthVariation() *((float)( perlinNoise.getValue(endPos.x,endPos.y,endPos.z)) + 1);
 
             }
-
+            if(trail.config().increaseWidthOverTime())
+            {
+                scaleStart *= getWidthOverTimeScale(start, currentTime, (long) (trailLifetime * 1000), trail);
+                scaleEnd *= getWidthOverTimeScale(end, currentTime, (long) (trailLifetime * 1000), trail);
+            }
             if(trail.config().fadeStart() && trail.config().translucentTrails())
             {
                 alphaStart *= computeStartFade(totalTrailLength- v1, trail.config());
@@ -227,12 +259,9 @@ public class TrailRenderer {
         }
     }
 
-    @SuppressWarnings("unused")
-    private static float cameraDistanceFade(float cameraDistBlocks) {
-        float denom = (CAMERA_FADE_FULL - CAMERA_FADE_ZERO);
-        float t = (cameraDistBlocks - CAMERA_FADE_ZERO) / denom;
-        t = Mth.clamp(t, 0f, 1f);
-        return t * t * (3f - 2f * t);
+    private float getWidthOverTimeScale(double epoch, long currentTime, long maxLifetime, Trail trail) {
+        long age = (long) (currentTime - epoch);
+        return (float)Mth.lerp((double) age /maxLifetime, trail.config().startingWidthMultiplier(), trail.config().endingWidthMultiplier());
     }
 
     private float firstPersonWidthFadeFactor(double epoch, long currentTime) {
@@ -252,6 +281,10 @@ public class TrailRenderer {
     }
 
     private float computeWidthScaling(float distFromStart, float distToEnd, TrailPackConfigManager.ResolvedTrailSettings config) {
+        if(distFromStart < 0)
+        {
+            return 0;
+        }
         float endRamp = (float) config.endRampDistance();
         float startRamp = (float) config.startRampDistance();
         float up;

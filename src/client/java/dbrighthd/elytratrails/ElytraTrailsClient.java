@@ -3,6 +3,8 @@ package dbrighthd.elytratrails;
 import dbrighthd.elytratrails.compat.Compatibility;
 import dbrighthd.elytratrails.config.ModConfig;
 import dbrighthd.elytratrails.config.pack.TrailPackConfigManager;
+import dbrighthd.elytratrails.controller.ContinuousTwirlController;
+import dbrighthd.elytratrails.controller.TwirlController;
 import dbrighthd.elytratrails.handler.ParticleHandler;
 import dbrighthd.elytratrails.network.RegisterPacketsClient;
 import dbrighthd.elytratrails.rendering.TrailPipelines;
@@ -40,7 +42,8 @@ public class ElytraTrailsClient implements ClientModInitializer {
 		ParticleHandler.init();
 		refreshLocalConfigs();
 		RegisterPacketsClient.initClient();
-
+		ContinuousTwirlController.setDurations();
+		TwirlController.setDurations();
 		ResourceManagerHelper.get(PackType.CLIENT_RESOURCES).registerReloadListener(
 			new SimpleSynchronousResourceReloadListener() {
 				@Override

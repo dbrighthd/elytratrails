@@ -14,7 +14,7 @@ public class TrailSystem {
         WorldRenderEvents.AFTER_ENTITIES.register(ctx -> {
             ModConfig config = ElytraTrailsClient.getConfig();
             if (!config.enableAllTrails) return;
-            renderer.renderAllTrails(ctx);
+            renderer.renderAllTrails(ctx,sampler.gatheredTrailsThisFrame);
         });
     }
     public static TrailManager getTrailManager()

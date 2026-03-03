@@ -1,6 +1,9 @@
 package dbrighthd.elytratrails.config;
 
+import dbrighthd.elytratrails.ElytraTrailsKeybind;
 import dbrighthd.elytratrails.config.pack.TrailPackConfigManager;
+import dbrighthd.elytratrails.controller.ContinuousTwirlController;
+import dbrighthd.elytratrails.controller.TwirlController;
 import dbrighthd.elytratrails.network.GetAllRequestC2SPayload;
 import dbrighthd.elytratrails.network.PlayerConfigC2SPayload;
 import dbrighthd.elytratrails.network.RemoveFromStoreC2SPayload;
@@ -10,6 +13,7 @@ import me.shedaniel.clothconfig2.api.ConfigBuilder;
 import me.shedaniel.clothconfig2.api.ConfigCategory;
 import me.shedaniel.clothconfig2.impl.builders.DropdownMenuBuilder;
 import net.fabricmc.fabric.api.client.networking.v1.ClientPlayNetworking;
+import net.minecraft.client.KeyMapping;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.network.chat.Component;
@@ -42,6 +46,7 @@ public class ConfigScreenBuilder {
         ConfigCategory elytra = builder.getOrCreateCategory(Component.translatable("text.elytratrails.category.elytra"));
         ConfigCategory server = builder.getOrCreateCategory(Component.translatable("text.elytratrails.category.server"));
         ConfigCategory others = builder.getOrCreateCategory(Component.translatable("text.elytratrails.category.others"));
+        ConfigCategory twirling = builder.getOrCreateCategory(Component.translatable("text.elytratrails.category.twirling"));
         ConfigCategory particles = builder.getOrCreateCategory(Component.translatable("text.elytratrails.category.particles"));
         ConfigCategory presets = builder.getOrCreateCategory(Component.translatable("text.elytratrails.category.presets"));
 
@@ -60,26 +65,17 @@ public class ConfigScreenBuilder {
                 .setTooltip(Component.translatable("text.elytratrails.option.emfSupport.@Tooltip"))
                 .setSaveConsumer(newValue -> config.emfSupport = newValue)
                 .build());
-        general.addEntry(entryBuilder.startBooleanToggle(Component.translatable("text.elytratrails.option.enableTwirls"), config.enableTwirls)
+        general.addEntry(entryBuilder.startBooleanToggle(Component.translatable("text.elytratrails.option.alwaysSnapTrail"), config.alwaysSnapTrail)
+                .setDefaultValue(false)
+                .setTooltip(Component.translatable("text.elytratrails.option.alwaysSnapTrail.@Tooltip"))
+                .setSaveConsumer(newValue -> config.alwaysSnapTrail = newValue)
+                .build());
+        general.addEntry(entryBuilder.startBooleanToggle(Component.translatable("text.elytratrails.option.resourcePackOverride"), config.resourcePackOverride)
                 .setDefaultValue(true)
-                .setTooltip(Component.translatable("text.elytratrails.option.enableTwirls.@Tooltip"))
-                .setSaveConsumer(newValue -> config.enableTwirls = newValue)
+                .setTooltip(Component.translatable("text.elytratrails.option.resourcePackOverride.@Tooltip"))
+                .setSaveConsumer(newValue -> config.resourcePackOverride = newValue)
                 .build());
-        general.addEntry(entryBuilder.startBooleanToggle(Component.translatable("text.elytratrails.option.alwaysShowTrailDuringTwirl"), config.alwaysShowTrailDuringTwirl)
-                .setDefaultValue(false)
-                .setTooltip(Component.translatable("text.elytratrails.option.alwaysShowTrailDuringTwirl.@Tooltip"))
-                .setSaveConsumer(newValue -> config.alwaysShowTrailDuringTwirl = newValue)
-                .build());
-        general.addEntry(entryBuilder.startBooleanToggle(Component.translatable("text.elytratrails.option.firstPersonTwirlCamera"), config.fishysStupidCameraRoll)
-                .setDefaultValue(false)
-                .setTooltip(Component.translatable("text.elytratrails.option.firstPersonTwirlCamera.@Tooltip"))
-                .setSaveConsumer(newValue -> config.fishysStupidCameraRoll = newValue)
-                .build());
-        general.addEntry(entryBuilder.startBooleanToggle(Component.translatable("text.elytratrails.option.thirdPersonTwirlCamera"), config.fishysStupidThirdPersonCameraRoll)
-                .setDefaultValue(false)
-                .setTooltip(Component.translatable("text.elytratrails.option.thirdPersonTwirlCamera.@Tooltip"))
-                .setSaveConsumer(newValue -> config.fishysStupidThirdPersonCameraRoll = newValue)
-                .build());
+
         general.addEntry(entryBuilder.startBooleanToggle(Component.translatable("text.elytratrails.option.logTrails"), config.logTrails)
                 .setDefaultValue(false)
                 .setTooltip(Component.translatable("text.elytratrails.option.logTrails.@Tooltip"))
@@ -91,6 +87,17 @@ public class ConfigScreenBuilder {
                 .setSaveConsumer(newValue -> config.alwaysGlowWhenShaderTranslucent = newValue)
                 .requireRestart()
                 .build());
+        general.addEntry(entryBuilder.startKeyCodeField(
+                        Component.translatable("text.elytratrails.option.toggle_trails_key"),
+                        ElytraTrailsKeybind.TOGGLE_TRAILS.key
+                )
+                .setDefaultValue(ElytraTrailsKeybind.TOGGLE_TRAILS.getDefaultKey())
+                .setTooltip(Component.translatable("text.elytratrails.option.toggle_trails_key.@Tooltip"))
+                .setKeySaveConsumer(newKey -> {
+                    ElytraTrailsKeybind.TOGGLE_TRAILS.setKey(newKey);
+                    KeyMapping.resetMapping();
+                })
+                .build());
         general.addEntry(entryBuilder.startEnumSelector(
                         Component.translatable("text.elytratrails.option.clearTrails"),
                         ModConfig.ClearTrails.class,
@@ -101,6 +108,102 @@ public class ConfigScreenBuilder {
                         TrailSystem.getTrailManager().removeAllTrails();
                 })
                 .build());
+
+        twirling.addEntry(entryBuilder.startTextDescription(
+                        Component.translatable("text.elytratrails.category.twirling.desc"))
+                .build());
+        twirling.addEntry(entryBuilder.startBooleanToggle(Component.translatable("text.elytratrails.option.enableTwirls"), config.enableTwirls)
+                .setDefaultValue(true)
+                .setTooltip(Component.translatable("text.elytratrails.option.enableTwirls.@Tooltip"))
+                .setSaveConsumer(newValue -> config.enableTwirls = newValue)
+                .build());
+        twirling.addEntry(entryBuilder.startBooleanToggle(Component.translatable("text.elytratrails.option.alwaysShowTrailDuringTwirl"), config.alwaysShowTrailDuringTwirl)
+                .setDefaultValue(false)
+                .setTooltip(Component.translatable("text.elytratrails.option.alwaysShowTrailDuringTwirl.@Tooltip"))
+                .setSaveConsumer(newValue -> config.alwaysShowTrailDuringTwirl = newValue)
+                .build());
+        twirling.addEntry(entryBuilder.startBooleanToggle(Component.translatable("text.elytratrails.option.firstPersonTwirlCamera"), config.fishysStupidCameraRoll)
+                .setDefaultValue(false)
+                .setTooltip(Component.translatable("text.elytratrails.option.firstPersonTwirlCamera.@Tooltip"))
+                .setSaveConsumer(newValue -> config.fishysStupidCameraRoll = newValue)
+                .build());
+        twirling.addEntry(entryBuilder.startBooleanToggle(Component.translatable("text.elytratrails.option.thirdPersonTwirlCamera"), config.fishysStupidThirdPersonCameraRoll)
+                .setDefaultValue(false)
+                .setTooltip(Component.translatable("text.elytratrails.option.thirdPersonTwirlCamera.@Tooltip"))
+                .setSaveConsumer(newValue -> config.fishysStupidThirdPersonCameraRoll = newValue)
+                .build());
+        twirling.addEntry(entryBuilder.startDoubleField(Component.translatable("text.elytratrails.option.twirlTime"), config.twirlTime)
+                .setDefaultValue(0.5)
+                .setTooltip(Component.translatable("text.elytratrails.option.twirlTime.@Tooltip"))
+                .setSaveConsumer(newValue -> config.twirlTime = newValue)
+                .build());
+        twirling.addEntry(entryBuilder.startEnumSelector(
+                        Component.translatable("text.elytratrails.option.easeType"),
+                        ModConfig.EaseType.class,
+                        config.easeType)
+                .setDefaultValue(ModConfig.EaseType.Sine)
+                .setTooltip(Component.translatable("text.elytratrails.option.easeType.@Tooltip"))
+                .setSaveConsumer(newValue -> config.easeType = newValue)
+                .build());
+
+        twirling.addEntry(entryBuilder.startKeyCodeField(
+                        Component.translatable("text.elytratrails.option.twirl_r_continuous_key"),
+                        ElytraTrailsKeybind.DO_A_LIL_CONTINUOUS_TWIRL_R.key
+                )
+                .setDefaultValue(ElytraTrailsKeybind.DO_A_LIL_CONTINUOUS_TWIRL_R.getDefaultKey())
+                .setTooltip(Component.translatable("text.elytratrails.option.twirl_r_continuous_key.@Tooltip"))
+                .setKeySaveConsumer(newKey -> {
+                    ElytraTrailsKeybind.DO_A_LIL_CONTINUOUS_TWIRL_R.setKey(newKey);
+                    KeyMapping.resetMapping();
+                })
+                .build());
+        twirling.addEntry(entryBuilder.startKeyCodeField(
+                        Component.translatable("text.elytratrails.option.twirl_l_continuous_key"),
+                        ElytraTrailsKeybind.DO_A_LIL_CONTINUOUS_TWIRL_L.key
+                )
+                .setDefaultValue(ElytraTrailsKeybind.DO_A_LIL_CONTINUOUS_TWIRL_L.getDefaultKey())
+                .setTooltip(Component.translatable("text.elytratrails.option.twirl_l_continuous_key.@Tooltip"))
+                .setKeySaveConsumer(newKey -> {
+                    ElytraTrailsKeybind.DO_A_LIL_CONTINUOUS_TWIRL_L.setKey(newKey);
+                    KeyMapping.resetMapping();
+                })
+                .build());
+
+        twirling.addEntry(entryBuilder.startKeyCodeField(
+                        Component.translatable("text.elytratrails.option.twirl_r_key"),
+                        ElytraTrailsKeybind.DO_A_LIL_TWIRL_R.key
+                )
+                .setDefaultValue(ElytraTrailsKeybind.DO_A_LIL_TWIRL_R.getDefaultKey())
+                .setTooltip(Component.translatable("text.elytratrails.option.twirl_r_key.@Tooltip"))
+                .setKeySaveConsumer(newKey -> {
+                    ElytraTrailsKeybind.DO_A_LIL_TWIRL_R.setKey(newKey);
+                    KeyMapping.resetMapping();
+                })
+                .build());
+        twirling.addEntry(entryBuilder.startKeyCodeField(
+                        Component.translatable("text.elytratrails.option.twirl_l_key"),
+                        ElytraTrailsKeybind.DO_A_LIL_TWIRL_L.key
+                )
+                .setDefaultValue(ElytraTrailsKeybind.DO_A_LIL_TWIRL_L.getDefaultKey())
+                .setTooltip(Component.translatable("text.elytratrails.option.twirl_l_key.@Tooltip"))
+                .setKeySaveConsumer(newKey -> {
+                    ElytraTrailsKeybind.DO_A_LIL_TWIRL_L.setKey(newKey);
+                    KeyMapping.resetMapping();
+                })
+                .build());
+
+        twirling.addEntry(entryBuilder.startKeyCodeField(
+                        Component.translatable("text.elytratrails.option.twirl_random_key"),
+                        ElytraTrailsKeybind.DO_A_LIL_TWIRL_RANDOM.key
+                )
+                .setDefaultValue(ElytraTrailsKeybind.DO_A_LIL_TWIRL_RANDOM.getDefaultKey())
+                .setTooltip(Component.translatable("text.elytratrails.option.twirl_random_key.@Tooltip"))
+                .setKeySaveConsumer(newKey -> {
+                    ElytraTrailsKeybind.DO_A_LIL_TWIRL_RANDOM.setKey(newKey);
+                    KeyMapping.resetMapping();
+                })
+                .build());
+
 
 
         elytra.addEntry(entryBuilder.startTextDescription(
@@ -191,6 +294,11 @@ public class ConfigScreenBuilder {
                 .setTooltip(Component.translatable("text.elytratrails.option.prideTrail.@Tooltip"))
                 .setSaveConsumer(newValue -> config.prideTrail = newValue)
                 .build());
+        elytra.addEntry(entryBuilder.startStrField(Component.translatable("text.elytratrails.option.prideTrailRight"), config.prideTrailRight)
+                .setDefaultValue("")
+                .setTooltip(Component.translatable("text.elytratrails.option.prideTrailRight.@Tooltip"))
+                .setSaveConsumer(newValue -> config.prideTrailRight = newValue)
+                .build());
         elytra.addEntry(entryBuilder.startDoubleField(Component.translatable("text.elytratrails.option.randomWidthVariation"), config.randomWidthVariation)
                 .setDefaultValue(1)
                 .setTooltip(Component.translatable("text.elytratrails.option.randomWidthVariation.@Tooltip"))
@@ -215,6 +323,26 @@ public class ConfigScreenBuilder {
                 .setDefaultValue(false)
                 .setTooltip(Component.translatable("text.elytratrails.option.wireframeTrails.@Tooltip"))
                 .setSaveConsumer(newValue -> config.wireframeTrails = newValue)
+                .build());
+        elytra.addEntry(entryBuilder.startBooleanToggle(Component.translatable("text.elytratrails.option.increaseWidthOverTime"), config.increaseWidthOverTime)
+                .setDefaultValue(false)
+                .setTooltip(Component.translatable("text.elytratrails.option.increaseWidthOverTime.@Tooltip"))
+                .setSaveConsumer(newValue -> config.increaseWidthOverTime = newValue)
+                .build());
+        elytra.addEntry(entryBuilder.startDoubleField(Component.translatable("text.elytratrails.option.startingWidthMultiplier"), config.startingWidthMultiplier)
+                .setDefaultValue(1.0)
+                .setTooltip(Component.translatable("text.elytratrails.option.startingWidthMultiplier.@Tooltip"))
+                .setSaveConsumer(newValue -> config.startingWidthMultiplier = newValue)
+                .build());
+        elytra.addEntry(entryBuilder.startDoubleField(Component.translatable("text.elytratrails.option.endingWidthMultiplier"), config.endingWidthMultiplier)
+                .setDefaultValue(5.0)
+                .setTooltip(Component.translatable("text.elytratrails.option.endingWidthMultiplier.@Tooltip"))
+                .setSaveConsumer(newValue -> config.endingWidthMultiplier = newValue)
+                .build());
+        elytra.addEntry(entryBuilder.startDoubleField(Component.translatable("text.elytratrails.option.distanceTillTrailStart"), config.distanceTillTrailStart)
+                .setDefaultValue(0.0)
+                .setTooltip(Component.translatable("text.elytratrails.option.distanceTillTrailStart.@Tooltip"))
+                .setSaveConsumer(newValue -> config.distanceTillTrailStart = newValue)
                 .build());
         elytra.addEntry(entryBuilder.startTextDescription(
                         Component.translatable("text.elytratrails.category.elytra.desc.export"))
@@ -344,7 +472,11 @@ public class ConfigScreenBuilder {
                 .setTooltip(Component.translatable("text.elytratrails.option.prideTrailOthersDefault.@Tooltip"))
                 .setSaveConsumer(newValue -> config.prideTrailOthersDefault = newValue)
                 .build());
-
+        others.addEntry(entryBuilder.startStrField(Component.translatable("text.elytratrails.option.prideTrailRightOthersDefault"), config.prideTrailRightOthersDefault)
+                .setDefaultValue("")
+                .setTooltip(Component.translatable("text.elytratrails.option.prideTrailRightOthersDefault.@Tooltip"))
+                .setSaveConsumer(newValue -> config.prideTrailRightOthersDefault = newValue)
+                .build());
         others.addEntry(entryBuilder.startDoubleField(Component.translatable("text.elytratrails.option.randomWidthVariationOthersDefault"), config.randomWidthVariationOthersDefault)
                 .setDefaultValue(1.0)
                 .setTooltip(Component.translatable("text.elytratrails.option.randomWidthVariationOthersDefault.@Tooltip"))
@@ -374,7 +506,26 @@ public class ConfigScreenBuilder {
                 .setTooltip(Component.translatable("text.elytratrails.option.wireframeTrailsOthersDefault.@Tooltip"))
                 .setSaveConsumer(newValue -> config.wireframeTrailsOthersDefault = newValue)
                 .build());
-
+        others.addEntry(entryBuilder.startBooleanToggle(Component.translatable("text.elytratrails.option.increaseWidthOverTimeOthersDefault"), config.increaseWidthOverTimeOthersDefault)
+                .setDefaultValue(false)
+                .setTooltip(Component.translatable("text.elytratrails.option.increaseWidthOverTimeOthersDefault.@Tooltip"))
+                .setSaveConsumer(newValue -> config.increaseWidthOverTimeOthersDefault = newValue)
+                .build());
+        others.addEntry(entryBuilder.startDoubleField(Component.translatable("text.elytratrails.option.startingWidthMultiplierOthersDefault"), config.startingWidthMultiplierOthersDefault)
+                .setDefaultValue(1.0)
+                .setTooltip(Component.translatable("text.elytratrails.option.startingWidthMultiplierOthersDefault.@Tooltip"))
+                .setSaveConsumer(newValue -> config.startingWidthMultiplierOthersDefault = newValue)
+                .build());
+        others.addEntry(entryBuilder.startDoubleField(Component.translatable("text.elytratrails.option.endingWidthMultiplierOthersDefault"), config.endingWidthMultiplierOthersDefault)
+                .setDefaultValue(5.0)
+                .setTooltip(Component.translatable("text.elytratrails.option.endingWidthMultiplierOthersDefault.@Tooltip"))
+                .setSaveConsumer(newValue -> config.endingWidthMultiplierOthersDefault = newValue)
+                .build());
+        others.addEntry(entryBuilder.startDoubleField(Component.translatable("text.elytratrails.option.OthersDefault"), config.distanceTillTrailStartOthersDefault)
+                .setDefaultValue(0.0)
+                .setTooltip(Component.translatable("text.elytratrails.option.distanceTillTrailStartOthersDefault.@Tooltip"))
+                .setSaveConsumer(newValue -> config.distanceTillTrailStartOthersDefault = newValue)
+                .build());
         particles.addEntry(entryBuilder.startTextDescription(
                         Component.translatable("text.elytratrails.category.particles.desc"))
                 .build());
@@ -464,12 +615,15 @@ public class ConfigScreenBuilder {
             encodeColors(config);
             exportPreset(config);
             applyPresetsToConfig(config);
+            TwirlController.setDurations();
+            ContinuousTwirlController.setDurations();
             AutoConfig.getConfigHolder(ModConfig.class).save();
                     var mc = Minecraft.getInstance();
                     refreshLocalConfigs();
                     if (mc.getConnection() != null && mc.player != null && mc.level != null) {
                         TrailSystem.getTrailManager().removeTrail(mc.player.getId());
                         TrailSystem.getWingtipSampler().removeAllEmfCache();
+
                         if(getConfig().shareTrail || !getConfig().showTrailToOtherPlayers)
                         {
                             ClientPlayNetworking.send(new PlayerConfigC2SPayload(getLocalPlayerConfigToSend()));

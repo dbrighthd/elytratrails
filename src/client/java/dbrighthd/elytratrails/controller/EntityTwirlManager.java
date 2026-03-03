@@ -1,5 +1,7 @@
 package dbrighthd.elytratrails.controller;
 
+import dbrighthd.elytratrails.config.ModConfig;
+import dbrighthd.elytratrails.network.ClientPlayerConfigStore;
 import dbrighthd.elytratrails.network.TwirlStateC2SPayload;
 import dbrighthd.elytratrails.util.TimeUtil;
 import it.unimi.dsi.fastutil.ints.Int2ObjectOpenHashMap;
@@ -12,11 +14,11 @@ import static dbrighthd.elytratrails.ElytraTrailsClient.getConfig;
 public final class EntityTwirlManager {
     private static final double HALF_TURN = Math.PI;
 
-    private static final double DURATION_S = 0.5;
-    private static final double HALF_DURATION_S = DURATION_S * 0.5;
-
-    private static final double OMEGA_RAD_S = (Math.PI * Math.PI) / DURATION_S;
-    private static final double TURN360_DURATION_S = Math.TAU / OMEGA_RAD_S;
+//    private static final double DURATION_S = 0.5;
+//    private static final double HALF_DURATION_S = DURATION_S * 0.5;
+//
+//    private static final double OMEGA_RAD_S = (Math.PI * Math.PI) / DURATION_S;
+//    private static final double TURN360_DURATION_S = Math.TAU / OMEGA_RAD_S;
 
     private enum Kind { NORMAL, CONTINUOUS }
     private enum Phase { EASE_IN_180, CONSTANT_360, EASE_OUT_180 }
@@ -80,7 +82,7 @@ public final class EntityTwirlManager {
                 data.kind = Kind.CONTINUOUS;
 
                 // Start ease-out from current angle (smooth).
-                double angleNow = currentContinuousAngle(data, now);
+                double angleNow = currentContinuousAngle(data, now, getEntityTwirlConfigs(entityId));
                 data.phase = Phase.EASE_OUT_180;
                 data.baseAngleRad = angleNow;
                 data.phaseStartNanos = now;
@@ -90,16 +92,48 @@ public final class EntityTwirlManager {
         }
     }
 
+    private record TwirlInfo(double duration, double half_duration, double omega_rad_s, double turn360_duration, ModConfig.EaseType easeType){}
+
+    private static TwirlInfo getEntityTwirlConfigs(int entityId)
+    {
+
+        double DURATION_S = Math.max(ClientPlayerConfigStore.getOrDefault(entityId).playerConfigExtended.twirlTime(),0.1);
+        if(entityId == Minecraft.getInstance().player.getId())
+        {
+            DURATION_S = getConfig().twirlTime;
+        }
+        double HALF_DURATION_S = DURATION_S * 0.5;
+        double OMEGA_RAD_S = (Math.PI * Math.PI) / DURATION_S;
+        double TURN360_DURATION_S = Math.TAU / OMEGA_RAD_S;
+        String easeTypeString = ClientPlayerConfigStore.getOrDefault(entityId).playerConfigExtended.easeType();
+        ModConfig.EaseType easeType = ModConfig.EaseType.Sine;
+        if(easeTypeString.equals("back"))
+        {
+            easeType = ModConfig.EaseType.Back;
+            DURATION_S *= 4;
+            HALF_DURATION_S *= 4;
+        }
+        if(easeTypeString.equals("none"))
+        {
+            easeType = ModConfig.EaseType.None;
+        }
+        if(entityId == Minecraft.getInstance().player.getId())
+        {
+            easeType = getConfig().easeType;
+        }
+        return new TwirlInfo(DURATION_S,HALF_DURATION_S,OMEGA_RAD_S,TURN360_DURATION_S,easeType);
+    }
+
     public static float getExtraRollRadians(int entityId) {
         TwirlData data = BY_ENTITY.get(entityId);
         if (data == null || !data.active) return 0f;
 
         long now = TimeUtil.currentNanos();
-        return (data.kind == Kind.NORMAL) ? computeNormal(data, now) : computeContinuous(data, now);
+        return (data.kind == Kind.NORMAL) ? computeNormal(data, now, getEntityTwirlConfigs(entityId)) : computeContinuous(data, now, getEntityTwirlConfigs(entityId));
     }
 
-    private static float computeNormal(TwirlData data, long now) {
-        double t = (now - data.startNanos) / (DURATION_S * 1_000_000_000.0);
+    private static float computeNormal(TwirlData data, long now, TwirlInfo twirlInfo) {
+        double t = (now - data.startNanos) / (twirlInfo.duration * 1_000_000_000.0);
 
         if (t >= 1.0) {
             BY_ENTITY.remove(data.entityId);
@@ -111,43 +145,43 @@ public final class EntityTwirlManager {
         return -(float) (data.dir * eased * Math.TAU);
     }
 
-    private static float computeContinuous(TwirlData data, long now) {
+    private static float computeContinuous(TwirlData data, long now, TwirlInfo twirlInfo) {
         for (int guard = 0; guard < 10; guard++) {
             double elapsedS = (now - data.phaseStartNanos) / 1_000_000_000.0;
 
             switch (data.phase) {
                 case EASE_IN_180 -> {
-                    if (elapsedS >= HALF_DURATION_S) {
+                    if (elapsedS >= twirlInfo.half_duration) {
                         data.baseAngleRad += data.dir * HALF_TURN;
-                        data.phaseStartNanos += (long) (HALF_DURATION_S * 1_000_000_000.0);
+                        data.phaseStartNanos += (long) (twirlInfo.half_duration * 1_000_000_000.0);
                         data.phase = Phase.CONSTANT_360;
                         continue;
                     }
 
-                    double u = Mth.clamp(elapsedS / HALF_DURATION_S, 0.0, 1.0);
-                    double roll = HALF_TURN * (1.0 - Math.cos((Math.PI * 0.5) * u));
+                    double u = Mth.clamp(elapsedS / twirlInfo.half_duration, 0.0, 1.0);
+                    double roll = HALF_TURN * EasingUtil.easeIn(u, twirlInfo.easeType);;
                     return (float) (data.baseAngleRad + data.dir * roll);
                 }
 
                 case CONSTANT_360 -> {
-                    while (elapsedS >= TURN360_DURATION_S) {
+                    while (elapsedS >= twirlInfo.turn360_duration) {
                         data.baseAngleRad += data.dir * Math.TAU;
-                        data.phaseStartNanos += (long) (TURN360_DURATION_S * 1_000_000_000.0);
+                        data.phaseStartNanos += (long) (twirlInfo.turn360_duration * 1_000_000_000.0);
                         elapsedS = (now - data.phaseStartNanos) / 1_000_000_000.0;
                     }
 
-                    double a = Mth.clamp(OMEGA_RAD_S * elapsedS, 0.0, Math.TAU);
+                    double a = Mth.clamp(twirlInfo.omega_rad_s * elapsedS, 0.0, Math.TAU);
                     return (float) (data.baseAngleRad + data.dir * a);
                 }
 
                 case EASE_OUT_180 -> {
-                    if (elapsedS >= HALF_DURATION_S) {
+                    if (elapsedS >= twirlInfo.half_duration) {
                         BY_ENTITY.remove(data.entityId);
                         return 0f;
                     }
 
-                    double u = Mth.clamp(elapsedS / HALF_DURATION_S, 0.0, 1.0);
-                    double roll = HALF_TURN * Math.sin((Math.PI * 0.5) * u);
+                    double u = Mth.clamp(elapsedS / twirlInfo.half_duration, 0.0, 1.0);
+                    double roll = HALF_TURN * EasingUtil.easeOut(u, twirlInfo.easeType);;
                     return (float) (data.baseAngleRad + data.dir * roll);
                 }
             }
@@ -157,24 +191,24 @@ public final class EntityTwirlManager {
         return 0f;
     }
 
-    private static double currentContinuousAngle(TwirlData data, long now) {
+    private static double currentContinuousAngle(TwirlData data, long now, TwirlInfo twirlInfo) {
         if (data.phaseStartNanos == 0L) return data.baseAngleRad;
 
         double elapsedS = (now - data.phaseStartNanos) / 1_000_000_000.0;
 
         return switch (data.phase) {
             case EASE_IN_180 -> {
-                double u = Mth.clamp(elapsedS / HALF_DURATION_S, 0.0, 1.0);
-                double roll = HALF_TURN * (1.0 - Math.cos((Math.PI * 0.5) * u));
+                double u = Mth.clamp(elapsedS / twirlInfo.half_duration, 0.0, 1.0);
+                double roll = HALF_TURN * EasingUtil.easeIn(u, twirlInfo.easeType);;
                 yield data.baseAngleRad + data.dir * roll;
             }
             case CONSTANT_360 -> {
-                double a = Mth.clamp(OMEGA_RAD_S * elapsedS, 0.0, Math.TAU);
+                double a = Mth.clamp(twirlInfo.omega_rad_s * elapsedS, 0.0, Math.TAU);
                 yield data.baseAngleRad + data.dir * a;
             }
             case EASE_OUT_180 -> {
-                double u = Mth.clamp(elapsedS / HALF_DURATION_S, 0.0, 1.0);
-                double roll = HALF_TURN * Math.sin((Math.PI * 0.5) * u);
+                double u = Mth.clamp(elapsedS / twirlInfo.half_duration, 0.0, 1.0);
+                double roll = HALF_TURN * EasingUtil.easeOut(u, twirlInfo.easeType);
                 yield data.baseAngleRad + data.dir * roll;
             }
         };

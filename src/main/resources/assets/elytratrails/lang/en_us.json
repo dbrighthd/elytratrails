@@ -122,6 +122,9 @@
   "text.elytratrails.option.emfSupport": "EMF Model Support",
   "text.elytratrails.option.emfSupport.@Tooltip": "Having this on tries to make it work with EMF models, can cause issues",
 
+  "text.elytratrails.option.alwaysSnapTrail": "Snap Trail to Wingtip",
+  "text.elytratrails.option.alwaysSnapTrail.@Tooltip": "!!MAY CAUSE LAG!! Looks for wingtips to snap trail to. looks weird on lower trail sample rates",
+
   "text.elytratrails.option.cameraDistanceFade": "Fade Trails Close to Camera",
   "text.elytratrails.option.cameraDistanceFade.@Tooltip": "Tries to fade trails close to camera to prevent annoyance",
 
@@ -221,20 +224,56 @@
   "text.elytratrails.option.fadeEndOthersDefault.@Tooltip": "Default: Should the trail fade away at the end? (REQUIRES TRANSLUCENT TRAILS)",
 
 
-  "text.elytratrails.option.resourcePackOverride": "Resource Pack Override (Players)",
+  "text.elytratrails.option.resourcePackOverride": "Resource Pack Override",
   "text.elytratrails.option.resourcePackOverride.@Tooltip": "If enabled, resource pack trail configs can override player trails too (falls back to synced/default settings if none exist).",
 
   "text.elytratrails.option.prideTrail": "Pride/Trail Texture",
   "text.elytratrails.option.prideTrail.@Tooltip": "Pride flag/Trail texture. Leave blank to disable. Example: rainbow, transgender.  Add new ones into assets/elytratrails/textures/trails",
 
+  "text.elytratrails.option.prideTrailRight": "(OPTIONAL) Pride/Trail Texture for Right Trail",
+  "text.elytratrails.option.prideTrailRight.@Tooltip": "Pride flag/Trail texture for right trail. Leave blank to keep them the same.",
+
+  "text.elytratrails.option.prideTrailRightOthersDefault": "(OPTIONAL) Other's Pride/Trail Texture for Right Trail",
+  "text.elytratrails.option.prideTrailRightOthersDefault.@Tooltip": "Default Pride flag/Trail texture for right trail. Leave blank to keep them the same.",
+
+
   "text.elytratrails.option.prideTrailOthersDefault": "Other's Pride/Trail Texture",
   "text.elytratrails.option.prideTrailOthersDefault.@Tooltip": "Default Pride flag/Trail texture. Leave blank to disable. Example: rainbow, transgender.  Add new ones into assets/elytratrails/textures/trails",
 
+  "text.elytratrails.option.twirlTime" : "Twirl Time",
+  "text.elytratrails.option.twirlTime.@Tooltip" : "Time it takes for a twirl to happen. Scales differently depending on easing type",
+
+  "text.elytratrails.option.easeType" : "Easing Type",
+  "text.elytratrails.option.easeType.@Tooltip" : "Type of easing function to use",
+
+  "text.elytratrails.option.increaseWidthOverTime": "Width changes over lifetime",
+  "text.elytratrails.option.increaseWidthOverTime.@Tooltip": "Whether width should be multiplied based on age (define below)",
+
+  "text.elytratrails.option.increaseWidthOverTimeOthersDefault": "Other's Width changes over lifetime",
+  "text.elytratrails.option.increaseWidthOverTimeOthersDefault.@Tooltip": "Default: Whether width should be multiplied based on age (define below)",
+
+  "text.elytratrails.option.startingWidthMultiplier": "Width Start Multiplier",
+  "text.elytratrails.option.startingWidthMultiplier.@Tooltip": "Width Multiplier the trail should start with",
+
+  "text.elytratrails.option.startingWidthMultiplierOthersDefault": "Other's Width Start Multiplier",
+  "text.elytratrails.option.startingWidthMultiplierOthersDefault.@Tooltip": "Default: Width Multiplier the trail should start with",
+
+
+  "text.elytratrails.option.endingWidthMultiplier": "Width End Multiplier",
+  "text.elytratrails.option.endingWidthMultiplier.@Tooltip": "Width Multiplier the trail should end with",
+
+  "text.elytratrails.option.endingWidthMultiplierOthersDefault": "Other's Width End Multiplier",
+  "text.elytratrails.option.endingWidthMultiplierOthersDefault.@Tooltip": "Default: Width Multiplier the trail should end with",
+
+
+  "text.elytratrails.option.distanceTillTrailStart": "Distance Before Trail Starts",
+  "text.elytratrails.option.distanceTillTrailStart.@Tooltip": "How big the gap between the wingtip and the trail start should be",
 
   "text.elytratrails.category.general": "General",
   "text.elytratrails.category.elytra": "Your Trails",
   "text.elytratrails.category.others": "Other's Trails",
   "text.elytratrails.category.server": "Server Syncing",
+  "text.elytratrails.category.twirling" : "Twirling",
   "text.elytratrails.category.particles": "Particles",
   "text.elytratrails.category.presets": "Presets",
 
@@ -245,15 +284,28 @@
   "text.elytratrails.category.server.desc": "Server syncing (only works if the mod exists on the server!)",
   "text.elytratrails.category.others.desc": "Defaults for other entities/players (Defaults for players unless synced with the server)",
   "text.elytratrails.category.particles.desc": "Optional particle effects while flying. (Fun fact: this was the original intention of this mod)",
+  "text.elytratrails.category.twirling.desc" : "Set keybinds to do silly twirls!!!",
   "text.elytratrails.category.presets.desc": "Load presets for YOUR trails. If a preset is selected below, it will override \"Your Trails\" settings when you save this config.",
   "text.elytratrails.category.presets.desc.others": "Load presets for OTHER's trails. If a preset is selected below, it will override \"Other's Trails\" settings when you save this config.",
 
 
   "key.category.elytratrails.skibidi": "Elytra Contrails Keybinds",
   "key.elytratrails.toggle": "Toggle Elytra Contrails",
+  "text.elytratrails.option.toggle_trails_key": "Keybind: Toggle All Trails",
+  "text.elytratrails.option.toggle_trails_key.@Tooltip" : "Keybind to toggle all trails showing up",
   "key.elytratrails.twirl_l": "One Twirl Left",
+  "text.elytratrails.option.twirl_l_key" : "Keybind: One Lil Twirl Left",
+  "text.elytratrails.option.twirl_l_key.@Tooltip" : "Keybind to do one twirl to the left",
   "key.elytratrails.twirl_r": "One Twirl Right",
-  "key.elytratrails.continuous_twirl_r": "Continuous Twirl Left",
-  "key.elytratrails.continuous_twirl_l": "Continuous Twirl Right",
-  "key.elytratrails.twirl_random": "Lil Twirl Alternating"
+  "text.elytratrails.option.twirl_r_key": "Keybind: One Lil Twirl Right",
+  "text.elytratrails.option.twirl_r_key.@Tooltip": "Keybind to do one twirl to the right",
+  "key.elytratrails.continuous_twirl_r": "Continuous Twirl Right",
+  "text.elytratrails.option.twirl_l_continuous_key": "Keybind: Continuous Twirl Left",
+  "text.elytratrails.option.twirl_l_continuous_key.@Tooltip": "Keybind to do a continuous leftward twirl. Keep holding to keep twirling!",
+  "key.elytratrails.continuous_twirl_l": "Continuous Twirl Left",
+  "text.elytratrails.option.twirl_r_continuous_key": "Keybind: Continuous Twirl Right",
+  "text.elytratrails.option.twirl_r_continuous_key.@Tooltip": "Keybind to do a continuous rightward twirl. Keep holding to keep twirling!",
+  "key.elytratrails.twirl_random": "Lil Twirl Alternating",
+  "text.elytratrails.option.twirl_random_key": "One Lil Twirl Alternating Direction",
+  "text.elytratrails.option.twirl_random_key.@Tooltip" : "Keybind to do one twirl in alternating directions"
 }

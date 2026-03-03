@@ -38,15 +38,29 @@ public class TrailManager {
         ClientTickEvents.END_CLIENT_TICK.register(this::removeDeadPoints);
         WorldRenderEvents.AFTER_ENTITIES.register(cxt -> {
             float now = TimeUtil.currentMillis();
+            boolean recordEmitters = true;
             if((now - lastSample) < (1000f / getConfig().maxSamplePerSecond))
             {
-                return;
+                if(getConfig().alwaysSnapTrail)
+                {
+                    recordEmitters = false;
+                }
+                else
+                {
+                    return;
+                }
             }
-            lastSample = TimeUtil.currentMillis();
-            gatherPlayerTrails(Minecraft.getInstance());
+            else
+            {
+                lastSample = TimeUtil.currentMillis();
+            }
+            gatherPlayerTrails(Minecraft.getInstance(), recordEmitters);
         });
     }
-
+    public boolean isActiveTrail(Trail trail)
+    {
+        return (activeTrails.containsKey(trail.entityId()) && activeTrails.get(trail.entityId()).trails().contains(trail));
+    }
 
     private void removeDeadPoints(Minecraft ctx) {
         long currentTime = TimeUtil.currentMillis();
@@ -78,11 +92,12 @@ public class TrailManager {
         activeTrails.remove(entityId);
     }
 
-    private void gatherPlayerTrails(Minecraft ctx) {
+    private void gatherPlayerTrails(Minecraft ctx, boolean recordEmitter) {
         ModConfig modConfig = ElytraTrailsClient.getConfig();
         if (ctx.level == null) return;
 
         List<AbstractClientPlayer> players = ctx.level.players();
+        sampler.clearFrameCache();
         for (AbstractClientPlayer player : players) {
             int eid = player.getId();
             TrailPackConfigManager.ResolvedTrailSettings config = getConfigFromPlayerId(eid);
@@ -93,14 +108,23 @@ public class TrailManager {
 
                 if (emitters.isEmpty())
                 {
+                    if(getConfig().logTrails)
+                    {
+                        LOGGER.info("Empty Emitters from {}, resetting trails if exist",eid);
+                    }
                     activeTrails.remove(eid);
                     continue;
                 }
-
+                if(!recordEmitter)
+                {
+                    return;
+                }
                 EntityTrailGroup trailGroup = activeTrails.computeIfAbsent(eid, id -> {
                     List<Trail> emittedTrails = new ArrayList<>();
+                    int emitterId = 0;
                     for (Emitter emitter : emitters) {
-                        emittedTrails.add(Trail.fromPlayerConfig(player.getId(), emitter));
+                        emittedTrails.add(Trail.fromPlayerConfig(player.getId(), emitter,emitterId));
+                        emitterId++;
                     }
 
                     trails.addAll(emittedTrails);
@@ -114,17 +138,11 @@ public class TrailManager {
                 });
                 if (trailGroup.trails().size() != emitters.size()) {
                     activeTrails.remove(eid);
-                    //trails.removeAll(trailGroup.trails());
                     return;
                 }
                 for (int i = 0; i < trailGroup.trails().size(); i++)  {
 
                     Trail trail = trailGroup.trails().get(i);
-//                    if (i >= emitters.size())
-//                    {
-//                        activeTrails.remove(eid);
-//                        continue;
-//                    }
                     Vec3 emitter = emitters.get(i).position();
                     trail.points().add(new Trail.Point(emitter));
                 }
@@ -143,7 +161,7 @@ public class TrailManager {
             if (player.getPose() != Pose.FALL_FLYING) return false;
         }
 
-        return (isRolling(entity.getId()) && getConfig().alwaysShowTrailDuringTwirl) || !config.speedDependentTrail() || (entity.getDeltaMovement().lengthSqr() > config.trailMinSpeed() * config.trailMinSpeed());
+        return (isRolling(entity.getId()) && config.alwaysShowTrailDuringTwirl()) || !config.speedDependentTrail() || (entity.getDeltaMovement().lengthSqr() > config.trailMinSpeed() * config.trailMinSpeed());
     }
 
     public List<Trail> trails() {

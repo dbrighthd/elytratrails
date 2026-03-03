@@ -19,5 +19,10 @@
   "randomWidthVariation": 1.0,
   "fadeStart": true,
   "fadeStartDistance": 5.0,
-  "fadeEnd": false
+  "fadeEnd": false,
+  "prideTrailRight": "",
+  "increaseWidthOverTime": false,
+  "startingWidthMultiplier": 0.0,
+  "endingWidthMultiplier": 1.0,
+  "distanceTillTrailStart": 0.1
 }

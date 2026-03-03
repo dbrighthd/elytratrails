@@ -1,5 +1,6 @@
 package dbrighthd.elytratrails.network;
 
+import dbrighthd.elytratrails.config.ModConfig;
 import dbrighthd.elytratrails.config.pack.TrailPackConfigManager;
 import net.minecraft.client.Minecraft;
 
@@ -11,41 +12,78 @@ import static java.lang.Math.clamp;
 
 public final class ClientPlayerConfigStore
 {
-    public static final ConcurrentHashMap<Integer, PlayerConfig> CLIENT_PLAYER_CONFIGS = new ConcurrentHashMap<>();
+    public static final ConcurrentHashMap<Integer, CompiledPlayerConfig> CLIENT_PLAYER_CONFIGS = new ConcurrentHashMap<>();
 
     public record TrailRenderSettings(boolean glowing, boolean translucent, boolean wireframe){}
 
-    public static PlayerConfig CLIENT_CONFIG;
+    public static CompiledPlayerConfig CLIENT_CONFIG;
 
-    public static PlayerConfig CLIENT_OTHERS_CONFIG;
+    public static CompiledPlayerConfig CLIENT_OTHERS_CONFIG;
 
     public static void refreshLocalConfigs()
     {
         setLocalPlayerConfig();
         setClientOthersConfig();
     }
-    public static void setLocalPlayerConfig() {
-        var config = getConfig();
-        CLIENT_CONFIG = new PlayerConfig(
-                config.enableTrail,
-                config.enableRandomWidth,
-                config.speedDependentTrail,
-                config.trailMinSpeed,
-                config.trailMovesWithElytraAngle,
-                config.width,
-                config.trailLifetime,
-                config.startRampDistance,
-                config.endRampDistance,
-                TrailPackConfigManager.parseHexColor(config.color),
-                config.randomWidthVariation,
-                config.prideTrail,
-                config.fadeStart,
-                config.fadeStartDistance,
-                config.fadeEnd,
-                encodeTrailType(config.glowingTrails, config.translucentTrails, config.wireframeTrails)
-        );
+
+    public static PlayerConfig getLocalPlayerConfigInitial()
+    {
+        ModConfig config = getConfig();
+        return
+                new PlayerConfig(
+                        config.enableTrail,
+                        config.enableRandomWidth,
+                        config.speedDependentTrail,
+                        config.trailMinSpeed,
+                        config.trailMovesWithElytraAngle,
+                        config.width,
+                        config.trailLifetime,
+                        config.startRampDistance,
+                        config.endRampDistance,
+                        TrailPackConfigManager.parseHexColor(config.color),
+                        config.randomWidthVariation,
+                        config.prideTrail,
+                        config.fadeStart,
+                        config.fadeStartDistance,
+                        config.fadeEnd,
+                        encodeTrailType(config.glowingTrails, config.translucentTrails, config.wireframeTrails)
+                );
     }
 
+    public static void setLocalPlayerConfig() {
+        var config = getConfig();
+        PlayerConfig playerConfig =
+                getLocalPlayerConfigInitial();
+        PlayerConfigExtended playerConfigExtended =
+                new PlayerConfigExtended(
+                        config.alwaysShowTrailDuringTwirl,
+                        config.prideTrailRight,
+                        config.twirlTime,
+                        config.increaseWidthOverTime,
+                        config.startingWidthMultiplier,
+                        config.endingWidthMultiplier,
+                        config.distanceTillTrailStart,
+                        easeTypeToString(config.easeType));
+        CLIENT_CONFIG = new CompiledPlayerConfig(playerConfig,playerConfigExtended);
+    }
+
+    public static String easeTypeToString(ModConfig.EaseType easeType)
+    {
+        if(easeType == ModConfig.EaseType.Sine)
+        {
+            return "sin";
+        }
+        if(easeType == ModConfig.EaseType.Back)
+        {
+            return "back";
+        }
+
+        if(easeType == ModConfig.EaseType.None)
+        {
+            return "none";
+        }
+        return "sin";
+    }
 
     public static int encodeTrailType(boolean glow, boolean translucent, boolean wireframe)
     {
@@ -58,8 +96,17 @@ public final class ClientPlayerConfigStore
     }
     public static void setClientOthersConfig ()
     {
+
+        PlayerConfig playerConfig = getClientOthersConfigInitial();
+
+        PlayerConfigExtended playerConfigExtended = getClientOthersConfigExtended();
+
+        CLIENT_OTHERS_CONFIG = new CompiledPlayerConfig(playerConfig,playerConfigExtended);
+    }
+    public static PlayerConfig getClientOthersConfigInitial()
+    {
         var config = getConfig();
-        CLIENT_OTHERS_CONFIG = new PlayerConfig(
+        return new PlayerConfig(
                 config.enableTrailOthersDefault,
                 config.enableRandomWidthOthersDefault,
                 config.speedDependentTrailOthersDefault,
@@ -78,7 +125,21 @@ public final class ClientPlayerConfigStore
                 encodeTrailType(config.glowingTrailsOthersDefault, config.translucentTrailsOthersDefault, config.wireframeTrailsOthersDefault)
         );
     }
-    public static PlayerConfig getLocalPlayerConfig() {
+    public static PlayerConfigExtended getClientOthersConfigExtended()
+    {
+        var config = getConfig();
+        return new PlayerConfigExtended(
+                config.alwaysShowTrailDuringTwirlOthersDefault,
+                config.prideTrailRightOthersDefault,
+                config.twirlTimeOthersDefault,
+                config.increaseWidthOverTimeOthersDefault,
+                config.startingWidthMultiplierOthersDefault,
+                config.endingWidthMultiplierOthersDefault,
+                config.distanceTillTrailStartOthersDefault,
+                easeTypeToString(config.easeTypeOthersDefault));
+    }
+
+    public static CompiledPlayerConfig getLocalPlayerConfig() {
         if(CLIENT_CONFIG != null)
         {
             return CLIENT_CONFIG;
@@ -92,7 +153,7 @@ public final class ClientPlayerConfigStore
         var config = getConfig();
         if(config.showTrailToOtherPlayers)
         {
-            return getLocalPlayerConfig();
+            return getLocalPlayerConfig().playerConfigInitial;
         }
         else
         {
@@ -116,7 +177,7 @@ public final class ClientPlayerConfigStore
             );
         }
     }
-    public static PlayerConfig getLocalPlayerConfigOthers() {
+    public static CompiledPlayerConfig getLocalPlayerConfigOthers() {
         var config = getConfig();
 
         // If enabled, "others" use the same defaults as the local (elytra) config.
@@ -132,7 +193,7 @@ public final class ClientPlayerConfigStore
         return CLIENT_OTHERS_CONFIG;
     }
 
-    public static void putSafe(int entityId, PlayerConfig incoming) {
+    public static void putSafeInitial(int entityId, PlayerConfig incoming) {
         if (incoming == null) {
             CLIENT_PLAYER_CONFIGS.remove(entityId);
             return;
@@ -177,12 +238,33 @@ public final class ClientPlayerConfigStore
                 incoming.trailType()
         );
 
-        CLIENT_PLAYER_CONFIGS.put(entityId, safe);
-
-
+        putInitialConfig(entityId,safe);
     }
 
-    public static PlayerConfig getOrDefault(int entityId)
+    public static void putInitialConfig(int eid, PlayerConfig playerConfigInitial)
+    {
+        if (CLIENT_PLAYER_CONFIGS.containsKey(eid))
+        {
+            CLIENT_PLAYER_CONFIGS.get(eid).updateInitialConfig(playerConfigInitial);
+        }
+        else
+        {
+            CLIENT_PLAYER_CONFIGS.put(eid, new CompiledPlayerConfig(playerConfigInitial));
+        }
+    }
+    public static void putExtendedConfig(int eid, PlayerConfigExtended playerConfigExtended)
+    {
+        if (CLIENT_PLAYER_CONFIGS.containsKey(eid))
+        {
+            CLIENT_PLAYER_CONFIGS.get(eid).updateExtendedConfig(playerConfigExtended);
+        }
+        else
+        {
+            CLIENT_PLAYER_CONFIGS.put(eid, new CompiledPlayerConfig(playerConfigExtended));
+        }
+    }
+
+    public static CompiledPlayerConfig getOrDefault(int entityId)
     {
         if(Minecraft.getInstance().player != null && Minecraft.getInstance().player.getId() == entityId)
         {

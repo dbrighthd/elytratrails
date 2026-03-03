@@ -8,8 +8,7 @@ import net.fabricmc.fabric.api.client.networking.v1.ClientPlayConnectionEvents;
 import net.fabricmc.fabric.api.client.networking.v1.ClientPlayNetworking;
 
 import static dbrighthd.elytratrails.ElytraTrailsClient.getConfig;
-import static dbrighthd.elytratrails.network.ClientPlayerConfigStore.CLIENT_PLAYER_CONFIGS;
-import static dbrighthd.elytratrails.network.ClientPlayerConfigStore.getLocalPlayerConfigToSend;
+import static dbrighthd.elytratrails.network.ClientPlayerConfigStore.*;
 
 public class RegisterPacketsClient {
     @Environment(EnvType.CLIENT)
@@ -19,7 +18,12 @@ public class RegisterPacketsClient {
         ClientPlayNetworking.registerGlobalReceiver(PlayerConfigS2CPayload.ID, (payload, context) ->
         {
             TrailSystem.getTrailManager().removeTrail(payload.entityId());
-            ClientPlayerConfigStore.putSafe(payload.entityId(),payload.playerConfig());
+            ClientPlayerConfigStore.putSafeInitial(payload.entityId(),payload.playerConfig());
+        });
+        ClientPlayNetworking.registerGlobalReceiver(PlayerConfigExtendedS2CPayload.ID, (payload, context) ->
+        {
+            TrailSystem.getTrailManager().removeTrail(payload.entityId());
+            ClientPlayerConfigStore.putExtendedConfig(payload.entityId(),payload.playerConfigExtended());
         });
         ClientPlayNetworking.registerGlobalReceiver(RemoveFromStoreS2CPayload.ID, (payload, context) ->
         {
@@ -34,6 +38,7 @@ public class RegisterPacketsClient {
             if(getConfig().shareTrail || !getConfig().showTrailToOtherPlayers)
             {
                 ClientPlayNetworking.send(new PlayerConfigC2SPayload(getLocalPlayerConfigToSend()));
+                ClientPlayNetworking.send(new PlayerConfigExtendedC2SPayload(getLocalPlayerConfig().playerConfigExtended));
             }
             ClientPlayNetworking.send(new GetAllRequestC2SPayload());
         });

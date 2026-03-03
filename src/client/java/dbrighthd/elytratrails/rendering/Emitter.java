@@ -1,6 +1,5 @@
 package dbrighthd.elytratrails.rendering;
 
-import dbrighthd.elytratrails.config.pack.TrailPackConfigManager;
 import net.minecraft.world.phys.Vec3;
 import org.jetbrains.annotations.Nullable;
 
