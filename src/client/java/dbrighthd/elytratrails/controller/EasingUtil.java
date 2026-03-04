@@ -120,31 +120,6 @@ public class EasingUtil {
         return easeBothSin(t);
     }
 
-    public static EaseType easeTypeFromString(String inputEaseType)
-    {
-        if(inputEaseType.equalsIgnoreCase("none"))
-        {
-            return EaseType.None;
-        }
-        if(inputEaseType.equalsIgnoreCase("back"))
-        {
-            return EaseType.Back;
-        }
-        return EaseType.Sine;
-    }
-    public static String stringFromEaseType(EaseType easeType)
-    {
-        if(easeType == EaseType.None)
-        {
-            return "none";
-        }
-        if(easeType == EaseType.Back)
-        {
-            return "back";
-        }
-        return "sine";
-    }
-
     public enum EaseType {
         Sine,
         Back,

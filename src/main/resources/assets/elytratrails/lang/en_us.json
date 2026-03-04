@@ -104,6 +104,20 @@
   "text.elytratrails.option.fadeStart": "Trail Fade-in at Start",
   "text.elytratrails.option.fadeStart.@Tooltip": "Should the trail fade in at the start? (REQUIRES TRANSLUCENT TRAILS)",
 
+  "text.elytratrails.option.endDistanceFade": "Trail Fade-out at End",
+  "text.elytratrails.option.endDistanceFade.@Tooltip": "Should the trail fade out at the end based on how far it is from the end? (REQUIRES TRANSLUCENT TRAILS)",
+
+  "text.elytratrails.option.endDistanceFadeAmount": "Trail Fade-out Distance",
+  "text.elytratrails.option.endDistanceFadeAmount.@Tooltip": "At what distance near the end should the trail start to fade out?",
+
+  "text.elytratrails.option.endDistanceFadeOthersDefault": "Other's Trail Fade-out at End",
+  "text.elytratrails.option.endDistanceFadeOthersDefault.@Tooltip": "Default: Should the trail fade out at the end based on how far it is from the end? (REQUIRES TRANSLUCENT TRAILS)",
+
+  "text.elytratrails.option.endDistanceFadeAmountOthersDefault": "Other's Trail Fade-out Distance",
+  "text.elytratrails.option.endDistanceFadeAmountOthersDefault.@Tooltip": "Default: zAt what distance near the end should the trail start to fade out?",
+
+
+
   "text.elytratrails.option.fadeStartDistance": "Fade-in Distance",
   "text.elytratrails.option.fadeStartDistance.@Tooltip": "How long should it take for the trail to fade in? (REQUIRES TRANSLUCENT TRAILS)",
 

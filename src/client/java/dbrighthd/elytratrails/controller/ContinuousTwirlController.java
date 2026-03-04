@@ -113,7 +113,6 @@ public final class ContinuousTwirlController {
     private static void sendEndOnce() {
         if (!endSent) {
             endSent = true;
-            // +/-4 = CONTINUOUS_END
             EntityTwirlManager.sendStatePacket(currentDir * 4);
         }
     }
@@ -132,10 +131,8 @@ public final class ContinuousTwirlController {
                         baseAngleRad += currentDir * HALF_TURN;
                         phaseStartNanos += (long) (HALF_DURATION_S * 1_000_000_000.0);
 
-                        // identical behavior: decide whether to enter constant or ease out
                         phase = shouldContinueConstant() ? Phase.CONSTANT_360 : Phase.EASE_OUT_180;
 
-                        // NEW: if we are going straight to ease-out (short tap), tell others now
                         if (phase == Phase.EASE_OUT_180) {
                             sendEndOnce();
                         }

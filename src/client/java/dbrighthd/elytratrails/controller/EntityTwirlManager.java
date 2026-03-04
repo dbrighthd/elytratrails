@@ -99,6 +99,14 @@ public final class EntityTwirlManager {
     {
         PlayerConfig playerConfig = ClientPlayerConfigStore.getOrDefault(entityId);
         double DURATION_S = Math.max(playerConfig.twirlTime(),0.1);
+        if(playerConfig.easeType() == EasingUtil.EaseType.Back)
+        {
+            DURATION_S *= 4;
+        }
+        if(playerConfig.easeType() == EasingUtil.EaseType.None)
+        {
+            DURATION_S /= 1.5;
+        }
         double HALF_DURATION_S = DURATION_S * 0.5;
         double OMEGA_RAD_S = (Math.PI * Math.PI) / DURATION_S;
         double TURN360_DURATION_S = Math.TAU / OMEGA_RAD_S;

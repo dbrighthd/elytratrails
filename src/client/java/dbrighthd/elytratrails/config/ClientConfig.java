@@ -125,7 +125,7 @@ public class ClientConfig {
                 1.0,
                 5.0,
                 0.0,
-                EasingUtil.EaseType.Sine,
+                EasingUtil.EaseType.Back,
                 false,
                 1.0
         );

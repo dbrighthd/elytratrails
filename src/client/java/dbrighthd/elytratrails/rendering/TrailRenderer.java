@@ -244,7 +244,7 @@ public class TrailRenderer {
                 alphaStart *= computeStartFade(totalTrailLength- v1, trail.config());
                 alphaEnd *= computeStartFade(totalTrailLength- v2, trail.config());
             }
-            if(trail.config().fadeEnd() && trail.config().translucentTrails())
+            if(trail.config().endDistanceFade() && trail.config().translucentTrails())
             {
                 alphaStart *= computeEndFade(-(endOfTrail - v1), trail.config());
                 alphaEnd *= computeEndFade(-(endOfTrail - v2), trail.config());
