@@ -2,6 +2,7 @@ package dbrighthd.elytratrails.controller;
 
 import dbrighthd.elytratrails.config.ModConfig;
 import dbrighthd.elytratrails.network.ClientPlayerConfigStore;
+import dbrighthd.elytratrails.network.PlayerConfig;
 import dbrighthd.elytratrails.network.TwirlStateC2SPayload;
 import dbrighthd.elytratrails.util.TimeUtil;
 import it.unimi.dsi.fastutil.ints.Int2ObjectOpenHashMap;
@@ -92,35 +93,16 @@ public final class EntityTwirlManager {
         }
     }
 
-    private record TwirlInfo(double duration, double half_duration, double omega_rad_s, double turn360_duration, ModConfig.EaseType easeType){}
+    private record TwirlInfo(double duration, double half_duration, double omega_rad_s, double turn360_duration, EasingUtil.EaseType easeType){}
 
     private static TwirlInfo getEntityTwirlConfigs(int entityId)
     {
-
-        double DURATION_S = Math.max(ClientPlayerConfigStore.getOrDefault(entityId).playerConfigExtended.twirlTime(),0.1);
-        if(entityId == Minecraft.getInstance().player.getId())
-        {
-            DURATION_S = getConfig().twirlTime;
-        }
+        PlayerConfig playerConfig = ClientPlayerConfigStore.getOrDefault(entityId);
+        double DURATION_S = Math.max(playerConfig.twirlTime(),0.1);
         double HALF_DURATION_S = DURATION_S * 0.5;
         double OMEGA_RAD_S = (Math.PI * Math.PI) / DURATION_S;
         double TURN360_DURATION_S = Math.TAU / OMEGA_RAD_S;
-        String easeTypeString = ClientPlayerConfigStore.getOrDefault(entityId).playerConfigExtended.easeType();
-        ModConfig.EaseType easeType = ModConfig.EaseType.Sine;
-        if(easeTypeString.equals("back"))
-        {
-            easeType = ModConfig.EaseType.Back;
-            DURATION_S *= 4;
-            HALF_DURATION_S *= 4;
-        }
-        if(easeTypeString.equals("none"))
-        {
-            easeType = ModConfig.EaseType.None;
-        }
-        if(entityId == Minecraft.getInstance().player.getId())
-        {
-            easeType = getConfig().easeType;
-        }
+        EasingUtil.EaseType easeType = playerConfig.easeType();
         return new TwirlInfo(DURATION_S,HALF_DURATION_S,OMEGA_RAD_S,TURN360_DURATION_S,easeType);
     }
 

@@ -83,40 +83,71 @@ public class EasingUtil {
     {
         return t;
     }
-    public static double easeIn(double t, ModConfig.EaseType easeType)
+    public static double easeIn(double t, EaseType easeType)
     {
-        if(easeType == ModConfig.EaseType.Back)
+        if(easeType == EaseType.Back)
         {
             return easeInBack(t);
         }
-        if(easeType == ModConfig.EaseType.None)
+        if(easeType == EaseType.None)
         {
             return noEase(t);
         }
         return easeInSin(t);
     }
-    public static double easeOut(double t, ModConfig.EaseType easeType)
+    public static double easeOut(double t, EaseType easeType)
     {
-        if(easeType == ModConfig.EaseType.Back)
+        if(easeType == EaseType.Back)
         {
             return easeOutBack(t);
         }
-        if(easeType == ModConfig.EaseType.None)
+        if(easeType == EaseType.None)
         {
             return noEase(t);
         }
         return easeOutSin(t);
     }
-    public static double easeBoth(double t, ModConfig.EaseType easeType)
+    public static double easeBoth(double t, EaseType easeType)
     {
-        if(easeType == ModConfig.EaseType.Back)
+        if(easeType == EaseType.Back)
         {
             return easeBothBack(t);
         }
-        if(easeType == ModConfig.EaseType.None)
+        if(easeType == EaseType.None)
         {
             return noEase(t);
         }
         return easeBothSin(t);
+    }
+
+    public static EaseType easeTypeFromString(String inputEaseType)
+    {
+        if(inputEaseType.equalsIgnoreCase("none"))
+        {
+            return EaseType.None;
+        }
+        if(inputEaseType.equalsIgnoreCase("back"))
+        {
+            return EaseType.Back;
+        }
+        return EaseType.Sine;
+    }
+    public static String stringFromEaseType(EaseType easeType)
+    {
+        if(easeType == EaseType.None)
+        {
+            return "none";
+        }
+        if(easeType == EaseType.Back)
+        {
+            return "back";
+        }
+        return "sine";
+    }
+
+    public enum EaseType {
+        Sine,
+        Back,
+        None,
     }
 }

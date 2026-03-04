@@ -269,6 +269,10 @@
   "text.elytratrails.option.distanceTillTrailStart": "Distance Before Trail Starts",
   "text.elytratrails.option.distanceTillTrailStart.@Tooltip": "How big the gap between the wingtip and the trail start should be",
 
+  "text.elytratrails.option.distanceTillTrailStartOthersDefault": "Other's Distance Before Trail Starts",
+  "text.elytratrails.option.distanceTillTrailStartOthersDefault.@Tooltip": "Default: How big the gap between the wingtip and the trail start should be",
+
+
   "text.elytratrails.category.general": "General",
   "text.elytratrails.category.elytra": "Your Trails",
   "text.elytratrails.category.others": "Other's Trails",

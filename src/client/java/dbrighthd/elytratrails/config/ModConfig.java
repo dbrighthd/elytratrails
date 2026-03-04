@@ -7,117 +7,8 @@ import me.shedaniel.autoconfig.annotation.ConfigEntry;
 @Config(name = "elytratrails")
 public class ModConfig implements ConfigData {
 
-
-
-
-    //your trail stuff
-    @ConfigEntry.Category("elytra")
-    @ConfigEntry.Gui.PrefixText
-    @ConfigEntry.Gui.Tooltip
-    public boolean enableTrail = true;
-
-    @ConfigEntry.Category("elytra")
-    @ConfigEntry.Gui.Tooltip
-    public boolean translucentTrails = true;
-
-    @ConfigEntry.Category("elytra")
-    @ConfigEntry.Gui.Tooltip
-    public boolean glowingTrails = false;
-
-
-    @ConfigEntry.Category("elytra")
-    @ConfigEntry.Gui.Tooltip
-    public boolean enableRandomWidth = false;
-
-
-    @ConfigEntry.Category("elytra")
-    @ConfigEntry.Gui.Tooltip
-    public boolean speedDependentTrail = true;
-
-    @ConfigEntry.Category("elytra")
-    @ConfigEntry.Gui.Tooltip
-    public boolean fadeFirstPersonTrail = true;
-
-    @ConfigEntry.Category("elytra")
-    @ConfigEntry.Gui.Tooltip
-    public boolean trailMovesWithElytraAngle = true;
-
-    @ConfigEntry.Category("elytra")
-    @ConfigEntry.Gui.Tooltip
-    public double width = 0.05;
-
-    @ConfigEntry.Category("elytra")
-    @ConfigEntry.Gui.Tooltip
-    public double firstPersonFadeTime = 0.2;
-
-    @ConfigEntry.Category("elytra")
-    @ConfigEntry.Gui.Tooltip
-    public double trailLifetime = 2.5;
-
-    @ConfigEntry.Category("elytra")
-    @ConfigEntry.Gui.Tooltip
-    public int maxSamplePerSecond = 60;
-
-    @ConfigEntry.Category("elytra")
-    @ConfigEntry.Gui.Tooltip
-    public double trailMinSpeed = 0.75;
-
-    @ConfigEntry.Category("elytra")
-    @ConfigEntry.Gui.Tooltip
-    public double startRampDistance = 4.0;
-
-    @ConfigEntry.Category("elytra")
-    @ConfigEntry.Gui.Tooltip
-    public double endRampDistance = 10.0;
-
-    @ConfigEntry.Category("elytra")
-    @ConfigEntry.Gui.Tooltip
-    public String color = "#FFFFFFFF";
-
-    public int justColor = 0xFFFFFF;
-    public int justAlpha = 255;
-
-    @ConfigEntry.Category("elytra")
-    @ConfigEntry.Gui.Tooltip
-    public String prideTrail = "";
-
-    @ConfigEntry.Category("elytra")
-    @ConfigEntry.Gui.Tooltip
-    public double randomWidthVariation = 1;
-
-    @ConfigEntry.Category("elytra")
-    @ConfigEntry.Gui.Tooltip
-    public boolean fadeStart = false;
-
-    @ConfigEntry.Category("elytra")
-    @ConfigEntry.Gui.Tooltip
-    public double fadeStartDistance = 4.0;
-
-    @ConfigEntry.Category("elytra")
-    @ConfigEntry.Gui.Tooltip
-    public boolean fadeEnd = true;
-
-
-    @ConfigEntry.Category("elytra")
-    @ConfigEntry.Gui.Tooltip
-    public boolean wireframeTrails = false;
-
-
-    public boolean alwaysShowTrailDuringTwirl = false;
-
-    public String prideTrailRight = "";
-
-    public double twirlTime = 0.5;
-
-    public boolean increaseWidthOverTime = false;
-
-    public double startingWidthMultiplier = 1.0;
-
-    public double endingWidthMultiplier = 5.0;
-
-    public double distanceTillTrailStart = 0.0;
-
-
+    public ClientConfig clientPlayerConfig = ClientConfig.getDefaultClientConfig();
+    public ClientConfig otherPlayerConfig = ClientConfig.getDefaultClientConfig();
     public boolean exportPreset = false;
     public String exportPresetName = "";
     //general
@@ -125,40 +16,19 @@ public class ModConfig implements ConfigData {
     @ConfigEntry.Gui.PrefixText
     @ConfigEntry.Gui.Tooltip
     public boolean enableAllTrails = true;
+    public int maxSamplePerSecond = 60;
+    public boolean fadeFirstPersonTrail = true;
+    public double firstPersonFadeTime = 0.2;
 
-
-
-    @SuppressWarnings("unused")
-    @ConfigEntry.Category("general")
-    @ConfigEntry.Gui.Tooltip
-    @ConfigEntry.Gui.Excluded
     public boolean resourcePackOverride = true;
-
     public boolean fishysStupidCameraRoll = false;
-
     public boolean fishysStupidThirdPersonCameraRoll = false;
-
-    @ConfigEntry.Category("general")
-    @ConfigEntry.Gui.Tooltip
     public boolean emfSupport = true;
-
-
-    @ConfigEntry.Category("general")
-    @ConfigEntry.Gui.Tooltip
     public boolean enableTwirls = true;
 
-    public EaseType easeType = EaseType.Sine;
-
-    public enum EaseType {
-        Sine,
-        Back,
-        None,
-    }
 
     public boolean alwaysSnapTrail = false;
-
     public boolean logTrails = false;
-
     public ClearTrails clearTrailsOption = ClearTrails.NO;
     public enum ClearTrails {
         NO,
@@ -197,103 +67,6 @@ public class ModConfig implements ConfigData {
     @ConfigEntry.Gui.Tooltip
     public boolean useSameDefaultsforOthers = false;
 
-    @ConfigEntry.Category("others")
-    @ConfigEntry.Gui.Tooltip
-    public boolean enableTrailOthersDefault = true;
-
-    @ConfigEntry.Category("others")
-    @ConfigEntry.Gui.Tooltip
-    public boolean translucentTrailsOthersDefault = true;
-
-    @ConfigEntry.Category("others")
-    @ConfigEntry.Gui.Tooltip
-    public boolean glowingTrailsOthersDefault = false;
-
-
-    @ConfigEntry.Category("others")
-    @ConfigEntry.Gui.Tooltip
-    public boolean enableRandomWidthOthersDefault = false;
-
-    @ConfigEntry.Category("others")
-    @ConfigEntry.Gui.Tooltip
-    public boolean speedDependentTrailOthersDefault = true;
-
-    @ConfigEntry.Category("others")
-    @ConfigEntry.Gui.Tooltip
-    public boolean trailMovesWithElytraAngleOthersDefault = true;
-
-    @ConfigEntry.Category("others")
-    @ConfigEntry.Gui.Tooltip
-    public boolean cameraDistanceFadeOthersDefault = true;
-
-    @ConfigEntry.Category("others")
-    @ConfigEntry.Gui.Tooltip
-    public double widthOthersDefault = 0.05;
-
-    @ConfigEntry.Category("others")
-    @ConfigEntry.Gui.Tooltip
-    public double trailLifetimeOthersDefault = 2.5;
-
-    @ConfigEntry.Category("others")
-    @ConfigEntry.Gui.Tooltip
-    public double trailMinSpeedOthersDefault = 0.75;
-
-    @ConfigEntry.Category("others")
-    @ConfigEntry.Gui.Tooltip
-    public double startRampDistanceOthersDefault = 4.0;
-
-    @ConfigEntry.Category("others")
-    @ConfigEntry.Gui.Tooltip
-    public double endRampDistanceOthersDefault = 10.0;
-
-    @ConfigEntry.Category("others")
-    @ConfigEntry.Gui.Tooltip
-    public String colorOthersDefault = "#FFFFFF";
-
-    public int justAlphaOthersDefault = 255;
-
-    public int justColorOthersDefault = 0xFFFFFF;
-
-    @ConfigEntry.Category("others")
-    @ConfigEntry.Gui.Tooltip
-    public String prideTrailOthersDefault = "";
-
-    @ConfigEntry.Category("others")
-    @ConfigEntry.Gui.Tooltip
-    public double randomWidthVariationOthersDefault = 1;
-
-    @ConfigEntry.Category("others")
-    @ConfigEntry.Gui.Tooltip
-    public boolean fadeStartOthersDefault = true;
-
-    @ConfigEntry.Category("others")
-    @ConfigEntry.Gui.Tooltip
-    public double fadeStartDistanceOthersDefault = 4.0;
-
-    @ConfigEntry.Category("others")
-    @ConfigEntry.Gui.Tooltip
-    public boolean fadeEndOthersDefault = true;
-
-
-    @ConfigEntry.Category("others")
-    @ConfigEntry.Gui.Tooltip
-    public boolean wireframeTrailsOthersDefault = false;
-
-    public boolean alwaysShowTrailDuringTwirlOthersDefault = false;
-
-    public String prideTrailRightOthersDefault = "";
-
-    public double twirlTimeOthersDefault = 0.5;
-
-    public boolean increaseWidthOverTimeOthersDefault = false;
-
-    public double startingWidthMultiplierOthersDefault = 1.0;
-
-    public double endingWidthMultiplierOthersDefault = 5.0;
-
-    public double distanceTillTrailStartOthersDefault = 0.0;
-
-    public EaseType easeTypeOthersDefault = EaseType.Sine;
     //particles
     @ConfigEntry.Category("particles")
     @ConfigEntry.Gui.PrefixText

@@ -244,6 +244,11 @@ public class TrailRenderer {
                 alphaStart *= computeStartFade(totalTrailLength- v1, trail.config());
                 alphaEnd *= computeStartFade(totalTrailLength- v2, trail.config());
             }
+            if(trail.config().fadeEnd() && trail.config().translucentTrails())
+            {
+                alphaStart *= computeEndFade(-(endOfTrail - v1), trail.config());
+                alphaEnd *= computeEndFade(-(endOfTrail - v2), trail.config());
+            }
             float halfWidthStart = (float) (trail.config().maxWidth() / 2f) * scaleStart;
             float halfWidthEnd = (float) (trail.config().maxWidth() / 2f) * scaleEnd;
 
@@ -319,6 +324,14 @@ public class TrailRenderer {
             else up = (float) Math.sin((distFromStart / startRamp) * (Math.PI / 2.0));
         }
         return (float) Math.pow(up, 0.9f);
+    }
+    private float computeEndFade(float distToEnd, TrailPackConfigManager.ResolvedTrailSettings cfg) {
+        float endRamp = (float) cfg.endDistanceFadeAmount();
+        float down;
+        if (distToEnd <= 0f) down = 0f;
+        else if (distToEnd >= endRamp) down = 1f;
+        else down = (float) Math.sin((distToEnd / endRamp) * (Math.PI / 2.0));
+        return (float) Math.pow(down, 0.9f);
     }
 
     @SuppressWarnings("unused")

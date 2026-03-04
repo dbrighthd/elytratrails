@@ -42,16 +42,16 @@ public final class ContinuousTwirlController {
 
     public static void setDurations()
     {
-        DURATION_S = Math.max(getConfig().twirlTime,0.1);
+        DURATION_S = Math.max(getConfig().clientPlayerConfig.twirlTime,0.1);
         HALF_DURATION_S = DURATION_S * 0.5;
         OMEGA_RAD_S = (Math.PI * Math.PI) / DURATION_S;
         TURN360_DURATION_S = Math.TAU / OMEGA_RAD_S;
-        if(getConfig().easeType == ModConfig.EaseType.Back)
+        if(getConfig().clientPlayerConfig.easeType == EasingUtil.EaseType.Back)
         {
             DURATION_S *= 4;
             HALF_DURATION_S *= 4;
         }
-        if(getConfig().easeType == ModConfig.EaseType.None)
+        if(getConfig().clientPlayerConfig.easeType == EasingUtil.EaseType.None)
         {
             DURATION_S /= 1.5;
             HALF_DURATION_S /= 1.5;
@@ -97,7 +97,7 @@ public final class ContinuousTwirlController {
 
     private static double rollFirst180(double elapsedS) {
         double u = Mth.clamp(elapsedS / HALF_DURATION_S, 0.0, 1.0);
-        return HALF_TURN * easeIn(u, getConfig().easeType);
+        return HALF_TURN * easeIn(u, getConfig().clientPlayerConfig.easeType);
     }
 
     private static double rollConstant360(double elapsedS) {
@@ -107,7 +107,7 @@ public final class ContinuousTwirlController {
 
     private static double rollLast180(double elapsedS) {
         double u = Mth.clamp(elapsedS / HALF_DURATION_S, 0.0, 1.0);
-        return HALF_TURN * easeOut(u, getConfig().easeType);
+        return HALF_TURN * easeOut(u, getConfig().clientPlayerConfig.easeType);
     }
 
     private static void sendEndOnce() {

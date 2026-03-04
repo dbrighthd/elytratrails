@@ -6,6 +6,7 @@ import net.fabricmc.fabric.api.networking.v1.PayloadTypeRegistry;
 import net.fabricmc.fabric.api.networking.v1.PlayerLookup;
 import net.fabricmc.fabric.api.networking.v1.ServerPlayNetworking;
 import net.fabricmc.loader.api.FabricLoader;
+import net.minecraft.nbt.CompoundTag;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.Entity;
@@ -23,8 +24,6 @@ public class RegisterPackets {
         PayloadTypeRegistry.playC2S().register(GetAllRequestC2SPayload.ID,GetAllRequestC2SPayload.CODEC);
         PayloadTypeRegistry.playS2C().register(RemoveFromStoreS2CPayload.ID,RemoveFromStoreS2CPayload.CODEC);
         PayloadTypeRegistry.playC2S().register(RemoveFromStoreC2SPayload.ID,RemoveFromStoreC2SPayload.CODEC);
-        PayloadTypeRegistry.playS2C().register(PlayerConfigExtendedS2CPayload.ID,PlayerConfigExtendedS2CPayload.CODEC);
-        PayloadTypeRegistry.playC2S().register(PlayerConfigExtendedC2SPayload.ID,PlayerConfigExtendedC2SPayload.CODEC);
     }
     public static void initServer() {
         ServerPlayNetworking.registerGlobalReceiver(TwirlStateC2SPayload.ID, (payload, context) -> {
@@ -36,34 +35,20 @@ public class RegisterPackets {
         });
         ServerPlayNetworking.registerGlobalReceiver(PlayerConfigC2SPayload.ID, (payload, context) -> {
             Entity entity = context.player();
-            ServerPlayerConfigStore.SERVER_PLAYER_CONFIGS.put(entity.getId(),payload.playerConfig());
-            PlayerConfigS2CPayload serverPayload = new PlayerConfigS2CPayload(entity.getId(), payload.playerConfig());
-            for (ServerPlayer player : context.server().getPlayerList().getPlayers()) {
-                ServerPlayNetworking.send(player, serverPayload);
-            }
-        });
-        ServerPlayNetworking.registerGlobalReceiver(PlayerConfigExtendedC2SPayload.ID, (payload, context) -> {
-            Entity entity = context.player();
-            ServerPlayerConfigExtendedStore.SERVER_EXTENDED_PLAYER_CONFIGS.put(entity.getId(),payload.playerConfigExtended());
-            PlayerConfigExtendedS2CPayload serverPayload = new PlayerConfigExtendedS2CPayload(entity.getId(), payload.playerConfigExtended());
+            ServerPlayerConfigStore.SERVER_PLAYER_CONFIGS.put(entity.getId(),payload.configTag());
+            PlayerConfigS2CPayload serverPayload = new PlayerConfigS2CPayload(entity.getId(), payload.configTag());
             for (ServerPlayer player : context.server().getPlayerList().getPlayers()) {
                 ServerPlayNetworking.send(player, serverPayload);
             }
         });
         ServerPlayNetworking.registerGlobalReceiver(GetAllRequestC2SPayload.ID, (payload, context) -> {
-            for(Map.Entry<Integer, PlayerConfig> configPair : ServerPlayerConfigStore.SERVER_PLAYER_CONFIGS.entrySet())
+            for(Map.Entry<Integer, CompoundTag> configPair : ServerPlayerConfigStore.SERVER_PLAYER_CONFIGS.entrySet())
             {
                 PlayerConfigS2CPayload serverPayload = new PlayerConfigS2CPayload(configPair.getKey(), configPair.getValue());
                 ServerPlayNetworking.send(context.player(), serverPayload);
             }
-            for(Map.Entry<Integer, PlayerConfigExtended> configPair : ServerPlayerConfigExtendedStore.SERVER_EXTENDED_PLAYER_CONFIGS.entrySet())
-            {
-                PlayerConfigExtendedS2CPayload serverPayload = new PlayerConfigExtendedS2CPayload(configPair.getKey(), configPair.getValue());
-                ServerPlayNetworking.send(context.player(), serverPayload);
-            }
         });
         ServerPlayNetworking.registerGlobalReceiver(RemoveFromStoreC2SPayload.ID, (payload, context) -> {
-            ServerPlayerConfigExtendedStore.SERVER_EXTENDED_PLAYER_CONFIGS.remove(context.player().getId());
             ServerPlayerConfigStore.SERVER_PLAYER_CONFIGS.remove(context.player().getId());
             for (ServerPlayer player : context.server().getPlayerList().getPlayers())
             {

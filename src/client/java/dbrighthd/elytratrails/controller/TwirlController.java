@@ -63,14 +63,14 @@ public final class TwirlController {
         }
 
         t = Mth.clamp(t, 0.0, 1.0);
-        double eased = easeBoth(t, getConfig().easeType);
+        double eased = easeBoth(t, getConfig().clientPlayerConfig.easeType);
         return (float) (currentDir * eased * Math.TAU);
     }
 
     public static void setDurations()
     {
-        DURATION_S = Math.max(getConfig().twirlTime,0.1);
-        if(getConfig().easeType == ModConfig.EaseType.Back)
+        DURATION_S = Math.max(getConfig().clientPlayerConfig.twirlTime,0.1);
+        if(getConfig().clientPlayerConfig.easeType == EasingUtil.EaseType.Back)
         {
             DURATION_S *= 4;
         }

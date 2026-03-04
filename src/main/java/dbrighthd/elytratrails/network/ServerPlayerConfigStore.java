@@ -3,13 +3,14 @@ package dbrighthd.elytratrails.network;
 import net.fabricmc.fabric.api.networking.v1.PlayerLookup;
 import net.fabricmc.fabric.api.networking.v1.ServerPlayConnectionEvents;
 import net.fabricmc.fabric.api.networking.v1.ServerPlayNetworking;
+import net.minecraft.nbt.CompoundTag;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 
 import java.util.concurrent.ConcurrentHashMap;
 
 public class ServerPlayerConfigStore {
-    public static final ConcurrentHashMap<Integer, PlayerConfig> SERVER_PLAYER_CONFIGS = new ConcurrentHashMap<>();
+    public static final ConcurrentHashMap<Integer, CompoundTag> SERVER_PLAYER_CONFIGS = new ConcurrentHashMap<>();
 
     public static void registerDisconnectCleanup() {
         ServerPlayConnectionEvents.DISCONNECT.register((handler, server) -> {

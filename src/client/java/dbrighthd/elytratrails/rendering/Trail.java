@@ -2,7 +2,6 @@ package dbrighthd.elytratrails.rendering;
 
 import dbrighthd.elytratrails.config.pack.TrailPackConfigManager;
 import dbrighthd.elytratrails.network.ClientPlayerConfigStore;
-import dbrighthd.elytratrails.network.CompiledPlayerConfig;
 import dbrighthd.elytratrails.network.PlayerConfig;
 import dbrighthd.elytratrails.util.TimeUtil;
 import net.minecraft.resources.Identifier;
@@ -15,7 +14,7 @@ import java.util.List;
 public record Trail(Identifier texture, List<Point> points, TrailPackConfigManager.ResolvedTrailSettings config, boolean flipUv, int entityId, int emitterIndex) {
 
     public static Trail fromPlayerConfig(int playerId, Emitter emitter, int index) {
-        CompiledPlayerConfig config = ClientPlayerConfigStore.getOrDefault(playerId);
+        PlayerConfig config = ClientPlayerConfigStore.getOrDefault(playerId);
         TrailPackConfigManager.ResolvedTrailSettings resolvedTrailSettings =  TrailPackConfigManager.resolve(emitter.modelName(), emitter.boneName(), config);
 
         Identifier texture = TrailTextureRegistry.resolveTextureOrNull(resolvedTrailSettings.prideTrail());

@@ -4,9 +4,9 @@ import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
+import dbrighthd.elytratrails.config.ClientConfig;
 import dbrighthd.elytratrails.config.ModConfig;
 import dbrighthd.elytratrails.network.ClientPlayerConfigStore;
-import dbrighthd.elytratrails.network.CompiledPlayerConfig;
 import dbrighthd.elytratrails.network.PlayerConfig;
 import net.fabricmc.loader.api.FabricLoader;
 import net.minecraft.resources.Identifier;
@@ -147,16 +147,16 @@ public final class TrailPackConfigManager {
         TrailOverrides overrides = CONFIG_PRESETS.get(presetName);
         if(self)
         {
-            applyPresetToSelf(overrides, modConfig);
+            applyPresetToConfig(overrides, modConfig.clientPlayerConfig);
         }
         else
         {
-            applyPresetToOthers(overrides,modConfig);
+            applyPresetToConfig(overrides,modConfig.otherPlayerConfig);
         }
 
     }
 
-    public static void applyPresetToSelf(TrailOverrides preset, ModConfig config)
+    public static void applyPresetToConfig(TrailOverrides preset, ClientConfig config)
     {
         applyIfPresent(preset.glowingTrails, v -> config.glowingTrails = v);
         applyIfPresent(preset.translucentTrails, v -> config.translucentTrails = v);
@@ -164,13 +164,13 @@ public final class TrailPackConfigManager {
         applyIfPresent(preset.enableTrail, v -> config.enableTrail = v);
         applyIfPresent(preset.enableRandomWidth, v -> config.enableRandomWidth = v);
         applyIfPresent(preset.speedDependentTrail, v -> config.speedDependentTrail = v);
-        applyIfPresent(preset.maxWidth, v -> config.width = v);
-        applyIfPresent(preset.trailLifetime, v -> config.trailLifetime = v);
+        applyIfPresent(preset.maxWidth, v -> config.maxWidth = v);
+        applyIfPresent(preset.trailLifetime, v -> config.trailLifeTime = v);
         applyIfPresent(preset.trailMinSpeed, v -> config.trailMinSpeed = v);
         applyIfPresent(preset.startRampDistance, v -> config.startRampDistance = v);
         applyIfPresent(preset.endRampDistance, v -> config.endRampDistance = v);
         applyIfPresent(preset.randomWidthVariation, v -> config.randomWidthVariation = v);
-        applyIfPresent(preset.color, v -> config.color = toHexColorString(v));
+        applyIfPresent(preset.color, v -> config.color = v);
         applyIfPresent(preset.prideTrail, v -> config.prideTrail = v);
         applyIfPresent(preset.fadeStart, v -> config.fadeStart = v);
         applyIfPresent(preset.fadeStartDistance, v -> config.fadeStartDistance = v);
@@ -181,33 +181,6 @@ public final class TrailPackConfigManager {
         applyIfPresent(preset.endingWidthMultiplier, v -> config.endingWidthMultiplier = v);
         applyIfPresent(preset.distanceTillTrailStart, v -> config.distanceTillTrailStart = v);
 
-    }
-
-    public static void applyPresetToOthers(TrailOverrides preset, ModConfig config)
-    {
-
-        applyIfPresent(preset.glowingTrails, v -> config.glowingTrailsOthersDefault = v);
-        applyIfPresent(preset.translucentTrails, v -> config.translucentTrailsOthersDefault = v);
-        applyIfPresent(preset.wireframeTrails, v -> config.wireframeTrailsOthersDefault = v);
-        applyIfPresent(preset.enableTrail, v -> config.enableTrailOthersDefault = v);
-        applyIfPresent(preset.enableRandomWidth, v -> config.enableRandomWidthOthersDefault = v);
-        applyIfPresent(preset.speedDependentTrail, v -> config.speedDependentTrailOthersDefault = v);
-        applyIfPresent(preset.maxWidth, v -> config.widthOthersDefault = v);
-        applyIfPresent(preset.trailLifetime, v -> config.trailLifetimeOthersDefault = v);
-        applyIfPresent(preset.trailMinSpeed, v -> config.trailMinSpeedOthersDefault = v);
-        applyIfPresent(preset.startRampDistance, v -> config.startRampDistanceOthersDefault = v);
-        applyIfPresent(preset.endRampDistance, v -> config.endRampDistanceOthersDefault = v);
-        applyIfPresent(preset.randomWidthVariation, v -> config.randomWidthVariationOthersDefault = v);
-        applyIfPresent(preset.color, v -> config.colorOthersDefault = toHexColorString(v));
-        applyIfPresent(preset.prideTrail, v -> config.prideTrailOthersDefault = v);
-        applyIfPresent(preset.fadeStart, v -> config.fadeStartOthersDefault = v);
-        applyIfPresent(preset.fadeStartDistance, v -> config.fadeStartDistanceOthersDefault = v);
-        applyIfPresent(preset.fadeEnd, v -> config.fadeEndOthersDefault = v);
-        applyIfPresent(preset.prideTrailRight, v -> config.prideTrailRightOthersDefault = v);
-        applyIfPresent(preset.increaseWidthOverTime, v -> config.increaseWidthOverTimeOthersDefault = v);
-        applyIfPresent(preset.startingWidthMultiplier, v -> config.startingWidthMultiplierOthersDefault = v);
-        applyIfPresent(preset.endingWidthMultiplier, v -> config.endingWidthMultiplierOthersDefault = v);
-        applyIfPresent(preset.distanceTillTrailStart, v -> config.distanceTillTrailStartOthersDefault = v);
     }
 
     private static <T> void applyIfPresent(T value, java.util.function.Consumer<T> setter) {
@@ -267,14 +240,14 @@ public final class TrailPackConfigManager {
         }
     }
 
-    public static boolean exportTrailPresetToDisk(@Nullable String presetName, @Nullable ModConfig config) {
-        if (config == null || presetName == null) return false;
+    public static void exportTrailPresetToDisk(@Nullable String presetName, @Nullable ModConfig config) {
+        if (config == null || presetName == null) return;
 
         String trimmed = presetName.trim();
-        if (trimmed.isEmpty()) return false;
+        if (trimmed.isEmpty()) return;
 
         String safeFileName = sanitizePresetFileName(trimmed);
-        if (safeFileName.isEmpty()) return false;
+        if (safeFileName.isEmpty()) return;
 
         Path presetDir = FabricLoader.getInstance()
                 .getGameDir()
@@ -299,43 +272,40 @@ public final class TrailPackConfigManager {
                 new GsonBuilder().setPrettyPrinting().create().toJson(root, writer);
             }
 
-            return true;
         } catch (IOException ignored) {
-            return false;
         }
     }
 
     private static @NotNull JsonObject getJsonObject(@NotNull ModConfig config) {
         JsonObject root = new JsonObject();
 
-        root.addProperty("enableTrail", config.enableTrail);
-        root.addProperty("glowingTrails", config.glowingTrails);
-        root.addProperty("translucentTrails", config.translucentTrails);
-        root.addProperty("wireframeTrails", config.wireframeTrails);
-        root.addProperty("enableRandomWidth", config.enableRandomWidth);
-        root.addProperty("speedDependentTrail", config.speedDependentTrail);
+        root.addProperty("enableTrail", config.clientPlayerConfig.enableTrail);
+        root.addProperty("glowingTrails", config.clientPlayerConfig.glowingTrails);
+        root.addProperty("translucentTrails", config.clientPlayerConfig.translucentTrails);
+        root.addProperty("wireframeTrails", config.clientPlayerConfig.wireframeTrails);
+        root.addProperty("enableRandomWidth", config.clientPlayerConfig.enableRandomWidth);
+        root.addProperty("speedDependentTrail", config.clientPlayerConfig.speedDependentTrail);
         root.addProperty("fadeFirstPersonTrail", config.fadeFirstPersonTrail);
-        root.addProperty("trailMovesWithElytraAngle", config.trailMovesWithElytraAngle);
-        root.addProperty("width", config.width);
+        root.addProperty("trailMovesWithElytraAngle", config.clientPlayerConfig.trailMovesWithElytraAngle);
+        root.addProperty("width", config.clientPlayerConfig.maxWidth);
         root.addProperty("firstPersonFadeTime", config.firstPersonFadeTime);
-        root.addProperty("trailLifetime", config.trailLifetime);
-        root.addProperty("maxSamplePerSecond", config.maxSamplePerSecond);
-        root.addProperty("trailMinSpeed", config.trailMinSpeed);
-        root.addProperty("startRampDistance", config.startRampDistance);
-        root.addProperty("endRampDistance", config.endRampDistance);
+        root.addProperty("trailLifetime", config.clientPlayerConfig.trailLifeTime);
+        root.addProperty("trailMinSpeed", config.clientPlayerConfig.trailMinSpeed);
+        root.addProperty("startRampDistance", config.clientPlayerConfig.startRampDistance);
+        root.addProperty("endRampDistance", config.clientPlayerConfig.endRampDistance);
 
-        root.addProperty("color", config.color);
+        root.addProperty("color", config.clientPlayerConfig.color);
 
-        root.addProperty("prideTrail", config.prideTrail == null ? "" : config.prideTrail);
-        root.addProperty("randomWidthVariation", config.randomWidthVariation);
-        root.addProperty("fadeStart", config.fadeStart);
-        root.addProperty("fadeStartDistance", config.fadeStartDistance);
-        root.addProperty("fadeEnd", config.fadeEnd);
-        root.addProperty("prideTrailRight", config.prideTrailRight == null ? "" : config.prideTrailRight);
-        root.addProperty("increaseWidthOverTime", config.increaseWidthOverTime);
-        root.addProperty("startingWidthMultiplier", config.startingWidthMultiplier);
-        root.addProperty("endingWidthMultiplier", config.endingWidthMultiplier);
-        root.addProperty("distanceTillTrailStart", config.distanceTillTrailStart);
+        root.addProperty("prideTrail", config.clientPlayerConfig.prideTrail == null ? "" : config.clientPlayerConfig.prideTrail);
+        root.addProperty("randomWidthVariation", config.clientPlayerConfig.randomWidthVariation);
+        root.addProperty("fadeStart", config.clientPlayerConfig.fadeStart);
+        root.addProperty("fadeStartDistance", config.clientPlayerConfig.fadeStartDistance);
+        root.addProperty("fadeEnd", config.clientPlayerConfig.fadeEnd);
+        root.addProperty("prideTrailRight", config.clientPlayerConfig.prideTrailRight == null ? "" : config.clientPlayerConfig.prideTrailRight);
+        root.addProperty("increaseWidthOverTime", config.clientPlayerConfig.increaseWidthOverTime);
+        root.addProperty("startingWidthMultiplier", config.clientPlayerConfig.startingWidthMultiplier);
+        root.addProperty("endingWidthMultiplier", config.clientPlayerConfig.endingWidthMultiplier);
+        root.addProperty("distanceTillTrailStart", config.clientPlayerConfig.distanceTillTrailStart);
         return root;
     }
 
@@ -393,7 +363,7 @@ public final class TrailPackConfigManager {
         return configDefaultSeconds;
     }
 
-    public static ResolvedTrailSettings resolve(@Nullable String modelName, @Nullable String boneName, @Nullable CompiledPlayerConfig baseConfig) {
+    public static ResolvedTrailSettings resolve(@Nullable String modelName, @Nullable String boneName, @Nullable PlayerConfig baseConfig) {
 
         if (baseConfig == null) return ResolvedTrailSettings.defaults();
         if (boneName != null)
@@ -634,36 +604,40 @@ public final class TrailPackConfigManager {
         @Nullable Double startingWidthMultiplier;
         @Nullable Double endingWidthMultiplier;
         @Nullable Double distanceTillTrailStart;
+        @Nullable Boolean endDistanceFade;
+        @Nullable Double endDistanceFadeAmount;
 
-        public static TrailOverrides fromBase(CompiledPlayerConfig baseConfig) {
+
+        public static TrailOverrides fromBase(PlayerConfig baseConfig) {
             TrailOverrides overrides = new TrailOverrides();
-            overrides.enableTrail = baseConfig.playerConfigInitial.enableTrail();
-            overrides.enableRandomWidth = baseConfig.playerConfigInitial.enableRandomWidth();
-            overrides.speedDependentTrail = baseConfig.playerConfigInitial.speedDependentTrail();
-            overrides.maxWidth = baseConfig.playerConfigInitial.maxWidth();
-            overrides.trailLifetime = baseConfig.playerConfigInitial.trailLifetime();
-            overrides.trailMinSpeed = baseConfig.playerConfigInitial.trailMinSpeed();
-            overrides.startRampDistance = baseConfig.playerConfigInitial.startRampDistance();
-            overrides.endRampDistance = baseConfig.playerConfigInitial.endRampDistance();
-            overrides.randomWidthVariation = baseConfig.playerConfigInitial.randomWidthVariation();
+            overrides.enableTrail = baseConfig.enableTrail();
+            overrides.enableRandomWidth = baseConfig.enableRandomWidth();
+            overrides.speedDependentTrail = baseConfig.speedDependentTrail();
+            overrides.maxWidth = baseConfig.maxWidth();
+            overrides.trailLifetime = baseConfig.trailLifetime();
+            overrides.trailMinSpeed = baseConfig.trailMinSpeed();
+            overrides.startRampDistance = baseConfig.startRampDistance();
+            overrides.endRampDistance = baseConfig.endRampDistance();
+            overrides.randomWidthVariation = baseConfig.randomWidthVariation();
 
-            overrides.color = baseConfig.playerConfigInitial.color();
-            overrides.prideTrail = baseConfig.playerConfigInitial.prideTrail();
-            ClientPlayerConfigStore.TrailRenderSettings baseTrailRenderSettings = ClientPlayerConfigStore.decodeTrailType(baseConfig.playerConfigInitial.trailType());
-            overrides.glowingTrails = baseTrailRenderSettings.glowing();
-            overrides.translucentTrails = baseTrailRenderSettings.translucent();
-            overrides.wireframeTrails = baseTrailRenderSettings.wireframe();
-            overrides.fadeStart = baseConfig.playerConfigInitial.fadeStart();
-            overrides.fadeStartDistance = baseConfig.playerConfigInitial.fadeStartDistance();
-            overrides.fadeEnd = baseConfig.playerConfigInitial.fadeEnd();
+            overrides.color = baseConfig.color();
+            overrides.prideTrail = baseConfig.prideTrail();
+            overrides.glowingTrails = baseConfig.glowingTrails();
+            overrides.translucentTrails = baseConfig.translucentTrails();
+            overrides.wireframeTrails = baseConfig.wireframeTrails();
+            overrides.fadeStart = baseConfig.fadeStart();
+            overrides.fadeStartDistance = baseConfig.fadeStartDistance();
+            overrides.fadeEnd = baseConfig.fadeEnd();
 
-            overrides.alwaysShowTrailDuringTwirl = baseConfig.playerConfigExtended.alwaysShowTrailDuringTwirl();
-            overrides.prideTrailRight = baseConfig.playerConfigExtended.prideTrailRight();
-            overrides.twirlTime = baseConfig.playerConfigExtended.twirlTime();
-            overrides.increaseWidthOverTime = baseConfig.playerConfigExtended.increaseWidthOverTime();
-            overrides.startingWidthMultiplier = baseConfig.playerConfigExtended.startingWidthMultiplier();
-            overrides.endingWidthMultiplier = baseConfig.playerConfigExtended.endingWidthMultiplier();
-            overrides.distanceTillTrailStart = baseConfig.playerConfigExtended.distanceTillTrailStart();
+            overrides.alwaysShowTrailDuringTwirl = baseConfig.alwaysShowTrailDuringTwirl();
+            overrides.prideTrailRight = baseConfig.prideTrailRight();
+            overrides.twirlTime = baseConfig.twirlTime();
+            overrides.increaseWidthOverTime = baseConfig.increaseWidthOverTime();
+            overrides.startingWidthMultiplier = baseConfig.startingWidthMultiplier();
+            overrides.endingWidthMultiplier = baseConfig.endingWidthMultiplier();
+            overrides.distanceTillTrailStart = baseConfig.distanceTillTrailStart();
+            overrides.endDistanceFade = baseConfig.endDistanceFade();
+            overrides.endDistanceFadeAmount = baseConfig.endDistanceFadeAmount();
 
             return overrides;
         }
@@ -696,32 +670,10 @@ public final class TrailPackConfigManager {
             o.increaseWidthOverTime = s.increaseWidthOverTime();
             o.endingWidthMultiplier = s.endingWidthMultiplier();
             o.distanceTillTrailStart = s.distanceTillTrailStart();
+            o.endDistanceFade = s.endDistanceFade();
+            o.endDistanceFadeAmount = s.endDistanceFadeAmount();
             return o;
         }
-
-        @SuppressWarnings("unused")
-        public static TrailOverrides fromOthersDefaults(ModConfig cfg) {
-            TrailOverrides overrides = new TrailOverrides();
-            overrides.enableTrail = cfg.enableTrailOthersDefault;
-            overrides.enableRandomWidth = cfg.enableRandomWidthOthersDefault;
-            overrides.speedDependentTrail = cfg.speedDependentTrailOthersDefault;
-            overrides.cameraDistanceFade = cfg.cameraDistanceFadeOthersDefault;
-
-            overrides.maxWidth = cfg.widthOthersDefault;
-            overrides.trailLifetime = cfg.trailLifetimeOthersDefault;
-            overrides.trailMinSpeed = cfg.trailMinSpeedOthersDefault;
-            overrides.startRampDistance = cfg.startRampDistanceOthersDefault;
-            overrides.endRampDistance = cfg.endRampDistanceOthersDefault;
-            overrides.randomWidthVariation = cfg.randomWidthVariationOthersDefault;
-
-            overrides.color = parseHexColor(cfg.colorOthersDefault);
-            overrides.prideTrail = cfg.prideTrailOthersDefault;
-            overrides.fadeStart = cfg.fadeStartOthersDefault;
-            overrides.fadeStartDistance = cfg.fadeStartDistanceOthersDefault;
-            overrides.fadeEnd = cfg.fadeEndOthersDefault;
-            return overrides;
-        }
-
         public static @Nullable TrailOverrides fromJson(@Nullable JsonObject json) {
             if (json == null) return null;
 
@@ -756,6 +708,8 @@ public final class TrailPackConfigManager {
             overrides.startingWidthMultiplier = readDouble(json, "startingWidthMultiplier");
             overrides.endingWidthMultiplier = readDouble(json, "endingWidthMultiplier");
             overrides.distanceTillTrailStart = readDouble(json, "distanceTillTrailStart");
+            overrides.endDistanceFade = readBoolean(json, "endDistanceFade");
+            overrides.endDistanceFadeAmount = readDouble(json, "endDistanceFadeAmount");
             return overrides;
         }
         public boolean isEmpty() {
@@ -785,7 +739,9 @@ public final class TrailPackConfigManager {
                     && increaseWidthOverTime == null
                     && startingWidthMultiplier == null
                     && endingWidthMultiplier == null
-                    && distanceTillTrailStart == null;
+                    && distanceTillTrailStart == null
+                    && endDistanceFade == null
+                    && endDistanceFadeAmount == null;
         }
 
         public TrailOverrides with(@Nullable TrailOverrides other) {
@@ -820,19 +776,9 @@ public final class TrailPackConfigManager {
             merged.startingWidthMultiplier = (other.startingWidthMultiplier != null) ? other.startingWidthMultiplier : this.startingWidthMultiplier;
             merged.endingWidthMultiplier = (other.endingWidthMultiplier != null) ? other.endingWidthMultiplier : this.endingWidthMultiplier;
             merged.distanceTillTrailStart = (other.distanceTillTrailStart != null) ? other.distanceTillTrailStart : this.distanceTillTrailStart;
+            merged.endDistanceFade = (other.endDistanceFade != null) ? other.endDistanceFade : this.endDistanceFade;
+            merged.endDistanceFadeAmount = (other.endDistanceFadeAmount != null) ? other.endDistanceFadeAmount : this.endDistanceFadeAmount;
             return merged;
-        }
-        @SuppressWarnings("unused")
-        public TrailOverrides getPreset() {
-            if(parentPreset == null || (!HIDDEN_CONFIG_PRESETS.containsKey(parentPreset) && !CONFIG_PRESETS.containsKey(parentPreset)))
-            {
-                return null;
-            }
-            if(HIDDEN_CONFIG_PRESETS.containsKey(parentPreset))
-            {
-                return  HIDDEN_CONFIG_PRESETS.get(parentPreset);
-            }
-            return CONFIG_PRESETS.get(parentPreset);
         }
         public ResolvedTrailSettings resolve() {
             return new ResolvedTrailSettings(
@@ -860,7 +806,9 @@ public final class TrailPackConfigManager {
                     asTrue(increaseWidthOverTime),
                     asNumber(startingWidthMultiplier),
                     asNumber(endingWidthMultiplier),
-                    asNumber(distanceTillTrailStart)
+                    asNumber(distanceTillTrailStart),
+                    asTrue(endDistanceFade),
+                    asNumber(endDistanceFadeAmount)
             );
         }
 
@@ -923,7 +871,9 @@ public final class TrailPackConfigManager {
             boolean increaseWidthOverTime,
             double startingWidthMultiplier,
             double endingWidthMultiplier,
-            double distanceTillTrailStart
+            double distanceTillTrailStart,
+            boolean endDistanceFade,
+            double endDistanceFadeAmount
     ) {
         public static ResolvedTrailSettings defaults() {
             return resolveFromPlayerConfig(ClientPlayerConfigStore.getLocalPlayerConfig());
@@ -971,42 +921,43 @@ public final class TrailPackConfigManager {
         int argb = (a << 24) | c;
         return String.format("#%08X", argb); // #AARRGGBB
     }
-    public static ResolvedTrailSettings resolveFromPlayerConfig(@Nullable CompiledPlayerConfig playerConfigCompiled) {
-
-        ClientPlayerConfigStore.TrailRenderSettings trailRenderSettings = ClientPlayerConfigStore.decodeTrailType(playerConfigCompiled.playerConfigInitial.trailType());
-        assert playerConfigCompiled != null;
+    public static ResolvedTrailSettings resolveFromPlayerConfig(@Nullable PlayerConfig playerConfig) {
+        assert playerConfig != null;
         return new ResolvedTrailSettings(
-                playerConfigCompiled.playerConfigInitial.enableTrail(),
-                playerConfigCompiled.playerConfigInitial.enableRandomWidth(),
-                playerConfigCompiled.playerConfigInitial.speedDependentTrail(),
+                playerConfig.enableTrail(),
+                playerConfig.enableRandomWidth(),
+                playerConfig.speedDependentTrail(),
                 false,       // not in PlayerConfig
-                playerConfigCompiled.playerConfigInitial.maxWidth(),
-                playerConfigCompiled.playerConfigInitial.trailLifetime(),
-                playerConfigCompiled.playerConfigInitial.trailMinSpeed(),
-                playerConfigCompiled.playerConfigInitial.startRampDistance(),
-                playerConfigCompiled.playerConfigInitial.endRampDistance(),
-                playerConfigCompiled.playerConfigInitial.randomWidthVariation(),
-                playerConfigCompiled.playerConfigInitial.color(),
-                safePride(playerConfigCompiled.playerConfigInitial),
-                playerConfigCompiled.playerConfigInitial.fadeStart(),
-                playerConfigCompiled.playerConfigInitial.fadeStartDistance(),
-                playerConfigCompiled.playerConfigInitial.fadeEnd(),
-                trailRenderSettings.glowing(),
-                trailRenderSettings.translucent(),
-                trailRenderSettings.wireframe(),
-                playerConfigCompiled.playerConfigExtended.alwaysShowTrailDuringTwirl(),
-                playerConfigCompiled.playerConfigExtended.prideTrailRight(),
-                playerConfigCompiled.playerConfigExtended.twirlTime(),
-                playerConfigCompiled.playerConfigExtended.increaseWidthOverTime(),
-                playerConfigCompiled.playerConfigExtended.startingWidthMultiplier(),
-                playerConfigCompiled.playerConfigExtended.endingWidthMultiplier(),
-                playerConfigCompiled.playerConfigExtended.distanceTillTrailStart()
+                playerConfig.maxWidth(),
+                playerConfig.trailLifetime(),
+                playerConfig.trailMinSpeed(),
+                playerConfig.startRampDistance(),
+                playerConfig.endRampDistance(),
+                playerConfig.randomWidthVariation(),
+                playerConfig.color(),
+                safePride(playerConfig.prideTrail()),
+                playerConfig.fadeStart(),
+                playerConfig.fadeStartDistance(),
+                playerConfig.fadeEnd(),
+                playerConfig.glowingTrails(),
+                playerConfig.translucentTrails(),
+                playerConfig.wireframeTrails(),
+                playerConfig.alwaysShowTrailDuringTwirl(),
+                safePride(playerConfig.prideTrailRight()),
+                playerConfig.twirlTime(),
+                playerConfig.increaseWidthOverTime(),
+                playerConfig.startingWidthMultiplier(),
+                playerConfig.endingWidthMultiplier(),
+                playerConfig.distanceTillTrailStart(),
+                playerConfig.endDistanceFade(),
+                playerConfig.endDistanceFadeAmount()
+
         );
     }
 
-    private static String safePride(PlayerConfig playerConfig) {
+    private static String safePride(String prideTrail) {
         try {
-            String v = playerConfig.prideTrail();
+            String v = prideTrail;
             if (v == null) return "trail";
             v = v.trim();
             return v.isEmpty() ? "" : v;

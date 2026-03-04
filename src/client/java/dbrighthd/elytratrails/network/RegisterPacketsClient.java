@@ -18,12 +18,7 @@ public class RegisterPacketsClient {
         ClientPlayNetworking.registerGlobalReceiver(PlayerConfigS2CPayload.ID, (payload, context) ->
         {
             TrailSystem.getTrailManager().removeTrail(payload.entityId());
-            ClientPlayerConfigStore.putSafeInitial(payload.entityId(),payload.playerConfig());
-        });
-        ClientPlayNetworking.registerGlobalReceiver(PlayerConfigExtendedS2CPayload.ID, (payload, context) ->
-        {
-            TrailSystem.getTrailManager().removeTrail(payload.entityId());
-            ClientPlayerConfigStore.putExtendedConfig(payload.entityId(),payload.playerConfigExtended());
+            ClientPlayerConfigStore.putSafeInitial(payload.entityId(),payload.configTag());
         });
         ClientPlayNetworking.registerGlobalReceiver(RemoveFromStoreS2CPayload.ID, (payload, context) ->
         {
@@ -37,8 +32,7 @@ public class RegisterPacketsClient {
             //if showTrailToOtherPlayers is turned on, we need to share that to other clients or else they will see the default.
             if(getConfig().shareTrail || !getConfig().showTrailToOtherPlayers)
             {
-                ClientPlayNetworking.send(new PlayerConfigC2SPayload(getLocalPlayerConfigToSend()));
-                ClientPlayNetworking.send(new PlayerConfigExtendedC2SPayload(getLocalPlayerConfig().playerConfigExtended));
+                ClientPlayNetworking.send(new PlayerConfigC2SPayload(getLocalPlayerConfigToSend().toTag()));
             }
             ClientPlayNetworking.send(new GetAllRequestC2SPayload());
         });
