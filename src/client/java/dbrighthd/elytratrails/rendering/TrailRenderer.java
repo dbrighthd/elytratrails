@@ -21,6 +21,8 @@ import net.minecraft.world.level.levelgen.synth.PerlinNoise;
 import net.minecraft.world.phys.Vec3;
 import org.jetbrains.annotations.NotNull;
 import org.joml.Vector3f;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -31,6 +33,9 @@ import static java.lang.Math.max;
 import static java.lang.Math.min;
 import static net.minecraft.util.ARGB.*;
 
+/**
+ * Handles trail rendering
+ */
 public class TrailRenderer {
 
     public static final Identifier DEFAULT_TEXTURE = Identifier.fromNamespaceAndPath("elytratrails", "textures/trails/trail.png");
@@ -45,8 +50,9 @@ public class TrailRenderer {
     private TrailPackConfigManager.ResolvedTrailSettings trailSettings;
     boolean isFirstPerson;
     boolean atEnd;
-    private static final float CAMERA_FADE_ZERO = 0.3f;
-    private static final float CAMERA_FADE_FULL = 0.5f;
+    private static final Logger LOGGER = LoggerFactory.getLogger(TrailRenderer.class);
+    private static final float CAMERA_FADE_ZERO = 0.5f;
+    private static final float CAMERA_FADE_FULL = 0.7f;
 
     public TrailRenderer(@NotNull TrailManager manager) {
         this.manager = manager;
@@ -57,9 +63,11 @@ public class TrailRenderer {
         PoseStack stack = ctx.matrices();
         stack.pushPose();
         stack.translate(ctx.gameRenderer().getMainCamera().position().scale(-1f));
+
         for (Trail trail : manager.trails()) {
             List<Trail.Point> points = new ArrayList<>(trail.points());
             if (points.size() < 4) continue; // splines :3
+
             RenderType renderType = getRenderType(trail);
 
 
@@ -161,6 +169,16 @@ public class TrailRenderer {
         Vec3 midPos = SplineInterpolation.catmullRom(p0, p1, p2, p3, midT);
 
         Vec3 chord = endPos.subtract(startPos);
+
+        if(chord.length() > 20)
+        {
+            if(modConfig.logTrails)
+            {
+                LOGGER.info("Trail removed for entity {}, trail was too long.", trail.entityId());
+            }
+            manager.removeTrail(trail.entityId());
+            return;
+        }
         double chordLenSq = chord.length();
 
         boolean needsSplit = false;
@@ -248,6 +266,11 @@ public class TrailRenderer {
             {
                 alphaStart *= computeEndFade(-(endOfTrail - v1), trail.config());
                 alphaEnd *= computeEndFade(-(endOfTrail - v2), trail.config());
+            }
+            if(modConfig.tryNearTrailFade)
+            {
+                alphaStart *= cameraDistanceFade((float)startPos.distanceTo(camera.position()));
+                alphaEnd *= cameraDistanceFade((float)endPos.distanceTo(camera.position()));
             }
             float halfWidthStart = (float) (trail.config().maxWidth() / 2f) * scaleStart;
             float halfWidthEnd = (float) (trail.config().maxWidth() / 2f) * scaleEnd;
@@ -466,7 +489,12 @@ public class TrailRenderer {
             this.totalTrailLength += (float) startPos.distanceTo(endPos);
         }
     }
-
+    private float cameraDistanceFade(float cameraDistBlocks) {
+        float denom = (CAMERA_FADE_FULL - CAMERA_FADE_ZERO);
+        float t = (cameraDistBlocks - CAMERA_FADE_ZERO) / denom;
+        t = Mth.clamp(t, 0f, 1f);
+        return t * t * (3f - 2f * t);
+    }
     // minecraft's alpha multiply function sets color to 0 when alpha is 0, which breaks with our interpolation. this function does the same but just sets alpha to be min 0
     private int multiplyAlpha(int color, float alpha)
     {

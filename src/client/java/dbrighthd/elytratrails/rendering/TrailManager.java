@@ -23,6 +23,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import static dbrighthd.elytratrails.ElytraTrailsClient.getConfig;
+import static dbrighthd.elytratrails.config.pack.TrailPackConfigManager.entitesWithTrails;
 import static dbrighthd.elytratrails.controller.EntityTwirlManager.isRolling;
 
 public class TrailManager {
@@ -55,6 +56,10 @@ public class TrailManager {
                 lastSample = TimeUtil.currentMillis();
             }
             gatherPlayerTrails(Minecraft.getInstance(), recordEmitters);
+            if(getConfig().extendedEmfSupport && !entitesWithTrails.isEmpty())
+            {
+                gatherEntityTrails(Minecraft.getInstance(), recordEmitters);
+            }
         });
     }
     public boolean isActiveTrail(Trail trail)
@@ -62,6 +67,11 @@ public class TrailManager {
         return (activeTrails.containsKey(trail.entityId()) && activeTrails.get(trail.entityId()).trails().contains(trail));
     }
 
+    @SuppressWarnings("unused")
+    public boolean entityHasActiveTrails(int eid)
+    {
+        return(activeTrails.containsKey(eid));
+    }
     private void removeDeadPoints(Minecraft ctx) {
         long currentTime = TimeUtil.currentMillis();
         if(getConfig().logTrails)
@@ -104,7 +114,7 @@ public class TrailManager {
             boolean valid = TrailManager.isEntityTrailValid(config, player);
 
             if (valid) {
-                List<Emitter> emitters = sampler.getTrailEmitterPositions(player, ctx.getDeltaTracker().getGameTimeDeltaPartialTick(false));
+                List<Emitter> emitters = sampler.getPlayerTrailEmitterPositions(player, ctx.getDeltaTracker().getGameTimeDeltaPartialTick(false));
 
                 if (emitters.isEmpty())
                 {
@@ -151,6 +161,79 @@ public class TrailManager {
             }
         }
     }
+    public int activeTrailsNumber() {
+        return activeTrails.values().stream()
+                .mapToInt(group -> group.trails().size())
+                .sum();
+    }
+    public int trailsNumber()
+    {
+        return trails.size();
+    }
+    private void gatherEntityTrails(Minecraft ctx, boolean recordEmitter) {
+        ModConfig modConfig = ElytraTrailsClient.getConfig();
+        if (ctx.level == null) return;
+        for (Entity entity :  ctx.level.entitiesForRendering()) {
+            if(!TrailPackConfigManager.doesEntityhaveOverrides(entity))
+            {
+                continue;
+            }
+            int eid = entity.getId();
+            TrailPackConfigManager.ResolvedTrailSettings config = getConfigFromPlayerId(eid);
+            boolean valid = TrailManager.isEntityTrailValid(config, entity);
+
+            if (valid) {
+                List<Emitter> emitters = sampler.getEntityTrailEmitterPositions(entity, ctx.getDeltaTracker().getGameTimeDeltaPartialTick(false));
+
+                if(entity instanceof Player)
+                {
+                    continue;
+                }
+                if (emitters.isEmpty())
+                {
+                    if(getConfig().logTrails)
+                    {
+                        LOGGER.info("Empty Emitters from non-player entity {} ({}), resetting trails if exist",eid, entity.getType());
+                    }
+                    activeTrails.remove(eid);
+                    continue;
+                }
+                if(!recordEmitter)
+                {
+                    return;
+                }
+                EntityTrailGroup trailGroup = activeTrails.computeIfAbsent(eid, id -> {
+                    List<Trail> emittedTrails = new ArrayList<>();
+                    int emitterId = 0;
+                    for (Emitter emitter : emitters) {
+                        emittedTrails.add(Trail.fromPlayerConfig(entity.getId(), emitter,emitterId));
+                        emitterId++;
+                    }
+
+                    trails.addAll(emittedTrails);
+                    if(modConfig.logTrails)
+                    {
+                        LOGGER.info("Created new trail group with {} trails for entity {} ({}})", emittedTrails.size(), id, entity.getType());
+                    }
+                    return new EntityTrailGroup(
+                            emittedTrails
+                    );
+                });
+                if (trailGroup.trails().size() != emitters.size()) {
+                    activeTrails.remove(eid);
+                    return;
+                }
+                for (int i = 0; i < trailGroup.trails().size(); i++)  {
+
+                    Trail trail = trailGroup.trails().get(i);
+                    Vec3 emitter = emitters.get(i).position();
+                    trail.points().add(new Trail.Point(emitter));
+                }
+            } else {
+                removeTrail(eid);
+            }
+        }
+    }
     public static TrailPackConfigManager.ResolvedTrailSettings getConfigFromPlayerId(int entityId)
     {
         return TrailPackConfigManager.resolveFromPlayerConfig(ClientPlayerConfigStore.getOrDefault(entityId));
@@ -158,9 +241,11 @@ public class TrailManager {
 
     public static boolean isEntityTrailValid(TrailPackConfigManager.ResolvedTrailSettings config, Entity entity) {
         if (entity instanceof Player player) {
-            if (player.getPose() != Pose.FALL_FLYING) return false;
+            if(!(player.getPose() == Pose.FALL_FLYING))
+            {
+                return false;
+            }
         }
-
         return (isRolling(entity.getId()) && config.alwaysShowTrailDuringTwirl()) || !config.speedDependentTrail() || (entity.getDeltaMovement().lengthSqr() > config.trailMinSpeed() * config.trailMinSpeed());
     }
 

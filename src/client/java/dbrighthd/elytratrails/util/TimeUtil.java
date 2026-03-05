@@ -4,6 +4,9 @@ import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents;
 import net.minecraft.client.Minecraft;
 import net.minecraft.util.Util;
 
+/**
+ * Call to this when you need a tick-based time (needed for flashback support to work well). Not sure if there's a better way to do this so if this is bad let me know
+ */
 public class TimeUtil {
 
     static long tickCounter = 0;

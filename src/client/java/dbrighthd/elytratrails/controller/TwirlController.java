@@ -1,13 +1,15 @@
 package dbrighthd.elytratrails.controller;
 
-import dbrighthd.elytratrails.config.ModConfig;
+import dbrighthd.elytratrails.util.EasingUtil;
 import dbrighthd.elytratrails.util.TimeUtil;
 import net.minecraft.util.Mth;
 
 import static dbrighthd.elytratrails.ElytraTrailsClient.getConfig;
-import static dbrighthd.elytratrails.controller.EasingUtil.easeBoth;
-import static dbrighthd.elytratrails.controller.EasingUtil.easeBothBack;
+import static dbrighthd.elytratrails.util.EasingUtil.easeBoth;
 
+/**
+ * This class is for the single twirls
+ */
 public final class TwirlController {
     private static long startNanos = 0L;
     private static boolean active = false;

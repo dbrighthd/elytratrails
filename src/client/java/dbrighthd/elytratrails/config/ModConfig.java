@@ -2,8 +2,9 @@ package dbrighthd.elytratrails.config;
 
 import me.shedaniel.autoconfig.ConfigData;
 import me.shedaniel.autoconfig.annotation.Config;
-import me.shedaniel.autoconfig.annotation.ConfigEntry;
-
+/**
+ * The config that gets serialized and stored
+ */
 @Config(name = "elytratrails")
 public class ModConfig implements ConfigData {
 
@@ -11,22 +12,17 @@ public class ModConfig implements ConfigData {
     public ClientConfig otherPlayerConfig = ClientConfig.getDefaultClientConfig();
     public boolean exportPreset = false;
     public String exportPresetName = "";
-    //general
-    @ConfigEntry.Category("general")
-    @ConfigEntry.Gui.PrefixText
-    @ConfigEntry.Gui.Tooltip
     public boolean enableAllTrails = true;
     public int maxSamplePerSecond = 60;
     public boolean fadeFirstPersonTrail = true;
     public double firstPersonFadeTime = 0.2;
-
     public boolean resourcePackOverride = true;
     public boolean fishysStupidCameraRoll = false;
     public boolean fishysStupidThirdPersonCameraRoll = false;
     public boolean emfSupport = true;
+    public boolean extendedEmfSupport = true;
     public boolean enableTwirls = true;
-
-
+    public boolean tryNearTrailFade = true;
     public boolean alwaysSnapTrail = false;
     public boolean logTrails = false;
     public ClearTrails clearTrailsOption = ClearTrails.NO;
@@ -35,47 +31,24 @@ public class ModConfig implements ConfigData {
         CLEAR,
     }
 
-    @ConfigEntry.Category("general")
-    @ConfigEntry.Gui.Tooltip
     public boolean alwaysGlowWhenShaderTranslucent = true;
 
     //server stuff
-    @ConfigEntry.Category("server")
-    @ConfigEntry.Gui.PrefixText
-    @ConfigEntry.Gui.Tooltip
     public boolean syncWithServer = true;
 
-    @ConfigEntry.Category("server")
-    @ConfigEntry.Gui.Tooltip(count = 2)
     public boolean shareTrail = true;
 
-    @ConfigEntry.Category("server")
-    @ConfigEntry.Gui.Tooltip
     public boolean showTrailToOtherPlayers = true;
 
-    @ConfigEntry.Category("server")
-    @ConfigEntry.Gui.Tooltip
     public double maxOnlineWidth = 5.0;
 
-    @ConfigEntry.Category("server")
-    @ConfigEntry.Gui.Tooltip
     public double maxOnlineLifetime = 120.0;
 
-    //others
-    @ConfigEntry.Category("others")
-    @ConfigEntry.Gui.PrefixText
-    @ConfigEntry.Gui.Tooltip
     public boolean useSameDefaultsforOthers = false;
 
-    //particles
-    @ConfigEntry.Category("particles")
-    @ConfigEntry.Gui.PrefixText
-    @ConfigEntry.Gui.Tooltip
     public boolean enableParticles = false;
 
 
-    @ConfigEntry.Category("particles")
-    @ConfigEntry.Gui.Tooltip
     public ParticleChoice particle = ParticleChoice.POOF;
     public String Preset = "";
     public String PresetOthers = "";
@@ -181,15 +154,11 @@ public class ModConfig implements ConfigData {
         WITCH
     }
 
-    @ConfigEntry.Category("particles") @ConfigEntry.Gui.Tooltip
     public int particleSpawnsPerTick = 3;
 
-    @ConfigEntry.Category("particles") @ConfigEntry.Gui.Tooltip
     public double particlesBlockRadius = 10;
 
-    @ConfigEntry.Category("particles") @ConfigEntry.Gui.Tooltip
     public double particlesVelocityAhead = 3;
 
-    @ConfigEntry.Category("particles") @ConfigEntry.Gui.Tooltip
     public double particlesVelocityBackwards = 0;
 }

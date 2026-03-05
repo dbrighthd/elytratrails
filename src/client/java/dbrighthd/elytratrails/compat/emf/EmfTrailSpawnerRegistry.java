@@ -6,6 +6,7 @@ import it.unimi.dsi.fastutil.objects.ObjectOpenHashSet;
 import net.minecraft.client.model.Model;
 import net.minecraft.client.model.geom.ModelPart;
 import net.minecraft.client.renderer.SubmitNodeStorage;
+import net.minecraft.world.entity.EntityType;
 import org.jetbrains.annotations.Nullable;
 import traben.entity_model_features.EMFManager;
 import traben.entity_model_features.models.IEMFModel;
@@ -13,6 +14,8 @@ import traben.entity_model_features.models.parts.EMFModelPartRoot;
 import traben.entity_model_features.models.parts.EMFModelPartWithState;
 
 import java.util.*;
+
+import static dbrighthd.elytratrails.config.pack.TrailPackConfigManager.entitesWithTrails;
 
 public final class EmfTrailSpawnerRegistry {
     private EmfTrailSpawnerRegistry() {}
@@ -70,6 +73,8 @@ public final class EmfTrailSpawnerRegistry {
         SPAWNER_PATHS_BY_TYPE.put(typeString, spawnerPaths);
 
         if (!spawnerPaths.isEmpty()) {
+            Optional<EntityType<?>> entityType = EntityType.byString(typeString.substring(typeString.lastIndexOf(".")+1));
+            entityType.ifPresent(entitesWithTrails::add);
             TYPES_WITH_SPAWNERS.add(typeString);
         }
 

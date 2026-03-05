@@ -1,6 +1,9 @@
 
 package dbrighthd.elytratrails.controller;
 
+/**
+ * Unified calls for twirling
+ */
 public final class TwirlRoll {
     private TwirlRoll() {}
 

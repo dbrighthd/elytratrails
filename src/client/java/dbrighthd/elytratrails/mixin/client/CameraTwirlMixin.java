@@ -16,7 +16,10 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 import static dbrighthd.elytratrails.ElytraTrailsClient.getConfig;
 
-//this sucks
+/**
+ * This sucks
+ * This is what handles the camera twirling when you twirl
+ */
 @Mixin(Camera.class)
 public class CameraTwirlMixin {
 

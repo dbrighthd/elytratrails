@@ -12,6 +12,8 @@ import net.fabricmc.loader.api.FabricLoader;
 import net.minecraft.resources.Identifier;
 import net.minecraft.server.packs.resources.Resource;
 import net.minecraft.server.packs.resources.ResourceManager;
+import net.minecraft.world.entity.Entity;
+import net.minecraft.world.entity.EntityType;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.slf4j.Logger;
@@ -25,8 +27,7 @@ import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.StandardOpenOption;
-import java.util.Locale;
-import java.util.Map;
+import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.Stream;
 
@@ -46,6 +47,7 @@ public final class TrailPackConfigManager {
     private static final ConcurrentHashMap<String, ModelTrailConfig> MODEL_TRAIL_CONFIGS = new ConcurrentHashMap<>();
     private static final ConcurrentHashMap<String, TrailOverrides> CONFIG_PRESETS = new ConcurrentHashMap<>();
     private static final ConcurrentHashMap<String, TrailOverrides> HIDDEN_CONFIG_PRESETS = new ConcurrentHashMap<>();
+    public static final Set<EntityType<?>> entitesWithTrails = new HashSet<>();
 
     private static double maxLifetimeOverrideSeconds = -1.0;
 
@@ -53,11 +55,17 @@ public final class TrailPackConfigManager {
         MODEL_TRAIL_CONFIGS.clear();
         maxLifetimeOverrideSeconds = -1.0;
     }
-
+    public static List<String> getModelStrings()
+    {
+        return Collections.list(MODEL_TRAIL_CONFIGS.keys());
+    }
+    public static boolean doesEntityhaveOverrides(Entity entity)
+    {
+        return entitesWithTrails.contains(entity.getType());
+    }
     public static void reload(@Nullable ResourceManager resourceManager) {
         clear();
         if (resourceManager == null) return;
-
         try {
             Map<Identifier, Resource> discoveredResources = resourceManager.listResources(CONFIG_FOLDER, id -> {
                 if (!NAMESPACE.equals(id.getNamespace())) return false;
@@ -306,6 +314,8 @@ public final class TrailPackConfigManager {
         root.addProperty("startingWidthMultiplier", config.clientPlayerConfig.startingWidthMultiplier);
         root.addProperty("endingWidthMultiplier", config.clientPlayerConfig.endingWidthMultiplier);
         root.addProperty("distanceTillTrailStart", config.clientPlayerConfig.distanceTillTrailStart);
+        root.addProperty("endDistanceFade", config.clientPlayerConfig.endDistanceFade);
+        root.addProperty("endDistanceFadeAmount", config.clientPlayerConfig.endDistanceFadeAmount);
         return root;
     }
 
@@ -373,9 +383,8 @@ public final class TrailPackConfigManager {
         ModConfig mainConfig = getConfig();
         String normalizedModelKey = normalizeModelKey(modelName);
         ModelTrailConfig modelConfig = (normalizedModelKey == null) ? null : MODEL_TRAIL_CONFIGS.get(normalizedModelKey);
-
         TrailOverrides mergedOverrides = TrailOverrides.fromBase(baseConfig);
-        if(!mainConfig.resourcePackOverride)
+        if(!mainConfig.resourcePackOverride && (modelName != null && modelName.contains("elytra")))
         {
             return mergedOverrides.resolve();
         }
@@ -445,7 +454,6 @@ public final class TrailPackConfigManager {
 
             ModelTrailConfig parsed = ModelTrailConfig.fromJson(rootObject);
             if (parsed == null) return;
-
             MODEL_TRAIL_CONFIGS.put(modelKey, parsed);
             maxLifetimeOverrideSeconds = Math.max(maxLifetimeOverrideSeconds, parsed.maxLifetimeSeconds());
         } catch (Throwable ignored) {
@@ -459,12 +467,15 @@ public final class TrailPackConfigManager {
 
             ModelTrailConfig parsed = ModelTrailConfig.fromJson(rootObject);
             if (parsed == null) return;
-
             MODEL_TRAIL_CONFIGS.put(modelKey, parsed);
         } catch (Throwable ignored) {
         }
     }
-
+    @SuppressWarnings("unused")
+    public static String sanatizeModelKey(String modelKey)
+    {
+        return modelKey.replaceAll("[0-9]","");
+    }
     private static @Nullable String normalizeModelKey(@Nullable String rawName) {
         if (rawName == null) return null;
 
@@ -641,6 +652,7 @@ public final class TrailPackConfigManager {
 
             return overrides;
         }
+        @SuppressWarnings("unused")
         public static TrailOverrides fromResolved(ResolvedTrailSettings s) {
             TrailOverrides o = new TrailOverrides();
             // base is "fully resolved", so treat everything as non-null base values
@@ -898,6 +910,7 @@ public final class TrailPackConfigManager {
         }
         return 0xFFFFFFFF;
     }
+    @SuppressWarnings("unused")
     public static String toHexColorString(int color) {
         return String.format("#%06X", color);
     }
@@ -915,6 +928,7 @@ public final class TrailPackConfigManager {
         int c = rgb & 0xFFFFFF;
         return (a << 24) | c;
     }
+    @SuppressWarnings("unused")
     public static String withAlphaAndColorToHexString(int alpha, int rgb) {
         int a = alpha & 0xFF;
         int c = rgb & 0xFFFFFF;

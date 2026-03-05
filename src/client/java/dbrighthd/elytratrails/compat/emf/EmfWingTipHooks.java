@@ -29,6 +29,17 @@ public final class EmfWingTipHooks {
 
         return out;
     }
+    public static List<SpawnerPath> findAllSpawnerPathsGeneric(ModelPart modelRoot) {
+        ArrayList<SpawnerPath> out = new ArrayList<>();
+        if (modelRoot != null) out.addAll(findSpawnerPaths(modelRoot, WhichRoot.LEFT_WING));
+
+        out.sort(Comparator
+                .comparing((SpawnerPath p) -> p.where().ordinal())
+                .thenComparing(SpawnerPath::path)
+                .thenComparing(SpawnerPath::key));
+
+        return out;
+    }
 
     private static List<SpawnerPath> findSpawnerPaths(ModelPart root, WhichRoot where) {
         ArrayList<SpawnerPath> found = new ArrayList<>();

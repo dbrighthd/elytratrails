@@ -1,9 +1,13 @@
 package dbrighthd.elytratrails.config;
 
-import dbrighthd.elytratrails.controller.EasingUtil;
-import dbrighthd.elytratrails.network.ClientPlayerConfigStore;
+import dbrighthd.elytratrails.util.EasingUtil;
 import dbrighthd.elytratrails.network.PlayerConfig;
 
+/**
+ * This class is basically the configs you can select in the "Your trails" or the "Other's Trails". I used to have them
+ * just be copies of variables in ModConfig but this way is much cleaner and allows them to share the same defaults.
+ * can be exported to PlayerConfig for use elsewhere.
+ */
 public class ClientConfig {
     public boolean enableTrail;
     public boolean enableRandomWidth;

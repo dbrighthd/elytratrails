@@ -1,8 +1,7 @@
 package dbrighthd.elytratrails.network;
 
-import dbrighthd.elytratrails.config.ClientConfig;
 import dbrighthd.elytratrails.config.ModConfig;
-import dbrighthd.elytratrails.controller.EasingUtil;
+import dbrighthd.elytratrails.util.EasingUtil;
 import net.minecraft.client.Minecraft;
 import net.minecraft.nbt.CompoundTag;
 
@@ -16,8 +15,6 @@ public final class ClientPlayerConfigStore
 {
     public static final ConcurrentHashMap<Integer, PlayerConfig> CLIENT_PLAYER_CONFIGS = new ConcurrentHashMap<>();
 
-    public record TrailRenderSettings(boolean glowing, boolean translucent, boolean wireframe){}
-
     public static PlayerConfig CLIENT_CONFIG;
 
     public static PlayerConfig CLIENT_OTHERS_CONFIG;
@@ -28,20 +25,11 @@ public final class ClientPlayerConfigStore
         setClientOthersConfig();
     }
 
-    public static PlayerConfig getLocalPlayerConfigInitial()
-    {
-        return getConfig().clientPlayerConfig.getPlayerConfig();
-    }
-
     public static void setLocalPlayerConfig() {
         var config = getConfig();
         CLIENT_CONFIG = config.clientPlayerConfig.getPlayerConfig();
     }
 
-    public static TrailRenderSettings decodeTrailType(int n)
-    {
-        return new TrailRenderSettings((n%2==0),(n%3==0),(n%5==0));
-    }
     public static void setClientOthersConfig ()
     {
 
@@ -138,7 +126,7 @@ public final class ClientPlayerConfigStore
                 incomingConfig.translucentTrails(),
                 incomingConfig.wireframeTrails(),
                 incomingConfig.alwaysShowTrailDuringTwirl(),
-                incomingConfig.prideTrailRight(),
+                safePrideRight,
                 incomingConfig.twirlTime(),
                 incomingConfig.increaseWidthOverTime(),
                 incomingConfig.startingWidthMultiplier(),

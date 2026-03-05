@@ -17,32 +17,41 @@ public final class EmfAnimationHooks {
 
     @SuppressWarnings("deprecation")
     public static @Nullable ModelPart applyManualAnimationAndGetRoot(Model<?> model, Entity entity) {
-        if (!ModStatuses.EMF_LOADED || model == null || entity == null) return null;
-        if (!(model instanceof IEMFModel emfModel)) return null;
+        if (model == null || entity == null) return null;
 
-        try {
-            if (!emfModel.emf$isEMFModel()) return null;
+        ModelPart root = model.root();
 
-            EMFModelPartRoot emfRoot = emfModel.emf$getEMFRootModel();
-            if (emfRoot == null) return null;
+        if (ModStatuses.EMF_LOADED) {
+            try {
+                EMFModelPartRoot emfRoot = null;
 
-            boolean contextSet = false;
+                if (model instanceof IEMFModel emfModel && emfModel.emf$isEMFModel()) {
+                    emfRoot = emfModel.emf$getEMFRootModel();
+                } else if (root instanceof EMFModelPartRoot castRoot) {
+                    emfRoot = castRoot;
+                }
 
-            if (entity instanceof EMFEntity emfEntity) {
-                EMFEntityRenderStateViaReference state = new EMFEntityRenderStateViaReference(emfEntity);
-                EMFAnimationEntityContext.setCurrentEntityNoIteration(state);
-                contextSet = true;
+                if (emfRoot != null) {
+                    boolean contextSet = false;
+                    try {
+                        if (entity instanceof EMFEntity emfEntity) {
+                            EMFEntityRenderStateViaReference state = new EMFEntityRenderStateViaReference(emfEntity);
+                            EMFAnimationEntityContext.setCurrentEntityNoIteration(state);
+                            contextSet = true;
+                        }
+
+                        emfRoot.triggerManualAnimation(new PoseStack());
+                        return emfRoot;
+                    } finally {
+                        if (contextSet) {
+                            EMFAnimationEntityContext.setCurrentEntityNoIteration(null);
+                        }
+                    }
+                }
+            } catch (Throwable ignored) {
             }
-
-            emfRoot.triggerManualAnimation(new PoseStack());
-
-            if (contextSet) {
-                EMFAnimationEntityContext.setCurrentEntityNoIteration(null);
-            }
-
-            return emfRoot;
-        } catch (Throwable ignored) {
-            return null;
         }
+
+        return root;
     }
 }

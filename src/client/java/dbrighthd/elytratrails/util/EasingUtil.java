@@ -1,7 +1,8 @@
-package dbrighthd.elytratrails.controller;
+package dbrighthd.elytratrails.util;
 
-import dbrighthd.elytratrails.config.ModConfig;
-
+/**
+ * sets up easings for twirling. I got the equations from <a href="https://www.desmos.com/calculator/m8myals511">this desmos tool</a>
+ */
 public class EasingUtil {
     public static double easeBothSin(double t)
     {
@@ -38,7 +39,6 @@ public class EasingUtil {
     }
     public static double easeBothBack(double t)
     {
-        double s = 1.70158;
         double s1 = 2.5949095;
         if(t < 0)
         {
@@ -56,7 +56,6 @@ public class EasingUtil {
     public static double easeOutBack(double t)
     {
         double s = 2.5949095;
-        double s1 = 2.5949095;
         if(t < 0)
         {
             return 0;
@@ -69,7 +68,6 @@ public class EasingUtil {
     public static double easeInBack(double t)
     {
         double s = 2.5949095;
-        double s1 = 2.5949095;
         if(t < 0)
         {
             return 0;

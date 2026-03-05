@@ -8,6 +8,9 @@ import org.spongepowered.asm.mixin.gen.Accessor;
 import java.util.List;
 import java.util.Map;
 
+/**
+ * model submits for extracting models in WingTipSampler
+ */
 @Mixin(targets = "net.minecraft.client.renderer.feature.ModelFeatureRenderer$Storage")
 public interface ModelFeatureStorageAccessor {
     @Accessor("opaqueModelSubmits")

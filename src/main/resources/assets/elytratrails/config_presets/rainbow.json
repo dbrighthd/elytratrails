@@ -24,5 +24,7 @@
   "increaseWidthOverTime": false,
   "startingWidthMultiplier": 0.0,
   "endingWidthMultiplier": 1.0,
-  "distanceTillTrailStart": 0.0
+  "distanceTillTrailStart": 0.0,
+  "endDistanceFade": false,
+  "endDistanceFadeAmount": 1.0
 }

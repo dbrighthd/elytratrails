@@ -241,6 +241,10 @@
   "text.elytratrails.option.resourcePackOverride": "Resource Pack Override",
   "text.elytratrails.option.resourcePackOverride.@Tooltip": "If enabled, resource pack trail configs can override player trails too (falls back to synced/default settings if none exist).",
 
+  "text.elytratrails.option.extendedEmfSupport": "Extended Emf Support",
+  "text.elytratrails.option.extendedEmfSupport.@Tooltip": "Allows resource packs to define trails in any EMF model",
+
+
   "text.elytratrails.option.prideTrail": "Pride/Trail Texture",
   "text.elytratrails.option.prideTrail.@Tooltip": "Pride flag/Trail texture. Leave blank to disable. Example: rainbow, transgender.  Add new ones into assets/elytratrails/textures/trails",
 

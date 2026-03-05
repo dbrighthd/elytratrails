@@ -1,9 +1,9 @@
 package dbrighthd.elytratrails.controller;
 
-import dbrighthd.elytratrails.config.ModConfig;
 import dbrighthd.elytratrails.network.ClientPlayerConfigStore;
 import dbrighthd.elytratrails.network.PlayerConfig;
 import dbrighthd.elytratrails.network.TwirlStateC2SPayload;
+import dbrighthd.elytratrails.util.EasingUtil;
 import dbrighthd.elytratrails.util.TimeUtil;
 import it.unimi.dsi.fastutil.ints.Int2ObjectOpenHashMap;
 import net.fabricmc.fabric.api.client.networking.v1.ClientPlayNetworking;
@@ -12,14 +12,11 @@ import net.minecraft.util.Mth;
 
 import static dbrighthd.elytratrails.ElytraTrailsClient.getConfig;
 
+/**
+ * this class is for handling twirling from *OTHER PLAYERS* on a server.
+ */
 public final class EntityTwirlManager {
     private static final double HALF_TURN = Math.PI;
-
-//    private static final double DURATION_S = 0.5;
-//    private static final double HALF_DURATION_S = DURATION_S * 0.5;
-//
-//    private static final double OMEGA_RAD_S = (Math.PI * Math.PI) / DURATION_S;
-//    private static final double TURN360_DURATION_S = Math.TAU / OMEGA_RAD_S;
 
     private enum Kind { NORMAL, CONTINUOUS }
     private enum Phase { EASE_IN_180, CONSTANT_360, EASE_OUT_180 }
@@ -149,7 +146,7 @@ public final class EntityTwirlManager {
                     }
 
                     double u = Mth.clamp(elapsedS / twirlInfo.half_duration, 0.0, 1.0);
-                    double roll = HALF_TURN * EasingUtil.easeIn(u, twirlInfo.easeType);;
+                    double roll = HALF_TURN * EasingUtil.easeIn(u, twirlInfo.easeType);
                     return (float) (data.baseAngleRad + data.dir * roll);
                 }
 
@@ -171,7 +168,7 @@ public final class EntityTwirlManager {
                     }
 
                     double u = Mth.clamp(elapsedS / twirlInfo.half_duration, 0.0, 1.0);
-                    double roll = HALF_TURN * EasingUtil.easeOut(u, twirlInfo.easeType);;
+                    double roll = HALF_TURN * EasingUtil.easeOut(u, twirlInfo.easeType);
                     return (float) (data.baseAngleRad + data.dir * roll);
                 }
             }
@@ -189,7 +186,7 @@ public final class EntityTwirlManager {
         return switch (data.phase) {
             case EASE_IN_180 -> {
                 double u = Mth.clamp(elapsedS / twirlInfo.half_duration, 0.0, 1.0);
-                double roll = HALF_TURN * EasingUtil.easeIn(u, twirlInfo.easeType);;
+                double roll = HALF_TURN * EasingUtil.easeIn(u, twirlInfo.easeType);
                 yield data.baseAngleRad + data.dir * roll;
             }
             case CONSTANT_360 -> {

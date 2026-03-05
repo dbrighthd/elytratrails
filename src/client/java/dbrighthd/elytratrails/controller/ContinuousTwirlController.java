@@ -1,16 +1,18 @@
 package dbrighthd.elytratrails.controller;
 
-import dbrighthd.elytratrails.config.ModConfig;
+import dbrighthd.elytratrails.util.EasingUtil;
 import dbrighthd.elytratrails.util.TimeUtil;
 import net.minecraft.util.Mth;
 
 import static dbrighthd.elytratrails.ElytraTrailsClient.getConfig;
-import static dbrighthd.elytratrails.controller.EasingUtil.*;
+import static dbrighthd.elytratrails.util.EasingUtil.*;
 
+/**
+ * This class handles the continuous twirling for when you hold down the continuous twirling keys
+ */
 public final class ContinuousTwirlController {
     private static final double HALF_TURN = Math.PI;
 
-    private static double DURATION_S;
     private static double HALF_DURATION_S;
 
     private static double OMEGA_RAD_S;
@@ -42,18 +44,16 @@ public final class ContinuousTwirlController {
 
     public static void setDurations()
     {
-        DURATION_S = Math.max(getConfig().clientPlayerConfig.twirlTime,0.1);
+        double DURATION_S = Math.max(getConfig().clientPlayerConfig.twirlTime, 0.1);
         HALF_DURATION_S = DURATION_S * 0.5;
         OMEGA_RAD_S = (Math.PI * Math.PI) / DURATION_S;
         TURN360_DURATION_S = Math.TAU / OMEGA_RAD_S;
         if(getConfig().clientPlayerConfig.easeType == EasingUtil.EaseType.Back)
         {
-            DURATION_S *= 4;
             HALF_DURATION_S *= 4;
         }
         if(getConfig().clientPlayerConfig.easeType == EasingUtil.EaseType.None)
         {
-            DURATION_S /= 1.5;
             HALF_DURATION_S /= 1.5;
         }
     }

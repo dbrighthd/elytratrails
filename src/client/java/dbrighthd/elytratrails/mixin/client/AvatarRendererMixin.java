@@ -14,6 +14,9 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 import static dbrighthd.elytratrails.ElytraTrailsClient.getConfig;
 
+/**
+ * This is what handles the rotations during twirls.
+ */
 @Mixin(AvatarRenderer.class)
 public abstract class AvatarRendererMixin {
 

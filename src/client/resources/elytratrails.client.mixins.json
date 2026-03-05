@@ -8,7 +8,6 @@
     "CameraTwirlMixin",
     "ClientLevelEntityRemovalMixin",
     "ClientPacketListenerRemoveEntitiesMixin",
-    "EquipmentElytraModelAccessor",
     "ModelFeatureStorageAccessor",
     "compat.EmfModelPartRootRegisterMixin"
   ],

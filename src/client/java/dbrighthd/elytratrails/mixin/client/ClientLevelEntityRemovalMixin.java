@@ -9,15 +9,13 @@ import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 /**
- * when a non-player entity unloads/despawns on the client, immediately break its trail so we never
- * draw a long connecting segment when it comes back (or if the numeric id gets reused).
+ * Tries to remove entities when the unload?? the client packet listener does this better
  */
 @Mixin(ClientLevel.class)
 public class ClientLevelEntityRemovalMixin {
 
-    @Inject(method = "removeEntity(ILnet/minecraft/world/entity/Entity$RemovalReason;)V", at = @At("HEAD"), require = 0)
+    @Inject(method = "removeEntity", at = @At("HEAD"))
     private void elytraTrails$onRemoveEntity(int entityId, Entity.RemovalReason reason, CallbackInfo ci) {
-        //TrailSystem.getTrailManager().removeTrail(entityId);
-        //WingTipSamplerHandler.onEntityRemoved(entityId);
+        TrailSystem.getTrailManager().removeTrail(entityId);
     }
 }

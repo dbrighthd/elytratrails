@@ -1,6 +1,6 @@
 package dbrighthd.elytratrails.network;
 
-import dbrighthd.elytratrails.controller.EasingUtil;
+import dbrighthd.elytratrails.util.EasingUtil;
 import net.minecraft.nbt.CompoundTag;
 
 public record PlayerConfig(

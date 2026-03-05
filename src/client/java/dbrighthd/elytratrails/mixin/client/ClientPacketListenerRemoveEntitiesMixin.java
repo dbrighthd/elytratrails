@@ -8,6 +8,9 @@ import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
+/**
+ * Removes entities when they unload
+ */
 @Mixin(ClientPacketListener.class)
 public class ClientPacketListenerRemoveEntitiesMixin {
 

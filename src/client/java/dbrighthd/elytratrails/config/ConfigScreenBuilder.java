@@ -3,7 +3,7 @@ package dbrighthd.elytratrails.config;
 import dbrighthd.elytratrails.ElytraTrailsKeybind;
 import dbrighthd.elytratrails.config.pack.TrailPackConfigManager;
 import dbrighthd.elytratrails.controller.ContinuousTwirlController;
-import dbrighthd.elytratrails.controller.EasingUtil;
+import dbrighthd.elytratrails.util.EasingUtil;
 import dbrighthd.elytratrails.controller.TwirlController;
 import dbrighthd.elytratrails.network.GetAllRequestC2SPayload;
 import dbrighthd.elytratrails.network.PlayerConfigC2SPayload;
@@ -27,6 +27,9 @@ import static dbrighthd.elytratrails.ElytraTrailsClient.getConfig;
 import static dbrighthd.elytratrails.config.pack.TrailPackConfigManager.*;
 import static dbrighthd.elytratrails.network.ClientPlayerConfigStore.*;
 
+/**
+ * Config screen built using cloth config
+ */
 public class ConfigScreenBuilder {
 
     public static Screen buildConfigScreen(Screen parent, ModConfig config)
@@ -83,7 +86,21 @@ public class ConfigScreenBuilder {
                 .setTooltip(Component.translatable("text.elytratrails.option.resourcePackOverride.@Tooltip"))
                 .setSaveConsumer(newValue -> config.resourcePackOverride = newValue)
                 .build());
-
+        general.addEntry(entryBuilder.startBooleanToggle(Component.translatable("text.elytratrails.option.extendedEmfSupport"), config.extendedEmfSupport)
+                .setDefaultValue(true)
+                .setTooltip(Component.translatable("text.elytratrails.option.extendedEmfSupport.@Tooltip"))
+                .setSaveConsumer(newValue -> config.extendedEmfSupport = newValue)
+                .build());
+        general.addEntry(entryBuilder.startBooleanToggle(Component.translatable("text.elytratrails.option.cameraDistanceFade"), config.tryNearTrailFade)
+                .setDefaultValue(true)
+                .setTooltip(Component.translatable("text.elytratrails.option.cameraDistanceFade.@Tooltip"))
+                .setSaveConsumer(newValue -> config.tryNearTrailFade = newValue)
+                .build());
+        general.addEntry(entryBuilder.startIntField(Component.translatable("text.elytratrails.option.maxSamplePerSecond"), config.maxSamplePerSecond)
+                .setDefaultValue(60)
+                .setTooltip(Component.translatable("text.elytratrails.option.maxSamplePerSecond.@Tooltip"))
+                .setSaveConsumer(newValue -> config.maxSamplePerSecond = newValue)
+                .build());
         general.addEntry(entryBuilder.startBooleanToggle(Component.translatable("text.elytratrails.option.logTrails"), config.logTrails)
                 .setDefaultValue(false)
                 .setTooltip(Component.translatable("text.elytratrails.option.logTrails.@Tooltip"))
@@ -267,11 +284,6 @@ public class ConfigScreenBuilder {
                 .setTooltip(Component.translatable("text.elytratrails.option.trailLifetime.@Tooltip"))
                 .setSaveConsumer(newValue -> config.clientPlayerConfig.trailLifeTime = newValue)
                 .build());
-        elytra.addEntry(entryBuilder.startIntField(Component.translatable("text.elytratrails.option.maxSamplePerSecond"), config.maxSamplePerSecond)
-                .setDefaultValue(60)
-                .setTooltip(Component.translatable("text.elytratrails.option.maxSamplePerSecond.@Tooltip"))
-                .setSaveConsumer(newValue -> config.maxSamplePerSecond = newValue)
-                .build());
         elytra.addEntry(entryBuilder.startDoubleField(Component.translatable("text.elytratrails.option.trailMinSpeed"), config.clientPlayerConfig.trailMinSpeed)
                 .setDefaultValue(ClientConfig.getDefaultClientConfig().trailMinSpeed)
                 .setTooltip(Component.translatable("text.elytratrails.option.trailMinSpeed.@Tooltip"))
@@ -409,6 +421,11 @@ public class ConfigScreenBuilder {
 
         others.addEntry(entryBuilder.startTextDescription(
                         Component.translatable("text.elytratrails.category.others.desc"))
+                .build());
+        others.addEntry(entryBuilder.startBooleanToggle(Component.translatable("text.elytratrails.option.useSameDefaultsforOthers"), config.useSameDefaultsforOthers)
+                .setDefaultValue(false)
+                .setTooltip(Component.translatable("text.elytratrails.option.useSameDefaultsforOthers.@Tooltip"))
+                .setSaveConsumer(newValue -> config.useSameDefaultsforOthers = newValue)
                 .build());
         others.addEntry(entryBuilder.startBooleanToggle(Component.translatable("text.elytratrails.option.enableTrailOthersDefault"), config.otherPlayerConfig.enableTrail)
                 .setDefaultValue(ClientConfig.getDefaultClientConfig().enableTrail)
