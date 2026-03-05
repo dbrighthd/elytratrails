@@ -7,11 +7,12 @@ import net.minecraft.network.codec.ByteBufCodecs;
 import net.minecraft.network.codec.StreamCodec;
 import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
 import net.minecraft.resources.Identifier;
+import org.jetbrains.annotations.NotNull;
 
 public record PlayerConfigS2CPayload(int entityId, CompoundTag configTag) implements CustomPacketPayload {
     public static final Identifier PLAYER_CONFIG_PAYLOAD_ID =
-            Identifier.fromNamespaceAndPath(ElytraTrails.MOD_ID, "player_config");
-    public static final Type<PlayerConfigS2CPayload> ID = new Type<>(PLAYER_CONFIG_PAYLOAD_ID);
+            Identifier.fromNamespaceAndPath(ElytraTrails.MOD_ID, "player_config_tag");
+    public static final Type<@NotNull PlayerConfigS2CPayload> ID = new Type<>(PLAYER_CONFIG_PAYLOAD_ID);
 
     public static final StreamCodec<RegistryFriendlyByteBuf, PlayerConfigS2CPayload> CODEC =
             StreamCodec.composite(
@@ -20,5 +21,5 @@ public record PlayerConfigS2CPayload(int entityId, CompoundTag configTag) implem
                     PlayerConfigS2CPayload::new
             );
 
-    @Override public Type<? extends CustomPacketPayload> type() { return ID; }
+    @Override public @NotNull Type<? extends @NotNull CustomPacketPayload> type() { return ID; }
 }
