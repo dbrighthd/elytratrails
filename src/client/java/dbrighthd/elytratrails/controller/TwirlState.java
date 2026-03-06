@@ -9,7 +9,9 @@ public enum TwirlState {
     // Continuous phases (start / middle / ending)
     CONTINUOUS_BEGIN(2),
     CONTINUOUS_MIDDLE(3),
-    CONTINUOUS_END(4);
+    CONTINUOUS_END(4),
+    NORMAL_REVERSE_SPLICE(5),
+    CONTINUOUS_REVERSE_SPLICE(6);
 
     public final int id;
 
@@ -24,7 +26,9 @@ public enum TwirlState {
         }
         return OFF;
     }
-
+    public int signedId(int dir) {
+        return Math.abs(id) * (dir < 0 ? -1 : 1);
+    }
     public static int dirFromId(int id) {
         if (id == 0) return 1;
         return id < 0 ? -1 : 1;

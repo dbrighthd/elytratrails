@@ -18,6 +18,9 @@ public final class ContinuousTwirlController {
     private static double OMEGA_RAD_S;
     private static double TURN360_DURATION_S;
 
+    private static final double BACK_EASE_OUT_PEAK_U = 0.518781;
+    private static final double BACK_EASE_IN_START_U = 0.481219;
+
     private enum Phase {
         EASE_IN_180,
         CONSTANT_360,
@@ -39,8 +42,10 @@ public final class ContinuousTwirlController {
     private static int currentDir = 1;
     private static int nextAltDir = 1;
 
-    // NEW: make sure we only send END once per spin
     private static boolean endSent = false;
+
+    private static boolean reverseQueued = false;
+    private static int reverseQueuedDir = 0;
 
     public static void setDurations()
     {
@@ -68,6 +73,30 @@ public final class ContinuousTwirlController {
 
         if (keyDown && !wasDown && !active) {
             startSpin();
+            return;
+        }
+
+        if (active
+                && phase == Phase.EASE_OUT_180
+                && keyDown
+                && pendingMode != 0
+                && pendingMode == -currentDir
+                && getConfig().clientPlayerConfig.easeType == EasingUtil.EaseType.Back) {
+
+            long now = TimeUtil.currentNanos();
+            double elapsedS = (now - phaseStartNanos) / 1_000_000_000.0;
+            double u = Mth.clamp(elapsedS / HALF_DURATION_S, 0.0, 1.0);
+
+            if (u < BACK_EASE_OUT_PEAK_U) {
+                reverseQueued = true;
+                reverseQueuedDir = pendingMode;
+            } else {
+                reverseQueued = false;
+                reverseQueuedDir = 0;
+            }
+        } else if (!keyDown || pendingMode == currentDir || pendingMode == 0) {
+            reverseQueued = false;
+            reverseQueuedDir = 0;
         }
     }
 
@@ -80,6 +109,9 @@ public final class ContinuousTwirlController {
         holdMode = pendingMode;
         endSent = false;
 
+        reverseQueued = false;
+        reverseQueuedDir = 0;
+
         if (pendingMode == 0) {
             currentDir = nextAltDir;
             nextAltDir = -nextAltDir;
@@ -87,8 +119,30 @@ public final class ContinuousTwirlController {
             currentDir = pendingMode;
         }
 
-        // +/-2 = CONTINUOUS_BEGIN
         EntityTwirlManager.sendStatePacket(currentDir * 2);
+    }
+
+    private static void reverseFromBackEaseOutPeak() {
+        holdMode = reverseQueuedDir;
+
+        int oldDir = currentDir;
+        int newDir = reverseQueuedDir;
+
+        baseAngleRad += oldDir * HALF_TURN;
+
+        currentDir = newDir;
+        phase = Phase.EASE_IN_180;
+
+        long now = TimeUtil.currentNanos();
+        long peakOffset = (long) (BACK_EASE_IN_START_U * HALF_DURATION_S * 1_000_000_000.0);
+        phaseStartNanos = now - peakOffset;
+
+        endSent = false;
+
+        reverseQueued = false;
+        reverseQueuedDir = 0;
+
+        EntityTwirlManager.sendStatePacket(TwirlState.CONTINUOUS_REVERSE_SPLICE.signedId(currentDir));
     }
 
     private static boolean shouldContinueConstant() {
@@ -148,8 +202,6 @@ public final class ContinuousTwirlController {
                         baseAngleRad += currentDir * Math.TAU;
                         phaseStartNanos += (long) (TURN360_DURATION_S * 1_000_000_000.0);
 
-                        // NEW: completed a 360 while still holding => keepalive/loop ping
-                        // +/-3 = CONTINUOUS_MIDDLE
                         if (shouldContinueConstant()) {
                             EntityTwirlManager.sendStatePacket(currentDir * 3);
                         }
@@ -158,9 +210,6 @@ public final class ContinuousTwirlController {
 
                         if (!shouldContinueConstant()) {
                             phase = Phase.EASE_OUT_180;
-
-                            // NEW: tell others we're ending, but ONLY once we commit to ending
-                            // (this preserves your "finish the current loop first" feel)
                             sendEndOnce();
                             break;
                         }
@@ -175,6 +224,21 @@ public final class ContinuousTwirlController {
                 }
 
                 case EASE_OUT_180: {
+                    double u = Mth.clamp(elapsedS / HALF_DURATION_S, 0.0, 1.0);
+
+                    if (getConfig().clientPlayerConfig.easeType == EasingUtil.EaseType.Back
+                            && reverseQueued
+                            && reverseQueuedDir == -currentDir) {
+
+                        if (u >= BACK_EASE_OUT_PEAK_U) {
+                            reverseFromBackEaseOutPeak();
+                            continue;
+                        }
+
+                        double angle = baseAngleRad + currentDir * rollLast180(elapsedS);
+                        return (float) angle;
+                    }
+
                     if (elapsedS >= HALF_DURATION_S) {
                         if (keyDown) {
                             startSpin();
@@ -184,6 +248,7 @@ public final class ContinuousTwirlController {
                         active = false;
                         return 0f;
                     }
+
                     double angle = baseAngleRad + currentDir * rollLast180(elapsedS);
                     return (float) angle;
                 }
