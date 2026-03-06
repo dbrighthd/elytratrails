@@ -174,7 +174,7 @@ public class TrailManager {
         ModConfig modConfig = ElytraTrailsClient.getConfig();
         if (ctx.level == null) return;
         for (Entity entity :  ctx.level.entitiesForRendering()) {
-            if(!TrailPackConfigManager.doesEntityhaveEmfTrails(entity) && ((!modConfig.tryWithoutEmf) && doesEntityhaveOverrides(entity)))
+            if(!TrailPackConfigManager.doesEntityhaveEmfTrails(entity) && ((!modConfig.tryWithoutEmf) && doesEntityhaveOverrides(entity)) || (!doesEntityhaveOverrides(entity) && !doesEntityhaveEmfTrails(entity)))
             {
                 continue;
             }

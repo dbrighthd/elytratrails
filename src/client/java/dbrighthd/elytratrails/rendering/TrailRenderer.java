@@ -281,6 +281,9 @@ public class TrailRenderer {
                     alphaEnd = 1;
                     alphaStart = 1;
                 }
+
+                v1 /=(float) trail.config().maxWidth();
+                v2 /= (float) trail.config().maxWidth();
                 quadBetweenPoints(pose, consumer, startPos, endPos, sideA, sideB, halfWidthStart, halfWidthEnd, v1, v2, alphaStart, alphaEnd, trail.flipUv(), color);
             }
             this.accumDist += segmentLength;
@@ -428,6 +431,7 @@ public class TrailRenderer {
 
         float widthStart = halfWidthStart <= 0 ? 0.5f : 1f;
         float widthEnd = halfWidthEnd <= 0 ? 0.5f : 1f;
+
 
         consumer.addVertex(pose, p1)
                 .setNormal(normalX, normalY, normalZ)
