@@ -290,6 +290,8 @@
   "text.elytratrails.option.distanceTillTrailStartOthersDefault": "Other's Distance Before Trail Starts",
   "text.elytratrails.option.distanceTillTrailStartOthersDefault.@Tooltip": "Default: How big the gap between the wingtip and the trail start should be",
 
+  "text.elytratrails.option.tryWithoutEmf" : "Try Resource Pack Trails with No Models",
+  "text.elytratrails.option.tryWithoutEmf.@Tooltip" : "If this is on, it will try to use fallbacks for trail spawners without EMF models (can look bad, but makes arrow built in pack work)",
 
   "text.elytratrails.category.general": "General",
   "text.elytratrails.category.elytra": "Your Trails",
@@ -298,6 +300,9 @@
   "text.elytratrails.category.twirling" : "Twirling",
   "text.elytratrails.category.particles": "Particles",
   "text.elytratrails.category.presets": "Presets",
+  "text.elytratrails.category.keybinds": "Keybinds",
+
+  "text.elytratrails.category.keybinds.desc": "Elytra Contrails Keybinds",
 
   "text.elytratrails.category.general.desc": "General Settings",
   "text.elytratrails.category.elytra.desc": "Applies to your own trails (elytra + first-person behavior).",
@@ -328,6 +333,10 @@
   "text.elytratrails.option.twirl_r_continuous_key": "Keybind: Continuous Twirl Right",
   "text.elytratrails.option.twirl_r_continuous_key.@Tooltip": "Keybind to do a continuous rightward twirl. Keep holding to keep twirling!",
   "key.elytratrails.twirl_random": "Lil Twirl Alternating",
-  "text.elytratrails.option.twirl_random_key": "One Lil Twirl Alternating Direction",
+  "key.elytratrails.open_settings": "Open Settings",
+  "text.elytratrails.option.open_settings_key": "Keybind: Open Settings",
+  "text.elytratrails.option.open_settings_key.@Tooltip": "Keybind to open this menu!",
+
+  "text.elytratrails.option.twirl_random_key": "Keybind: One Lil Twirl Alternating Direction",
   "text.elytratrails.option.twirl_random_key.@Tooltip" : "Keybind to do one twirl in alternating directions"
 }

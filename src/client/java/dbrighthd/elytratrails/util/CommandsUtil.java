@@ -60,12 +60,7 @@ public class CommandsUtil {
         context.getSource().sendFeedback(Component.literal("Stored Configs: " + CLIENT_PLAYER_CONFIGS.size()));
         for(var pair : CLIENT_PLAYER_CONFIGS.entrySet())
         {
-            assert mc.level != null;
-            Entity entity = mc.level.getEntity(pair.getKey());
-            if(entity instanceof Player player)
-            {
-                context.getSource().sendFeedback(Component.literal(player.getName().getString()));
-            }
+            context.getSource().sendFeedback(Component.literal(pair.getValue().playerName()));
         }
         context.getSource().sendFeedback(Component.literal("Current Trails: " + trailcount));
         context.getSource().sendFeedback(Component.literal("Active Trails:  " + activetrailcount));

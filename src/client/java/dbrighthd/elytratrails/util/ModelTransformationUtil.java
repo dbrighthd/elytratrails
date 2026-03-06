@@ -11,6 +11,8 @@ public class ModelTransformationUtil {
 
     public static Vec3 VANILLA_LEFT_WING_TIP = new Vec3(-10.0 / 16.0, 21.0 / 16.0, 2.0 / 16.0);
     public static Vec3 VANILLA_RIGHT_WING_TIP = new Vec3( 10.0 / 16.0, 21.0 / 16.0, 2.0 / 16.0);
+    public static Vec3 ZERO_WINGTIP = new Vec3(0.0 / 16.0, 0.0 / 16.0, 0.0 / 16.0);
+    public static Vec3 VANILLA_ARROW_WINGTIP = new Vec3(-8.0 / 16.0, 0 / 16.0, 0.0 / 16.0);
 
     public static Vec3 transformPoint(Matrix4f matrix, Vec3 localPoint) {
         Vector4f homogeneous = new Vector4f((float) localPoint.x, (float) localPoint.y, (float) localPoint.z, 1.0f);

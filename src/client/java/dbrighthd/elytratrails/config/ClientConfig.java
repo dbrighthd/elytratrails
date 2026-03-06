@@ -2,6 +2,8 @@ package dbrighthd.elytratrails.config;
 
 import dbrighthd.elytratrails.util.EasingUtil;
 import dbrighthd.elytratrails.network.PlayerConfig;
+import net.minecraft.client.Minecraft;
+import net.minecraft.world.entity.player.Player;
 
 /**
  * This class is basically the configs you can select in the "Your trails" or the "Other's Trails". I used to have them
@@ -164,7 +166,8 @@ public class ClientConfig {
                 distanceTillTrailStart,
                 easeType,
                 endDistanceFade,
-                endDistanceFadeAmount);
+                endDistanceFadeAmount,
+                Minecraft.getInstance().getUser().getName());
     }
     public PlayerConfig getHiddenPlayerConfig()
     {
@@ -196,6 +199,7 @@ public class ClientConfig {
                 distanceTillTrailStart,
                 easeType,
                 endDistanceFade,
-                endDistanceFadeAmount);
+                endDistanceFadeAmount,
+                "Hidden User");
     }
 }

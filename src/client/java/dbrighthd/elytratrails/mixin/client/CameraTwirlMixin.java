@@ -6,6 +6,7 @@ import net.minecraft.client.Camera;
 import net.minecraft.client.Minecraft;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.phys.Vec3;
 import org.joml.Quaternionf;
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
@@ -23,9 +24,16 @@ import static dbrighthd.elytratrails.ElytraTrailsClient.getConfig;
 @Mixin(Camera.class)
 public class CameraTwirlMixin {
 
+    @Shadow
+    protected void setPosition(Vec3 pos) {
+
+    }
+
     @Shadow @Final private Quaternionf rotation;
 
     @Shadow private Entity entity;
+
+    @Shadow private Vec3 position;
 
     @Inject(method = "setRotation(FF)V", at = @At("TAIL"))
     private void twirl_applyExtraRotation(float yRot, float xRot, CallbackInfo ci) {
@@ -66,7 +74,6 @@ public class CameraTwirlMixin {
         }
         if (extra != 0f) {
             this.rotation.rotateZ(-extra);
-
         }
     }
 }

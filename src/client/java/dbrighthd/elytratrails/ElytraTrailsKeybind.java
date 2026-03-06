@@ -2,6 +2,7 @@
 package dbrighthd.elytratrails;
 
 import com.mojang.blaze3d.platform.InputConstants;
+import dbrighthd.elytratrails.config.ConfigScreenBuilder;
 import dbrighthd.elytratrails.config.ModConfig;
 import dbrighthd.elytratrails.controller.ContinuousTwirlController;
 import dbrighthd.elytratrails.controller.TwirlController;
@@ -23,12 +24,18 @@ public final class ElytraTrailsKeybind {
 
     public static KeyMapping DO_A_LIL_CONTINUOUS_TWIRL_L;
     public static KeyMapping DO_A_LIL_CONTINUOUS_TWIRL_R;
-
+    public static KeyMapping OPEN_SETTINGS;
     public static KeyMapping TOGGLE_TRAILS;
 
     public static void init() {
         DO_A_LIL_TWIRL_RANDOM = KeyBindingHelper.registerKeyBinding(new KeyMapping(
                 "key.elytratrails.twirl_random",
+                InputConstants.Type.KEYSYM,
+                InputConstants.UNKNOWN.getValue(),
+                CATEGORY
+        ));
+        OPEN_SETTINGS = KeyBindingHelper.registerKeyBinding(new KeyMapping(
+                "key.elytratrails.open_settings",
                 InputConstants.Type.KEYSYM,
                 InputConstants.UNKNOWN.getValue(),
                 CATEGORY
@@ -114,6 +121,9 @@ public final class ElytraTrailsKeybind {
             } else {
                 TwirlController.tickTwirlKey(false, desiredMode);
                 ContinuousTwirlController.tickContinuousTwirlKey(false, continuousMode);
+            }
+            while (OPEN_SETTINGS.consumeClick()) {
+                client.setScreen(ConfigScreenBuilder.buildConfigScreen(client.screen, getConfig()));
             }
 
             while (TOGGLE_TRAILS.consumeClick()) {

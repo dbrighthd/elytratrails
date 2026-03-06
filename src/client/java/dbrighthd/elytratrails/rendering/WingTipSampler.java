@@ -19,9 +19,7 @@ import net.minecraft.client.renderer.SubmitNodeStorage;
 import net.minecraft.client.renderer.entity.EntityRenderDispatcher;
 import net.minecraft.client.renderer.entity.EntityRenderer;
 
-import net.minecraft.client.renderer.entity.state.AvatarRenderState;
-import net.minecraft.client.renderer.entity.state.EntityRenderState;
-import net.minecraft.client.renderer.entity.state.HumanoidRenderState;
+import net.minecraft.client.renderer.entity.state.*;
 import net.minecraft.client.renderer.feature.ModelFeatureRenderer;
 import net.minecraft.client.renderer.rendertype.RenderType;
 import net.minecraft.client.renderer.state.CameraRenderState;
@@ -29,6 +27,7 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.util.Mth;
 import net.minecraft.world.entity.Avatar;
 import net.minecraft.world.entity.Entity;
+import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.phys.Vec3;
 import org.jetbrains.annotations.NotNull;
@@ -151,7 +150,12 @@ public class WingTipSampler {
                 return gatheredTrails;
             }
         }
-        return List.of();
+        List<Emitter> gatheredTrails = getVanillaTrailEmittersGeneric(basePose, animatedRoot, entityModel, camera.position(), entityWorldOffset, entity);
+        if(config.alwaysSnapTrail)
+        {
+            gatheredTrailsThisFrame.put(eid,gatheredTrails);
+        }
+        return gatheredTrails;
     }
     public void removeFromEmfCache(int eid)
     {
@@ -236,6 +240,28 @@ public class WingTipSampler {
                 new Emitter (cameraPos.add(rightTip).add(entityWorldOffset), false, "elytra","/rightWingTip")
         );
     }
+    private @NotNull List<Emitter> getVanillaTrailEmittersGeneric(
+            @NotNull PoseStack stack,
+            @Nullable ModelPart animatedRoot,
+            @NotNull EntityModel<?> model,
+            @NotNull Vec3 cameraPos,
+            @NotNull Vec3 entityWorldOffset,
+            Entity entity
+    ) {
+        Vec3 tip;
+
+        if (entity.getType() == EntityType.ARROW || entity.getType() == EntityType.SPECTRAL_ARROW) {
+            ModelPart root = animatedRoot != null ? animatedRoot : model.root();
+            tip = computeTransformedPoint(stack, root, root, ModelTransformationUtil.VANILLA_ARROW_WINGTIP, entity);
+        } else {
+            ModelPart root = animatedRoot != null ? animatedRoot : model.root();
+            tip = computeTransformedPoint(stack, root, root, ModelTransformationUtil.ZERO_WINGTIP, entity);
+        }
+
+        return List.of(
+                new Emitter(cameraPos.add(tip).add(entityWorldOffset), true, entity.getType().toShortString(), "/trailspawner")
+        );
+    }
 
 
     private @NotNull Vec3 computeTransformedWingTip(@NotNull PoseStack stack, @Nullable ModelPart elytraRoot, @NotNull ModelPart wingRoot, @NotNull Vec3 localPos) {
@@ -246,6 +272,16 @@ public class WingTipSampler {
         return transformLocalPoint(stack, elytraRoot, wingRoot, scaledLocalTip);
     }
 
+    private @NotNull Vec3 computeTransformedPoint(@NotNull PoseStack stack, @Nullable ModelPart modelRoot, @NotNull ModelPart partRoot, @NotNull Vec3 localPos, Entity entity ) {
+        stack.pushPose();
+        if (modelRoot != null && modelRoot != partRoot) {
+            modelRoot.translateAndRotate(stack);
+        }
+        partRoot.translateAndRotate(stack);
+        Vec3 point = ModelTransformationUtil.transformPoint(stack.last().pose(), localPos);
+        stack.popPose();
+        return point;
+    }
     private @NotNull Vec3 transformLocalPoint(@NotNull PoseStack stack, @Nullable ModelPart elytraRoot, @NotNull ModelPart wingRoot, @NotNull Vec3 localPos) {
         stack.pushPose();
         if (elytraRoot != null && elytraRoot != wingRoot) {

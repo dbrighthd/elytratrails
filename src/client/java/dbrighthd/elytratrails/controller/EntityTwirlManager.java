@@ -35,6 +35,7 @@ public final class EntityTwirlManager {
         long startNanos = 0L;
 
         Phase phase = Phase.EASE_IN_180;
+        boolean endRequested = false;
         long phaseStartNanos = 0L;
         double baseAngleRad = 0.0;
     }
@@ -72,18 +73,16 @@ public final class EntityTwirlManager {
                 data.phase = Phase.EASE_IN_180;
                 data.phaseStartNanos = now;
                 data.baseAngleRad = 0.0;
+                data.endRequested = false;
             }
 
-            case CONTINUOUS_MIDDLE -> data.kind = Kind.CONTINUOUS;
+            case CONTINUOUS_MIDDLE -> {
+                data.kind = Kind.CONTINUOUS;
+            }
 
             case CONTINUOUS_END -> {
                 data.kind = Kind.CONTINUOUS;
-
-                // Start ease-out from current angle (smooth).
-                double angleNow = currentContinuousAngle(data, now, getEntityTwirlConfigs(entityId));
-                data.phase = Phase.EASE_OUT_180;
-                data.baseAngleRad = angleNow;
-                data.phaseStartNanos = now;
+                data.endRequested = true;
             }
 
             default -> {}
@@ -96,18 +95,18 @@ public final class EntityTwirlManager {
     {
         PlayerConfig playerConfig = ClientPlayerConfigStore.getOrDefault(entityId);
         double DURATION_S = Math.max(playerConfig.twirlTime(),0.1);
-        if(playerConfig.easeType() == EasingUtil.EaseType.Back)
-        {
-            DURATION_S *= 4;
-        }
-        if(playerConfig.easeType() == EasingUtil.EaseType.None)
-        {
-            DURATION_S /= 1.5;
-        }
         double HALF_DURATION_S = DURATION_S * 0.5;
         double OMEGA_RAD_S = (Math.PI * Math.PI) / DURATION_S;
         double TURN360_DURATION_S = Math.TAU / OMEGA_RAD_S;
         EasingUtil.EaseType easeType = playerConfig.easeType();
+        if(playerConfig.easeType() == EasingUtil.EaseType.Back)
+        {
+            HALF_DURATION_S *= 4;
+        }
+        if(playerConfig.easeType() == EasingUtil.EaseType.None)
+        {
+            HALF_DURATION_S /= 1.5;
+        }
         return new TwirlInfo(DURATION_S,HALF_DURATION_S,OMEGA_RAD_S,TURN360_DURATION_S,easeType);
     }
 
@@ -151,13 +150,19 @@ public final class EntityTwirlManager {
                 }
 
                 case CONSTANT_360 -> {
-                    while (elapsedS >= twirlInfo.turn360_duration) {
+                    while (elapsedS >= twirlInfo.turn360_duration()) {
                         data.baseAngleRad += data.dir * Math.TAU;
-                        data.phaseStartNanos += (long) (twirlInfo.turn360_duration * 1_000_000_000.0);
+                        data.phaseStartNanos += (long) (twirlInfo.turn360_duration() * 1_000_000_000.0);
                         elapsedS = (now - data.phaseStartNanos) / 1_000_000_000.0;
+
+                        if (data.endRequested) {
+                            data.phase = Phase.EASE_OUT_180;
+                            data.phaseStartNanos = now;
+                            return (float) data.baseAngleRad;
+                        }
                     }
 
-                    double a = Mth.clamp(twirlInfo.omega_rad_s * elapsedS, 0.0, Math.TAU);
+                    double a = Mth.clamp(twirlInfo.omega_rad_s() * elapsedS, 0.0, Math.TAU);
                     return (float) (data.baseAngleRad + data.dir * a);
                 }
 

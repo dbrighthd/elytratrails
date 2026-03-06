@@ -60,6 +60,8 @@ public class ConfigScreenBuilder {
         ConfigCategory twirling = builder.getOrCreateCategory(Component.translatable("text.elytratrails.category.twirling"));
         ConfigCategory particles = builder.getOrCreateCategory(Component.translatable("text.elytratrails.category.particles"));
         ConfigCategory presets = builder.getOrCreateCategory(Component.translatable("text.elytratrails.category.presets"));
+        ConfigCategory keybinds = builder.getOrCreateCategory(Component.translatable("text.elytratrails.category.keybinds"));
+
 
 
 
@@ -77,7 +79,7 @@ public class ConfigScreenBuilder {
                 .setSaveConsumer(newValue -> config.emfSupport = newValue)
                 .build());
         general.addEntry(entryBuilder.startBooleanToggle(Component.translatable("text.elytratrails.option.alwaysSnapTrail"), config.alwaysSnapTrail)
-                .setDefaultValue(false)
+                .setDefaultValue(true)
                 .setTooltip(Component.translatable("text.elytratrails.option.alwaysSnapTrail.@Tooltip"))
                 .setSaveConsumer(newValue -> config.alwaysSnapTrail = newValue)
                 .build());
@@ -91,8 +93,13 @@ public class ConfigScreenBuilder {
                 .setTooltip(Component.translatable("text.elytratrails.option.extendedEmfSupport.@Tooltip"))
                 .setSaveConsumer(newValue -> config.extendedEmfSupport = newValue)
                 .build());
-        general.addEntry(entryBuilder.startBooleanToggle(Component.translatable("text.elytratrails.option.cameraDistanceFade"), config.tryNearTrailFade)
+        general.addEntry(entryBuilder.startBooleanToggle(Component.translatable("text.elytratrails.option.tryWithoutEmf"), config.tryWithoutEmf)
                 .setDefaultValue(true)
+                .setTooltip(Component.translatable("text.elytratrails.option.tryWithoutEmf.@Tooltip"))
+                .setSaveConsumer(newValue -> config.tryWithoutEmf = newValue)
+                .build());
+        general.addEntry(entryBuilder.startBooleanToggle(Component.translatable("text.elytratrails.option.cameraDistanceFade"), config.tryNearTrailFade)
+                .setDefaultValue(false)
                 .setTooltip(Component.translatable("text.elytratrails.option.cameraDistanceFade.@Tooltip"))
                 .setSaveConsumer(newValue -> config.tryNearTrailFade = newValue)
                 .build());
@@ -112,17 +119,7 @@ public class ConfigScreenBuilder {
                 .setSaveConsumer(newValue -> config.alwaysGlowWhenShaderTranslucent = newValue)
                 .requireRestart()
                 .build());
-        general.addEntry(entryBuilder.startKeyCodeField(
-                        Component.translatable("text.elytratrails.option.toggle_trails_key"),
-                        ElytraTrailsKeybind.TOGGLE_TRAILS.key
-                )
-                .setDefaultValue(ElytraTrailsKeybind.TOGGLE_TRAILS.getDefaultKey())
-                .setTooltip(Component.translatable("text.elytratrails.option.toggle_trails_key.@Tooltip"))
-                .setKeySaveConsumer(newKey -> {
-                    ElytraTrailsKeybind.TOGGLE_TRAILS.setKey(newKey);
-                    KeyMapping.resetMapping();
-                })
-                .build());
+
         general.addEntry(entryBuilder.startEnumSelector(
                         Component.translatable("text.elytratrails.option.clearTrails"),
                         ModConfig.ClearTrails.class,
@@ -166,12 +163,14 @@ public class ConfigScreenBuilder {
                         Component.translatable("text.elytratrails.option.easeType"),
                         EasingUtil.EaseType.class,
                         config.clientPlayerConfig.easeType)
-                .setDefaultValue(EasingUtil.EaseType.Sine)
+                .setDefaultValue(ClientConfig.getDefaultClientConfig().easeType)
                 .setTooltip(Component.translatable("text.elytratrails.option.easeType.@Tooltip"))
                 .setSaveConsumer(newValue -> config.clientPlayerConfig.easeType = newValue)
                 .build());
-
-        twirling.addEntry(entryBuilder.startKeyCodeField(
+        keybinds.addEntry(entryBuilder.startTextDescription(
+                        Component.translatable("text.elytratrails.category.keybinds.desc"))
+                .build());
+        keybinds.addEntry(entryBuilder.startKeyCodeField(
                         Component.translatable("text.elytratrails.option.twirl_r_continuous_key"),
                         ElytraTrailsKeybind.DO_A_LIL_CONTINUOUS_TWIRL_R.key
                 )
@@ -182,7 +181,7 @@ public class ConfigScreenBuilder {
                     KeyMapping.resetMapping();
                 })
                 .build());
-        twirling.addEntry(entryBuilder.startKeyCodeField(
+        keybinds.addEntry(entryBuilder.startKeyCodeField(
                         Component.translatable("text.elytratrails.option.twirl_l_continuous_key"),
                         ElytraTrailsKeybind.DO_A_LIL_CONTINUOUS_TWIRL_L.key
                 )
@@ -194,7 +193,7 @@ public class ConfigScreenBuilder {
                 })
                 .build());
 
-        twirling.addEntry(entryBuilder.startKeyCodeField(
+        keybinds.addEntry(entryBuilder.startKeyCodeField(
                         Component.translatable("text.elytratrails.option.twirl_r_key"),
                         ElytraTrailsKeybind.DO_A_LIL_TWIRL_R.key
                 )
@@ -205,7 +204,7 @@ public class ConfigScreenBuilder {
                     KeyMapping.resetMapping();
                 })
                 .build());
-        twirling.addEntry(entryBuilder.startKeyCodeField(
+        keybinds.addEntry(entryBuilder.startKeyCodeField(
                         Component.translatable("text.elytratrails.option.twirl_l_key"),
                         ElytraTrailsKeybind.DO_A_LIL_TWIRL_L.key
                 )
@@ -216,8 +215,7 @@ public class ConfigScreenBuilder {
                     KeyMapping.resetMapping();
                 })
                 .build());
-
-        twirling.addEntry(entryBuilder.startKeyCodeField(
+        keybinds.addEntry(entryBuilder.startKeyCodeField(
                         Component.translatable("text.elytratrails.option.twirl_random_key"),
                         ElytraTrailsKeybind.DO_A_LIL_TWIRL_RANDOM.key
                 )
@@ -225,6 +223,28 @@ public class ConfigScreenBuilder {
                 .setTooltip(Component.translatable("text.elytratrails.option.twirl_random_key.@Tooltip"))
                 .setKeySaveConsumer(newKey -> {
                     ElytraTrailsKeybind.DO_A_LIL_TWIRL_RANDOM.setKey(newKey);
+                    KeyMapping.resetMapping();
+                })
+                .build());
+        keybinds.addEntry(entryBuilder.startKeyCodeField(
+                        Component.translatable("text.elytratrails.option.toggle_trails_key"),
+                        ElytraTrailsKeybind.TOGGLE_TRAILS.key
+                )
+                .setDefaultValue(ElytraTrailsKeybind.TOGGLE_TRAILS.getDefaultKey())
+                .setTooltip(Component.translatable("text.elytratrails.option.toggle_trails_key.@Tooltip"))
+                .setKeySaveConsumer(newKey -> {
+                    ElytraTrailsKeybind.TOGGLE_TRAILS.setKey(newKey);
+                    KeyMapping.resetMapping();
+                })
+                .build());
+        keybinds.addEntry(entryBuilder.startKeyCodeField(
+                        Component.translatable("text.elytratrails.option.open_settings_key"),
+                        ElytraTrailsKeybind.OPEN_SETTINGS.key
+                )
+                .setDefaultValue(ElytraTrailsKeybind.OPEN_SETTINGS.getDefaultKey())
+                .setTooltip(Component.translatable("text.elytratrails.option.open_settings_key.@Tooltip"))
+                .setKeySaveConsumer(newKey -> {
+                    ElytraTrailsKeybind.OPEN_SETTINGS.setKey(newKey);
                     KeyMapping.resetMapping();
                 })
                 .build());

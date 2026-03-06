@@ -23,7 +23,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import static dbrighthd.elytratrails.ElytraTrailsClient.getConfig;
-import static dbrighthd.elytratrails.config.pack.TrailPackConfigManager.entitesWithTrails;
+import static dbrighthd.elytratrails.config.pack.TrailPackConfigManager.*;
 import static dbrighthd.elytratrails.controller.EntityTwirlManager.isRolling;
 
 public class TrailManager {
@@ -56,7 +56,7 @@ public class TrailManager {
                 lastSample = TimeUtil.currentMillis();
             }
             gatherPlayerTrails(Minecraft.getInstance(), recordEmitters);
-            if(getConfig().extendedEmfSupport && !entitesWithTrails.isEmpty())
+            if(getConfig().extendedEmfSupport && (!entitesWithTrails.isEmpty() || !entitesWithTrailOverrides.isEmpty()))
             {
                 gatherEntityTrails(Minecraft.getInstance(), recordEmitters);
             }
@@ -174,7 +174,7 @@ public class TrailManager {
         ModConfig modConfig = ElytraTrailsClient.getConfig();
         if (ctx.level == null) return;
         for (Entity entity :  ctx.level.entitiesForRendering()) {
-            if(!TrailPackConfigManager.doesEntityhaveOverrides(entity))
+            if(!TrailPackConfigManager.doesEntityhaveEmfTrails(entity) && ((!modConfig.tryWithoutEmf) && doesEntityhaveOverrides(entity)))
             {
                 continue;
             }

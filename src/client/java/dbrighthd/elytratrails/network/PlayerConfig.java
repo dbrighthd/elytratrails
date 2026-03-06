@@ -31,7 +31,8 @@ public record PlayerConfig(
         double distanceTillTrailStart,
         EasingUtil.EaseType easeType,
         boolean endDistanceFade,
-        double endDistanceFadeAmount
+        double endDistanceFadeAmount,
+        String playerName
 ) {
     public static final int WIRE_VERSION = 1; // bump when you change meaning, not when you add fields
 
@@ -66,6 +67,7 @@ public record PlayerConfig(
         tag.putString("easeType", easeType.name());
         tag.putBoolean("endDistanceFade", endDistanceFade);
         tag.putDouble("endDistanceFadeAmount", endDistanceFadeAmount);
+        tag.putString("playerName", playerName);
 
 
         return tag;

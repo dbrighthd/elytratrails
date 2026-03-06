@@ -1,21 +1,19 @@
 package dbrighthd.elytratrails.network;
 
-import net.fabricmc.api.EnvType;
-import net.fabricmc.api.Environment;
 import net.fabricmc.fabric.api.networking.v1.PayloadTypeRegistry;
-import net.fabricmc.fabric.api.networking.v1.PlayerLookup;
 import net.fabricmc.fabric.api.networking.v1.ServerPlayNetworking;
-import net.fabricmc.loader.api.FabricLoader;
 import net.minecraft.nbt.CompoundTag;
-import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.Entity;
 
+import java.util.HashSet;
 import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
+import java.util.Set;
+import java.util.UUID;
 
 
 public class RegisterPackets {
+    public static Set<UUID> playersReceivedWarnings = new HashSet<>();
     public static void initCommon() {
         PayloadTypeRegistry.playS2C().register(TwirlStateS2CPayload.ID,TwirlStateS2CPayload.CODEC);
         PayloadTypeRegistry.playC2S().register(TwirlStateC2SPayload.ID,TwirlStateC2SPayload.CODEC);
@@ -24,6 +22,8 @@ public class RegisterPackets {
         PayloadTypeRegistry.playC2S().register(GetAllRequestC2SPayload.ID,GetAllRequestC2SPayload.CODEC);
         PayloadTypeRegistry.playS2C().register(RemoveFromStoreS2CPayload.ID,RemoveFromStoreS2CPayload.CODEC);
         PayloadTypeRegistry.playC2S().register(RemoveFromStoreC2SPayload.ID,RemoveFromStoreC2SPayload.CODEC);
+        PayloadTypeRegistry.playS2C().register(LegacyPlayerConfigS2CPayload.ID,LegacyPlayerConfigS2CPayload.CODEC);
+        PayloadTypeRegistry.playC2S().register(LegacyPlayerConfigC2SPayload.ID,LegacyPlayerConfigC2SPayload.CODEC);
     }
     public static void initServer() {
         ServerPlayNetworking.registerGlobalReceiver(TwirlStateC2SPayload.ID, (payload, context) -> {
@@ -40,6 +40,16 @@ public class RegisterPackets {
             for (ServerPlayer player : context.server().getPlayerList().getPlayers()) {
                 ServerPlayNetworking.send(player, serverPayload);
             }
+        });
+        ServerPlayNetworking.registerGlobalReceiver(LegacyPlayerConfigC2SPayload.ID, (payload, context) -> {
+            if(!playersReceivedWarnings.contains(context.player().getUUID()))
+            {
+                context.player().displayClientMessage(
+                        net.minecraft.network.chat.Component.literal("§cYou are using an outdated version of Elytra Contrails. To sync with this server, you must update to Elytra Contrails 1.4.0+"),
+                        false
+                );
+            }
+            playersReceivedWarnings.add(context.player().getUUID());
         });
         ServerPlayNetworking.registerGlobalReceiver(GetAllRequestC2SPayload.ID, (payload, context) -> {
             for(Map.Entry<Integer, CompoundTag> configPair : ServerPlayerConfigStore.SERVER_PLAYER_CONFIGS.entrySet())

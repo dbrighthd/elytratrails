@@ -2,6 +2,8 @@ package dbrighthd.elytratrails.config;
 
 import me.shedaniel.autoconfig.ConfigData;
 import me.shedaniel.autoconfig.annotation.Config;
+import net.fabricmc.fabric.api.datagen.v1.provider.FabricAdvancementProvider;
+
 /**
  * The config that gets serialized and stored
  */
@@ -21,9 +23,10 @@ public class ModConfig implements ConfigData {
     public boolean fishysStupidThirdPersonCameraRoll = false;
     public boolean emfSupport = true;
     public boolean extendedEmfSupport = true;
+    public boolean tryWithoutEmf;
     public boolean enableTwirls = true;
-    public boolean tryNearTrailFade = true;
-    public boolean alwaysSnapTrail = false;
+    public boolean tryNearTrailFade = false;
+    public boolean alwaysSnapTrail = true;
     public boolean logTrails = false;
     public ClearTrails clearTrailsOption = ClearTrails.NO;
     public enum ClearTrails {

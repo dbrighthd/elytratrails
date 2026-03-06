@@ -134,7 +134,8 @@ public final class ClientPlayerConfigStore
                 incomingConfig.distanceTillTrailStart(),
                 incomingConfig.easeType(),
                 incomingConfig.endDistanceFade(),
-                incomingConfig.endDistanceFadeAmount()
+                incomingConfig.endDistanceFadeAmount(),
+                incomingConfig.playerName()
         );
 
         CLIENT_PLAYER_CONFIGS.put(entityId,safe);
@@ -184,6 +185,8 @@ public final class ClientPlayerConfigStore
         boolean endDistanceFade = tag.getBooleanOr("endDistanceFade", fallbackConfig.endDistanceFade());
         double endDistanceFadeAmount = tag.getDoubleOr("endDistanceFadeAmount", fallbackConfig.endDistanceFadeAmount());
 
+        String playerName = tag.getStringOr("playerName", fallbackConfig.playerName());
+
         return new PlayerConfig(
                 enableTrail,
                 enableRandomWidth,
@@ -212,7 +215,8 @@ public final class ClientPlayerConfigStore
                 distanceTillTrailStart,
                 easeType,
                 endDistanceFade,
-                endDistanceFadeAmount
+                endDistanceFadeAmount,
+                playerName
         );
     }
     public static <E extends Enum<E>> E readEnum(CompoundTag tag, String key, Class<E> enumClass, E fallback) {
