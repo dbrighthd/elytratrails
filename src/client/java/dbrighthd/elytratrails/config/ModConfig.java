@@ -2,7 +2,6 @@ package dbrighthd.elytratrails.config;
 
 import me.shedaniel.autoconfig.ConfigData;
 import me.shedaniel.autoconfig.annotation.Config;
-import net.fabricmc.fabric.api.datagen.v1.provider.FabricAdvancementProvider;
 
 /**
  * The config that gets serialized and stored
@@ -47,7 +46,7 @@ public class ModConfig implements ConfigData {
 
     public double maxOnlineLifetime = 120.0;
 
-    public boolean useSameDefaultsforOthers = false;
+    public boolean useSameDefaultsForOthers = false;
 
     public boolean enableParticles = false;
 

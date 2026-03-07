@@ -47,8 +47,8 @@ public final class TrailPackConfigManager {
     private static final ConcurrentHashMap<String, ModelTrailConfig> MODEL_TRAIL_CONFIGS = new ConcurrentHashMap<>();
     private static final ConcurrentHashMap<String, TrailOverrides> CONFIG_PRESETS = new ConcurrentHashMap<>();
     private static final ConcurrentHashMap<String, TrailOverrides> HIDDEN_CONFIG_PRESETS = new ConcurrentHashMap<>();
-    public static final Set<EntityType<?>> entitesWithTrails = new HashSet<>();
-    public static final Set<EntityType<?>> entitesWithTrailOverrides = new HashSet<>();
+    public static final Set<EntityType<?>> entitiesWithTrails = new HashSet<>();
+    public static final Set<EntityType<?>> entitiesWithTrailOverrides = new HashSet<>();
     private static double maxLifetimeOverrideSeconds = -1.0;
 
     public static void clear() {
@@ -59,17 +59,19 @@ public final class TrailPackConfigManager {
     {
         return Collections.list(MODEL_TRAIL_CONFIGS.keys());
     }
-    public static boolean doesEntityhaveEmfTrails(Entity entity)
+
+    @SuppressWarnings("BooleanMethodIsAlwaysInverted")
+    public static boolean doesEntityHaveEmfTrails(Entity entity)
     {
-        return entitesWithTrails.contains(entity.getType());
+        return entitiesWithTrails.contains(entity.getType());
     }
-    public static boolean doesEntityhaveOverrides(Entity entity)
+    public static boolean doesEntityHaveOverrides(Entity entity)
     {
-        return entitesWithTrailOverrides.contains(entity.getType());
+        return entitiesWithTrailOverrides.contains(entity.getType());
     }
     public static void reload(@Nullable ResourceManager resourceManager) {
         clear();
-        entitesWithTrailOverrides.clear();
+        entitiesWithTrailOverrides.clear();
         if (resourceManager == null) return;
         try {
             Map<Identifier, Resource> discoveredResources = resourceManager.listResources(CONFIG_FOLDER, id -> {
@@ -90,7 +92,7 @@ public final class TrailPackConfigManager {
                 String modelKey = modelKeyFromTrailConfigsPath(resourceId.getPath());
                 if (modelKey == null) continue;
 
-                EntityType.byString(sanatizeModelKey(modelKey)).ifPresent(entitesWithTrailOverrides::add);
+                EntityType.byString(sanitizeModelKey(modelKey)).ifPresent(entitiesWithTrailOverrides::add);
                 loadAndCacheModelConfig(modelKey, resource);
             }
         } catch (Throwable ignored) {
@@ -495,7 +497,7 @@ public final class TrailPackConfigManager {
         }
     }
     @SuppressWarnings("unused")
-    public static String sanatizeModelKey(String modelKey)
+    public static String sanitizeModelKey(String modelKey)
     {
         return modelKey.replaceAll("[0-9]","");
     }

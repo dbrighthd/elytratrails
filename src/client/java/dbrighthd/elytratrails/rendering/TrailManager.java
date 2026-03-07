@@ -55,7 +55,7 @@ public class TrailManager {
                 lastSample = TimeUtil.currentMillis();
             }
             gatherPlayerTrails(Minecraft.getInstance(), recordEmitters);
-            if(modConfig.extendedEmfSupport && (!entitesWithTrails.isEmpty() || !entitesWithTrailOverrides.isEmpty()))
+            if(modConfig.extendedEmfSupport && (!entitiesWithTrails.isEmpty() || !entitiesWithTrailOverrides.isEmpty()))
             {
                 gatherEntityTrails(Minecraft.getInstance(), recordEmitters);
             }
@@ -171,7 +171,7 @@ public class TrailManager {
     private void gatherEntityTrails(Minecraft ctx, boolean recordEmitter) {
         if (ctx.level == null) return;
         for (Entity entity :  ctx.level.entitiesForRendering()) {
-            if(!TrailPackConfigManager.doesEntityhaveEmfTrails(entity) && ((!modConfig.tryWithoutEmf) && doesEntityhaveOverrides(entity)) || (!doesEntityhaveOverrides(entity) && !doesEntityhaveEmfTrails(entity)))
+            if(!TrailPackConfigManager.doesEntityHaveEmfTrails(entity) && ((!modConfig.tryWithoutEmf) && doesEntityHaveOverrides(entity)) || (!doesEntityHaveOverrides(entity) && !doesEntityHaveEmfTrails(entity)))
             {
                 continue;
             }

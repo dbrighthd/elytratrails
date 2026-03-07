@@ -250,12 +250,11 @@ public class WingTipSampler {
     ) {
         Vec3 tip;
 
+        ModelPart modelPart = animatedRoot != null ? animatedRoot : model.root();
         if (entity.getType() == EntityType.ARROW || entity.getType() == EntityType.SPECTRAL_ARROW) {
-            ModelPart root = animatedRoot != null ? animatedRoot : model.root();
-            tip = computeTransformedPoint(stack, root, root, ModelTransformationUtil.VANILLA_ARROW_WINGTIP, entity);
+            tip = computeTransformedPoint(stack, modelPart, modelPart, ModelTransformationUtil.VANILLA_ARROW_WINGTIP);
         } else {
-            ModelPart root = animatedRoot != null ? animatedRoot : model.root();
-            tip = computeTransformedPoint(stack, root, root, ModelTransformationUtil.ZERO_WINGTIP, entity);
+            tip = computeTransformedPoint(stack, modelPart, modelPart, ModelTransformationUtil.ZERO_WINGTIP);
         }
 
         return List.of(
@@ -272,7 +271,7 @@ public class WingTipSampler {
         return transformLocalPoint(stack, elytraRoot, wingRoot, scaledLocalTip);
     }
 
-    private @NotNull Vec3 computeTransformedPoint(@NotNull PoseStack stack, @Nullable ModelPart modelRoot, @NotNull ModelPart partRoot, @NotNull Vec3 localPos, Entity entity ) {
+    private @NotNull Vec3 computeTransformedPoint(@NotNull PoseStack stack, @Nullable ModelPart modelRoot, @NotNull ModelPart partRoot, @NotNull Vec3 localPos ) {
         stack.pushPose();
         if (modelRoot != null && modelRoot != partRoot) {
             modelRoot.translateAndRotate(stack);

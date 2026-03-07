@@ -15,7 +15,7 @@ import traben.entity_model_features.models.parts.EMFModelPartWithState;
 
 import java.util.*;
 
-import static dbrighthd.elytratrails.config.pack.TrailPackConfigManager.entitesWithTrails;
+import static dbrighthd.elytratrails.config.pack.TrailPackConfigManager.entitiesWithTrails;
 
 public final class EmfTrailSpawnerRegistry {
     private EmfTrailSpawnerRegistry() {}
@@ -74,7 +74,7 @@ public final class EmfTrailSpawnerRegistry {
 
         if (!spawnerPaths.isEmpty()) {
             Optional<EntityType<?>> entityType = EntityType.byString(typeString.substring(typeString.lastIndexOf(".")+1));
-            entityType.ifPresent(entitesWithTrails::add);
+            entityType.ifPresent(entitiesWithTrails::add);
             TYPES_WITH_SPAWNERS.add(typeString);
         }
 

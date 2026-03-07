@@ -60,7 +60,7 @@ public final class ClientPlayerConfigStore
     public static PlayerConfig getLocalPlayerConfigOthers() {
         var config = getConfig();
 
-        if (config.useSameDefaultsforOthers) {
+        if (config.useSameDefaultsForOthers) {
             return getLocalPlayerConfig();
         }
 

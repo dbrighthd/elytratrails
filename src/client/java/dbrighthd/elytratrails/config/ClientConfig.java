@@ -3,7 +3,6 @@ package dbrighthd.elytratrails.config;
 import dbrighthd.elytratrails.util.EasingUtil;
 import dbrighthd.elytratrails.network.PlayerConfig;
 import net.minecraft.client.Minecraft;
-import net.minecraft.world.entity.player.Player;
 
 /**
  * This class is basically the configs you can select in the "Your trails" or the "Other's Trails". I used to have them

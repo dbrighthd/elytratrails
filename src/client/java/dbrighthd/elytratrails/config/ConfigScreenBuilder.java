@@ -472,10 +472,10 @@ public class ConfigScreenBuilder {
         others.addEntry(entryBuilder.startTextDescription(
                         Component.translatable("text.elytratrails.category.others.desc"))
                 .build());
-        others.addEntry(entryBuilder.startBooleanToggle(Component.translatable("text.elytratrails.option.useSameDefaultsforOthers"), config.useSameDefaultsforOthers)
+        others.addEntry(entryBuilder.startBooleanToggle(Component.translatable("text.elytratrails.option.useSameDefaultsforOthers"), config.useSameDefaultsForOthers)
                 .setDefaultValue(false)
                 .setTooltip(Component.translatable("text.elytratrails.option.useSameDefaultsforOthers.@Tooltip"))
-                .setSaveConsumer(newValue -> config.useSameDefaultsforOthers = newValue)
+                .setSaveConsumer(newValue -> config.useSameDefaultsForOthers = newValue)
                 .build());
         others.addEntry(entryBuilder.startBooleanToggle(Component.translatable("text.elytratrails.option.enableTrailOthersDefault"), config.otherPlayerConfig.enableTrail)
                 .setDefaultValue(ClientConfig.getDefaultClientConfig().enableTrail)

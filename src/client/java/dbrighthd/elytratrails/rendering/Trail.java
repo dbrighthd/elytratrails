@@ -15,7 +15,6 @@ public record Trail(Identifier texture, List<Point> points, TrailPackConfigManag
 
     public static Trail fromPlayerConfig(int playerId, Emitter emitter, int index) {
         PlayerConfig config = ClientPlayerConfigStore.getOrDefault(playerId);
-        System.out.println(config);
         TrailPackConfigManager.ResolvedTrailSettings resolvedTrailSettings =  TrailPackConfigManager.resolve(emitter.modelName(), emitter.boneName(), config);
 
         Identifier texture = TrailTextureRegistry.resolveTextureOrNull(resolvedTrailSettings.prideTrail());

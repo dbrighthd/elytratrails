@@ -9,10 +9,7 @@ import net.fabricmc.fabric.api.client.command.v2.ClientCommandManager;
 import net.fabricmc.fabric.api.client.command.v2.ClientCommandRegistrationCallback;
 import net.fabricmc.fabric.api.client.command.v2.FabricClientCommandSource;
 import net.fabricmc.fabric.api.client.networking.v1.ClientPlayNetworking;
-import net.minecraft.client.Minecraft;
 import net.minecraft.network.chat.Component;
-import net.minecraft.world.entity.Entity;
-import net.minecraft.world.entity.player.Player;
 
 import static dbrighthd.elytratrails.network.ClientPlayerConfigStore.CLIENT_PLAYER_CONFIGS;
 
@@ -54,7 +51,6 @@ public class CommandsUtil {
     }
     private static int debugCommand(CommandContext<FabricClientCommandSource> context)
     {
-        Minecraft mc = Minecraft.getInstance();
         int trailcount = TrailSystem.getTrailManager().trailsNumber();
         int activetrailcount = TrailSystem.getTrailManager().activeTrailsNumber();
         context.getSource().sendFeedback(Component.literal("Stored Configs: " + CLIENT_PLAYER_CONFIGS.size()));

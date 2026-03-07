@@ -24,7 +24,6 @@ import org.joml.Vector3f;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
@@ -139,14 +138,6 @@ public class TrailRenderer {
         }
 
         stack.popPose();
-    }
-    private Trail.Point getPointWithOptionalSnappedLast(
-            List<Trail.Point> points,
-            int index,
-            Trail.Point snappedLastPoint
-    ) {
-        int last = points.size() - 1;
-        return (snappedLastPoint != null && index == last) ? snappedLastPoint : points.get(index);
     }
     private Trail.Point copyTrailPointNewPos(Trail.Point point, Vec3 newPos)
     {
