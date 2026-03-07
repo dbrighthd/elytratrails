@@ -1,7 +1,5 @@
 package dbrighthd.elytratrails.rendering;
 
-
-import dbrighthd.elytratrails.ElytraTrailsClient;
 import dbrighthd.elytratrails.config.ModConfig;
 import dbrighthd.elytratrails.config.pack.TrailPackConfigManager;
 import dbrighthd.elytratrails.network.ClientPlayerConfigStore;
@@ -33,16 +31,17 @@ public class TrailManager {
     private final List<Trail> trails = new ArrayList<>();
     private float lastSample;
     private final WingTipSampler sampler;
-
+    private ModConfig modConfig;
     public TrailManager(WingTipSampler sampler) {
         this.sampler = sampler;
         ClientTickEvents.END_CLIENT_TICK.register(this::removeDeadPoints);
         WorldRenderEvents.AFTER_ENTITIES.register(cxt -> {
+            modConfig = getConfig();
             float now = TimeUtil.currentMillis();
             boolean recordEmitters = true;
-            if((now - lastSample) < (1000f / getConfig().maxSamplePerSecond))
+            if((now - lastSample) < (1000f / modConfig.maxSamplePerSecond))
             {
-                if(getConfig().alwaysSnapTrail)
+                if(modConfig.alwaysSnapTrail)
                 {
                     recordEmitters = false;
                 }
@@ -56,7 +55,7 @@ public class TrailManager {
                 lastSample = TimeUtil.currentMillis();
             }
             gatherPlayerTrails(Minecraft.getInstance(), recordEmitters);
-            if(getConfig().extendedEmfSupport && (!entitesWithTrails.isEmpty() || !entitesWithTrailOverrides.isEmpty()))
+            if(modConfig.extendedEmfSupport && (!entitesWithTrails.isEmpty() || !entitesWithTrailOverrides.isEmpty()))
             {
                 gatherEntityTrails(Minecraft.getInstance(), recordEmitters);
             }
@@ -103,7 +102,6 @@ public class TrailManager {
     }
 
     private void gatherPlayerTrails(Minecraft ctx, boolean recordEmitter) {
-        ModConfig modConfig = ElytraTrailsClient.getConfig();
         if (ctx.level == null) return;
 
         List<AbstractClientPlayer> players = ctx.level.players();
@@ -115,10 +113,10 @@ public class TrailManager {
 
             if (valid) {
                 List<Emitter> emitters = sampler.getPlayerTrailEmitterPositions(player, ctx.getDeltaTracker().getGameTimeDeltaPartialTick(false));
-
+                double speed = player.getDeltaMovement().length();
                 if (emitters.isEmpty())
                 {
-                    if(getConfig().logTrails)
+                    if(modConfig.logTrails)
                     {
                         LOGGER.info("Empty Emitters from {}, resetting trails if exist",eid);
                     }
@@ -154,7 +152,7 @@ public class TrailManager {
 
                     Trail trail = trailGroup.trails().get(i);
                     Vec3 emitter = emitters.get(i).position();
-                    trail.points().add(new Trail.Point(emitter));
+                    trail.points().add(new Trail.Point(emitter,speed));
                 }
             } else {
                 removeTrail(eid);
@@ -171,7 +169,6 @@ public class TrailManager {
         return trails.size();
     }
     private void gatherEntityTrails(Minecraft ctx, boolean recordEmitter) {
-        ModConfig modConfig = ElytraTrailsClient.getConfig();
         if (ctx.level == null) return;
         for (Entity entity :  ctx.level.entitiesForRendering()) {
             if(!TrailPackConfigManager.doesEntityhaveEmfTrails(entity) && ((!modConfig.tryWithoutEmf) && doesEntityhaveOverrides(entity)) || (!doesEntityhaveOverrides(entity) && !doesEntityhaveEmfTrails(entity)))
@@ -184,14 +181,14 @@ public class TrailManager {
 
             if (valid) {
                 List<Emitter> emitters = sampler.getEntityTrailEmitterPositions(entity, ctx.getDeltaTracker().getGameTimeDeltaPartialTick(false));
-
+                double speed = entity.getDeltaMovement().length();
                 if(entity instanceof Player)
                 {
                     continue;
                 }
                 if (emitters.isEmpty())
                 {
-                    if(getConfig().logTrails)
+                    if(modConfig.logTrails)
                     {
                         LOGGER.info("Empty Emitters from non-player entity {} ({}), resetting trails if exist",eid, entity.getType());
                     }
@@ -227,7 +224,7 @@ public class TrailManager {
 
                     Trail trail = trailGroup.trails().get(i);
                     Vec3 emitter = emitters.get(i).position();
-                    trail.points().add(new Trail.Point(emitter));
+                    trail.points().add(new Trail.Point(emitter,speed));
                 }
             } else {
                 removeTrail(eid);
@@ -255,7 +252,7 @@ public class TrailManager {
 
     public void removeAllTrails()
     {
-        if(getConfig().logTrails)
+        if(modConfig.logTrails)
         {
             LOGGER.info("Cleared {} trails, of which {} were active.", trails.size(), activeTrails.size());
         }

@@ -26,5 +26,11 @@
   "endingWidthMultiplier": 1.0,
   "distanceTillTrailStart": 0.0,
   "endDistanceFade": false,
-  "endDistanceFadeAmount": 1.0
+  "endDistanceFadeAmount": 1.0,
+  "speedBasedAlpha": false,
+  "minAlphaSpeed": 0.75,
+  "maxAlphaSpeed": 2.0,
+  "speedBasedWidth": false,
+  "minWidthSpeed": 0.75,
+  "maxWidthSpeed": 2.0
 }

@@ -15,6 +15,7 @@ public record Trail(Identifier texture, List<Point> points, TrailPackConfigManag
 
     public static Trail fromPlayerConfig(int playerId, Emitter emitter, int index) {
         PlayerConfig config = ClientPlayerConfigStore.getOrDefault(playerId);
+        System.out.println(config);
         TrailPackConfigManager.ResolvedTrailSettings resolvedTrailSettings =  TrailPackConfigManager.resolve(emitter.modelName(), emitter.boneName(), config);
 
         Identifier texture = TrailTextureRegistry.resolveTextureOrNull(resolvedTrailSettings.prideTrail());
@@ -38,9 +39,9 @@ public record Trail(Identifier texture, List<Point> points, TrailPackConfigManag
      * @param pos position of trail point
      * @param epoch time of creation, in milliseconds
      */
-    public record Point(Vec3 pos, long epoch) {
-        public Point(Vec3 pos) {
-            this(pos, TimeUtil.currentMillis());
+    public record Point(Vec3 pos, long epoch, double speedAtEmission) {
+        public Point(Vec3 pos, double speed) {
+            this(pos, TimeUtil.currentMillis(), speed);
         }
     }
 }

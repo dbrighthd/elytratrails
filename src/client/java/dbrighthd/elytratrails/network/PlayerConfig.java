@@ -32,7 +32,13 @@ public record PlayerConfig(
         EasingUtil.EaseType easeType,
         boolean endDistanceFade,
         double endDistanceFadeAmount,
-        String playerName
+        String playerName,
+        boolean speedBasedAlpha,
+        double minAlphaSpeed,
+        double maxAlphaSpeed,
+        boolean speedBasedWidth,
+        double minWidthSpeed,
+        double maxWidthSpeed
 ) {
     public static final int WIRE_VERSION = 1; // bump when you change meaning, not when you add fields
 
@@ -64,12 +70,17 @@ public record PlayerConfig(
         tag.putBoolean("increaseWidthOverTime", increaseWidthOverTime);
         tag.putDouble("startingWidthMultiplier", startingWidthMultiplier);
         tag.putDouble("endingWidthMultiplier", endingWidthMultiplier);
+        tag.putDouble("distanceTillTrailStart",distanceTillTrailStart);
         tag.putString("easeType", easeType.name());
         tag.putBoolean("endDistanceFade", endDistanceFade);
         tag.putDouble("endDistanceFadeAmount", endDistanceFadeAmount);
         tag.putString("playerName", playerName);
-
-
+        tag.putBoolean("speedBasedAlpha", speedBasedAlpha);
+        tag.putDouble("minAlphaSpeed",minAlphaSpeed);
+        tag.putDouble("maxAlphaSpeed",maxAlphaSpeed);
+        tag.putBoolean("speedBasedWidth",speedBasedWidth);
+        tag.putDouble("minWidthSpeed",minWidthSpeed);
+        tag.putDouble("maxWidthSpeed",minWidthSpeed);
         return tag;
     }
 

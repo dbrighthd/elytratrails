@@ -135,7 +135,13 @@ public final class ClientPlayerConfigStore
                 incomingConfig.easeType(),
                 incomingConfig.endDistanceFade(),
                 incomingConfig.endDistanceFadeAmount(),
-                incomingConfig.playerName()
+                incomingConfig.playerName(),
+                incomingConfig.speedBasedAlpha(),
+                incomingConfig.minAlphaSpeed(),
+                incomingConfig.maxAlphaSpeed(),
+                incomingConfig.speedBasedWidth(),
+                incomingConfig.minWidthSpeed(),
+                incomingConfig.maxWidthSpeed()
         );
 
         CLIENT_PLAYER_CONFIGS.put(entityId,safe);
@@ -186,6 +192,12 @@ public final class ClientPlayerConfigStore
         double endDistanceFadeAmount = tag.getDoubleOr("endDistanceFadeAmount", fallbackConfig.endDistanceFadeAmount());
 
         String playerName = tag.getStringOr("playerName", fallbackConfig.playerName());
+        boolean speedBasedAlpha = tag.getBooleanOr("speedBasedAlpha", fallbackConfig.speedBasedAlpha());
+        double minAlphaSpeed = tag.getDoubleOr("minAlphaSpeed", fallbackConfig.minAlphaSpeed());
+        double maxAlphaSpeed = tag.getDoubleOr("maxAlphaSpeed",fallbackConfig.maxAlphaSpeed());
+        boolean speedBasedWidth = tag.getBooleanOr("speedBasedWidth", fallbackConfig.speedBasedWidth());
+        double minWidthSpeed = tag.getDoubleOr("minWidthSpeed", fallbackConfig.minWidthSpeed());
+        double maxWidthSpeed = tag.getDoubleOr("maxWidthSpeed", fallbackConfig.maxWidthSpeed());
 
         return new PlayerConfig(
                 enableTrail,
@@ -216,7 +228,13 @@ public final class ClientPlayerConfigStore
                 easeType,
                 endDistanceFade,
                 endDistanceFadeAmount,
-                playerName
+                playerName,
+                speedBasedAlpha,
+                minAlphaSpeed,
+                maxAlphaSpeed,
+                speedBasedWidth,
+                minWidthSpeed,
+                maxWidthSpeed
         );
     }
     public static <E extends Enum<E>> E readEnum(CompoundTag tag, String key, Class<E> enumClass, E fallback) {

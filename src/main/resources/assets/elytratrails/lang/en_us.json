@@ -284,6 +284,45 @@
   "text.elytratrails.option.endingWidthMultiplierOthersDefault.@Tooltip": "Default: Width Multiplier the trail should end with",
 
 
+  "text.elytratrails.option.speedBasedAlphaOthersDefault" : "Other's Speed Dependent Transparency",
+  "text.elytratrails.option.speedBasedAlphaOthersDefault.@Tooltip" : "Default: Change trail opacity/alpha based on speed",
+
+  "text.elytratrails.option.minAlphaSpeedOthersDefault" : "Other's 0 Alpha Speed",
+  "text.elytratrails.option.minAlphaSpeedOthersDefault.@Tooltip" : "Default Speed at which alpha is set to 0",
+
+  "text.elytratrails.option.maxAlphaSpeedOthersDefault" : "Other's Full Alpha Speed",
+  "text.elytratrails.option.maxAlphaSpeedOthersDefault.@Tooltip" : "Default Speed at which alpha is set to max",
+
+  "text.elytratrails.option.speedBasedWidthOthersDefault" : "Other's Speed Dependent Width",
+  "text.elytratrails.option.speedBasedWidthOthersDefault.@Tooltip" : "Default: Change trail width based on speed",
+
+  "text.elytratrails.option.minWidthSpeedOthersDefault" : "Other's 0 Width Speed",
+  "text.elytratrails.option.minWidthSpeedOthersDefault.@Tooltip" : "Default Speed at which width is set to 0",
+
+  "text.elytratrails.option.maxWidthSpeedOthersDefault" : "Other's Full Width Speed",
+  "text.elytratrails.option.maxWidthSpeedOthersDefault.@Tooltip" : "Default Speed at which width is set to max",
+
+  "text.elytratrails.option.speedBasedAlpha" : "Speed Dependent Transparency",
+  "text.elytratrails.option.speedBasedAlpha.@Tooltip" : "Change trail opacity/alpha based on speed",
+
+  "text.elytratrails.option.minAlphaSpeed" : "0 Alpha Speed",
+  "text.elytratrails.option.minAlphaSpeed.@Tooltip" : "Speed at which alpha is set to 0",
+
+  "text.elytratrails.option.maxAlphaSpeed" : "Full Alpha Speed",
+  "text.elytratrails.option.maxAlphaSpeed.@Tooltip" : "Speed at which alpha is set to max",
+
+  "text.elytratrails.option.speedBasedWidth" : "Speed Dependent Width",
+  "text.elytratrails.option.speedBasedWidth.@Tooltip" : "Change trail width based on speed",
+
+  "text.elytratrails.option.minWidthSpeed" : "0 Width Speed",
+  "text.elytratrails.option.minWidthSpeed.@Tooltip" : "Speed at which width is set to 0",
+
+  "text.elytratrails.option.maxWidthSpeed" : "Full Width Speed",
+  "text.elytratrails.option.maxWidthSpeed.@Tooltip" : "Speed at which width is set to max",
+
+
+
+
   "text.elytratrails.option.distanceTillTrailStart": "Distance Before Trail Starts",
   "text.elytratrails.option.distanceTillTrailStart.@Tooltip": "How big the gap between the wingtip and the trail start should be",
 

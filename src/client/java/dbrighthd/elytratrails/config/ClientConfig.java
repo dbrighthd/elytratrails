@@ -39,6 +39,12 @@ public class ClientConfig {
     public EasingUtil.EaseType easeType;
     public boolean endDistanceFade;
     public double endDistanceFadeAmount;
+    public boolean speedBasedAlpha;
+    public double minAlphaSpeed;
+    public double maxAlphaSpeed;
+    public boolean speedBasedWidth;
+    public double minWidthSpeed;
+    public double maxWidthSpeed;
 
     public int justColor;
     public int justAlpha;
@@ -71,7 +77,13 @@ public class ClientConfig {
             double distanceTillTrailStart,
             EasingUtil.EaseType easeType,
             boolean endDistanceFade,
-            double endDistanceFadeAmount
+            double endDistanceFadeAmount,
+            boolean speedBasedAlpha,
+            double minAlphaSpeed,
+            double maxAlphaSpeed,
+            boolean speedBasedWidth,
+            double minWidthSpeed,
+            double maxWidthSpeed
     ) {
         this.enableTrail = enableTrail;
         this.enableRandomWidth = enableRandomWidth;
@@ -101,6 +113,12 @@ public class ClientConfig {
         this.easeType = easeType;
         this.endDistanceFade = endDistanceFade;
         this.endDistanceFadeAmount = endDistanceFadeAmount;
+        this.speedBasedAlpha = speedBasedAlpha;
+        this.minAlphaSpeed = minAlphaSpeed;
+        this.maxAlphaSpeed = maxAlphaSpeed;
+        this.speedBasedWidth = speedBasedWidth;
+        this.minWidthSpeed = minWidthSpeed;
+        this.maxWidthSpeed = maxWidthSpeed;
     }
 
     public static ClientConfig getDefaultClientConfig()
@@ -133,7 +151,13 @@ public class ClientConfig {
                 0.0,
                 EasingUtil.EaseType.Back,
                 false,
-                1.0
+                1.0,
+                false,
+                0.75,
+                2.0,
+                false,
+                0.75,
+                2.0
         );
     }
     public PlayerConfig getPlayerConfig()
@@ -167,7 +191,13 @@ public class ClientConfig {
                 easeType,
                 endDistanceFade,
                 endDistanceFadeAmount,
-                Minecraft.getInstance().getUser().getName());
+                Minecraft.getInstance().getUser().getName(),
+                speedBasedAlpha,
+                minAlphaSpeed,
+                maxAlphaSpeed,
+                speedBasedWidth,
+                minWidthSpeed,
+                maxWidthSpeed);
     }
     public PlayerConfig getHiddenPlayerConfig()
     {
@@ -200,6 +230,12 @@ public class ClientConfig {
                 easeType,
                 endDistanceFade,
                 endDistanceFadeAmount,
-                "Hidden User");
+                "Hidden User",
+                speedBasedAlpha,
+                minAlphaSpeed,
+                maxAlphaSpeed,
+                speedBasedWidth,
+                minWidthSpeed,
+                maxWidthSpeed);
     }
 }

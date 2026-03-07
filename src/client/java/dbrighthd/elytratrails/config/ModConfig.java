@@ -23,7 +23,7 @@ public class ModConfig implements ConfigData {
     public boolean fishysStupidThirdPersonCameraRoll = false;
     public boolean emfSupport = true;
     public boolean extendedEmfSupport = true;
-    public boolean tryWithoutEmf;
+    public boolean tryWithoutEmf = true;
     public boolean enableTwirls = true;
     public boolean tryNearTrailFade = false;
     public boolean alwaysSnapTrail = true;

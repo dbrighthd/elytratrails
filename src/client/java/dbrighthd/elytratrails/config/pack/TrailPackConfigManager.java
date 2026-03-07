@@ -194,7 +194,14 @@ public final class TrailPackConfigManager {
         applyIfPresent(preset.startingWidthMultiplier, v -> config.startingWidthMultiplier = v);
         applyIfPresent(preset.endingWidthMultiplier, v -> config.endingWidthMultiplier = v);
         applyIfPresent(preset.distanceTillTrailStart, v -> config.distanceTillTrailStart = v);
-
+        applyIfPresent(preset.endDistanceFade, v -> config.endDistanceFade = v);
+        applyIfPresent(preset.endDistanceFadeAmount, v -> config.endDistanceFadeAmount = v);
+        applyIfPresent(preset.speedBasedAlpha, v -> config.speedBasedAlpha = v);
+        applyIfPresent(preset.minAlphaSpeed, v -> config.minAlphaSpeed = v);
+        applyIfPresent(preset.maxAlphaSpeed, v -> config.maxAlphaSpeed = v);
+        applyIfPresent(preset.speedBasedWidth, v -> config.speedBasedWidth = v);
+        applyIfPresent(preset.minWidthSpeed, v -> config.minWidthSpeed = v);
+        applyIfPresent(preset.maxWidthSpeed, v -> config.maxWidthSpeed = v);
     }
 
     private static <T> void applyIfPresent(T value, java.util.function.Consumer<T> setter) {
@@ -308,7 +315,7 @@ public final class TrailPackConfigManager {
         root.addProperty("startRampDistance", config.clientPlayerConfig.startRampDistance);
         root.addProperty("endRampDistance", config.clientPlayerConfig.endRampDistance);
 
-        root.addProperty("color", config.clientPlayerConfig.color);
+        root.addProperty("color", toHexColorString(config.clientPlayerConfig.color));
 
         root.addProperty("prideTrail", config.clientPlayerConfig.prideTrail == null ? "" : config.clientPlayerConfig.prideTrail);
         root.addProperty("randomWidthVariation", config.clientPlayerConfig.randomWidthVariation);
@@ -322,6 +329,12 @@ public final class TrailPackConfigManager {
         root.addProperty("distanceTillTrailStart", config.clientPlayerConfig.distanceTillTrailStart);
         root.addProperty("endDistanceFade", config.clientPlayerConfig.endDistanceFade);
         root.addProperty("endDistanceFadeAmount", config.clientPlayerConfig.endDistanceFadeAmount);
+        root.addProperty("speedBasedAlpha", config.clientPlayerConfig.speedBasedAlpha);
+        root.addProperty("minAlphaSpeed", config.clientPlayerConfig.minAlphaSpeed);
+        root.addProperty("maxAlphaSpeed", config.clientPlayerConfig.maxAlphaSpeed);
+        root.addProperty("speedBasedWidth", config.clientPlayerConfig.speedBasedWidth);
+        root.addProperty("minWidthSpeed", config.clientPlayerConfig.minWidthSpeed);
+        root.addProperty("maxWidthSpeed", config.clientPlayerConfig.maxWidthSpeed);
         return root;
     }
 
@@ -389,6 +402,10 @@ public final class TrailPackConfigManager {
         ModConfig mainConfig = getConfig();
         String normalizedModelKey = normalizeModelKey(modelName);
         ModelTrailConfig modelConfig = (normalizedModelKey == null) ? null : MODEL_TRAIL_CONFIGS.get(normalizedModelKey);
+        if(baseConfig.speedBasedAlpha())
+        {
+            System.out.println("SPEED BASED HERE");
+        }
         TrailOverrides mergedOverrides = TrailOverrides.fromBase(baseConfig);
         if(!mainConfig.resourcePackOverride && (modelName != null && modelName.contains("elytra")))
         {
@@ -595,8 +612,6 @@ public final class TrailPackConfigManager {
         @Nullable Boolean enableRandomWidth;
         @Nullable Boolean useSplineTrail;
         @Nullable Boolean speedDependentTrail;
-        @Nullable Boolean cameraDistanceFade;
-
         @Nullable Double maxWidth;
         @Nullable Double trailLifetime;
         @Nullable Double trailMinSpeed;
@@ -623,7 +638,12 @@ public final class TrailPackConfigManager {
         @Nullable Double distanceTillTrailStart;
         @Nullable Boolean endDistanceFade;
         @Nullable Double endDistanceFadeAmount;
-
+        @Nullable Boolean speedBasedAlpha;
+        @Nullable Double minAlphaSpeed;
+        @Nullable Double maxAlphaSpeed;
+        @Nullable Boolean speedBasedWidth;
+        @Nullable Double minWidthSpeed;
+        @Nullable Double maxWidthSpeed;
 
         public static TrailOverrides fromBase(PlayerConfig baseConfig) {
             TrailOverrides overrides = new TrailOverrides();
@@ -655,7 +675,12 @@ public final class TrailPackConfigManager {
             overrides.distanceTillTrailStart = baseConfig.distanceTillTrailStart();
             overrides.endDistanceFade = baseConfig.endDistanceFade();
             overrides.endDistanceFadeAmount = baseConfig.endDistanceFadeAmount();
-
+            overrides.speedBasedAlpha = baseConfig.speedBasedAlpha();
+            overrides.minAlphaSpeed = baseConfig.minAlphaSpeed();
+            overrides.maxAlphaSpeed = baseConfig.maxAlphaSpeed();
+            overrides.speedBasedWidth = baseConfig.speedBasedWidth();
+            overrides.minWidthSpeed = baseConfig.minWidthSpeed();
+            overrides.maxWidthSpeed = baseConfig.maxWidthSpeed();
             return overrides;
         }
         @SuppressWarnings("unused")
@@ -665,7 +690,6 @@ public final class TrailPackConfigManager {
             o.enableTrail = s.enableTrail();
             o.enableRandomWidth = s.enableRandomWidth();
             o.speedDependentTrail = s.speedDependentTrail();
-            o.cameraDistanceFade = s.cameraDistanceFade();
 
             o.maxWidth = s.maxWidth();
             o.trailLifetime = s.trailLifetime();
@@ -708,8 +732,6 @@ public final class TrailPackConfigManager {
             overrides.enableRandomWidth = readBoolean(json, "enableRandomWidth");
             overrides.useSplineTrail = readBoolean(json, "useSplineTrail");
             overrides.speedDependentTrail = readBoolean(json, "speedDependentTrail", "speeddependant", "speedDependent");
-            overrides.cameraDistanceFade = readBoolean(json, "cameraDistanceFade");
-
             overrides.color = json.has("color") ? parseHexColor(readString(json, "color")) : null;
             overrides.prideTrail = readString(json, "prideTrail");
             overrides.fadeStart = readBoolean(json, "fadeStart");
@@ -728,6 +750,14 @@ public final class TrailPackConfigManager {
             overrides.distanceTillTrailStart = readDouble(json, "distanceTillTrailStart");
             overrides.endDistanceFade = readBoolean(json, "endDistanceFade");
             overrides.endDistanceFadeAmount = readDouble(json, "endDistanceFadeAmount");
+            overrides.speedBasedAlpha = readBoolean(json, "speedBasedAlpha");
+            overrides.minAlphaSpeed = readDouble(json, "minAlphaSpeed");
+            overrides.maxAlphaSpeed = readDouble(json, "maxAlphaSpeed");
+
+            overrides.speedBasedWidth = readBoolean(json, "speedBasedWidth");
+            overrides.minWidthSpeed = readDouble(json, "minWidthSpeed");
+            overrides.maxWidthSpeed = readDouble(json, "maxWidthSpeed");
+
             return overrides;
         }
         public boolean isEmpty() {
@@ -735,7 +765,6 @@ public final class TrailPackConfigManager {
                     && enableRandomWidth == null
                     && useSplineTrail == null
                     && speedDependentTrail == null
-                    && cameraDistanceFade == null
                     && maxWidth == null
                     && trailLifetime == null
                     && trailMinSpeed == null
@@ -759,7 +788,13 @@ public final class TrailPackConfigManager {
                     && endingWidthMultiplier == null
                     && distanceTillTrailStart == null
                     && endDistanceFade == null
-                    && endDistanceFadeAmount == null;
+                    && endDistanceFadeAmount == null
+                    && speedBasedAlpha == null
+                    && minAlphaSpeed == null
+                    && maxAlphaSpeed == null
+                    && speedBasedWidth == null
+                    && minWidthSpeed == null
+                    && maxWidthSpeed == null;
         }
 
         public TrailOverrides with(@Nullable TrailOverrides other) {
@@ -770,8 +805,6 @@ public final class TrailPackConfigManager {
             merged.enableRandomWidth = (other.enableRandomWidth != null) ? other.enableRandomWidth : this.enableRandomWidth;
             merged.useSplineTrail = (other.useSplineTrail != null) ? other.useSplineTrail : this.useSplineTrail;
             merged.speedDependentTrail = (other.speedDependentTrail != null) ? other.speedDependentTrail : this.speedDependentTrail;
-            merged.cameraDistanceFade = (other.cameraDistanceFade != null) ? other.cameraDistanceFade : this.cameraDistanceFade;
-
             merged.maxWidth = (other.maxWidth != null) ? other.maxWidth : this.maxWidth;
             merged.trailLifetime = (other.trailLifetime != null) ? other.trailLifetime : this.trailLifetime;
             merged.trailMinSpeed = (other.trailMinSpeed != null) ? other.trailMinSpeed : this.trailMinSpeed;
@@ -796,6 +829,12 @@ public final class TrailPackConfigManager {
             merged.distanceTillTrailStart = (other.distanceTillTrailStart != null) ? other.distanceTillTrailStart : this.distanceTillTrailStart;
             merged.endDistanceFade = (other.endDistanceFade != null) ? other.endDistanceFade : this.endDistanceFade;
             merged.endDistanceFadeAmount = (other.endDistanceFadeAmount != null) ? other.endDistanceFadeAmount : this.endDistanceFadeAmount;
+            merged.speedBasedAlpha = (other.speedBasedAlpha != null) ? other.speedBasedAlpha : this.speedBasedAlpha;
+            merged.minAlphaSpeed = (other.minAlphaSpeed != null) ? other.minAlphaSpeed : this.minAlphaSpeed;
+            merged.maxAlphaSpeed = (other.maxAlphaSpeed != null) ? other.maxAlphaSpeed : this.maxAlphaSpeed;
+            merged.speedBasedWidth = (other.speedBasedWidth != null) ? other.speedBasedWidth : this.speedBasedWidth;
+            merged.minWidthSpeed = (other.minWidthSpeed != null) ? other.minWidthSpeed : this.minWidthSpeed;
+            merged.maxWidthSpeed = (other.maxWidthSpeed != null) ? other.maxWidthSpeed : this.maxWidthSpeed;
             return merged;
         }
         public ResolvedTrailSettings resolve() {
@@ -803,7 +842,6 @@ public final class TrailPackConfigManager {
                     asTrue(enableTrail),
                     asTrue(enableRandomWidth),
                     asTrue(speedDependentTrail),
-                    asTrue(cameraDistanceFade),
                     asNumber(maxWidth),
                     asNumber(trailLifetime),
                     asNumber(trailMinSpeed),
@@ -826,7 +864,13 @@ public final class TrailPackConfigManager {
                     asNumber(endingWidthMultiplier),
                     asNumber(distanceTillTrailStart),
                     asTrue(endDistanceFade),
-                    asNumber(endDistanceFadeAmount)
+                    asNumber(endDistanceFadeAmount),
+                    asTrue(speedBasedAlpha),
+                    asNumber(minAlphaSpeed),
+                    asNumber(maxAlphaSpeed),
+                    asTrue(speedBasedWidth),
+                    asNumber(minWidthSpeed),
+                    asNumber(maxWidthSpeed)
             );
         }
 
@@ -868,7 +912,6 @@ public final class TrailPackConfigManager {
             boolean enableTrail,
             boolean enableRandomWidth,
             boolean speedDependentTrail,
-            boolean cameraDistanceFade,
             double maxWidth,
             double trailLifetime,
             double trailMinSpeed,
@@ -891,7 +934,13 @@ public final class TrailPackConfigManager {
             double endingWidthMultiplier,
             double distanceTillTrailStart,
             boolean endDistanceFade,
-            double endDistanceFadeAmount
+            double endDistanceFadeAmount,
+            boolean speedBasedAlpha,
+            double minAlphaSpeed,
+            double maxAlphaSpeed,
+            boolean speedBasedWidth,
+            double minWidthSpeed,
+            double maxWidthSpeed
     ) {
         public static ResolvedTrailSettings defaults() {
             return resolveFromPlayerConfig(ClientPlayerConfigStore.getLocalPlayerConfig());
@@ -947,7 +996,6 @@ public final class TrailPackConfigManager {
                 playerConfig.enableTrail(),
                 playerConfig.enableRandomWidth(),
                 playerConfig.speedDependentTrail(),
-                false,       // not in PlayerConfig
                 playerConfig.maxWidth(),
                 playerConfig.trailLifetime(),
                 playerConfig.trailMinSpeed(),
@@ -970,8 +1018,13 @@ public final class TrailPackConfigManager {
                 playerConfig.endingWidthMultiplier(),
                 playerConfig.distanceTillTrailStart(),
                 playerConfig.endDistanceFade(),
-                playerConfig.endDistanceFadeAmount()
-
+                playerConfig.endDistanceFadeAmount(),
+                playerConfig.speedBasedAlpha(),
+                playerConfig.minAlphaSpeed(),
+                playerConfig.maxAlphaSpeed(),
+                playerConfig.speedBasedWidth(),
+                playerConfig.minWidthSpeed(),
+                playerConfig.maxWidthSpeed()
         );
     }
 
