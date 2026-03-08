@@ -18,7 +18,9 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import static dbrighthd.elytratrails.ElytraTrailsClient.getConfig;
 import static dbrighthd.elytratrails.config.pack.TrailPackConfigManager.*;
@@ -28,6 +30,8 @@ public class TrailManager {
     private static final Logger LOGGER = LoggerFactory.getLogger(TrailManager.class);
 
     private final Int2ObjectMap<EntityTrailGroup> activeTrails = new Int2ObjectOpenHashMap<>();
+    public final Map<Long,Float> deadPointDistance = new HashMap<>();
+    long trailId = 0;
     private final List<Trail> trails = new ArrayList<>();
     private float lastSample;
     private final WingTipSampler sampler;
@@ -61,6 +65,10 @@ public class TrailManager {
             }
         });
     }
+    public long newTrailId()
+    {
+        return trailId++;
+    }
     public boolean isActiveTrail(Trail trail)
     {
         return (activeTrails.containsKey(trail.entityId()) && activeTrails.get(trail.entityId()).trails().contains(trail));
@@ -89,7 +97,35 @@ public class TrailManager {
 
             }
         }
-        trails.removeIf(t -> t.points().isEmpty() || t.points().stream().allMatch(p -> currentTime - p.epoch() > t.config().trailLifetime() * 1000));
+        trails.removeIf(t -> (t.points().isEmpty() || t.points().stream().allMatch(p -> currentTime - p.epoch() > t.config().trailLifetime() * 1000)) && removeTrailFromMap(t));
+        for (Trail trail : trails) {
+            List<Trail.Point> points = trail.points();
+            if (points.size() < 2) continue;
+
+            float removedDistance = 0.0f;
+            long lifetimeMs = (long) (trail.config().trailLifetime() * 1000.0);
+
+            while (points.size() > 1) {
+                Trail.Point point = points.get(0);
+
+                if (currentTime - point.epoch() <= lifetimeMs) {
+                    break;
+                }
+
+                removedDistance += (float) point.pos().distanceTo(points.get(1).pos());
+                points.removeFirst();
+            }
+
+            if (removedDistance > 0.0f) {
+                deadPointDistance.merge(trail.trailId(), removedDistance, Float::sum);
+            }
+        }
+    }
+    public boolean removeTrailFromMap(Trail trail)
+    {
+        deadPointDistance.remove(trail.trailId());
+        return true;
+
     }
 
     public void removeTrail(int entityId)
@@ -131,7 +167,7 @@ public class TrailManager {
                     List<Trail> emittedTrails = new ArrayList<>();
                     int emitterId = 0;
                     for (Emitter emitter : emitters) {
-                        emittedTrails.add(Trail.fromPlayerConfig(player.getId(), emitter,emitterId));
+                        emittedTrails.add(Trail.fromPlayerConfig(player.getId(), emitter,emitterId, newTrailId()));
                         emitterId++;
                     }
 
@@ -203,7 +239,7 @@ public class TrailManager {
                     List<Trail> emittedTrails = new ArrayList<>();
                     int emitterId = 0;
                     for (Emitter emitter : emitters) {
-                        emittedTrails.add(Trail.fromPlayerConfig(entity.getId(), emitter,emitterId));
+                        emittedTrails.add(Trail.fromPlayerConfig(entity.getId(), emitter,emitterId, newTrailId()));
                         emitterId++;
                     }
 

@@ -42,7 +42,6 @@ public class TrailRenderer {
     private final @NotNull TrailManager manager;
 
     private float accumDist = 0.0f;
-    private float endOfTrail = 0.0f;
     private ModConfig modConfig;
     private final PerlinNoise perlinNoise =  PerlinNoise.create(RandomSource.create(), List.of(1));
     private float totalTrailLength;
@@ -111,7 +110,6 @@ public class TrailRenderer {
                 totalTrailLength -= (float) trailSettings.distanceTillTrailStart();
                 totalTrailLength = max(totalTrailLength, 0);
                 this.accumDist = 0f;
-                this.endOfTrail = 0f;
 
                 this.atEnd = false;
                 this.isFirstPerson =
@@ -233,18 +231,11 @@ public class TrailRenderer {
             double end = Mth.lerp(tEnd, epoch0, epoch1);
 
             double trailLifetime = trailSettings.enableTrail() ? trailSettings.trailLifetime() : 0;
-            float alphaEnd = computeLifetimeFadeout(end, currentTime, (long) (trailLifetime * 1000));
-            float alphaStart = trailSettings.fadeEnd() || alphaEnd <= 0 ? computeLifetimeFadeout(start, currentTime, (long) (trailLifetime * 1000)) : 1f;
-            if(alphaEnd <= 0)
-            {
-                endOfTrail = v2;
-            }
-            else if(!trailSettings.fadeEnd())
-            {
-                alphaEnd = 1f;
-            }
-            float scaleStart = computeWidthScaling(totalTrailLength- v1, -(endOfTrail - v1), trailSettings);
-            float scaleEnd = computeWidthScaling(totalTrailLength- v2, -(endOfTrail - v2), trailSettings);
+            float alphaEnd = trailSettings.fadeEnd() ?  computeLifetimeFadeout(end, currentTime, (long) (trailLifetime * 1000)) : 1f;
+            float alphaStart = trailSettings.fadeEnd() ? computeLifetimeFadeout(start, currentTime, (long) (trailLifetime * 1000)) : 1f;
+
+            float scaleStart = computeWidthScaling(totalTrailLength- v1, v1, trailSettings);
+            float scaleEnd = computeWidthScaling(totalTrailLength- v2, v2, trailSettings);
             if(trailSettings.startRampDistance() == 0)
             {
                 if(scaleEnd == 0)
@@ -284,8 +275,8 @@ public class TrailRenderer {
             }
             if(trailSettings.endDistanceFade() && trailSettings.translucentTrails())
             {
-                alphaStart *= computeEndFade(-(endOfTrail - v1), trailSettings);
-                alphaEnd *= computeEndFade(-(endOfTrail - v2), trailSettings);
+                alphaStart *= computeEndFade(v1, trailSettings);
+                alphaEnd *= computeEndFade(v2, trailSettings);
             }
             if(trailSettings.speedBasedAlpha())
             {
@@ -317,6 +308,9 @@ public class TrailRenderer {
                 Vec3 sideA = startTan.cross(startPos.subtract(cameraPosition).normalize()).normalize();
                 Vec3 sideB = endTan.cross(endPos.subtract(cameraPosition).normalize()).normalize();
 
+                float removeDist = manager.deadPointDistance.getOrDefault(trail.trailId(),0f);
+                v1 += removeDist;
+                v2 += removeDist;
                 v1 /=(float) trailSettings.maxWidth();
                 v2 /= (float) trailSettings.maxWidth();
                 quadBetweenPoints(pose, consumer, startPos, endPos, sideA, sideB, halfWidthStart, halfWidthEnd, v1, v2, alphaStart, alphaEnd, trail.flipUv(), color,trailSettings);
