@@ -16,7 +16,7 @@ public class ClientConfig {
     public double trailMinSpeed;
     public boolean trailMovesWithElytraAngle;
     public double maxWidth;
-    public double trailLifeTime;
+    public double trailLifetime;
     public double startRampDistance;
     public double endRampDistance;
     public int color;
@@ -45,10 +45,15 @@ public class ClientConfig {
     public double minWidthSpeed;
     public double maxWidthSpeed;
     public boolean trailMovesWithAngleOfAttack;
+    public boolean useColorBoth;
+    public int colorRight;
 
-    public int justColor;
-    public int justAlpha;
 
+
+    public transient int justColor;
+    public transient int justAlpha;
+    public transient int justColorRight;
+    public transient int justAlphaRight;
     public ClientConfig(
             boolean enableTrail,
             boolean enableRandomWidth,
@@ -56,7 +61,7 @@ public class ClientConfig {
             double trailMinSpeed,
             boolean trailMovesWithElytraAngle,
             double maxWidth,
-            double trailLifeTime,
+            double trailLifetime,
             double startRampDistance,
             double endRampDistance,
             int color,
@@ -84,7 +89,9 @@ public class ClientConfig {
             boolean speedBasedWidth,
             double minWidthSpeed,
             double maxWidthSpeed,
-            boolean trailMovesWithAngleOfAttack
+            boolean trailMovesWithAngleOfAttack,
+            boolean useColorBoth,
+            int colorRight
     ) {
         this.enableTrail = enableTrail;
         this.enableRandomWidth = enableRandomWidth;
@@ -92,7 +99,7 @@ public class ClientConfig {
         this.trailMinSpeed = trailMinSpeed;
         this.trailMovesWithElytraAngle = trailMovesWithElytraAngle;
         this.maxWidth = maxWidth;
-        this.trailLifeTime = trailLifeTime;
+        this.trailLifetime = trailLifetime;
         this.startRampDistance = startRampDistance;
         this.endRampDistance = endRampDistance;
         this.color = color;
@@ -121,6 +128,8 @@ public class ClientConfig {
         this.minWidthSpeed = minWidthSpeed;
         this.maxWidthSpeed = maxWidthSpeed;
         this.trailMovesWithAngleOfAttack = trailMovesWithAngleOfAttack;
+        this.useColorBoth = useColorBoth;
+        this.colorRight = colorRight;
     }
 
     public static ClientConfig getDefaultClientConfig()
@@ -160,7 +169,9 @@ public class ClientConfig {
                 false,
                 0.75,
                 2.0,
-                true
+                true,
+                true ,
+                0xFFFFFFFF
         );
     }
     public PlayerConfig getPlayerConfig()
@@ -172,7 +183,7 @@ public class ClientConfig {
                 trailMinSpeed,
                 trailMovesWithElytraAngle,
                 maxWidth,
-                trailLifeTime,
+                trailLifetime,
                 startRampDistance,
                 endRampDistance,
                 color,
@@ -201,7 +212,9 @@ public class ClientConfig {
                 speedBasedWidth,
                 minWidthSpeed,
                 maxWidthSpeed,
-                trailMovesWithAngleOfAttack);
+                trailMovesWithAngleOfAttack,
+                useColorBoth,
+                colorRight);
     }
     public PlayerConfig getHiddenPlayerConfig()
     {
@@ -241,6 +254,8 @@ public class ClientConfig {
                 speedBasedWidth,
                 minWidthSpeed,
                 maxWidthSpeed,
-                false);
+                trailMovesWithAngleOfAttack,
+                useColorBoth,
+                colorRight);
     }
 }

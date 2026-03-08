@@ -26,7 +26,6 @@ import net.minecraft.client.renderer.feature.ModelFeatureRenderer;
 import net.minecraft.client.renderer.rendertype.RenderType;
 import net.minecraft.client.renderer.state.CameraRenderState;
 import net.minecraft.core.BlockPos;
-import net.minecraft.network.chat.Component;
 import net.minecraft.util.Mth;
 import net.minecraft.world.entity.Avatar;
 import net.minecraft.world.entity.Entity;
@@ -106,7 +105,7 @@ public class WingTipSampler {
                 return gatheredTrails;
             }
         }
-        List<Emitter> gatheredTrails = getVanillaTrailEmitters(basePose, animatedElytraRoot, elytraModel, camera.position(), entityWorldOffset,player,modConfig);
+        List<Emitter> gatheredTrails = getVanillaTrailEmitters(basePose, animatedElytraRoot, elytraModel, camera.position(), entityWorldOffset,player);
         if(config.alwaysSnapTrail)
         {
             gatheredTrailsThisFrame.put(eid,gatheredTrails);
@@ -232,12 +231,12 @@ public class WingTipSampler {
         return (modelRoot == EmfWingTipHooks.WhichRoot.LEFT_WING);
     }
 
-    private @NotNull List<Emitter> getVanillaTrailEmitters(@NotNull PoseStack stack, @Nullable ModelPart elytraRoot, @NotNull ElytraModel model, @NotNull Vec3 cameraPos, @NotNull Vec3 entityWorldOffset, Player player, ModConfig modConfig) {
+    private @NotNull List<Emitter> getVanillaTrailEmitters(@NotNull PoseStack stack, @Nullable ModelPart elytraRoot, @NotNull ElytraModel model, @NotNull Vec3 cameraPos, @NotNull Vec3 entityWorldOffset, Player player) {
         ModelPart leftWing = model.leftWing;
         ModelPart rightWing = model.rightWing;
 
-        Vec3 leftTip = computeTransformedWingTip(stack, elytraRoot, leftWing, ModelTransformationUtil.VANILLA_LEFT_WING_TIP,player, modConfig);
-        Vec3 rightTip = computeTransformedWingTip(stack, elytraRoot, rightWing, ModelTransformationUtil.VANILLA_RIGHT_WING_TIP,player, modConfig);
+        Vec3 leftTip = computeTransformedWingTip(stack, elytraRoot, leftWing, ModelTransformationUtil.VANILLA_LEFT_WING_TIP,player);
+        Vec3 rightTip = computeTransformedWingTip(stack, elytraRoot, rightWing, ModelTransformationUtil.VANILLA_RIGHT_WING_TIP,player);
 
         return List.of(
                 new Emitter(cameraPos.add(leftTip).add(entityWorldOffset), true, "elytra","/leftWingTip"),
@@ -281,7 +280,7 @@ public class WingTipSampler {
         };
     }
 
-    private @NotNull Vec3 computeTransformedWingTip(@NotNull PoseStack stack, @Nullable ModelPart elytraRoot, @NotNull ModelPart wingRoot, @NotNull Vec3 localPos, Player player, ModConfig modConfig) {
+    private @NotNull Vec3 computeTransformedWingTip(@NotNull PoseStack stack, @Nullable ModelPart elytraRoot, @NotNull ModelPart wingRoot, @NotNull Vec3 localPos, Player player) {
         float wingspread = ModelTransformationUtil.computeWingOpenness(wingRoot);
         float xScale = 1.0f;
         float zScale = 0.666666f;
@@ -356,40 +355,6 @@ public class WingTipSampler {
         }
         wingRoot.translateAndRotate(stack);
         Vec3 point = ModelTransformationUtil.transformPoint(stack.last().pose(), localPos);
-        stack.popPose();
-        return point;
-    }
-
-    private @Nullable Vec3 transformLocalPointThroughPath(@NotNull PoseStack stack, @Nullable ModelPart elytraRoot, @NotNull ModelPart wingRoot, @Nullable String childOnlyPath) {
-        if (childOnlyPath == null || childOnlyPath.isEmpty()) return null;
-
-        stack.pushPose();
-        if (elytraRoot != null && elytraRoot != wingRoot) {
-            elytraRoot.translateAndRotate(stack);
-        }
-        wingRoot.translateAndRotate(stack);
-
-        ModelPart current = wingRoot;
-        int segmentStartIndex = 0;
-
-        while (segmentStartIndex < childOnlyPath.length()) {
-            int nextSlashIndex = childOnlyPath.indexOf('/', segmentStartIndex);
-            String segmentName = (nextSlashIndex == -1)
-                    ? childOnlyPath.substring(segmentStartIndex)
-                    : childOnlyPath.substring(segmentStartIndex, nextSlashIndex);
-
-            ModelPart child = findChildIgnoreCase(current, segmentName);
-            if (child == null) return null;
-
-            child.translateAndRotate(stack);
-            current = child;
-
-            if (nextSlashIndex == -1) break;
-            segmentStartIndex = nextSlashIndex + 1;
-        }
-
-        Vec3 point = ModelTransformationUtil.transformPoint(stack.last().pose(), Vec3.ZERO);
-
         stack.popPose();
         return point;
     }

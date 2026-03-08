@@ -1,6 +1,7 @@
 package dbrighthd.elytratrails.rendering;
 
 import dbrighthd.elytratrails.config.ModConfig;
+import dbrighthd.elytratrails.config.pack.ResolvedTrailSettings;
 import dbrighthd.elytratrails.config.pack.TrailPackConfigManager;
 import dbrighthd.elytratrails.network.ClientPlayerConfigStore;
 import dbrighthd.elytratrails.util.TimeUtil;
@@ -144,7 +145,7 @@ public class TrailManager {
         sampler.clearFrameCache();
         for (AbstractClientPlayer player : players) {
             int eid = player.getId();
-            TrailPackConfigManager.ResolvedTrailSettings config = getConfigFromPlayerId(eid);
+            ResolvedTrailSettings config = getConfigFromPlayerId(eid);
             boolean valid = TrailManager.isEntityTrailValid(config, player);
 
             if (valid) {
@@ -212,7 +213,7 @@ public class TrailManager {
                 continue;
             }
             int eid = entity.getId();
-            TrailPackConfigManager.ResolvedTrailSettings config = getConfigFromPlayerId(eid);
+            ResolvedTrailSettings config = getConfigFromPlayerId(eid);
             boolean valid = TrailManager.isEntityTrailValid(config, entity);
 
             if (valid) {
@@ -267,12 +268,12 @@ public class TrailManager {
             }
         }
     }
-    public static TrailPackConfigManager.ResolvedTrailSettings getConfigFromPlayerId(int entityId)
+    public static ResolvedTrailSettings getConfigFromPlayerId(int entityId)
     {
         return TrailPackConfigManager.resolveFromPlayerConfig(ClientPlayerConfigStore.getOrDefault(entityId));
     }
 
-    public static boolean isEntityTrailValid(TrailPackConfigManager.ResolvedTrailSettings config, Entity entity) {
+    public static boolean isEntityTrailValid(ResolvedTrailSettings config, Entity entity) {
         if (entity instanceof Player player) {
             if(!(player.getPose() == Pose.FALL_FLYING))
             {

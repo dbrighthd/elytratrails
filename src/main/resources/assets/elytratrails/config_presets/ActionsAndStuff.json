@@ -7,7 +7,7 @@
   "speedDependentTrail": false,
   "fadeFirstPersonTrail": true,
   "trailMovesWithElytraAngle": true,
-  "width": 0.07,
+  "maxWidth": 0.07,
   "firstPersonFadeTime": 0.2,
   "trailLifetime": 0.6,
   "maxSamplePerSecond": 60,
@@ -32,5 +32,8 @@
   "maxAlphaSpeed": 2.0,
   "speedBasedWidth": false,
   "minWidthSpeed": 0.75,
-  "maxWidthSpeed": 2.0
+  "maxWidthSpeed": 2.0,
+  "trailMovesWithAngleOfAttack" : false,
+  "useColorBoth": true,
+  "colorRight": "#FFFFFFFF"
 }

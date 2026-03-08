@@ -171,7 +171,6 @@ public class EasingUtil {
         Back,
         @SuppressWarnings("unused") Sine, // it thinks its unused because it's not in the code (it's a fallback) but it can be selected by the player
         Cubic,
-        Circ,
         None,
     }
 }

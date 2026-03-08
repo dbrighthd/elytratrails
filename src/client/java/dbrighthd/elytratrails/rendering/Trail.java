@@ -1,5 +1,6 @@
 package dbrighthd.elytratrails.rendering;
 
+import dbrighthd.elytratrails.config.pack.ResolvedTrailSettings;
 import dbrighthd.elytratrails.config.pack.TrailPackConfigManager;
 import dbrighthd.elytratrails.network.ClientPlayerConfigStore;
 import dbrighthd.elytratrails.network.PlayerConfig;
@@ -11,19 +12,19 @@ import net.minecraft.world.phys.Vec3;
 import java.util.ArrayList;
 import java.util.List;
 
-public record Trail(Identifier texture, List<Point> points, TrailPackConfigManager.ResolvedTrailSettings config, boolean flipUv, int entityId, int emitterIndex, Long trailId) {
+public record Trail(Identifier texture, List<Point> points, ResolvedTrailSettings config, boolean isLeftWing, int entityId, int emitterIndex, Long trailId) {
 
     public static Trail fromPlayerConfig(int playerId, Emitter emitter, int index, long trailId) {
         PlayerConfig config = ClientPlayerConfigStore.getOrDefault(playerId);
-        TrailPackConfigManager.ResolvedTrailSettings resolvedTrailSettings =  TrailPackConfigManager.resolve(emitter.modelName(), emitter.boneName(), config);
+        ResolvedTrailSettings resolvedTrailSettings =  TrailPackConfigManager.resolve(emitter.modelName(), emitter.boneName(), config);
 
         Identifier texture = TrailTextureRegistry.resolveTextureOrNull(resolvedTrailSettings.prideTrail());
-        if(!emitter.flipUv() && (!(resolvedTrailSettings.prideTrailRight() == null || resolvedTrailSettings.prideTrailRight().isEmpty())))
+        if(!emitter.isLeftWing() && (!(resolvedTrailSettings.prideTrailRight() == null || resolvedTrailSettings.prideTrailRight().isEmpty())))
         {
             texture = TrailTextureRegistry.resolveTextureOrNull(resolvedTrailSettings.prideTrailRight());
         }
         if (texture == null) texture = TrailRenderer.DEFAULT_TEXTURE;
-        return new Trail(texture, new ArrayList<>(), resolvedTrailSettings, emitter.flipUv(), playerId,index, trailId);
+        return new Trail(texture, new ArrayList<>(), resolvedTrailSettings, emitter.isLeftWing(), playerId,index, trailId);
     }
     @SuppressWarnings("unused")
     public float length() {

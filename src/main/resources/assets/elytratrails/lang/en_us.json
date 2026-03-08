@@ -151,7 +151,14 @@
   "text.elytratrails.option.alpha": "Trail Alpha",
   "text.elytratrails.option.alpha.@Tooltip": "Trail Alpha",
 
+  "text.elytratrails.option.useColorBoth" : "Use Same Color for Both Wings",
+  "text.elytratrails.option.useColorBoth.@Tooltip" : "Use the \"Trail Color\" and \"Trail Alpha\" fields for both left and right trails",
 
+  "text.elytratrails.option.colorRight": "Right Trail Color",
+  "text.elytratrails.option.colorRight.@Tooltip": "Right Trail color as hex (example: #FFFFFF)",
+
+  "text.elytratrails.option.alphaRight": "Right Trail Alpha",
+  "text.elytratrails.option.alphaRight.@Tooltip": " Right Trail Alpha",
 
   "text.elytratrails.option.maxOnlineWidth": "Max Online Width",
   "text.elytratrails.option.maxOnlineWidth.@Tooltip": "Maximum trail width accepted from other players (blocks)",
@@ -217,6 +224,16 @@
   "text.elytratrails.option.colorOthersDefault": "Other's Trail Color",
   "text.elytratrails.option.colorOthersDefault.@Tooltip": "Default color for other trails as hex (example: #FFFFFF)",
 
+  "text.elytratrails.option.useColorBothOthersDefault" : "Other's Use Same Color for Both Wings",
+  "text.elytratrails.option.useColorBothOthersDefault.@Tooltip" : "Default: Use the \"Trail Color\" and \"Trail Alpha\" fields for both left and right trails",
+
+  "text.elytratrails.option.colorRightOthersDefault": "Other's Right Trail Color",
+  "text.elytratrails.option.colorRightOthersDefault.@Tooltip": "Default Right Trail color as hex (example: #FFFFFF)",
+
+  "text.elytratrails.option.alphaRightOthersDefault": "Other's Right Trail Alpha",
+  "text.elytratrails.option.alphaRightOthersDefault.@Tooltip": "Default Right Trail Alpha",
+
+
   "text.elytratrails.option.alphaOthersDefault": "Other's Trail Alpha",
   "text.elytratrails.option.alphaOthersDefault.@Tooltip": "Default: Trail Alpha",
 
@@ -226,7 +243,7 @@
   "text.elytratrails.option.logTrails" : "Log Trails",
   "text.elytratrails.option.logTrails.@Tooltip" : "Logs trail creation/deletion",
 
-  "text.elytratrails.option.hardCodedFreshAnimationsPlayerWingtips" : "FA+Player Hardcoded Wingtips",
+  "text.elytratrails.option.hardCodedFreshAnimationsPlayerWingtips" : "Check for FA+Player Wingtips",
   "text.elytratrails.option.hardCodedFreshAnimationsPlayerWingtips.@Tooltip" : "Tries to assume wingtip position in FA+Player elytra model. This option will be deleted if FA+Player updates to support this mod.",
 
 

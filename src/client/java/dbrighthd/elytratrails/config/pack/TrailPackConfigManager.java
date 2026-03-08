@@ -6,7 +6,6 @@ import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import dbrighthd.elytratrails.config.ClientConfig;
 import dbrighthd.elytratrails.config.ModConfig;
-import dbrighthd.elytratrails.network.ClientPlayerConfigStore;
 import dbrighthd.elytratrails.network.PlayerConfig;
 import net.fabricmc.loader.api.FabricLoader;
 import net.minecraft.resources.Identifier;
@@ -14,7 +13,6 @@ import net.minecraft.server.packs.resources.Resource;
 import net.minecraft.server.packs.resources.ResourceManager;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntityType;
-import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -23,6 +21,7 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.Writer;
+import java.lang.reflect.Field;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -169,46 +168,57 @@ public final class TrailPackConfigManager {
         {
             applyPresetToConfig(overrides,modConfig.otherPlayerConfig);
         }
-
     }
-
     public static void applyPresetToConfig(TrailOverrides preset, ClientConfig config)
     {
-        applyIfPresent(preset.glowingTrails, v -> config.glowingTrails = v);
-        applyIfPresent(preset.translucentTrails, v -> config.translucentTrails = v);
-        applyIfPresent(preset.wireframeTrails, v -> config.wireframeTrails = v);
-        applyIfPresent(preset.enableTrail, v -> config.enableTrail = v);
-        applyIfPresent(preset.enableRandomWidth, v -> config.enableRandomWidth = v);
-        applyIfPresent(preset.speedDependentTrail, v -> config.speedDependentTrail = v);
-        applyIfPresent(preset.maxWidth, v -> config.maxWidth = v);
-        applyIfPresent(preset.trailLifetime, v -> config.trailLifeTime = v);
-        applyIfPresent(preset.trailMinSpeed, v -> config.trailMinSpeed = v);
-        applyIfPresent(preset.startRampDistance, v -> config.startRampDistance = v);
-        applyIfPresent(preset.endRampDistance, v -> config.endRampDistance = v);
-        applyIfPresent(preset.randomWidthVariation, v -> config.randomWidthVariation = v);
-        applyIfPresent(preset.color, v -> config.color = v);
-        applyIfPresent(preset.prideTrail, v -> config.prideTrail = v);
-        applyIfPresent(preset.fadeStart, v -> config.fadeStart = v);
-        applyIfPresent(preset.fadeStartDistance, v -> config.fadeStartDistance = v);
-        applyIfPresent(preset.fadeEnd, v -> config.fadeEnd = v);
-        applyIfPresent(preset.prideTrailRight, v -> config.prideTrailRight = v);
-        applyIfPresent(preset.increaseWidthOverTime, v -> config.increaseWidthOverTime = v);
-        applyIfPresent(preset.startingWidthMultiplier, v -> config.startingWidthMultiplier = v);
-        applyIfPresent(preset.endingWidthMultiplier, v -> config.endingWidthMultiplier = v);
-        applyIfPresent(preset.distanceTillTrailStart, v -> config.distanceTillTrailStart = v);
-        applyIfPresent(preset.endDistanceFade, v -> config.endDistanceFade = v);
-        applyIfPresent(preset.endDistanceFadeAmount, v -> config.endDistanceFadeAmount = v);
-        applyIfPresent(preset.speedBasedAlpha, v -> config.speedBasedAlpha = v);
-        applyIfPresent(preset.minAlphaSpeed, v -> config.minAlphaSpeed = v);
-        applyIfPresent(preset.maxAlphaSpeed, v -> config.maxAlphaSpeed = v);
-        applyIfPresent(preset.speedBasedWidth, v -> config.speedBasedWidth = v);
-        applyIfPresent(preset.minWidthSpeed, v -> config.minWidthSpeed = v);
-        applyIfPresent(preset.maxWidthSpeed, v -> config.maxWidthSpeed = v);
-        applyIfPresent(preset.trailMovesWithAngleOfAttack, v -> config.trailMovesWithAngleOfAttack = v);
-    }
+        try {
+            Map<String, Field> configFields = new HashMap<>();
+            for (Field field : ClientConfig.class.getDeclaredFields())
+            {
+                field.setAccessible(true);
+                configFields.put(field.getName(), field);
+            }
 
-    private static <T> void applyIfPresent(T value, java.util.function.Consumer<T> setter) {
-        if (value != null) setter.accept(value);
+            JsonObject values = preset.values();
+
+            for (var entry : values.entrySet())
+            {
+                Field configField = configFields.get(entry.getKey());
+                if (configField == null)
+                {
+                    continue;
+                }
+
+                JsonElement element = entry.getValue();
+                if (element == null || !element.isJsonPrimitive()) {
+                    continue;
+                }
+
+                Class<?> type = configField.getType(); //I got tired of changing the long apply preset class, so I made it do it dynamically
+
+                if (type == boolean.class) {
+                    if (element.getAsJsonPrimitive().isBoolean()) {
+                        configField.setBoolean(config, element.getAsBoolean());
+                    }
+                } else if (type == double.class) {
+                    if (element.getAsJsonPrimitive().isNumber()) {
+                        configField.setDouble(config, element.getAsDouble());
+                    }
+                } else if (type == int.class) { //for manually-made presets, sometimes people write the hex string instead of the int so this checks for that
+                    if (element.getAsJsonPrimitive().isNumber()) {
+                        configField.setInt(config, element.getAsInt());
+                    } else if (element.getAsJsonPrimitive().isString()) {
+                        configField.setInt(config, parseHexColor(element.getAsString()));
+                    }
+                } else if (type == String.class) {
+                    if (element.getAsJsonPrimitive().isString()) {
+                        configField.set(config, element.getAsString());
+                    }
+                }
+            }
+        } catch (IllegalAccessException e) {
+            throw new RuntimeException("Failed to apply preset to config", e);
+        }
     }
     private static @Nullable String presetKeyFromPresetPath(String rawPath) {
         String normalizedPath = rawPath.replace('\\', '/');
@@ -217,7 +227,6 @@ public final class TrailPackConfigManager {
 
         String fileName = normalizedPath.substring((PRESETS_FOLDER + "/").length());
         if (fileName.contains("/")) return null;
-
 
         String withoutExt = fileName.substring(0, fileName.length() - ".json".length());
         String trimmed = withoutExt.trim();
@@ -249,7 +258,7 @@ public final class TrailPackConfigManager {
             if (!(rootElement instanceof JsonObject rootObject)) return;
 
             TrailOverrides overrides = TrailOverrides.fromJson(rootObject);
-            if (overrides == null || overrides.isEmpty()) return;
+            if (overrides.isEmpty()) return;
 
             if(!hidden)
             {
@@ -283,8 +292,11 @@ public final class TrailPackConfigManager {
         try {
             Files.createDirectories(presetDir);
 
-            JsonObject root = getJsonObject(config);
+            Gson gson = new GsonBuilder().setPrettyPrinting().create();
+            JsonObject root = gson.toJsonTree(config.clientPlayerConfig).getAsJsonObject();
 
+            root.remove("easeType");
+            root.remove("twirlTime");
             // Overwrite if the file already exists, so people can actually update their presets instead of living with the endless suffering if they accidentally made their trail slightly too thin
             try (Writer writer = Files.newBufferedWriter(
                     outFile,
@@ -293,52 +305,11 @@ public final class TrailPackConfigManager {
                     StandardOpenOption.TRUNCATE_EXISTING,
                     StandardOpenOption.WRITE
             )) {
-                new GsonBuilder().setPrettyPrinting().create().toJson(root, writer);
+                gson.toJson(root, writer);
             }
 
         } catch (IOException ignored) {
         }
-    }
-
-    private static @NotNull JsonObject getJsonObject(@NotNull ModConfig config) {
-        JsonObject root = new JsonObject();
-
-        root.addProperty("enableTrail", config.clientPlayerConfig.enableTrail);
-        root.addProperty("glowingTrails", config.clientPlayerConfig.glowingTrails);
-        root.addProperty("translucentTrails", config.clientPlayerConfig.translucentTrails);
-        root.addProperty("wireframeTrails", config.clientPlayerConfig.wireframeTrails);
-        root.addProperty("enableRandomWidth", config.clientPlayerConfig.enableRandomWidth);
-        root.addProperty("speedDependentTrail", config.clientPlayerConfig.speedDependentTrail);
-        root.addProperty("fadeFirstPersonTrail", config.fadeFirstPersonTrail);
-        root.addProperty("trailMovesWithElytraAngle", config.clientPlayerConfig.trailMovesWithElytraAngle);
-        root.addProperty("width", config.clientPlayerConfig.maxWidth);
-        root.addProperty("firstPersonFadeTime", config.firstPersonFadeTime);
-        root.addProperty("trailLifetime", config.clientPlayerConfig.trailLifeTime);
-        root.addProperty("trailMinSpeed", config.clientPlayerConfig.trailMinSpeed);
-        root.addProperty("startRampDistance", config.clientPlayerConfig.startRampDistance);
-        root.addProperty("endRampDistance", config.clientPlayerConfig.endRampDistance);
-
-        root.addProperty("color", toHexColorString(config.clientPlayerConfig.color));
-
-        root.addProperty("prideTrail", config.clientPlayerConfig.prideTrail == null ? "" : config.clientPlayerConfig.prideTrail);
-        root.addProperty("randomWidthVariation", config.clientPlayerConfig.randomWidthVariation);
-        root.addProperty("fadeStart", config.clientPlayerConfig.fadeStart);
-        root.addProperty("fadeStartDistance", config.clientPlayerConfig.fadeStartDistance);
-        root.addProperty("fadeEnd", config.clientPlayerConfig.fadeEnd);
-        root.addProperty("prideTrailRight", config.clientPlayerConfig.prideTrailRight == null ? "" : config.clientPlayerConfig.prideTrailRight);
-        root.addProperty("increaseWidthOverTime", config.clientPlayerConfig.increaseWidthOverTime);
-        root.addProperty("startingWidthMultiplier", config.clientPlayerConfig.startingWidthMultiplier);
-        root.addProperty("endingWidthMultiplier", config.clientPlayerConfig.endingWidthMultiplier);
-        root.addProperty("distanceTillTrailStart", config.clientPlayerConfig.distanceTillTrailStart);
-        root.addProperty("endDistanceFade", config.clientPlayerConfig.endDistanceFade);
-        root.addProperty("endDistanceFadeAmount", config.clientPlayerConfig.endDistanceFadeAmount);
-        root.addProperty("speedBasedAlpha", config.clientPlayerConfig.speedBasedAlpha);
-        root.addProperty("minAlphaSpeed", config.clientPlayerConfig.minAlphaSpeed);
-        root.addProperty("maxAlphaSpeed", config.clientPlayerConfig.maxAlphaSpeed);
-        root.addProperty("speedBasedWidth", config.clientPlayerConfig.speedBasedWidth);
-        root.addProperty("minWidthSpeed", config.clientPlayerConfig.minWidthSpeed);
-        root.addProperty("maxWidthSpeed", config.clientPlayerConfig.maxWidthSpeed);
-        return root;
     }
 
     private static String sanitizePresetFileName(String raw) {
@@ -376,7 +347,7 @@ public final class TrailPackConfigManager {
             if (!(rootElement instanceof JsonObject rootObject)) return;
 
             TrailOverrides overrides = TrailOverrides.fromJson(rootObject);
-            if (overrides == null || overrides.isEmpty()) return;
+            if (overrides.isEmpty()) return;
 
             String fileName = file.getFileName().toString();
             String fallbackName = fileName.substring(0, fileName.length() - ".json".length()).trim();
@@ -396,7 +367,6 @@ public final class TrailPackConfigManager {
     }
 
     public static ResolvedTrailSettings resolve(@Nullable String modelName, @Nullable String boneName, @Nullable PlayerConfig baseConfig) {
-
         if (baseConfig == null) return ResolvedTrailSettings.defaults();
         if (boneName != null)
         {
@@ -405,23 +375,20 @@ public final class TrailPackConfigManager {
         ModConfig mainConfig = getConfig();
         String normalizedModelKey = normalizeModelKey(modelName);
         ModelTrailConfig modelConfig = (normalizedModelKey == null) ? null : MODEL_TRAIL_CONFIGS.get(normalizedModelKey);
-        if(baseConfig.speedBasedAlpha())
-        {
-            System.out.println("SPEED BASED HERE");
-        }
         TrailOverrides mergedOverrides = TrailOverrides.fromBase(baseConfig);
         if(!mainConfig.resourcePackOverride && (modelName != null && modelName.contains("elytra")))
         {
             return mergedOverrides.resolve();
         }
         if (modelConfig != null && modelConfig.defaultOverrides != null) {
-            if(modelConfig.defaultOverrides.parentPreset != null)
+            String parentPreset = modelConfig.defaultOverrides.getString("parentPreset");
+            if(parentPreset != null)
             {
                 if(mainConfig.logTrails)
                 {
-                    LOGGER.info("Parent default preset found in model {}, preset name: {}", modelName, modelConfig.defaultOverrides.parentPreset);
+                    LOGGER.info("Parent default preset found in model {}, preset name: {}", modelName, parentPreset);
                 }
-                TrailOverrides preset = getPresetOverrides(modelConfig.defaultOverrides.parentPreset);
+                TrailOverrides preset = getPresetOverrides(parentPreset);
                 mergedOverrides = mergedOverrides.with(preset);
             }
             mergedOverrides = mergedOverrides.with(modelConfig.defaultOverrides);
@@ -432,13 +399,12 @@ public final class TrailPackConfigManager {
             if (normalizedBoneKey != null) {
                 TrailOverrides boneOverrides = modelConfig.boneOverrides.get(normalizedBoneKey);
                 if (boneOverrides != null) {
-                    if(boneOverrides.parentPreset != null)
-                    {
-                        if(mainConfig.logTrails)
-                        {
-                            LOGGER.info("Parent preset found for bone {} in model {}, preset name: {}", boneName, modelName, boneOverrides.parentPreset);
+                    String parentPreset = boneOverrides.getString("parentPreset");
+                    if (parentPreset != null) {
+                        if (mainConfig.logTrails) {
+                            LOGGER.info("Parent preset found for bone {} in model {}, preset name: {}", boneName, modelName, parentPreset);
                         }
-                        TrailOverrides preset = getPresetOverrides(boneOverrides.parentPreset);
+                        TrailOverrides preset = getPresetOverrides(parentPreset);
                         mergedOverrides = mergedOverrides.with(preset);
                     }
                     mergedOverrides = mergedOverrides.with(boneOverrides);
@@ -554,7 +520,7 @@ public final class TrailPackConfigManager {
             if (defaultsFromDefaultsObject != null && !defaultsFromDefaultsObject.isEmpty()) {
                 mergedDefaults = defaultsFromDefaultsObject;
             }
-            if (defaultsFromTopLevel != null && !defaultsFromTopLevel.isEmpty()) {
+            if (!defaultsFromTopLevel.isEmpty()) {
                 mergedDefaults = (mergedDefaults == null) ? defaultsFromTopLevel : mergedDefaults.with(defaultsFromTopLevel);
             }
 
@@ -564,7 +530,7 @@ public final class TrailPackConfigManager {
                     if (!(entry.getValue() instanceof JsonObject boneObject)) continue;
 
                     TrailOverrides overrides = TrailOverrides.fromJson(boneObject);
-                    if (overrides == null || overrides.isEmpty()) continue;
+                    if (overrides.isEmpty()) continue;
 
                     String normalizedBoneKey = normalizeBoneKey(entry.getKey());
                     if (normalizedBoneKey != null) {
@@ -580,12 +546,14 @@ public final class TrailPackConfigManager {
         double maxLifetimeSeconds() {
             double max = -1.0;
 
-            if (defaultOverrides != null && defaultOverrides.trailLifetime != null) {
-                max = Math.max(max, defaultOverrides.trailLifetime);
+            if (defaultOverrides != null) {
+                Double lifetime = defaultOverrides.getDouble("trailLifetime");
+                max = Math.max(max, lifetime);
             }
             for (TrailOverrides overrides : boneOverrides.values()) {
-                if (overrides != null && overrides.trailLifetime != null) {
-                    max = Math.max(max, overrides.trailLifetime);
+                if (overrides != null) {
+                    Double lifetime = overrides.getDouble("trailLifetime");
+                    max = Math.max(max, lifetime);
                 }
             }
 
@@ -609,352 +577,7 @@ public final class TrailPackConfigManager {
         }
         return CONFIG_PRESETS.get(key);
     }
-    public static final class TrailOverrides {
-        @Nullable String parentPreset;
-        @Nullable Boolean enableTrail;
-        @Nullable Boolean enableRandomWidth;
-        @Nullable Boolean useSplineTrail;
-        @Nullable Boolean speedDependentTrail;
-        @Nullable Double maxWidth;
-        @Nullable Double trailLifetime;
-        @Nullable Double trailMinSpeed;
-        @Nullable Double startRampDistance;
-        @Nullable Double endRampDistance;
-        @Nullable Double randomWidthVariation;
 
-        @Nullable Integer color;
-
-        @Nullable String prideTrail;
-
-        @Nullable Boolean fadeStart;
-        @Nullable Double fadeStartDistance;
-        @Nullable Boolean fadeEnd;
-        @Nullable Boolean glowingTrails;
-        @Nullable Boolean translucentTrails;
-        @Nullable Boolean wireframeTrails;
-        @Nullable Boolean alwaysShowTrailDuringTwirl;
-        @Nullable String prideTrailRight;
-        @Nullable Double twirlTime;
-        @Nullable Boolean increaseWidthOverTime;
-        @Nullable Double startingWidthMultiplier;
-        @Nullable Double endingWidthMultiplier;
-        @Nullable Double distanceTillTrailStart;
-        @Nullable Boolean endDistanceFade;
-        @Nullable Double endDistanceFadeAmount;
-        @Nullable Boolean speedBasedAlpha;
-        @Nullable Double minAlphaSpeed;
-        @Nullable Double maxAlphaSpeed;
-        @Nullable Boolean speedBasedWidth;
-        @Nullable Double minWidthSpeed;
-        @Nullable Double maxWidthSpeed;
-        @Nullable Boolean trailMovesWithAngleOfAttack;
-
-        public static TrailOverrides fromBase(PlayerConfig baseConfig) {
-            TrailOverrides overrides = new TrailOverrides();
-            overrides.enableTrail = baseConfig.enableTrail();
-            overrides.enableRandomWidth = baseConfig.enableRandomWidth();
-            overrides.speedDependentTrail = baseConfig.speedDependentTrail();
-            overrides.maxWidth = baseConfig.maxWidth();
-            overrides.trailLifetime = baseConfig.trailLifetime();
-            overrides.trailMinSpeed = baseConfig.trailMinSpeed();
-            overrides.startRampDistance = baseConfig.startRampDistance();
-            overrides.endRampDistance = baseConfig.endRampDistance();
-            overrides.randomWidthVariation = baseConfig.randomWidthVariation();
-
-            overrides.color = baseConfig.color();
-            overrides.prideTrail = baseConfig.prideTrail();
-            overrides.glowingTrails = baseConfig.glowingTrails();
-            overrides.translucentTrails = baseConfig.translucentTrails();
-            overrides.wireframeTrails = baseConfig.wireframeTrails();
-            overrides.fadeStart = baseConfig.fadeStart();
-            overrides.fadeStartDistance = baseConfig.fadeStartDistance();
-            overrides.fadeEnd = baseConfig.fadeEnd();
-
-            overrides.alwaysShowTrailDuringTwirl = baseConfig.alwaysShowTrailDuringTwirl();
-            overrides.prideTrailRight = baseConfig.prideTrailRight();
-            overrides.twirlTime = baseConfig.twirlTime();
-            overrides.increaseWidthOverTime = baseConfig.increaseWidthOverTime();
-            overrides.startingWidthMultiplier = baseConfig.startingWidthMultiplier();
-            overrides.endingWidthMultiplier = baseConfig.endingWidthMultiplier();
-            overrides.distanceTillTrailStart = baseConfig.distanceTillTrailStart();
-            overrides.endDistanceFade = baseConfig.endDistanceFade();
-            overrides.endDistanceFadeAmount = baseConfig.endDistanceFadeAmount();
-            overrides.speedBasedAlpha = baseConfig.speedBasedAlpha();
-            overrides.minAlphaSpeed = baseConfig.minAlphaSpeed();
-            overrides.maxAlphaSpeed = baseConfig.maxAlphaSpeed();
-            overrides.speedBasedWidth = baseConfig.speedBasedWidth();
-            overrides.minWidthSpeed = baseConfig.minWidthSpeed();
-            overrides.maxWidthSpeed = baseConfig.maxWidthSpeed();
-            return overrides;
-        }
-        @SuppressWarnings("unused")
-        public static TrailOverrides fromResolved(ResolvedTrailSettings s) {
-            TrailOverrides o = new TrailOverrides();
-            // base is "fully resolved", so treat everything as non-null base values
-            o.enableTrail = s.enableTrail();
-            o.enableRandomWidth = s.enableRandomWidth();
-            o.speedDependentTrail = s.speedDependentTrail();
-
-            o.maxWidth = s.maxWidth();
-            o.trailLifetime = s.trailLifetime();
-            o.trailMinSpeed = s.trailMinSpeed();
-            o.startRampDistance = s.startRampDistance();
-            o.endRampDistance = s.endRampDistance();
-            o.randomWidthVariation = s.randomWidthVariation();
-
-            o.color = s.color();
-            o.prideTrail = s.prideTrail();
-            o.glowingTrails = s.glowingTrails();
-            o.translucentTrails = s.translucentTrails();
-            o.wireframeTrails = s.wireframeTrails();
-            o.fadeStart = s.fadeStart();
-            o.fadeStartDistance = s.fadeStartDistance();
-            o.fadeEnd = s.fadeEnd();
-
-            o.alwaysShowTrailDuringTwirl = s.alwaysShowTrailDuringTwirl();
-            o.prideTrailRight = s.prideTrailRight();
-            o.increaseWidthOverTime = s.increaseWidthOverTime();
-            o.endingWidthMultiplier = s.endingWidthMultiplier();
-            o.distanceTillTrailStart = s.distanceTillTrailStart();
-            o.endDistanceFade = s.endDistanceFade();
-            o.endDistanceFadeAmount = s.endDistanceFadeAmount();
-            return o;
-        }
-        public static @Nullable TrailOverrides fromJson(@Nullable JsonObject json) {
-            if (json == null) return null;
-
-            TrailOverrides overrides = new TrailOverrides();
-            overrides.parentPreset = readString(json, "parentPreset");
-            overrides.maxWidth = readDouble(json, "maxWidth", "maxwidth", "width");
-            overrides.trailLifetime = readDouble(json, "trailLifetime", "traillifetime");
-            overrides.trailMinSpeed = readDouble(json, "trailMinSpeed", "minspeed");
-            overrides.startRampDistance = readDouble(json, "startRampDistance", "startramp");
-            overrides.endRampDistance = readDouble(json, "endRampDistance", "endramp");
-            overrides.randomWidthVariation = readDouble(json, "randomWidthVariation");
-
-            overrides.enableTrail = readBoolean(json, "enableTrail");
-            overrides.enableRandomWidth = readBoolean(json, "enableRandomWidth");
-            overrides.useSplineTrail = readBoolean(json, "useSplineTrail");
-            overrides.speedDependentTrail = readBoolean(json, "speedDependentTrail", "speeddependant", "speedDependent");
-            overrides.color = json.has("color") ? parseHexColor(readString(json, "color")) : null;
-            overrides.prideTrail = readString(json, "prideTrail");
-            overrides.fadeStart = readBoolean(json, "fadeStart");
-            overrides.fadeStartDistance = readDouble(json,"fadeStartDistance");
-            overrides.fadeEnd = readBoolean(json,"fadeEnd");
-            overrides.glowingTrails = readBoolean(json,"glowingTrails");
-            overrides.translucentTrails = readBoolean(json,"translucentTrails");
-            overrides.wireframeTrails = readBoolean(json,"wireframeTrails");
-            overrides.parentPreset = readString(json, "parentPreset");
-            overrides.alwaysShowTrailDuringTwirl = readBoolean(json, "alwaysShowTrailDuringTwirl");
-            overrides.prideTrailRight = readString(json, "prideTrailRight");
-            overrides.twirlTime = readDouble(json, "twirlTime");
-            overrides.increaseWidthOverTime = readBoolean(json, "increaseWidthOverTime");
-            overrides.startingWidthMultiplier = readDouble(json, "startingWidthMultiplier");
-            overrides.endingWidthMultiplier = readDouble(json, "endingWidthMultiplier");
-            overrides.distanceTillTrailStart = readDouble(json, "distanceTillTrailStart");
-            overrides.endDistanceFade = readBoolean(json, "endDistanceFade");
-            overrides.endDistanceFadeAmount = readDouble(json, "endDistanceFadeAmount");
-            overrides.speedBasedAlpha = readBoolean(json, "speedBasedAlpha");
-            overrides.minAlphaSpeed = readDouble(json, "minAlphaSpeed");
-            overrides.maxAlphaSpeed = readDouble(json, "maxAlphaSpeed");
-
-            overrides.speedBasedWidth = readBoolean(json, "speedBasedWidth");
-            overrides.minWidthSpeed = readDouble(json, "minWidthSpeed");
-            overrides.maxWidthSpeed = readDouble(json, "maxWidthSpeed");
-            overrides.trailMovesWithAngleOfAttack = readBoolean(json, "trailMovesWithAngleOfAttack");
-            return overrides;
-        }
-        public boolean isEmpty() {
-            return enableTrail == null
-                    && enableRandomWidth == null
-                    && useSplineTrail == null
-                    && speedDependentTrail == null
-                    && maxWidth == null
-                    && trailLifetime == null
-                    && trailMinSpeed == null
-                    && startRampDistance == null
-                    && endRampDistance == null
-                    && randomWidthVariation == null
-                    && color == null
-                    && prideTrail == null
-                    && fadeStart == null
-                    && fadeEnd == null
-                    && fadeStartDistance == null
-                    && glowingTrails == null
-                    && translucentTrails == null
-                    && wireframeTrails == null
-                    && parentPreset == null
-                    && alwaysShowTrailDuringTwirl == null
-                    && prideTrailRight == null
-                    && twirlTime == null
-                    && increaseWidthOverTime == null
-                    && startingWidthMultiplier == null
-                    && endingWidthMultiplier == null
-                    && distanceTillTrailStart == null
-                    && endDistanceFade == null
-                    && endDistanceFadeAmount == null
-                    && speedBasedAlpha == null
-                    && minAlphaSpeed == null
-                    && maxAlphaSpeed == null
-                    && speedBasedWidth == null
-                    && minWidthSpeed == null
-                    && maxWidthSpeed == null
-                    && trailMovesWithAngleOfAttack == null;
-        }
-
-        public TrailOverrides with(@Nullable TrailOverrides other) {
-            if (other == null) return this;
-
-            TrailOverrides merged = new TrailOverrides();
-            merged.enableTrail = (other.enableTrail != null) ? other.enableTrail : this.enableTrail;
-            merged.enableRandomWidth = (other.enableRandomWidth != null) ? other.enableRandomWidth : this.enableRandomWidth;
-            merged.useSplineTrail = (other.useSplineTrail != null) ? other.useSplineTrail : this.useSplineTrail;
-            merged.speedDependentTrail = (other.speedDependentTrail != null) ? other.speedDependentTrail : this.speedDependentTrail;
-            merged.maxWidth = (other.maxWidth != null) ? other.maxWidth : this.maxWidth;
-            merged.trailLifetime = (other.trailLifetime != null) ? other.trailLifetime : this.trailLifetime;
-            merged.trailMinSpeed = (other.trailMinSpeed != null) ? other.trailMinSpeed : this.trailMinSpeed;
-            merged.startRampDistance = (other.startRampDistance != null) ? other.startRampDistance : this.startRampDistance;
-            merged.endRampDistance = (other.endRampDistance != null) ? other.endRampDistance : this.endRampDistance;
-            merged.randomWidthVariation = (other.randomWidthVariation != null) ? other.randomWidthVariation : this.randomWidthVariation;
-
-            merged.color = (other.color != null) ? other.color : this.color;
-            merged.prideTrail = (other.prideTrail != null) ? other.prideTrail : this.prideTrail;
-            merged.fadeEnd = (other.fadeEnd != null) ? other.fadeEnd : this.fadeEnd;
-            merged.fadeStart = (other.fadeStart != null) ? other.fadeStart : this.fadeStart;
-            merged.fadeStartDistance = (other.fadeStartDistance != null) ? other.fadeStartDistance : this.fadeStartDistance;
-            merged.glowingTrails = (other.glowingTrails != null) ? other.glowingTrails : this.glowingTrails;
-            merged.translucentTrails = (other.translucentTrails != null) ? other.translucentTrails : this.translucentTrails;
-            merged.wireframeTrails = (other.wireframeTrails != null) ? other.wireframeTrails : this.wireframeTrails;
-            merged.alwaysShowTrailDuringTwirl = (other.alwaysShowTrailDuringTwirl != null) ? other.alwaysShowTrailDuringTwirl : this.alwaysShowTrailDuringTwirl;
-            merged.prideTrailRight = (other.prideTrailRight != null) ? other.prideTrailRight : this.prideTrailRight;
-            merged.twirlTime = (other.twirlTime != null) ? other.twirlTime : this.twirlTime;
-            merged.increaseWidthOverTime = (other.increaseWidthOverTime != null) ? other.increaseWidthOverTime : this.increaseWidthOverTime;
-            merged.startingWidthMultiplier = (other.startingWidthMultiplier != null) ? other.startingWidthMultiplier : this.startingWidthMultiplier;
-            merged.endingWidthMultiplier = (other.endingWidthMultiplier != null) ? other.endingWidthMultiplier : this.endingWidthMultiplier;
-            merged.distanceTillTrailStart = (other.distanceTillTrailStart != null) ? other.distanceTillTrailStart : this.distanceTillTrailStart;
-            merged.endDistanceFade = (other.endDistanceFade != null) ? other.endDistanceFade : this.endDistanceFade;
-            merged.endDistanceFadeAmount = (other.endDistanceFadeAmount != null) ? other.endDistanceFadeAmount : this.endDistanceFadeAmount;
-            merged.speedBasedAlpha = (other.speedBasedAlpha != null) ? other.speedBasedAlpha : this.speedBasedAlpha;
-            merged.minAlphaSpeed = (other.minAlphaSpeed != null) ? other.minAlphaSpeed : this.minAlphaSpeed;
-            merged.maxAlphaSpeed = (other.maxAlphaSpeed != null) ? other.maxAlphaSpeed : this.maxAlphaSpeed;
-            merged.speedBasedWidth = (other.speedBasedWidth != null) ? other.speedBasedWidth : this.speedBasedWidth;
-            merged.minWidthSpeed = (other.minWidthSpeed != null) ? other.minWidthSpeed : this.minWidthSpeed;
-            merged.maxWidthSpeed = (other.maxWidthSpeed != null) ? other.maxWidthSpeed : this.maxWidthSpeed;
-            merged.trailMovesWithAngleOfAttack = (other.trailMovesWithAngleOfAttack != null) ? other.trailMovesWithAngleOfAttack : this.trailMovesWithAngleOfAttack;
-
-            return merged;
-        }
-        public ResolvedTrailSettings resolve() {
-            return new ResolvedTrailSettings(
-                    asTrue(enableTrail),
-                    asTrue(enableRandomWidth),
-                    asTrue(speedDependentTrail),
-                    asNumber(maxWidth),
-                    asNumber(trailLifetime),
-                    asNumber(trailMinSpeed),
-                    asNumber(startRampDistance),
-                    asNumber(endRampDistance),
-                    asNumber(randomWidthVariation),
-                    color != null ? color : 0xFFFFFFFF,
-                    prideTrail,
-                    asTrue(fadeStart),
-                    asNumber(fadeStartDistance),
-                    asTrue(fadeEnd),
-                    asTrue(glowingTrails),
-                    asTrue(translucentTrails),
-                    asTrue(wireframeTrails),
-                    asTrue(alwaysShowTrailDuringTwirl),
-                    prideTrailRight,
-                    asNumber(twirlTime),
-                    asTrue(increaseWidthOverTime),
-                    asNumber(startingWidthMultiplier),
-                    asNumber(endingWidthMultiplier),
-                    asNumber(distanceTillTrailStart),
-                    asTrue(endDistanceFade),
-                    asNumber(endDistanceFadeAmount),
-                    asTrue(speedBasedAlpha),
-                    asNumber(minAlphaSpeed),
-                    asNumber(maxAlphaSpeed),
-                    asTrue(speedBasedWidth),
-                    asNumber(minWidthSpeed),
-                    asNumber(maxWidthSpeed),
-                    asTrue(trailMovesWithAngleOfAttack)
-            );
-        }
-
-        public  static boolean asTrue(@Nullable Boolean value) {
-            return value != null && value;
-        }
-
-        public  static double asNumber(@Nullable Double value) {
-            return value != null ? value : 0.0;
-        }
-
-        public  static @Nullable Double readDouble(JsonObject json, String... keys) {
-            for (String key : keys) {
-                if (json.has(key) && json.get(key).isJsonPrimitive() && json.get(key).getAsJsonPrimitive().isNumber()) {
-                    return json.get(key).getAsDouble();
-                }
-            }
-            return null;
-        }
-
-        public  static @Nullable Boolean readBoolean(JsonObject json, String... keys) {
-            for (String key : keys) {
-                if (json.has(key) && json.get(key).isJsonPrimitive() && json.get(key).getAsJsonPrimitive().isBoolean()) {
-                    return json.get(key).getAsBoolean();
-                }
-            }
-            return null;
-        }
-
-        public  static @Nullable String readString(JsonObject json, String key) {
-            if (json.has(key) && json.get(key).isJsonPrimitive() && json.get(key).getAsJsonPrimitive().isString()) {
-                return json.get(key).getAsString();
-            }
-            return null;
-        }
-    }
-
-    public record ResolvedTrailSettings(
-            boolean enableTrail,
-            boolean enableRandomWidth,
-            boolean speedDependentTrail,
-            double maxWidth,
-            double trailLifetime,
-            double trailMinSpeed,
-            double startRampDistance,
-            double endRampDistance,
-            double randomWidthVariation,
-            int color,
-            @Nullable String prideTrail,
-            boolean fadeStart,
-            double fadeStartDistance,
-            boolean fadeEnd,
-            boolean glowingTrails,
-            boolean translucentTrails,
-            boolean wireframeTrails,
-            boolean alwaysShowTrailDuringTwirl,
-            String prideTrailRight,
-            double twirlTimeOthersDefault,
-            boolean increaseWidthOverTime,
-            double startingWidthMultiplier,
-            double endingWidthMultiplier,
-            double distanceTillTrailStart,
-            boolean endDistanceFade,
-            double endDistanceFadeAmount,
-            boolean speedBasedAlpha,
-            double minAlphaSpeed,
-            double maxAlphaSpeed,
-            boolean speedBasedWidth,
-            double minWidthSpeed,
-            double maxWidthSpeed,
-            boolean trailMovesWithAngleOfAttack
-    ) {
-        public static ResolvedTrailSettings defaults() {
-            return resolveFromPlayerConfig(ClientPlayerConfigStore.getLocalPlayerConfig());
-        }
-    }
     public static int parseHexColor(String s) {
         if (s == null) return 0xFFFFFFFF;
         String t = s.trim();
@@ -999,8 +622,7 @@ public final class TrailPackConfigManager {
         int argb = (a << 24) | c;
         return String.format("#%08X", argb); // #AARRGGBB
     }
-    public static ResolvedTrailSettings resolveFromPlayerConfig(@Nullable PlayerConfig playerConfig) {
-        assert playerConfig != null;
+    public static ResolvedTrailSettings resolveFromPlayerConfig(PlayerConfig playerConfig) {
         return new ResolvedTrailSettings(
                 playerConfig.enableTrail(),
                 playerConfig.enableRandomWidth(),
@@ -1034,7 +656,9 @@ public final class TrailPackConfigManager {
                 playerConfig.speedBasedWidth(),
                 playerConfig.minWidthSpeed(),
                 playerConfig.maxWidthSpeed(),
-                playerConfig.trailMovesWithAngleOfAttack()
+                playerConfig.trailMovesWithAngleOfAttack(),
+                playerConfig.useColorBoth(),
+                playerConfig.color()
         );
     }
 
