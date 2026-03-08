@@ -157,10 +157,14 @@ public final class TwirlController {
 
     public static void setDurations()
     {
-        DURATION_S = Math.max(getConfig().clientPlayerConfig.twirlTime,0.1);
+        DURATION_S = Math.max(getConfig().clientPlayerConfig.twirlTime,0.0001);
         if(getConfig().clientPlayerConfig.easeType == EasingUtil.EaseType.Back)
         {
-            DURATION_S *= 4;
+            DURATION_S *= 2.993;
+        }
+        if(getConfig().clientPlayerConfig.easeType == EasingUtil.EaseType.Cubic)
+        {
+            DURATION_S *= 1.99;
         }
     }
 

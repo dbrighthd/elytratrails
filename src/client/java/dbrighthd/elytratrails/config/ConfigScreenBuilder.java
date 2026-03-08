@@ -120,10 +120,9 @@ public class ConfigScreenBuilder {
                 .requireRestart()
                 .build());
         general.addEntry(entryBuilder.startBooleanToggle(Component.translatable("text.elytratrails.option.hardCodedFreshAnimationsPlayerWingtips"), config.hardCodedFreshAnimationsPlayerWingtips)
-                .setDefaultValue(true)
+                .setDefaultValue(false)
                 .setTooltip(Component.translatable("text.elytratrails.option.hardCodedFreshAnimationsPlayerWingtips.@Tooltip"))
                 .setSaveConsumer(newValue -> config.hardCodedFreshAnimationsPlayerWingtips = newValue)
-                .requireRestart()
                 .build());
         general.addEntry(entryBuilder.startEnumSelector(
                         Component.translatable("text.elytratrails.option.clearTrails"),
@@ -160,7 +159,7 @@ public class ConfigScreenBuilder {
                 .setSaveConsumer(newValue -> config.fishysStupidThirdPersonCameraRoll = newValue)
                 .build());
         twirling.addEntry(entryBuilder.startDoubleField(Component.translatable("text.elytratrails.option.twirlTime"), config.clientPlayerConfig.twirlTime)
-                .setDefaultValue(0.5)
+                .setDefaultValue(ClientConfig.getDefaultClientConfig().twirlTime)
                 .setTooltip(Component.translatable("text.elytratrails.option.twirlTime.@Tooltip"))
                 .setSaveConsumer(newValue -> config.clientPlayerConfig.twirlTime = newValue)
                 .build());

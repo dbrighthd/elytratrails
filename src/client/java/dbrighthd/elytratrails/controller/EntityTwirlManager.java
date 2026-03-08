@@ -183,15 +183,19 @@ public final class EntityTwirlManager {
 
     private static TwirlInfo getEntityTwirlConfigs(int entityId) {
         PlayerConfig playerConfig = ClientPlayerConfigStore.getOrDefault(entityId);
-        double DURATION_S = Math.max(playerConfig.twirlTime(), 0.1);
+        double DURATION_S = Math.max(playerConfig.twirlTime(), 0.0001);
         double HALF_DURATION_S = DURATION_S * 0.5;
         double OMEGA_RAD_S = (Math.PI * Math.PI) / DURATION_S;
         double TURN360_DURATION_S = Math.TAU / OMEGA_RAD_S;
         EasingUtil.EaseType easeType = playerConfig.easeType();
 
         if (playerConfig.easeType() == EasingUtil.EaseType.Back) {
-            DURATION_S *=4;
-            HALF_DURATION_S *= 4;
+            DURATION_S *=2.993;
+            HALF_DURATION_S *= 2.993;
+        }
+        if (playerConfig.easeType() == EasingUtil.EaseType.Cubic) {
+            DURATION_S *=1.99;
+            HALF_DURATION_S *= 1.99;
         }
         if (playerConfig.easeType() == EasingUtil.EaseType.None) {
             HALF_DURATION_S /= 1.5;

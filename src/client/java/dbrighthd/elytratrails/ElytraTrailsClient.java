@@ -8,7 +8,7 @@ import dbrighthd.elytratrails.controller.TwirlController;
 import dbrighthd.elytratrails.handler.ParticleHandler;
 import dbrighthd.elytratrails.network.RegisterPacketsClient;
 import dbrighthd.elytratrails.rendering.*;
-import dbrighthd.elytratrails.util.CommandsUtil;
+import dbrighthd.elytratrails.handler.CommandHandler;
 import dbrighthd.elytratrails.util.TimeUtil;
 import me.shedaniel.autoconfig.AutoConfig;
 import me.shedaniel.autoconfig.serializer.GsonConfigSerializer;
@@ -43,7 +43,7 @@ public class ElytraTrailsClient implements ClientModInitializer {
 		ParticleHandler.init();
 		refreshLocalConfigs();
 		RegisterPacketsClient.initClient();
-		CommandsUtil.init();
+		CommandHandler.init();
 		ContinuousTwirlController.setDurations();
 		TwirlController.setDurations();
 		ResourceManagerHelper.get(PackType.CLIENT_RESOURCES).registerReloadListener(

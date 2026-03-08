@@ -1,4 +1,4 @@
-package dbrighthd.elytratrails.util;
+package dbrighthd.elytratrails.handler;
 
 import com.mojang.brigadier.Command;
 import com.mojang.brigadier.context.CommandContext;
@@ -16,26 +16,26 @@ import static dbrighthd.elytratrails.network.ClientPlayerConfigStore.CLIENT_PLAY
 /**
  * Sets up some handy client commands
  */
-public class CommandsUtil {
+public class CommandHandler {
     public static void init()
     {
         ClientCommandRegistrationCallback.EVENT.register((dispatcher, registryAccess) -> dispatcher.register(
                 ClientCommandManager.literal("elytratrails").then(ClientCommandManager.literal("debug")
-                        .executes(CommandsUtil::debugCommand))
+                        .executes(CommandHandler::debugCommand))
         ));
         ClientCommandRegistrationCallback.EVENT.register((dispatcher, registryAccess) -> dispatcher.register(
                 ClientCommandManager.literal("elytratrails").then(ClientCommandManager.literal("debugmodels")
-                        .executes(CommandsUtil::debugModelsCommand))
+                        .executes(CommandHandler::debugModelsCommand))
         ));
         ClientCommandRegistrationCallback.EVENT.register((dispatcher, registryAccess) -> dispatcher.register(
                 ClientCommandManager.literal("elytratrails")
                         .then(ClientCommandManager.literal("clear")
-                                .executes(CommandsUtil::clearCommand))
+                                .executes(CommandHandler::clearCommand))
         ));
         ClientCommandRegistrationCallback.EVENT.register((dispatcher, registryAccess) -> dispatcher.register(
                 ClientCommandManager.literal("elytratrails")
                         .then(ClientCommandManager.literal("getconfigs")
-                                .executes(CommandsUtil::requestTrailConfigs))
+                                .executes(CommandHandler::requestTrailConfigs))
         ));
     }
     private static int clearCommand(CommandContext<FabricClientCommandSource> context)

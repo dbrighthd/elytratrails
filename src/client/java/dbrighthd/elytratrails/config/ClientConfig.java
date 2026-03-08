@@ -146,7 +146,7 @@ public class ClientConfig {
                 false,
                 false,
                 "",
-                0.5,
+                0.67,
                 false,
                 1.0,
                 5.0,

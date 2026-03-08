@@ -15,6 +15,7 @@ import traben.entity_model_features.models.parts.EMFModelPartWithState;
 
 import java.util.*;
 
+import static dbrighthd.elytratrails.ElytraTrailsClient.getConfig;
 import static dbrighthd.elytratrails.config.pack.TrailPackConfigManager.entitiesWithTrails;
 
 public final class EmfTrailSpawnerRegistry {

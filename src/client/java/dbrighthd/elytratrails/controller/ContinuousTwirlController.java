@@ -49,13 +49,17 @@ public final class ContinuousTwirlController {
 
     public static void setDurations()
     {
-        double DURATION_S = Math.max(getConfig().clientPlayerConfig.twirlTime, 0.1);
+        double DURATION_S = Math.max(getConfig().clientPlayerConfig.twirlTime, 0.0001);
         HALF_DURATION_S = DURATION_S * 0.5;
         OMEGA_RAD_S = (Math.PI * Math.PI) / DURATION_S;
         TURN360_DURATION_S = Math.TAU / OMEGA_RAD_S;
         if(getConfig().clientPlayerConfig.easeType == EasingUtil.EaseType.Back)
         {
-            HALF_DURATION_S *= 4;
+            HALF_DURATION_S *= 2.993;
+        }
+        if(getConfig().clientPlayerConfig.easeType == EaseType.Cubic)
+        {
+            HALF_DURATION_S *= 1.99;
         }
         if(getConfig().clientPlayerConfig.easeType == EasingUtil.EaseType.None)
         {

@@ -93,7 +93,7 @@ public class WingTipSampler {
                 {
                     LOGGER.info("Entity {}, New elytra equipped with model variant {}",eid, variant);
                 }
-                emfCache.put(eid,new EmfInfo("elytra", variant, getSpawnersInfo(EmfWingTipHooks.findAllSpawnerPaths(leftWing, rightWing))));
+                emfCache.put(eid,new EmfInfo("elytra", variant, getSpawnersInfo(EmfWingTipHooks.findAllSpawnerPaths(leftWing, rightWing, modConfig.hardCodedFreshAnimationsPlayerWingtips))));
                 return List.of();
             }
             EmfInfo emfInfo = emfCache.get(eid);
@@ -140,7 +140,7 @@ public class WingTipSampler {
                 {
                     LOGGER.info("Entity {}, New variant with model variant {}",eid, variant);
                 }
-                emfCache.put(eid,new EmfInfo(entity.getType().toString(), variant, getSpawnersInfo(EmfWingTipHooks.findAllSpawnerPathsGeneric(animatedRoot))));
+                emfCache.put(eid,new EmfInfo(entity.getType().toString(), variant, getSpawnersInfo(EmfWingTipHooks.findAllSpawnerPathsGeneric(animatedRoot, false))));
                 return List.of();
 
             }
@@ -199,7 +199,7 @@ public class WingTipSampler {
             ModelPart wingRoot = (spawner.spawner.where() == EmfWingTipHooks.WhichRoot.LEFT_WING) ? leftWing : rightWing;
 
             Vec3 cameraRelative = transformLocalPointThroughPath(
-                    stack, elytraRoot, wingRoot, spawner.spawner.path()
+                    stack, elytraRoot, wingRoot, spawner.spawner.path(), getEmitterLocalOffset(spawner)
             );
             if (cameraRelative == null) continue;
 
@@ -265,7 +265,21 @@ public class WingTipSampler {
                 new Emitter(cameraPos.add(tip).add(entityWorldOffset), true, entity.getType().toShortString(), "/trailspawner")
         );
     }
+    private static final Vec3 FRESH_ANIMATIONS_LEFT_WINGTIP_OFFSET =
+            new Vec3(-11.0 / 16.0, 21.0 / 16.0, 3.0 / 16.0);
 
+    private static final Vec3 FRESH_ANIMATIONS_RIGHT_WINGTIP_OFFSET =
+            new Vec3(11.0 / 16.0, 21.0 / 16.0, 3.0 / 16.0);
+    private static Vec3 getEmitterLocalOffset(SpawnerInfo spawner) {
+        String key = spawner.spawner.key();
+        if (key == null) return Vec3.ZERO;
+
+        return switch (key.toLowerCase()) {
+            case "emf_left_wing2" -> FRESH_ANIMATIONS_LEFT_WINGTIP_OFFSET;
+            case "emf_right_wing2" -> FRESH_ANIMATIONS_RIGHT_WINGTIP_OFFSET;
+            default -> Vec3.ZERO;
+        };
+    }
 
     private @NotNull Vec3 computeTransformedWingTip(@NotNull PoseStack stack, @Nullable ModelPart elytraRoot, @NotNull ModelPart wingRoot, @NotNull Vec3 localPos, Player player, ModConfig modConfig) {
         float wingspread = ModelTransformationUtil.computeWingOpenness(wingRoot);
@@ -291,6 +305,47 @@ public class WingTipSampler {
         }
         partRoot.translateAndRotate(stack);
         Vec3 point = ModelTransformationUtil.transformPoint(stack.last().pose(), localPos);
+        stack.popPose();
+        return point;
+    }
+    private @Nullable Vec3 transformLocalPointThroughPath(
+            @NotNull PoseStack stack,
+            @Nullable ModelPart elytraRoot,
+            @NotNull ModelPart wingRoot,
+            @Nullable String childOnlyPath,
+            @NotNull Vec3 localOffset
+    ) {
+        if (childOnlyPath == null || childOnlyPath.isEmpty()) return null;
+
+        stack.pushPose();
+        if (elytraRoot != null && elytraRoot != wingRoot) {
+            elytraRoot.translateAndRotate(stack);
+        }
+        wingRoot.translateAndRotate(stack);
+
+        ModelPart current = wingRoot;
+        int segmentStartIndex = 0;
+
+        while (segmentStartIndex < childOnlyPath.length()) {
+            int nextSlashIndex = childOnlyPath.indexOf('/', segmentStartIndex);
+            String segmentName = (nextSlashIndex == -1)
+                    ? childOnlyPath.substring(segmentStartIndex)
+                    : childOnlyPath.substring(segmentStartIndex, nextSlashIndex);
+
+            ModelPart child = findChildIgnoreCase(current, segmentName);
+            if (child == null) {
+                stack.popPose();
+                return null;
+            }
+
+            child.translateAndRotate(stack);
+            current = child;
+
+            if (nextSlashIndex == -1) break;
+            segmentStartIndex = nextSlashIndex + 1;
+        }
+
+        Vec3 point = ModelTransformationUtil.transformPoint(stack.last().pose(), localOffset);
         stack.popPose();
         return point;
     }

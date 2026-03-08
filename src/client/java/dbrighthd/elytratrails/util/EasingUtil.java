@@ -37,6 +37,43 @@ public class EasingUtil {
         }
         return (1.0 - Math.cos((Math.PI * 0.5) * t));
     }
+    public static double easeInCubic(double t)
+    {
+        if(t < 0)
+        {
+            return 0;
+        }
+        if( t >= 1){
+            return 1;
+        }
+        return t*t*t;
+    }
+    public static double easeOutCubic(double t)
+    {
+        if(t < 0)
+        {
+            return 0;
+        }
+        if( t >= 1){
+            return 1;
+        }
+        return Math.pow(t-1,3)+1;
+    }
+    public static double easeBothCubic(double t)
+    {
+        if(t < 0)
+        {
+            return 0;
+        }
+        if( t >= 1){
+            return 1;
+        }
+        if( t <= 0.5)
+        {
+            return 4*Math.pow(t,3);
+        }
+        return 4*Math.pow(t-1,3)+1;
+    }
     public static double easeBothBack(double t)
     {
         double s1 = 2.5949095;
@@ -91,6 +128,10 @@ public class EasingUtil {
         {
             return noEase(t);
         }
+        if(easeType == EaseType.Cubic)
+        {
+            return easeInCubic(t);
+        }
         return easeInSin(t);
     }
     public static double easeOut(double t, EaseType easeType)
@@ -102,6 +143,10 @@ public class EasingUtil {
         if(easeType == EaseType.None)
         {
             return noEase(t);
+        }
+        if(easeType == EaseType.Cubic)
+        {
+            return easeOutCubic(t);
         }
         return easeOutSin(t);
     }
@@ -115,12 +160,18 @@ public class EasingUtil {
         {
             return noEase(t);
         }
+        if(easeType == EaseType.Cubic)
+        {
+            return easeBothCubic(t);
+        }
         return easeBothSin(t);
     }
 
     public enum EaseType {
-        @SuppressWarnings("unused") Sine, // it thinks its unused because it's not in the code (it's a fallback) but it can be selected by the player
         Back,
+        @SuppressWarnings("unused") Sine, // it thinks its unused because it's not in the code (it's a fallback) but it can be selected by the player
+        Cubic,
+        Circ,
         None,
     }
 }
