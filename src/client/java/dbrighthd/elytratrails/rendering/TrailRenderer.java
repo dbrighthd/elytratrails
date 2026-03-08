@@ -51,6 +51,7 @@ public class TrailRenderer {
     private static final Logger LOGGER = LoggerFactory.getLogger(TrailRenderer.class);
     private static final float CAMERA_FADE_ZERO = 0.5f;
     private static final float CAMERA_FADE_FULL = 0.7f;
+    private static float endCorrection = 0f;
     private Vec3 cameraPosition;
     long currentTime;
     public TrailRenderer(@NotNull TrailManager manager) {
@@ -109,6 +110,7 @@ public class TrailRenderer {
 
                 totalTrailLength -= (float) trailSettings.distanceTillTrailStart();
                 totalTrailLength = max(totalTrailLength, 0);
+                endCorrection = 0f;
                 this.accumDist = 0f;
 
                 this.atEnd = false;
@@ -234,12 +236,15 @@ public class TrailRenderer {
             double start = Mth.lerp(tStart, epoch0, epoch1);
             double end = Mth.lerp(tEnd, epoch0, epoch1);
 
-            double trailLifetime = trailSettings.enableTrail() ? trailSettings.trailLifetime() : 0;
-            float alphaEnd = trailSettings.fadeEnd() ?  computeLifetimeFadeout(end, currentTime, (long) (trailLifetime * 1000)) : 1f;
-            float alphaStart = trailSettings.fadeEnd() ? computeLifetimeFadeout(start, currentTime, (long) (trailLifetime * 1000)) : 1f;
-
-            float scaleStart = computeWidthScaling(totalTrailLength- v1, v1, trailSettings);
-            float scaleEnd = computeWidthScaling(totalTrailLength- v2, v2, trailSettings);
+            double trailLifetimeMillis = trailSettings.enableTrail() ? trailSettings.trailLifetime()* 1000 : 0;
+            float alphaEnd = trailSettings.fadeEnd() ?  computeLifetimeFadeout(end, currentTime, (long) (trailLifetimeMillis)) : 1f;
+            float alphaStart = trailSettings.fadeEnd() ? computeLifetimeFadeout(start, currentTime, (long) (trailLifetimeMillis)) : 1f;
+            if((currentTime - end) >= trailLifetimeMillis)
+            {
+                endCorrection = v2;
+            }
+            float scaleStart = computeWidthScaling(totalTrailLength- v1, v1-endCorrection, trailSettings);
+            float scaleEnd = computeWidthScaling(totalTrailLength- v2, v2-endCorrection, trailSettings);
             if(trailSettings.startRampDistance() == 0)
             {
                 if(scaleEnd == 0)
@@ -269,8 +274,8 @@ public class TrailRenderer {
             }
             if(trailSettings.increaseWidthOverTime())
             {
-                scaleStart *= getWidthOverTimeScale(start, currentTime, (long) (trailLifetime * 1000), trailSettings);
-                scaleEnd *= getWidthOverTimeScale(end, currentTime, (long) (trailLifetime * 1000), trailSettings);
+                scaleStart *= getWidthOverTimeScale(start, currentTime, (long) (trailLifetimeMillis), trailSettings);
+                scaleEnd *= getWidthOverTimeScale(end, currentTime, (long) (trailLifetimeMillis), trailSettings);
             }
             if(trailSettings.fadeStart() && trailSettings.translucentTrails())
             {
@@ -279,8 +284,8 @@ public class TrailRenderer {
             }
             if(trailSettings.endDistanceFade() && trailSettings.translucentTrails())
             {
-                alphaStart *= computeEndFade(v1, trailSettings);
-                alphaEnd *= computeEndFade(v2, trailSettings);
+                alphaStart *= computeEndFade(v1-endCorrection, trailSettings);
+                alphaEnd *= computeEndFade(v2-endCorrection, trailSettings);
             }
             if(trailSettings.speedBasedAlpha())
             {
