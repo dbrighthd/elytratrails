@@ -132,9 +132,8 @@ public class ClientConfig {
         this.colorRight = colorRight;
     }
 
-    public static ClientConfig getDefaultClientConfig()
-    {
-        return new ClientConfig(
+    public ClientConfig() {
+        this(
                 true,
                 false,
                 true,
@@ -170,10 +169,15 @@ public class ClientConfig {
                 0.75,
                 2.0,
                 true,
-                true ,
+                true,
                 0xFFFFFFFF
         );
     }
+
+    public static ClientConfig getDefaultClientConfig() {
+        return new ClientConfig();
+    }
+
     public PlayerConfig getPlayerConfig()
     {
         return new PlayerConfig(
