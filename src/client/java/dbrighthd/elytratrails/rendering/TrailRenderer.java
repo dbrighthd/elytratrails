@@ -65,11 +65,10 @@ public class TrailRenderer {
         stack.pushPose();
 
         Camera camera = ctx.gameRenderer().getMainCamera();
+
+        modConfig = getConfig();
         cameraPosition = camera.position();
         stack.translate(cameraPosition.scale(-1f));
-        currentTime = TimeUtil.currentMillis();
-        modConfig = getConfig();
-
         for (Trail trail : manager.trails()) {
             List<Trail.Point> points = trail.points();
             int size = points.size();
@@ -91,12 +90,11 @@ public class TrailRenderer {
                 }
             }
 
-            final Trail.Point effectiveLastPoint =
-                    snappedLastPoint != null ? snappedLastPoint : points.get(last);
+            final Trail.Point effectiveLastPoint = snappedLastPoint != null ? snappedLastPoint : points.get(last);
 
             ctx.commandQueue().order(1).submitCustomGeometry(stack, renderType, (pose, consumer) -> {
                 totalTrailLength = 0f;
-
+                currentTime = TimeUtil.currentMillis();
                 for (int i = 0; i < last; i++) {
                     int i0 = (i > 0) ? i - 1 : 0;
                     int i2 = i + 1;
@@ -391,7 +389,7 @@ public class TrailRenderer {
             else if (distFromStart >= startRamp) up = 1f;
             else up = (float) Math.sin((distFromStart / startRamp) * (Math.PI / 2.0));
         }
-        return (float) Math.pow(up, 0.9f);
+        return up;
     }
     private float computeEndFade(float distToEnd, TrailPackConfigManager.ResolvedTrailSettings cfg) {
         float endRamp = (float) cfg.endDistanceFadeAmount();
@@ -399,7 +397,7 @@ public class TrailRenderer {
         if (distToEnd <= 0f) down = 0f;
         else if (distToEnd >= endRamp) down = 1f;
         else down = (float) Math.sin((distToEnd / endRamp) * (Math.PI / 2.0));
-        return (float) Math.pow(down, 0.9f);
+        return down;
     }
 
     @SuppressWarnings("unused")

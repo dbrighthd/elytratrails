@@ -38,7 +38,8 @@ public record PlayerConfig(
         double maxAlphaSpeed,
         boolean speedBasedWidth,
         double minWidthSpeed,
-        double maxWidthSpeed
+        double maxWidthSpeed,
+        boolean trailMovesWithAngleOfAttack
 ) {
     public static final int WIRE_VERSION = 1; // bump when you change meaning, not when you add fields
 
@@ -81,6 +82,7 @@ public record PlayerConfig(
         tag.putBoolean("speedBasedWidth",speedBasedWidth);
         tag.putDouble("minWidthSpeed",minWidthSpeed);
         tag.putDouble("maxWidthSpeed",minWidthSpeed);
+        tag.putBoolean("trailMovesWithAngleOfAttack",trailMovesWithAngleOfAttack);
         return tag;
     }
 

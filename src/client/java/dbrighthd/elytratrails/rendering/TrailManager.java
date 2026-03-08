@@ -112,7 +112,7 @@ public class TrailManager {
             boolean valid = TrailManager.isEntityTrailValid(config, player);
 
             if (valid) {
-                List<Emitter> emitters = sampler.getPlayerTrailEmitterPositions(player, ctx.getDeltaTracker().getGameTimeDeltaPartialTick(false));
+                List<Emitter> emitters = sampler.getPlayerTrailEmitterPositions(player, ctx.getDeltaTracker().getGameTimeDeltaPartialTick(false),modConfig);
                 double speed = player.getDeltaMovement().length();
                 if (emitters.isEmpty())
                 {

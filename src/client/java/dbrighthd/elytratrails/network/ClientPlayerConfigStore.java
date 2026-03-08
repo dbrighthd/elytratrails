@@ -141,7 +141,8 @@ public final class ClientPlayerConfigStore
                 incomingConfig.maxAlphaSpeed(),
                 incomingConfig.speedBasedWidth(),
                 incomingConfig.minWidthSpeed(),
-                incomingConfig.maxWidthSpeed()
+                incomingConfig.maxWidthSpeed(),
+                incomingConfig.trailMovesWithAngleOfAttack()
         );
 
         CLIENT_PLAYER_CONFIGS.put(entityId,safe);
@@ -198,7 +199,7 @@ public final class ClientPlayerConfigStore
         boolean speedBasedWidth = tag.getBooleanOr("speedBasedWidth", fallbackConfig.speedBasedWidth());
         double minWidthSpeed = tag.getDoubleOr("minWidthSpeed", fallbackConfig.minWidthSpeed());
         double maxWidthSpeed = tag.getDoubleOr("maxWidthSpeed", fallbackConfig.maxWidthSpeed());
-
+        boolean trailMovesWithAngleOfAttack = tag.getBooleanOr("trailMovesWithAngleOfAttack",fallbackConfig.trailMovesWithAngleOfAttack());
         return new PlayerConfig(
                 enableTrail,
                 enableRandomWidth,
@@ -234,7 +235,8 @@ public final class ClientPlayerConfigStore
                 maxAlphaSpeed,
                 speedBasedWidth,
                 minWidthSpeed,
-                maxWidthSpeed
+                maxWidthSpeed,
+                trailMovesWithAngleOfAttack
         );
     }
     public static <E extends Enum<E>> E readEnum(CompoundTag tag, String key, Class<E> enumClass, E fallback) {

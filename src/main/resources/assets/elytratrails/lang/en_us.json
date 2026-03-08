@@ -71,6 +71,9 @@
   "text.elytratrails.option.trailMovesWithElytraAngle": "Dynamic Wingtip Position",
   "text.elytratrails.option.trailMovesWithElytraAngle.@Tooltip": "Whether the calculated wingtip should change based on the elytra's spread",
 
+  "text.elytratrails.option.trailMovesWithAngleOfAttack" : "Wingtip AOA Correction",
+  "text.elytratrails.option.trailMovesWithAngleOfAttack.@Tooltip" : "If on, try to position the wingtip to be accurate based on Angle of Attack. if off, trail will always appear from midpoint vertically",
+
   "text.elytratrails.option.enableParticles": "Enable Particles During Flight",
   "text.elytratrails.option.enableParticles.@Tooltip": "Spawns particles around the player during flight, to show speed",
 
@@ -190,6 +193,9 @@
   "text.elytratrails.option.trailMovesWithElytraAngleOthersDefault": "Other's Dynamic Wingtip Position",
   "text.elytratrails.option.trailMovesWithElytraAngleOthersDefault.@Tooltip": "Default: whether other wingtips move with elytra angle",
 
+  "text.elytratrails.option.trailMovesWithAngleOfAttackOthersDefault" : "Wingtip AOA Correction",
+  "text.elytratrails.option.trailMovesWithAngleOfAttackOthersDefault.@Tooltip" : "If on, try to position the wingtip to be accurate based on Angle of Attack. if off, trail will always appear from midpoint vertically",
+
   "text.elytratrails.option.cameraDistanceFadeOthersDefault": "Other's Camera Fade",
   "text.elytratrails.option.cameraDistanceFadeOthersDefault.@Tooltip": "Default: fade other trails when close to your camera",
 
@@ -219,6 +225,9 @@
 
   "text.elytratrails.option.logTrails" : "Log Trails",
   "text.elytratrails.option.logTrails.@Tooltip" : "Logs trail creation/deletion",
+
+  "text.elytratrails.option.hardCodedFreshAnimationsPlayerWingtips" : "FA+Player Hardcoded Wingtips",
+  "text.elytratrails.option.hardCodedFreshAnimationsPlayerWingtips.@Tooltip" : "Tries to assume wingtip position in FA+Player elytra model. This option will be deleted if FA+Player updates to support this mod.",
 
 
   "text.elytratrails.option.shaderOverride": "Shader Forces Glowing",

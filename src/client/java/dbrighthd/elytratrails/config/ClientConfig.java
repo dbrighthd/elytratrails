@@ -44,6 +44,7 @@ public class ClientConfig {
     public boolean speedBasedWidth;
     public double minWidthSpeed;
     public double maxWidthSpeed;
+    public boolean trailMovesWithAngleOfAttack;
 
     public int justColor;
     public int justAlpha;
@@ -82,7 +83,8 @@ public class ClientConfig {
             double maxAlphaSpeed,
             boolean speedBasedWidth,
             double minWidthSpeed,
-            double maxWidthSpeed
+            double maxWidthSpeed,
+            boolean trailMovesWithAngleOfAttack
     ) {
         this.enableTrail = enableTrail;
         this.enableRandomWidth = enableRandomWidth;
@@ -118,6 +120,7 @@ public class ClientConfig {
         this.speedBasedWidth = speedBasedWidth;
         this.minWidthSpeed = minWidthSpeed;
         this.maxWidthSpeed = maxWidthSpeed;
+        this.trailMovesWithAngleOfAttack = trailMovesWithAngleOfAttack;
     }
 
     public static ClientConfig getDefaultClientConfig()
@@ -156,7 +159,8 @@ public class ClientConfig {
                 2.0,
                 false,
                 0.75,
-                2.0
+                2.0,
+                true
         );
     }
     public PlayerConfig getPlayerConfig()
@@ -196,7 +200,8 @@ public class ClientConfig {
                 maxAlphaSpeed,
                 speedBasedWidth,
                 minWidthSpeed,
-                maxWidthSpeed);
+                maxWidthSpeed,
+                trailMovesWithAngleOfAttack);
     }
     public PlayerConfig getHiddenPlayerConfig()
     {
@@ -205,7 +210,7 @@ public class ClientConfig {
                 enableRandomWidth,
                 speedDependentTrail,
                 trailMinSpeed,
-                trailMovesWithElytraAngle,
+                false,
                 0,
                 0,
                 startRampDistance,
@@ -235,6 +240,7 @@ public class ClientConfig {
                 maxAlphaSpeed,
                 speedBasedWidth,
                 minWidthSpeed,
-                maxWidthSpeed);
+                maxWidthSpeed,
+                false);
     }
 }

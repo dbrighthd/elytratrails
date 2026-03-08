@@ -7,6 +7,8 @@ import dbrighthd.elytratrails.compat.emf.EmfAnimationHooks;
 import dbrighthd.elytratrails.compat.emf.EmfWingTipHooks;
 import dbrighthd.elytratrails.config.ModConfig;
 import dbrighthd.elytratrails.mixin.client.ModelFeatureStorageAccessor;
+import dbrighthd.elytratrails.network.ClientPlayerConfigStore;
+import dbrighthd.elytratrails.network.PlayerConfig;
 import dbrighthd.elytratrails.util.ModelTransformationUtil;
 import dbrighthd.elytratrails.util.ShaderChecksUtil;
 import net.minecraft.client.Camera;
@@ -24,6 +26,7 @@ import net.minecraft.client.renderer.feature.ModelFeatureRenderer;
 import net.minecraft.client.renderer.rendertype.RenderType;
 import net.minecraft.client.renderer.state.CameraRenderState;
 import net.minecraft.core.BlockPos;
+import net.minecraft.network.chat.Component;
 import net.minecraft.util.Mth;
 import net.minecraft.world.entity.Avatar;
 import net.minecraft.world.entity.Entity;
@@ -42,6 +45,7 @@ import java.util.List;
 import java.util.Map;
 
 import static dbrighthd.elytratrails.compat.emf.EmfTrailSpawnerRegistry.getModelVariantFromModel;
+import static dbrighthd.elytratrails.util.ModelTransformationUtil.getSignedElytraAoARadiansFast;
 
 public class WingTipSampler {
     private final SubmitNodeStorage submitStorage = new SubmitNodeStorage();
@@ -57,7 +61,7 @@ public class WingTipSampler {
     {
         gatheredTrailsThisFrame.clear();
     }
-    public @NotNull List<Emitter> getPlayerTrailEmitterPositions(Player player, float partialTick) {
+    public @NotNull List<Emitter> getPlayerTrailEmitterPositions(Player player, float partialTick, ModConfig modConfig) {
         ModConfig config = ElytraTrailsClient.getConfig();
         Minecraft mc = Minecraft.getInstance();
         if (mc.level == null || ShaderChecksUtil.isShadowPass()) return List.of();
@@ -102,7 +106,7 @@ public class WingTipSampler {
                 return gatheredTrails;
             }
         }
-        List<Emitter> gatheredTrails = getVanillaTrailEmitters(basePose, animatedElytraRoot, elytraModel, camera.position(), entityWorldOffset);
+        List<Emitter> gatheredTrails = getVanillaTrailEmitters(basePose, animatedElytraRoot, elytraModel, camera.position(), entityWorldOffset,player,modConfig);
         if(config.alwaysSnapTrail)
         {
             gatheredTrailsThisFrame.put(eid,gatheredTrails);
@@ -228,12 +232,12 @@ public class WingTipSampler {
         return (modelRoot == EmfWingTipHooks.WhichRoot.LEFT_WING);
     }
 
-    private @NotNull List<Emitter> getVanillaTrailEmitters(@NotNull PoseStack stack, @Nullable ModelPart elytraRoot, @NotNull ElytraModel model, @NotNull Vec3 cameraPos, @NotNull Vec3 entityWorldOffset) {
+    private @NotNull List<Emitter> getVanillaTrailEmitters(@NotNull PoseStack stack, @Nullable ModelPart elytraRoot, @NotNull ElytraModel model, @NotNull Vec3 cameraPos, @NotNull Vec3 entityWorldOffset, Player player, ModConfig modConfig) {
         ModelPart leftWing = model.leftWing;
         ModelPart rightWing = model.rightWing;
 
-        Vec3 leftTip = computeTransformedWingTip(stack, elytraRoot, leftWing, ModelTransformationUtil.VANILLA_LEFT_WING_TIP);
-        Vec3 rightTip = computeTransformedWingTip(stack, elytraRoot, rightWing, ModelTransformationUtil.VANILLA_RIGHT_WING_TIP);
+        Vec3 leftTip = computeTransformedWingTip(stack, elytraRoot, leftWing, ModelTransformationUtil.VANILLA_LEFT_WING_TIP,player, modConfig);
+        Vec3 rightTip = computeTransformedWingTip(stack, elytraRoot, rightWing, ModelTransformationUtil.VANILLA_RIGHT_WING_TIP,player, modConfig);
 
         return List.of(
                 new Emitter(cameraPos.add(leftTip).add(entityWorldOffset), true, "elytra","/leftWingTip"),
@@ -263,11 +267,20 @@ public class WingTipSampler {
     }
 
 
-    private @NotNull Vec3 computeTransformedWingTip(@NotNull PoseStack stack, @Nullable ModelPart elytraRoot, @NotNull ModelPart wingRoot, @NotNull Vec3 localPos) {
+    private @NotNull Vec3 computeTransformedWingTip(@NotNull PoseStack stack, @Nullable ModelPart elytraRoot, @NotNull ModelPart wingRoot, @NotNull Vec3 localPos, Player player, ModConfig modConfig) {
         float wingspread = ModelTransformationUtil.computeWingOpenness(wingRoot);
-
-        float xScale = Mth.lerp(wingspread, 0.33f, 1.0f);
-        Vec3 scaledLocalTip = new Vec3(localPos.x * xScale, localPos.y, localPos.z);
+        float xScale = 1.0f;
+        float zScale = 0.666666f;
+        PlayerConfig config = ClientPlayerConfigStore.getOrDefault(player.getId());
+        if(config.trailMovesWithElytraAngle())
+        {
+            xScale = Mth.lerp(wingspread, 0.33333f, 1.0f);
+        }
+        if(config.trailMovesWithAngleOfAttack())
+        {
+            zScale = Mth.lerp(getSignedElytraAoARadiansFast(player),0.33333f,1.0f);
+        }
+        Vec3 scaledLocalTip = new Vec3(localPos.x * xScale, localPos.y, localPos.z * zScale);
         return transformLocalPoint(stack, elytraRoot, wingRoot, scaledLocalTip);
     }
 

@@ -119,7 +119,12 @@ public class ConfigScreenBuilder {
                 .setSaveConsumer(newValue -> config.alwaysGlowWhenShaderTranslucent = newValue)
                 .requireRestart()
                 .build());
-
+        general.addEntry(entryBuilder.startBooleanToggle(Component.translatable("text.elytratrails.option.hardCodedFreshAnimationsPlayerWingtips"), config.hardCodedFreshAnimationsPlayerWingtips)
+                .setDefaultValue(true)
+                .setTooltip(Component.translatable("text.elytratrails.option.hardCodedFreshAnimationsPlayerWingtips.@Tooltip"))
+                .setSaveConsumer(newValue -> config.hardCodedFreshAnimationsPlayerWingtips = newValue)
+                .requireRestart()
+                .build());
         general.addEntry(entryBuilder.startEnumSelector(
                         Component.translatable("text.elytratrails.option.clearTrails"),
                         ModConfig.ClearTrails.class,
@@ -289,6 +294,11 @@ public class ConfigScreenBuilder {
                 .setTooltip(Component.translatable("text.elytratrails.option.trailMovesWithElytraAngle.@Tooltip"))
                 .setSaveConsumer(newValue -> config.clientPlayerConfig.trailMovesWithElytraAngle = newValue)
                 .build());
+        elytra.addEntry(entryBuilder.startBooleanToggle(Component.translatable("text.elytratrails.option.trailMovesWithAngleOfAttack"), config.clientPlayerConfig.trailMovesWithAngleOfAttack)
+                .setDefaultValue(ClientConfig.getDefaultClientConfig().trailMovesWithAngleOfAttack)
+                .setTooltip(Component.translatable("text.elytratrails.option.trailMovesWithAngleOfAttack.@Tooltip"))
+                .setSaveConsumer(newValue -> config.clientPlayerConfig.trailMovesWithAngleOfAttack = newValue)
+                .build());
         elytra.addEntry(entryBuilder.startDoubleField(Component.translatable("text.elytratrails.option.width"), config.clientPlayerConfig.maxWidth)
                 .setDefaultValue(ClientConfig.getDefaultClientConfig().maxWidth)
                 .setTooltip(Component.translatable("text.elytratrails.option.width.@Tooltip"))
@@ -354,6 +364,16 @@ public class ConfigScreenBuilder {
                 .setTooltip(Component.translatable("text.elytratrails.option.fadeStartDistance.@Tooltip"))
                 .setSaveConsumer(newValue -> config.clientPlayerConfig.fadeStartDistance = newValue)
                 .build());
+        elytra.addEntry(entryBuilder.startBooleanToggle(Component.translatable("text.elytratrails.option.endDistanceFade"), config.clientPlayerConfig.endDistanceFade)
+                .setDefaultValue(ClientConfig.getDefaultClientConfig().endDistanceFade)
+                .setTooltip(Component.translatable("text.elytratrails.option.endDistanceFade.@Tooltip"))
+                .setSaveConsumer(newValue -> config.clientPlayerConfig.endDistanceFade = newValue)
+                .build());
+        elytra.addEntry(entryBuilder.startDoubleField(Component.translatable("text.elytratrails.option.endDistanceFadeAmount"), config.clientPlayerConfig.endDistanceFadeAmount)
+                .setDefaultValue(ClientConfig.getDefaultClientConfig().endDistanceFadeAmount)
+                .setTooltip(Component.translatable("text.elytratrails.option.endDistanceFadeAmount.@Tooltip"))
+                .setSaveConsumer(newValue -> config.clientPlayerConfig.endDistanceFadeAmount = newValue)
+                .build());
         elytra.addEntry(entryBuilder.startBooleanToggle(Component.translatable("text.elytratrails.option.fadeEnd"), config.clientPlayerConfig.fadeEnd)
                 .setDefaultValue(ClientConfig.getDefaultClientConfig().fadeEnd)
                 .setTooltip(Component.translatable("text.elytratrails.option.fadeEnd.@Tooltip"))
@@ -383,16 +403,6 @@ public class ConfigScreenBuilder {
                 .setDefaultValue(ClientConfig.getDefaultClientConfig().distanceTillTrailStart)
                 .setTooltip(Component.translatable("text.elytratrails.option.distanceTillTrailStart.@Tooltip"))
                 .setSaveConsumer(newValue -> config.clientPlayerConfig.distanceTillTrailStart = newValue)
-                .build());
-        elytra.addEntry(entryBuilder.startBooleanToggle(Component.translatable("text.elytratrails.option.endDistanceFade"), config.clientPlayerConfig.endDistanceFade)
-                .setDefaultValue(ClientConfig.getDefaultClientConfig().endDistanceFade)
-                .setTooltip(Component.translatable("text.elytratrails.option.endDistanceFade.@Tooltip"))
-                .setSaveConsumer(newValue -> config.clientPlayerConfig.endDistanceFade = newValue)
-                .build());
-        elytra.addEntry(entryBuilder.startDoubleField(Component.translatable("text.elytratrails.option.endDistanceFadeAmount"), config.clientPlayerConfig.endDistanceFadeAmount)
-                .setDefaultValue(ClientConfig.getDefaultClientConfig().endDistanceFadeAmount)
-                .setTooltip(Component.translatable("text.elytratrails.option.endDistanceFadeAmount.@Tooltip"))
-                .setSaveConsumer(newValue -> config.clientPlayerConfig.endDistanceFadeAmount = newValue)
                 .build());
         elytra.addEntry(entryBuilder.startBooleanToggle(Component.translatable("text.elytratrails.option.speedBasedAlpha"), config.clientPlayerConfig.speedBasedAlpha)
                 .setDefaultValue(ClientConfig.getDefaultClientConfig().speedBasedAlpha)
@@ -511,7 +521,11 @@ public class ConfigScreenBuilder {
                 .setTooltip(Component.translatable("text.elytratrails.option.trailMovesWithElytraAngleOthersDefault.@Tooltip"))
                 .setSaveConsumer(newValue -> config.otherPlayerConfig.trailMovesWithElytraAngle = newValue)
                 .build());
-
+        others.addEntry(entryBuilder.startBooleanToggle(Component.translatable("text.elytratrails.option.trailMovesWithAngleOfAttackOthersDefault"), config.otherPlayerConfig.trailMovesWithAngleOfAttack)
+                .setDefaultValue(ClientConfig.getDefaultClientConfig().trailMovesWithAngleOfAttack)
+                .setTooltip(Component.translatable("text.elytratrails.option.trailMovesWithAngleOfAttackOthersDefault.@Tooltip"))
+                .setSaveConsumer(newValue -> config.otherPlayerConfig.trailMovesWithAngleOfAttack = newValue)
+                .build());
         others.addEntry(entryBuilder.startDoubleField(Component.translatable("text.elytratrails.option.widthOthersDefault"), config.otherPlayerConfig.maxWidth)
                 .setDefaultValue(ClientConfig.getDefaultClientConfig().maxWidth)
                 .setTooltip(Component.translatable("text.elytratrails.option.widthOthersDefault.@Tooltip"))
@@ -579,6 +593,16 @@ public class ConfigScreenBuilder {
                 .setTooltip(Component.translatable("text.elytratrails.option.fadeStartDistanceOthersDefault.@Tooltip"))
                 .setSaveConsumer(newValue -> config.otherPlayerConfig.fadeStartDistance = newValue)
                 .build());
+        others.addEntry(entryBuilder.startBooleanToggle(Component.translatable("text.elytratrails.option.endDistanceFadeOthersDefault"), config.otherPlayerConfig.endDistanceFade)
+                .setDefaultValue(ClientConfig.getDefaultClientConfig().endDistanceFade)
+                .setTooltip(Component.translatable("text.elytratrails.option.endDistanceFadeOthersDefault.@Tooltip"))
+                .setSaveConsumer(newValue -> config.otherPlayerConfig.endDistanceFade = newValue)
+                .build());
+        others.addEntry(entryBuilder.startDoubleField(Component.translatable("text.elytratrails.option.endDistanceFadeAmountOthersDefault"), config.otherPlayerConfig.endDistanceFadeAmount)
+                .setDefaultValue(ClientConfig.getDefaultClientConfig().endDistanceFadeAmount)
+                .setTooltip(Component.translatable("text.elytratrails.option.endDistanceFadeAmountOthersDefault.@Tooltip"))
+                .setSaveConsumer(newValue -> config.otherPlayerConfig.endDistanceFadeAmount = newValue)
+                .build());
         others.addEntry(entryBuilder.startBooleanToggle(Component.translatable("text.elytratrails.option.fadeEndOthersDefault"), config.otherPlayerConfig.fadeEnd)
                 .setDefaultValue(ClientConfig.getDefaultClientConfig().fadeEnd)
                 .setTooltip(Component.translatable("text.elytratrails.option.fadeEndOthersDefault.@Tooltip"))
@@ -608,16 +632,6 @@ public class ConfigScreenBuilder {
                 .setDefaultValue(ClientConfig.getDefaultClientConfig().distanceTillTrailStart)
                 .setTooltip(Component.translatable("text.elytratrails.option.distanceTillTrailStartOthersDefault.@Tooltip"))
                 .setSaveConsumer(newValue -> config.otherPlayerConfig.distanceTillTrailStart = newValue)
-                .build());
-        others.addEntry(entryBuilder.startBooleanToggle(Component.translatable("text.elytratrails.option.endDistanceFadeOthersDefault"), config.otherPlayerConfig.endDistanceFade)
-                .setDefaultValue(ClientConfig.getDefaultClientConfig().endDistanceFade)
-                .setTooltip(Component.translatable("text.elytratrails.option.endDistanceFadeOthersDefault.@Tooltip"))
-                .setSaveConsumer(newValue -> config.otherPlayerConfig.endDistanceFade = newValue)
-                .build());
-        others.addEntry(entryBuilder.startDoubleField(Component.translatable("text.elytratrails.option.endDistanceFadeAmountOthersDefault"), config.otherPlayerConfig.endDistanceFadeAmount)
-                .setDefaultValue(ClientConfig.getDefaultClientConfig().endDistanceFadeAmount)
-                .setTooltip(Component.translatable("text.elytratrails.option.endDistanceFadeAmountOthersDefault.@Tooltip"))
-                .setSaveConsumer(newValue -> config.otherPlayerConfig.endDistanceFadeAmount = newValue)
                 .build());
         others.addEntry(entryBuilder.startBooleanToggle(Component.translatable("text.elytratrails.option.speedBasedAlphaOthersDefault"), config.otherPlayerConfig.speedBasedAlpha)
                 .setDefaultValue(ClientConfig.getDefaultClientConfig().speedBasedAlpha)

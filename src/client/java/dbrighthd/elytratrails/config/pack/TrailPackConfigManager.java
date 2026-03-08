@@ -204,6 +204,7 @@ public final class TrailPackConfigManager {
         applyIfPresent(preset.speedBasedWidth, v -> config.speedBasedWidth = v);
         applyIfPresent(preset.minWidthSpeed, v -> config.minWidthSpeed = v);
         applyIfPresent(preset.maxWidthSpeed, v -> config.maxWidthSpeed = v);
+        applyIfPresent(preset.trailMovesWithAngleOfAttack, v -> config.trailMovesWithAngleOfAttack = v);
     }
 
     private static <T> void applyIfPresent(T value, java.util.function.Consumer<T> setter) {
@@ -646,6 +647,7 @@ public final class TrailPackConfigManager {
         @Nullable Boolean speedBasedWidth;
         @Nullable Double minWidthSpeed;
         @Nullable Double maxWidthSpeed;
+        @Nullable Boolean trailMovesWithAngleOfAttack;
 
         public static TrailOverrides fromBase(PlayerConfig baseConfig) {
             TrailOverrides overrides = new TrailOverrides();
@@ -759,7 +761,7 @@ public final class TrailPackConfigManager {
             overrides.speedBasedWidth = readBoolean(json, "speedBasedWidth");
             overrides.minWidthSpeed = readDouble(json, "minWidthSpeed");
             overrides.maxWidthSpeed = readDouble(json, "maxWidthSpeed");
-
+            overrides.trailMovesWithAngleOfAttack = readBoolean(json, "trailMovesWithAngleOfAttack");
             return overrides;
         }
         public boolean isEmpty() {
@@ -796,7 +798,8 @@ public final class TrailPackConfigManager {
                     && maxAlphaSpeed == null
                     && speedBasedWidth == null
                     && minWidthSpeed == null
-                    && maxWidthSpeed == null;
+                    && maxWidthSpeed == null
+                    && trailMovesWithAngleOfAttack == null;
         }
 
         public TrailOverrides with(@Nullable TrailOverrides other) {
@@ -837,6 +840,8 @@ public final class TrailPackConfigManager {
             merged.speedBasedWidth = (other.speedBasedWidth != null) ? other.speedBasedWidth : this.speedBasedWidth;
             merged.minWidthSpeed = (other.minWidthSpeed != null) ? other.minWidthSpeed : this.minWidthSpeed;
             merged.maxWidthSpeed = (other.maxWidthSpeed != null) ? other.maxWidthSpeed : this.maxWidthSpeed;
+            merged.trailMovesWithAngleOfAttack = (other.trailMovesWithAngleOfAttack != null) ? other.trailMovesWithAngleOfAttack : this.trailMovesWithAngleOfAttack;
+
             return merged;
         }
         public ResolvedTrailSettings resolve() {
@@ -872,7 +877,8 @@ public final class TrailPackConfigManager {
                     asNumber(maxAlphaSpeed),
                     asTrue(speedBasedWidth),
                     asNumber(minWidthSpeed),
-                    asNumber(maxWidthSpeed)
+                    asNumber(maxWidthSpeed),
+                    asTrue(trailMovesWithAngleOfAttack)
             );
         }
 
@@ -942,7 +948,8 @@ public final class TrailPackConfigManager {
             double maxAlphaSpeed,
             boolean speedBasedWidth,
             double minWidthSpeed,
-            double maxWidthSpeed
+            double maxWidthSpeed,
+            boolean trailMovesWithAngleOfAttack
     ) {
         public static ResolvedTrailSettings defaults() {
             return resolveFromPlayerConfig(ClientPlayerConfigStore.getLocalPlayerConfig());
@@ -1026,7 +1033,8 @@ public final class TrailPackConfigManager {
                 playerConfig.maxAlphaSpeed(),
                 playerConfig.speedBasedWidth(),
                 playerConfig.minWidthSpeed(),
-                playerConfig.maxWidthSpeed()
+                playerConfig.maxWidthSpeed(),
+                playerConfig.trailMovesWithAngleOfAttack()
         );
     }
 
