@@ -1,6 +1,7 @@
 package dbrighthd.elytratrails.compat.emf;
 
 import dbrighthd.elytratrails.compat.ModStatuses;
+import dbrighthd.elytratrails.config.pack.TrailPackConfigManager;
 import it.unimi.dsi.fastutil.objects.Object2ObjectOpenHashMap;
 import it.unimi.dsi.fastutil.objects.ObjectOpenHashSet;
 import net.minecraft.client.model.Model;
@@ -76,6 +77,7 @@ public final class EmfTrailSpawnerRegistry {
         if (!spawnerPaths.isEmpty()) {
             Optional<EntityType<?>> entityType = EntityType.byString(typeString.substring(typeString.lastIndexOf(".")+1));
             entityType.ifPresent(entitiesWithTrails::add);
+            entityType.ifPresent(TrailPackConfigManager::setEntityDefaultModel);
             TYPES_WITH_SPAWNERS.add(typeString);
         }
 

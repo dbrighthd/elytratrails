@@ -208,12 +208,14 @@ public class TrailManager {
     private void gatherEntityTrails(Minecraft ctx, boolean recordEmitter) {
         if (ctx.level == null) return;
         for (Entity entity :  ctx.level.entitiesForRendering()) {
+
             if(!TrailPackConfigManager.doesEntityHaveEmfTrails(entity) && ((!modConfig.tryWithoutEmf) && doesEntityHaveOverrides(entity)) || (!doesEntityHaveOverrides(entity) && !doesEntityHaveEmfTrails(entity)))
             {
+
                 continue;
             }
             int eid = entity.getId();
-            ResolvedTrailSettings config = getConfigFromPlayerId(eid);
+            ResolvedTrailSettings config = getConfigFromEntity(entity);
             boolean valid = TrailManager.isEntityTrailValid(config, entity);
 
             if (valid) {
@@ -271,6 +273,10 @@ public class TrailManager {
     public static ResolvedTrailSettings getConfigFromPlayerId(int entityId)
     {
         return TrailPackConfigManager.resolveFromPlayerConfig(ClientPlayerConfigStore.getOrDefault(entityId));
+    }
+    public static ResolvedTrailSettings getConfigFromEntity(Entity entity)
+    {
+        return TrailPackConfigManager.getDefaultEntitySettings(entity);
     }
 
     public static boolean isEntityTrailValid(ResolvedTrailSettings config, Entity entity) {

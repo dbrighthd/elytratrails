@@ -256,7 +256,11 @@ public class WingTipSampler {
         ModelPart modelPart = animatedRoot != null ? animatedRoot : model.root();
         if (entity.getType() == EntityType.ARROW || entity.getType() == EntityType.SPECTRAL_ARROW) {
             tip = computeTransformedPoint(stack, modelPart, modelPart, ModelTransformationUtil.VANILLA_ARROW_WINGTIP);
-        } else {
+        } else if (entity.getType() == EntityType.ALLAY)
+        {
+            tip = computeTransformedPoint(stack, modelPart, modelPart, ModelTransformationUtil.VANILLA_ALLAY_WINGTIP);
+        }
+        else {
             tip = computeTransformedPoint(stack, modelPart, modelPart, ModelTransformationUtil.ZERO_WINGTIP);
         }
 
@@ -360,41 +364,45 @@ public class WingTipSampler {
         stack.popPose();
         return point;
     }
-    private @Nullable Vec3 transformLocalPointThroughPathGeneric(@NotNull PoseStack stack, @Nullable ModelPart modelRoot, @Nullable String childOnlyPath) {
-        if (childOnlyPath == null || childOnlyPath.isEmpty()) return null;
+    private @Nullable Vec3 transformLocalPointThroughPathGeneric(
+            @NotNull PoseStack stack,
+            @Nullable ModelPart modelRoot,
+            @Nullable String childOnlyPath
+    ) {
+        if (childOnlyPath == null || childOnlyPath.isEmpty() || modelRoot == null) return null;
 
         stack.pushPose();
-        if (modelRoot != null) {
+        try {
             modelRoot.translateAndRotate(stack);
-        }
 
-        ModelPart current = modelRoot;
-        int segmentStartIndex = 0;
+            ModelPart current = modelRoot;
+            int segmentStartIndex = 0;
 
-        while (segmentStartIndex < childOnlyPath.length()) {
-            int nextSlashIndex = childOnlyPath.indexOf('/', segmentStartIndex);
-            String segmentName = (nextSlashIndex == -1)
-                    ? childOnlyPath.substring(segmentStartIndex)
-                    : childOnlyPath.substring(segmentStartIndex, nextSlashIndex);
+            while (segmentStartIndex < childOnlyPath.length()) {
+                int nextSlashIndex = childOnlyPath.indexOf('/', segmentStartIndex);
+                String segmentName = (nextSlashIndex == -1)
+                        ? childOnlyPath.substring(segmentStartIndex)
+                        : childOnlyPath.substring(segmentStartIndex, nextSlashIndex);
 
-            if(current==null)
-            {
-                return null;
+                if (segmentName.isEmpty()) {
+                    segmentStartIndex = nextSlashIndex + 1;
+                    continue;
+                }
+
+                ModelPart child = findChildIgnoreCase(current, segmentName);
+                if (child == null) return null;
+
+                child.translateAndRotate(stack);
+                current = child;
+
+                if (nextSlashIndex == -1) break;
+                segmentStartIndex = nextSlashIndex + 1;
             }
-            ModelPart child = findChildIgnoreCase(current, segmentName);
-            if (child == null) return null;
 
-            child.translateAndRotate(stack);
-            current = child;
-
-            if (nextSlashIndex == -1) break;
-            segmentStartIndex = nextSlashIndex + 1;
+            return ModelTransformationUtil.transformPoint(stack.last().pose(), Vec3.ZERO);
+        } finally {
+            stack.popPose();
         }
-
-        Vec3 point = ModelTransformationUtil.transformPoint(stack.last().pose(), Vec3.ZERO);
-
-        stack.popPose();
-        return point;
     }
 
     private @Nullable ModelPart findChildIgnoreCase(@NotNull ModelPart parent, @NotNull String name) {

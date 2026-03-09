@@ -10,6 +10,7 @@ import net.fabricmc.fabric.api.client.command.v2.ClientCommandRegistrationCallba
 import net.fabricmc.fabric.api.client.command.v2.FabricClientCommandSource;
 import net.fabricmc.fabric.api.client.networking.v1.ClientPlayNetworking;
 import net.minecraft.network.chat.Component;
+import net.minecraft.world.entity.EntityType;
 
 import static dbrighthd.elytratrails.network.ClientPlayerConfigStore.CLIENT_PLAYER_CONFIGS;
 
@@ -22,6 +23,10 @@ public class CommandHandler {
         ClientCommandRegistrationCallback.EVENT.register((dispatcher, registryAccess) -> dispatcher.register(
                 ClientCommandManager.literal("elytratrails").then(ClientCommandManager.literal("debug")
                         .executes(CommandHandler::debugCommand))
+        ));
+        ClientCommandRegistrationCallback.EVENT.register((dispatcher, registryAccess) -> dispatcher.register(
+                ClientCommandManager.literal("elytratrails").then(ClientCommandManager.literal("debugmoverrides")
+                        .executes(CommandHandler::debugOverridesCommand))
         ));
         ClientCommandRegistrationCallback.EVENT.register((dispatcher, registryAccess) -> dispatcher.register(
                 ClientCommandManager.literal("elytratrails").then(ClientCommandManager.literal("debugmodels")
@@ -62,13 +67,24 @@ public class CommandHandler {
         context.getSource().sendFeedback(Component.literal("Active Trails:  " + activetrailcount));
         return Command.SINGLE_SUCCESS;
     }
-    private static int debugModelsCommand(CommandContext<FabricClientCommandSource> context)
+    private static int debugOverridesCommand(CommandContext<FabricClientCommandSource> context)
     {
         context.getSource().sendFeedback(Component.literal("Current Model Overrides: "));
 
         for(String model : TrailPackConfigManager.getModelStrings())
         {
             context.getSource().sendFeedback(Component.literal(model));
+
+        }
+        return Command.SINGLE_SUCCESS;
+    }
+    private static int debugModelsCommand(CommandContext<FabricClientCommandSource> context)
+    {
+        context.getSource().sendFeedback(Component.literal("Current Models With Trails Defined: "));
+
+        for(EntityType<?> entityType : TrailPackConfigManager.entitiesWithTrails)
+        {
+            context.getSource().sendFeedback(Component.literal(entityType.toShortString()));
 
         }
         return Command.SINGLE_SUCCESS;
