@@ -54,6 +54,8 @@ public record TrailOverrides(JsonObject values) {
         json.addProperty("trailMovesWithElytraAngle", baseConfig.trailMovesWithElytraAngle());
         json.addProperty("useColorBoth", baseConfig.useColorBoth());
         json.addProperty("colorRight", baseConfig.colorRight());
+        json.addProperty("wingtipVerticalPosition", baseConfig.wingtipVerticalPosition());
+        json.addProperty("wingtipHorizontalPosition", baseConfig.wingtipHorizontalPosition());
         return new TrailOverrides(json);
     }
 
@@ -145,7 +147,7 @@ public record TrailOverrides(JsonObject values) {
                 getBoolean("trailMovesWithAngleOfAttack"),
                 getBoolean("useColorBoth"),
                 resolveColor("colorRight")
-        );
+                );
     }
 
     private int resolveColor(String key) {

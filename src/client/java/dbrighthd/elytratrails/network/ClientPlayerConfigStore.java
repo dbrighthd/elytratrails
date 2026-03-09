@@ -1,7 +1,9 @@
 package dbrighthd.elytratrails.network;
 
+import dbrighthd.elytratrails.compat.flashback.FlashbackCompat;
 import dbrighthd.elytratrails.config.ModConfig;
 import dbrighthd.elytratrails.util.EasingUtil;
+import net.fabricmc.loader.api.FabricLoader;
 import net.minecraft.client.Minecraft;
 import net.minecraft.nbt.CompoundTag;
 
@@ -14,7 +16,7 @@ import static java.lang.Math.clamp;
 public final class ClientPlayerConfigStore
 {
     public static final ConcurrentHashMap<Integer, PlayerConfig> CLIENT_PLAYER_CONFIGS = new ConcurrentHashMap<>();
-
+    public static final boolean FLASHBACK_LOADED = FabricLoader.getInstance().isModLoaded("flashback");
     public static PlayerConfig CLIENT_CONFIG;
 
     public static PlayerConfig CLIENT_OTHERS_CONFIG;
@@ -144,7 +146,9 @@ public final class ClientPlayerConfigStore
                 incomingConfig.maxWidthSpeed(),
                 incomingConfig.trailMovesWithAngleOfAttack(),
                 incomingConfig.useColorBoth(),
-                incomingConfig.colorRight()
+                incomingConfig.colorRight(),
+                incomingConfig.wingtipVerticalPosition(),
+                incomingConfig.wingtipHorizontalPosition()
         );
 
         CLIENT_PLAYER_CONFIGS.put(entityId,safe);
@@ -204,7 +208,8 @@ public final class ClientPlayerConfigStore
         boolean trailMovesWithAngleOfAttack = tag.getBooleanOr("trailMovesWithAngleOfAttack",fallbackConfig.trailMovesWithAngleOfAttack());
         boolean useColorBoth = tag.getBooleanOr("useColorBoth",fallbackConfig.useColorBoth());
         int colorRight = tag.getIntOr("colorRight", fallbackConfig.colorRight());
-
+        double wingtipVerticalPosition = tag.getDoubleOr("wingtipVerticalPosition", fallbackConfig.wingtipVerticalPosition());
+        double wingtipHorizontalPosition = tag.getDoubleOr("wingtipHorizontalPosition", fallbackConfig.wingtipHorizontalPosition());
         return new PlayerConfig(
                 enableTrail,
                 enableRandomWidth,
@@ -243,7 +248,9 @@ public final class ClientPlayerConfigStore
                 maxWidthSpeed,
                 trailMovesWithAngleOfAttack,
                 useColorBoth,
-                colorRight
+                colorRight,
+                wingtipVerticalPosition,
+                wingtipHorizontalPosition
         );
     }
     public static <E extends Enum<E>> E readEnum(CompoundTag tag, String key, Class<E> enumClass, E fallback) {
@@ -260,6 +267,13 @@ public final class ClientPlayerConfigStore
     {
         if(Minecraft.getInstance().player != null && Minecraft.getInstance().player.getId() == entityId)
         {
+            if(FLASHBACK_LOADED && FlashbackCompat.isInReplay()) //return the config that was set at the time if it exists
+            {
+                if (CLIENT_PLAYER_CONFIGS.containsKey(entityId))
+                {
+                    return CLIENT_PLAYER_CONFIGS.get(entityId);
+                }
+            }
             return getLocalPlayerConfig();
         }
         else if (CLIENT_PLAYER_CONFIGS.containsKey(entityId))

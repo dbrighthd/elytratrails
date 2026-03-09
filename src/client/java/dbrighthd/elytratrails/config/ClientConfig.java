@@ -47,7 +47,8 @@ public class ClientConfig {
     public boolean trailMovesWithAngleOfAttack;
     public boolean useColorBoth;
     public int colorRight;
-
+    public double wingtipVerticalPosition;
+    public double wingtipHorizontalPosition;
 
 
     public transient int justColor;
@@ -91,7 +92,9 @@ public class ClientConfig {
             double maxWidthSpeed,
             boolean trailMovesWithAngleOfAttack,
             boolean useColorBoth,
-            int colorRight
+            int colorRight,
+            double wingtipVerticalPosition,
+            double wingtipHorizontalPosition
     ) {
         this.enableTrail = enableTrail;
         this.enableRandomWidth = enableRandomWidth;
@@ -130,6 +133,8 @@ public class ClientConfig {
         this.trailMovesWithAngleOfAttack = trailMovesWithAngleOfAttack;
         this.useColorBoth = useColorBoth;
         this.colorRight = colorRight;
+        this.wingtipVerticalPosition = wingtipVerticalPosition;
+        this.wingtipHorizontalPosition = wingtipHorizontalPosition;
     }
 
     public ClientConfig() {
@@ -170,7 +175,9 @@ public class ClientConfig {
                 2.0,
                 true,
                 true,
-                0xFFFFFFFF
+                0xFFFFFFFF,
+                0.5,
+                1.0
         );
     }
 
@@ -218,7 +225,8 @@ public class ClientConfig {
                 maxWidthSpeed,
                 trailMovesWithAngleOfAttack,
                 useColorBoth,
-                colorRight);
+                colorRight,wingtipVerticalPosition,
+                wingtipHorizontalPosition);
     }
     public PlayerConfig getHiddenPlayerConfig()
     {
@@ -260,6 +268,8 @@ public class ClientConfig {
                 maxWidthSpeed,
                 trailMovesWithAngleOfAttack,
                 useColorBoth,
-                colorRight);
+                colorRight,
+                wingtipVerticalPosition,
+                wingtipHorizontalPosition);
     }
 }

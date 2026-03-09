@@ -282,9 +282,11 @@ public class WingTipSampler {
 
     private @NotNull Vec3 computeTransformedWingTip(@NotNull PoseStack stack, @Nullable ModelPart elytraRoot, @NotNull ModelPart wingRoot, @NotNull Vec3 localPos, Player player) {
         float wingspread = ModelTransformationUtil.computeWingOpenness(wingRoot);
-        float xScale = 1.0f;
-        float zScale = 0.666666f;
+
         PlayerConfig config = ClientPlayerConfigStore.getOrDefault(player.getId());
+        float xScale = 1.0f;
+        float zScale = (float)((1.0 + (config.wingtipVerticalPosition()*2.0))/3.0);
+        float yScale = (float) config.wingtipHorizontalPosition();
         if(config.trailMovesWithElytraAngle())
         {
             xScale = Mth.lerp(wingspread, 0.33333f, 1.0f);
@@ -293,7 +295,7 @@ public class WingTipSampler {
         {
             zScale = Mth.lerp(getSignedElytraAoARadiansFast(player),0.33333f,1.0f);
         }
-        Vec3 scaledLocalTip = new Vec3(localPos.x * xScale, localPos.y, localPos.z * zScale);
+        Vec3 scaledLocalTip = new Vec3(localPos.x * xScale, localPos.y * yScale, localPos.z * zScale);
         return transformLocalPoint(stack, elytraRoot, wingRoot, scaledLocalTip);
     }
 

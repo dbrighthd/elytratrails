@@ -11,7 +11,6 @@ public final class FlashbackCompat {
         return replayServer != null && replayServer.replayPaused;
     }
 
-    @SuppressWarnings("unused")
     public static boolean isInReplay() {
         return Flashback.getReplayServer() != null;
     }

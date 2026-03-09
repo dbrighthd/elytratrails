@@ -34,5 +34,8 @@
   "minWidthSpeed": 0.75,
   "maxWidthSpeed": 2.0,
   "useColorBoth": true,
-  "colorRight": "#FFFFFFFF"
+  "trailMovesWithAngleOfAttack" : true,
+  "colorRight": "#FFFFFFFF",
+  "wingtipVerticalPosition": 0.5,
+  "wingtipHorizontalPosition": 1.0
 }

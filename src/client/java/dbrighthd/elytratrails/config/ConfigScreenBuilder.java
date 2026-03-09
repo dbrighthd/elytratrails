@@ -13,6 +13,7 @@ import me.shedaniel.autoconfig.AutoConfig;
 import me.shedaniel.clothconfig2.api.ConfigBuilder;
 import me.shedaniel.clothconfig2.api.ConfigCategory;
 import me.shedaniel.clothconfig2.impl.builders.DropdownMenuBuilder;
+import me.shedaniel.clothconfig2.impl.builders.SubCategoryBuilder;
 import net.fabricmc.fabric.api.client.networking.v1.ClientPlayNetworking;
 import net.minecraft.client.KeyMapping;
 import net.minecraft.client.Minecraft;
@@ -59,7 +60,9 @@ public class ConfigScreenBuilder {
         ConfigCategory particles = builder.getOrCreateCategory(Component.translatable("text.elytratrails.category.particles"));
         ConfigCategory presets = builder.getOrCreateCategory(Component.translatable("text.elytratrails.category.presets"));
         ConfigCategory keybinds = builder.getOrCreateCategory(Component.translatable("text.elytratrails.category.keybinds"));
+        SubCategoryBuilder advanced = entryBuilder.startSubCategory(Component.translatable("text.elytratrails.category.elytra.advanced"));
 
+        SubCategoryBuilder advancedOthers = entryBuilder.startSubCategory(Component.translatable("text.elytratrails.category.elytra.advancedOthers"));
 
 
         general.addEntry(entryBuilder.startTextDescription(
@@ -271,6 +274,7 @@ public class ConfigScreenBuilder {
                 entryBuilder,
                 config.clientPlayerConfig,
                 defaultConfig,
+                advanced,
                 ""
         );
 
@@ -336,6 +340,7 @@ public class ConfigScreenBuilder {
                 entryBuilder,
                 config.otherPlayerConfig,
                 defaultConfig,
+                advancedOthers,
                 "OthersDefault"
         );
 
@@ -500,6 +505,7 @@ public class ConfigScreenBuilder {
             ConfigEntryBuilder entryBuilder,
             ClientConfig targetConfig,
             ClientConfig defaultConfig,
+            SubCategoryBuilder advancedOptions,
             String suffix
     ) {
         category.addEntry(entryBuilder.startBooleanToggle(option("enableTrail", suffix), targetConfig.enableTrail)
@@ -532,18 +538,27 @@ public class ConfigScreenBuilder {
                 .setSaveConsumer(newValue -> targetConfig.speedDependentTrail = newValue)
                 .build());
 
-        category.addEntry(entryBuilder.startBooleanToggle(option("trailMovesWithElytraAngle", suffix), targetConfig.trailMovesWithElytraAngle)
+        advancedOptions.add(entryBuilder.startBooleanToggle(option("trailMovesWithElytraAngle", suffix), targetConfig.trailMovesWithElytraAngle)
                 .setDefaultValue(defaultConfig.trailMovesWithElytraAngle)
                 .setTooltip(tooltip("trailMovesWithElytraAngle", suffix))
                 .setSaveConsumer(newValue -> targetConfig.trailMovesWithElytraAngle = newValue)
                 .build());
 
-        category.addEntry(entryBuilder.startBooleanToggle(option("trailMovesWithAngleOfAttack", suffix), targetConfig.trailMovesWithAngleOfAttack)
+        advancedOptions.add(entryBuilder.startBooleanToggle(option("trailMovesWithAngleOfAttack", suffix), targetConfig.trailMovesWithAngleOfAttack)
                 .setDefaultValue(defaultConfig.trailMovesWithAngleOfAttack)
                 .setTooltip(tooltip("trailMovesWithAngleOfAttack", suffix))
                 .setSaveConsumer(newValue -> targetConfig.trailMovesWithAngleOfAttack = newValue)
                 .build());
-
+        advancedOptions.add(entryBuilder.startDoubleField(option("wingtipVerticalPosition", suffix), targetConfig.wingtipVerticalPosition)
+                .setDefaultValue(defaultConfig.wingtipVerticalPosition)
+                .setTooltip(tooltip("wingtipVerticalPosition", suffix))
+                .setSaveConsumer(newValue -> targetConfig.wingtipVerticalPosition = newValue)
+                .build());
+        advancedOptions.add(entryBuilder.startDoubleField(option("wingtipHorizontalPosition", suffix), targetConfig.wingtipHorizontalPosition)
+                .setDefaultValue(defaultConfig.wingtipHorizontalPosition)
+                .setTooltip(tooltip("wingtipHorizontalPosition", suffix))
+                .setSaveConsumer(newValue -> targetConfig.wingtipHorizontalPosition = newValue)
+                .build());
         category.addEntry(entryBuilder.startDoubleField(option("width", suffix), targetConfig.maxWidth)
                 .setDefaultValue(defaultConfig.maxWidth)
                 .setTooltip(tooltip("width", suffix))
@@ -556,19 +571,14 @@ public class ConfigScreenBuilder {
                 .setSaveConsumer(newValue -> targetConfig.trailLifetime = newValue)
                 .build());
 
-        category.addEntry(entryBuilder.startDoubleField(option("trailMinSpeed", suffix), targetConfig.trailMinSpeed)
-                .setDefaultValue(defaultConfig.trailMinSpeed)
-                .setTooltip(tooltip("trailMinSpeed", suffix))
-                .setSaveConsumer(newValue -> targetConfig.trailMinSpeed = newValue)
-                .build());
 
-        category.addEntry(entryBuilder.startDoubleField(option("startRampDistance", suffix), targetConfig.startRampDistance)
+        advancedOptions.add(entryBuilder.startDoubleField(option("startRampDistance", suffix), targetConfig.startRampDistance)
                 .setDefaultValue(defaultConfig.startRampDistance)
                 .setTooltip(tooltip("startRampDistance", suffix))
                 .setSaveConsumer(newValue -> targetConfig.startRampDistance = newValue)
                 .build());
 
-        category.addEntry(entryBuilder.startDoubleField(option("endRampDistance", suffix), targetConfig.endRampDistance)
+        advancedOptions.add(entryBuilder.startDoubleField(option("endRampDistance", suffix), targetConfig.endRampDistance)
                 .setDefaultValue(defaultConfig.endRampDistance)
                 .setTooltip(tooltip("endRampDistance", suffix))
                 .setSaveConsumer(newValue -> targetConfig.endRampDistance = newValue)
@@ -586,19 +596,19 @@ public class ConfigScreenBuilder {
                 .setSaveConsumer(newValue -> targetConfig.justAlpha = newValue)
                 .build());
 
-        category.addEntry(entryBuilder.startBooleanToggle(option("useColorBoth", suffix), targetConfig.useColorBoth)
+        advancedOptions.add(entryBuilder.startBooleanToggle(option("useColorBoth", suffix), targetConfig.useColorBoth)
                 .setDefaultValue(defaultConfig.useColorBoth)
                 .setTooltip(tooltip("useColorBoth", suffix))
                 .setSaveConsumer(newValue -> targetConfig.useColorBoth = newValue)
                 .build());
 
-        category.addEntry(entryBuilder.startColorField(option("colorRight", suffix), targetConfig.justColorRight)
+        advancedOptions.add(entryBuilder.startColorField(option("colorRight", suffix), targetConfig.justColorRight)
                 .setDefaultValue(0xFFFFFF)
                 .setTooltip(tooltip("colorRight", suffix))
                 .setSaveConsumer(newValue -> targetConfig.justColorRight = newValue)
                 .build());
 
-        category.addEntry(entryBuilder.startIntField(option("alphaRight", suffix), targetConfig.justAlphaRight)
+        advancedOptions.add(entryBuilder.startIntField(option("alphaRight", suffix), targetConfig.justAlphaRight)
                 .setDefaultValue(255)
                 .setTooltip(tooltip("alphaRight", suffix))
                 .setSaveConsumer(newValue -> targetConfig.justAlphaRight = newValue)
@@ -616,107 +626,118 @@ public class ConfigScreenBuilder {
                 .setSaveConsumer(newValue -> targetConfig.prideTrailRight = newValue)
                 .build());
 
-        category.addEntry(entryBuilder.startDoubleField(option("randomWidthVariation", suffix), targetConfig.randomWidthVariation)
+        advancedOptions.add(entryBuilder.startDoubleField(option("randomWidthVariation", suffix), targetConfig.randomWidthVariation)
                 .setDefaultValue(defaultConfig.randomWidthVariation)
                 .setTooltip(tooltip("randomWidthVariation", suffix))
                 .setSaveConsumer(newValue -> targetConfig.randomWidthVariation = newValue)
                 .build());
 
-        category.addEntry(entryBuilder.startBooleanToggle(option("fadeStart", suffix), targetConfig.fadeStart)
+
+        advancedOptions.add(entryBuilder.startBooleanToggle(option("fadeStart", suffix), targetConfig.fadeStart)
                 .setDefaultValue(defaultConfig.fadeStart)
                 .setTooltip(tooltip("fadeStart", suffix))
                 .setSaveConsumer(newValue -> targetConfig.fadeStart = newValue)
                 .build());
 
-        category.addEntry(entryBuilder.startDoubleField(option("fadeStartDistance", suffix), targetConfig.fadeStartDistance)
+        advancedOptions.add(entryBuilder.startDoubleField(option("fadeStartDistance", suffix), targetConfig.fadeStartDistance)
                 .setDefaultValue(defaultConfig.fadeStartDistance)
                 .setTooltip(tooltip("fadeStartDistance", suffix))
                 .setSaveConsumer(newValue -> targetConfig.fadeStartDistance = newValue)
                 .build());
 
-        category.addEntry(entryBuilder.startBooleanToggle(option("endDistanceFade", suffix), targetConfig.endDistanceFade)
+        advancedOptions.add(entryBuilder.startBooleanToggle(option("endDistanceFade", suffix), targetConfig.endDistanceFade)
                 .setDefaultValue(defaultConfig.endDistanceFade)
                 .setTooltip(tooltip("endDistanceFade", suffix))
                 .setSaveConsumer(newValue -> targetConfig.endDistanceFade = newValue)
                 .build());
 
-        category.addEntry(entryBuilder.startDoubleField(option("endDistanceFadeAmount", suffix), targetConfig.endDistanceFadeAmount)
+        advancedOptions.add(entryBuilder.startDoubleField(option("endDistanceFadeAmount", suffix), targetConfig.endDistanceFadeAmount)
                 .setDefaultValue(defaultConfig.endDistanceFadeAmount)
                 .setTooltip(tooltip("endDistanceFadeAmount", suffix))
                 .setSaveConsumer(newValue -> targetConfig.endDistanceFadeAmount = newValue)
                 .build());
 
-        category.addEntry(entryBuilder.startBooleanToggle(option("fadeEnd", suffix), targetConfig.fadeEnd)
+        advancedOptions.add(entryBuilder.startBooleanToggle(option("fadeEnd", suffix), targetConfig.fadeEnd)
                 .setDefaultValue(defaultConfig.fadeEnd)
                 .setTooltip(tooltip("fadeEnd", suffix))
                 .setSaveConsumer(newValue -> targetConfig.fadeEnd = newValue)
                 .build());
 
-        category.addEntry(entryBuilder.startBooleanToggle(option("wireframeTrails", suffix), targetConfig.wireframeTrails)
+        advancedOptions.add(entryBuilder.startBooleanToggle(option("wireframeTrails", suffix), targetConfig.wireframeTrails)
                 .setDefaultValue(defaultConfig.wireframeTrails)
                 .setTooltip(tooltip("wireframeTrails", suffix))
                 .setSaveConsumer(newValue -> targetConfig.wireframeTrails = newValue)
                 .build());
 
-        category.addEntry(entryBuilder.startBooleanToggle(option("increaseWidthOverTime", suffix), targetConfig.increaseWidthOverTime)
+        advancedOptions.add(entryBuilder.startBooleanToggle(option("increaseWidthOverTime", suffix), targetConfig.increaseWidthOverTime)
                 .setDefaultValue(defaultConfig.increaseWidthOverTime)
                 .setTooltip(tooltip("increaseWidthOverTime", suffix))
                 .setSaveConsumer(newValue -> targetConfig.increaseWidthOverTime = newValue)
                 .build());
 
-        category.addEntry(entryBuilder.startDoubleField(option("startingWidthMultiplier", suffix), targetConfig.startingWidthMultiplier)
+        advancedOptions.add(entryBuilder.startDoubleField(option("startingWidthMultiplier", suffix), targetConfig.startingWidthMultiplier)
                 .setDefaultValue(defaultConfig.startingWidthMultiplier)
                 .setTooltip(tooltip("startingWidthMultiplier", suffix))
                 .setSaveConsumer(newValue -> targetConfig.startingWidthMultiplier = newValue)
                 .build());
 
-        category.addEntry(entryBuilder.startDoubleField(option("endingWidthMultiplier", suffix), targetConfig.endingWidthMultiplier)
+        advancedOptions.add(entryBuilder.startDoubleField(option("endingWidthMultiplier", suffix), targetConfig.endingWidthMultiplier)
                 .setDefaultValue(defaultConfig.endingWidthMultiplier)
                 .setTooltip(tooltip("endingWidthMultiplier", suffix))
                 .setSaveConsumer(newValue -> targetConfig.endingWidthMultiplier = newValue)
                 .build());
 
-        category.addEntry(entryBuilder.startDoubleField(option("distanceTillTrailStart", suffix), targetConfig.distanceTillTrailStart)
+        advancedOptions.add(entryBuilder.startDoubleField(option("distanceTillTrailStart", suffix), targetConfig.distanceTillTrailStart)
                 .setDefaultValue(defaultConfig.distanceTillTrailStart)
                 .setTooltip(tooltip("distanceTillTrailStart", suffix))
                 .setSaveConsumer(newValue -> targetConfig.distanceTillTrailStart = newValue)
                 .build());
 
-        category.addEntry(entryBuilder.startBooleanToggle(option("speedBasedAlpha", suffix), targetConfig.speedBasedAlpha)
+
+        category.addEntry(entryBuilder.startDoubleField(option("trailMinSpeed", suffix), targetConfig.trailMinSpeed)
+                .setDefaultValue(defaultConfig.trailMinSpeed)
+                .setTooltip(tooltip("trailMinSpeed", suffix))
+                .setSaveConsumer(newValue -> targetConfig.trailMinSpeed = newValue)
+                .build());
+        advancedOptions.add(entryBuilder.startBooleanToggle(option("speedBasedAlpha", suffix), targetConfig.speedBasedAlpha)
                 .setDefaultValue(defaultConfig.speedBasedAlpha)
                 .setTooltip(tooltip("speedBasedAlpha", suffix))
                 .setSaveConsumer(newValue -> targetConfig.speedBasedAlpha = newValue)
                 .build());
 
-        category.addEntry(entryBuilder.startDoubleField(option("minAlphaSpeed", suffix), targetConfig.minAlphaSpeed)
+        advancedOptions.add(entryBuilder.startDoubleField(option("minAlphaSpeed", suffix), targetConfig.minAlphaSpeed)
                 .setDefaultValue(defaultConfig.minAlphaSpeed)
                 .setTooltip(tooltip("minAlphaSpeed", suffix))
                 .setSaveConsumer(newValue -> targetConfig.minAlphaSpeed = newValue)
                 .build());
 
-        category.addEntry(entryBuilder.startDoubleField(option("maxAlphaSpeed", suffix), targetConfig.maxAlphaSpeed)
+        advancedOptions.add(entryBuilder.startDoubleField(option("maxAlphaSpeed", suffix), targetConfig.maxAlphaSpeed)
                 .setDefaultValue(defaultConfig.maxAlphaSpeed)
                 .setTooltip(tooltip("maxAlphaSpeed", suffix))
                 .setSaveConsumer(newValue -> targetConfig.maxAlphaSpeed = newValue)
                 .build());
 
-        category.addEntry(entryBuilder.startBooleanToggle(option("speedBasedWidth", suffix), targetConfig.speedBasedWidth)
+        advancedOptions.add(entryBuilder.startBooleanToggle(option("speedBasedWidth", suffix), targetConfig.speedBasedWidth)
                 .setDefaultValue(defaultConfig.speedBasedWidth)
                 .setTooltip(tooltip("speedBasedWidth", suffix))
                 .setSaveConsumer(newValue -> targetConfig.speedBasedWidth = newValue)
                 .build());
 
-        category.addEntry(entryBuilder.startDoubleField(option("minWidthSpeed", suffix), targetConfig.minWidthSpeed)
+        advancedOptions.add(entryBuilder.startDoubleField(option("minWidthSpeed", suffix), targetConfig.minWidthSpeed)
                 .setDefaultValue(defaultConfig.minWidthSpeed)
                 .setTooltip(tooltip("minWidthSpeed", suffix))
                 .setSaveConsumer(newValue -> targetConfig.minWidthSpeed = newValue)
                 .build());
 
-        category.addEntry(entryBuilder.startDoubleField(option("maxWidthSpeed", suffix), targetConfig.maxWidthSpeed)
+        advancedOptions.add(entryBuilder.startDoubleField(option("maxWidthSpeed", suffix), targetConfig.maxWidthSpeed)
                 .setDefaultValue(defaultConfig.maxWidthSpeed)
                 .setTooltip(tooltip("maxWidthSpeed", suffix))
                 .setSaveConsumer(newValue -> targetConfig.maxWidthSpeed = newValue)
                 .build());
+        category.addEntry(entryBuilder.startTextDescription(
+                        Component.translatable("text.elytratrails.category.advanced"))
+                .build());
+        category.addEntry(advancedOptions.build());
     }
 
     private static Component option(String baseKey, String suffix) {

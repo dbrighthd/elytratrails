@@ -41,7 +41,9 @@ public record PlayerConfig(
         double maxWidthSpeed,
         boolean trailMovesWithAngleOfAttack,
         boolean useColorBoth,
-        int colorRight
+        int colorRight,
+        double wingtipVerticalPosition,
+        double wingtipHorizontalPosition
 ) {
     public static final int WIRE_VERSION = 1; // bump when you change meaning, not when you add fields
 
@@ -87,6 +89,8 @@ public record PlayerConfig(
         tag.putBoolean("trailMovesWithAngleOfAttack",trailMovesWithAngleOfAttack);
         tag.putBoolean("useColorBoth",useColorBoth);
         tag.putInt("colorRight", colorRight);
+        tag.putDouble("wingtipVerticalPosition",wingtipVerticalPosition);
+        tag.putDouble("wingtipHorizontalPosition",wingtipHorizontalPosition);
 
         return tag;
     }
