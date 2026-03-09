@@ -4,6 +4,7 @@ import dbrighthd.elytratrails.controller.EntityTwirlManager;
 import dbrighthd.elytratrails.rendering.TrailSystem;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
+import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents;
 import net.fabricmc.fabric.api.client.networking.v1.ClientPlayConnectionEvents;
 import net.fabricmc.fabric.api.client.networking.v1.ClientPlayNetworking;
 import net.minecraft.client.Minecraft;
@@ -14,6 +15,7 @@ import static dbrighthd.elytratrails.network.ClientPlayerConfigStore.*;
 public class RegisterPacketsClient {
     @Environment(EnvType.CLIENT)
     public static boolean hasRecievedThisSession = false;
+    private static int pendingConfigRequestTicks = -1;
     public static void initClient() {
         ClientPlayNetworking.registerGlobalReceiver(TwirlStateS2CPayload.ID, (payload, context) ->
                 EntityTwirlManager.setEntityTwirlState(payload.entityId(), payload.twirlState()));
@@ -43,13 +45,21 @@ public class RegisterPacketsClient {
             hasRecievedThisSession = true;
         });
         ClientPlayConnectionEvents.JOIN.register((handler, sender, client) -> {
-            //if showTrailToOtherPlayers is turned on, we need to share that to other clients or else they will see the default.
-            if(getConfig().shareTrail || !getConfig().showTrailToOtherPlayers)
-            {
+            if (getConfig().shareTrail || !getConfig().showTrailToOtherPlayers) {
                 ClientPlayNetworking.send(new PlayerConfigC2SPayload(getLocalPlayerConfigToSend().toTag()));
             }
-            ClientPlayNetworking.send(new GetAllRequestC2SPayload());
+
+            pendingConfigRequestTicks = 10;
         });
-        ClientPlayConnectionEvents.DISCONNECT.register((handler, sender) -> {TrailSystem.getWingtipSampler().removeAllEmfCache(); hasRecievedThisSession = false;});
+
+        ClientTickEvents.END_CLIENT_TICK.register(client -> {
+            if (pendingConfigRequestTicks > 0) {
+                pendingConfigRequestTicks--;
+                if (pendingConfigRequestTicks == 0) {
+                    ClientPlayNetworking.send(new GetAllRequestC2SPayload());
+                }
+            }
+        });
+        ClientPlayConnectionEvents.DISCONNECT.register((handler, sender) -> {TrailSystem.getWingtipSampler().removeAllEmfCache(); hasRecievedThisSession = false; CLIENT_PLAYER_CONFIGS.clear();});
     }
 }
