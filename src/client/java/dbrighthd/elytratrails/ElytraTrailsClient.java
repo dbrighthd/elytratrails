@@ -69,20 +69,18 @@ public class ElytraTrailsClient implements ClientModInitializer {
 				}
 			}
 		);
-		FabricLoader.getInstance().getModContainer("elytratrails").ifPresent(container -> {
-			boolean ok = ResourceManagerHelper.registerBuiltinResourcePack(
-					Identifier.fromNamespaceAndPath("elytratrails", "arrowtrails"),
-					container,
-					Component.literal("arrowtrails"),
-					ResourcePackActivationType.NORMAL
-			);
-
-			if (!ok) {
-				ElytraTrails.LOGGER.warn("Failed to register built-in resource pack elytratrails:arrowtrials");
-			}
-		});
-
-
+		FabricLoader.getInstance().getModContainer("elytratrails").ifPresent(container -> ResourceManagerHelper.registerBuiltinResourcePack(
+                Identifier.fromNamespaceAndPath("elytratrails", "arrowtrails"),
+                container,
+                Component.literal("Arrow Trails"),
+                ResourcePackActivationType.NORMAL
+        ));
+		FabricLoader.getInstance().getModContainer("elytratrails").ifPresent(container -> ResourceManagerHelper.registerBuiltinResourcePack(
+                Identifier.fromNamespaceAndPath("elytratrails", "allaytrails"),
+                container,
+                Component.literal("Allay Trails"),
+                ResourcePackActivationType.NORMAL
+        ));
 	}
 
 	public static ModConfig getConfig()
