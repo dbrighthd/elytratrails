@@ -517,6 +517,7 @@ public class ConfigScreenBuilder {
             SubCategoryBuilder advancedOptions,
             String suffix
     ) {
+
         category.addEntry(entryBuilder.startBooleanToggle(option("enableTrail", suffix), targetConfig.enableTrail)
                 .setDefaultValue(defaultConfig.enableTrail)
                 .setTooltip(tooltip("enableTrail", suffix))
@@ -535,6 +536,11 @@ public class ConfigScreenBuilder {
                 .setSaveConsumer(newValue -> targetConfig.glowingTrails = newValue)
                 .build());
 
+        advancedOptions.add(entryBuilder.startBooleanToggle(option("wireframeTrails", suffix), targetConfig.wireframeTrails)
+                .setDefaultValue(defaultConfig.wireframeTrails)
+                .setTooltip(tooltip("wireframeTrails", suffix))
+                .setSaveConsumer(newValue -> targetConfig.wireframeTrails = newValue)
+                .build());
         category.addEntry(entryBuilder.startBooleanToggle(option("enableRandomWidth", suffix), targetConfig.enableRandomWidth)
                 .setDefaultValue(defaultConfig.enableRandomWidth)
                 .setTooltip(tooltip("enableRandomWidth", suffix))
@@ -672,11 +678,6 @@ public class ConfigScreenBuilder {
                 .setSaveConsumer(newValue -> targetConfig.fadeEnd = newValue)
                 .build());
 
-        advancedOptions.add(entryBuilder.startBooleanToggle(option("wireframeTrails", suffix), targetConfig.wireframeTrails)
-                .setDefaultValue(defaultConfig.wireframeTrails)
-                .setTooltip(tooltip("wireframeTrails", suffix))
-                .setSaveConsumer(newValue -> targetConfig.wireframeTrails = newValue)
-                .build());
 
         advancedOptions.add(entryBuilder.startBooleanToggle(option("increaseWidthOverTime", suffix), targetConfig.increaseWidthOverTime)
                 .setDefaultValue(defaultConfig.increaseWidthOverTime)
