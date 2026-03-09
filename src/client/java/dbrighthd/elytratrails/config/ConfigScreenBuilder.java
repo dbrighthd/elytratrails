@@ -62,7 +62,6 @@ public class ConfigScreenBuilder {
 
 
 
-
         general.addEntry(entryBuilder.startTextDescription(
                         Component.translatable("text.elytratrails.category.general.desc"))
                 .build());
@@ -266,194 +265,25 @@ public class ConfigScreenBuilder {
         elytra.addEntry(entryBuilder.startTextDescription(
                         Component.translatable("text.elytratrails.category.elytra.desc"))
                 .build());
-        elytra.addEntry(entryBuilder.startBooleanToggle(Component.translatable("text.elytratrails.option.enableTrail"), config.clientPlayerConfig.enableTrail)
-                .setDefaultValue(defaultConfig.enableTrail)
-                .setTooltip(Component.translatable("text.elytratrails.option.enableTrail.@Tooltip"))
-                .setSaveConsumer(newValue -> config.clientPlayerConfig.enableTrail = newValue)
-                .build());
-        elytra.addEntry(entryBuilder.startBooleanToggle(Component.translatable("text.elytratrails.option.translucentTrails"), config.clientPlayerConfig.translucentTrails)
-                .setDefaultValue(defaultConfig.translucentTrails)
-                .setTooltip(Component.translatable("text.elytratrails.option.translucentTrails.@Tooltip"))
-                .setSaveConsumer(newValue -> config.clientPlayerConfig.translucentTrails = newValue)
-                .build());
-        elytra.addEntry(entryBuilder.startBooleanToggle(Component.translatable("text.elytratrails.option.glowingTrails"), config.clientPlayerConfig.glowingTrails)
-                .setDefaultValue(defaultConfig.glowingTrails)
-                .setTooltip(Component.translatable("text.elytratrails.option.glowingTrails.@Tooltip"))
-                .setSaveConsumer(newValue -> config.clientPlayerConfig.glowingTrails = newValue)
-                .build());
-        elytra.addEntry(entryBuilder.startBooleanToggle(Component.translatable("text.elytratrails.option.enableRandomWidth"), config.clientPlayerConfig.enableRandomWidth)
-                .setDefaultValue(defaultConfig.enableRandomWidth)
-                .setTooltip(Component.translatable("text.elytratrails.option.enableRandomWidth.@Tooltip"))
-                .setSaveConsumer(newValue -> config.clientPlayerConfig.enableRandomWidth = newValue)
-                .build());
-        elytra.addEntry(entryBuilder.startBooleanToggle(Component.translatable("text.elytratrails.option.speedDependentTrail"), config.clientPlayerConfig.speedDependentTrail)
-                .setDefaultValue(defaultConfig.speedDependentTrail)
-                .setTooltip(Component.translatable("text.elytratrails.option.speedDependentTrail.@Tooltip"))
-                .setSaveConsumer(newValue -> config.clientPlayerConfig.speedDependentTrail = newValue)
-                .build());
-        elytra.addEntry(entryBuilder.startBooleanToggle(Component.translatable("text.elytratrails.option.trailMovesWithElytraAngle"), config.clientPlayerConfig.trailMovesWithElytraAngle)
-                .setDefaultValue(defaultConfig.trailMovesWithElytraAngle)
-                .setTooltip(Component.translatable("text.elytratrails.option.trailMovesWithElytraAngle.@Tooltip"))
-                .setSaveConsumer(newValue -> config.clientPlayerConfig.trailMovesWithElytraAngle = newValue)
-                .build());
-        elytra.addEntry(entryBuilder.startBooleanToggle(Component.translatable("text.elytratrails.option.trailMovesWithAngleOfAttack"), config.clientPlayerConfig.trailMovesWithAngleOfAttack)
-                .setDefaultValue(defaultConfig.trailMovesWithAngleOfAttack)
-                .setTooltip(Component.translatable("text.elytratrails.option.trailMovesWithAngleOfAttack.@Tooltip"))
-                .setSaveConsumer(newValue -> config.clientPlayerConfig.trailMovesWithAngleOfAttack = newValue)
-                .build());
-        elytra.addEntry(entryBuilder.startDoubleField(Component.translatable("text.elytratrails.option.width"), config.clientPlayerConfig.maxWidth)
-                .setDefaultValue(defaultConfig.maxWidth)
-                .setTooltip(Component.translatable("text.elytratrails.option.width.@Tooltip"))
-                .setSaveConsumer(newValue -> config.clientPlayerConfig.maxWidth = newValue)
-                .build());
-        elytra.addEntry(entryBuilder.startDoubleField(Component.translatable("text.elytratrails.option.trailLifetime"), config.clientPlayerConfig.trailLifetime)
-                .setDefaultValue(defaultConfig.trailLifetime)
-                .setTooltip(Component.translatable("text.elytratrails.option.trailLifetime.@Tooltip"))
-                .setSaveConsumer(newValue -> config.clientPlayerConfig.trailLifetime = newValue)
-                .build());
-        elytra.addEntry(entryBuilder.startDoubleField(Component.translatable("text.elytratrails.option.trailMinSpeed"), config.clientPlayerConfig.trailMinSpeed)
-                .setDefaultValue(defaultConfig.trailMinSpeed)
-                .setTooltip(Component.translatable("text.elytratrails.option.trailMinSpeed.@Tooltip"))
-                .setSaveConsumer(newValue -> config.clientPlayerConfig.trailMinSpeed = newValue)
-                .build());
-        elytra.addEntry(entryBuilder.startDoubleField(Component.translatable("text.elytratrails.option.startRampDistance"), config.clientPlayerConfig.startRampDistance)
-                .setDefaultValue(defaultConfig.startRampDistance)
-                .setTooltip(Component.translatable("text.elytratrails.option.startRampDistance.@Tooltip"))
-                .setSaveConsumer(newValue -> config.clientPlayerConfig.startRampDistance = newValue)
-                .build());
-        elytra.addEntry(entryBuilder.startDoubleField(Component.translatable("text.elytratrails.option.endRampDistance"), config.clientPlayerConfig.endRampDistance)
-                .setDefaultValue(defaultConfig.endRampDistance)
-                .setTooltip(Component.translatable("text.elytratrails.option.endRampDistance.@Tooltip"))
-                .setSaveConsumer(newValue -> config.clientPlayerConfig.endRampDistance = newValue)
-                .build());
-        elytra.addEntry(entryBuilder.startColorField(Component.translatable("text.elytratrails.option.color"), config.clientPlayerConfig.justColor)
-                .setDefaultValue(0xFFFFFF)
-                .setTooltip(Component.translatable("text.elytratrails.option.color.@Tooltip"))
-                .setSaveConsumer(newValue -> config.clientPlayerConfig.justColor = newValue)
-                .build());
-        elytra.addEntry(entryBuilder.startIntField(Component.translatable("text.elytratrails.option.alpha"), config.clientPlayerConfig.justAlpha)
-                .setDefaultValue(255)
-                .setTooltip(Component.translatable("text.elytratrails.option.alpha.@Tooltip"))
-                .setSaveConsumer(newValue -> config.clientPlayerConfig.justAlpha = newValue)
-                .build());
-        elytra.addEntry(entryBuilder.startBooleanToggle(Component.translatable("text.elytratrails.option.useColorBoth"), config.clientPlayerConfig.useColorBoth)
-                .setDefaultValue(defaultConfig.useColorBoth)
-                .setTooltip(Component.translatable("text.elytratrails.option.useColorBoth.@Tooltip"))
-                .setSaveConsumer(newValue -> config.clientPlayerConfig.useColorBoth = newValue)
-                .build());
-        elytra.addEntry(entryBuilder.startColorField(Component.translatable("text.elytratrails.option.colorRight"), config.clientPlayerConfig.justColorRight)
-                .setDefaultValue(0xFFFFFF)
-                .setTooltip(Component.translatable("text.elytratrails.option.colorRight.@Tooltip"))
-                .setSaveConsumer(newValue -> config.clientPlayerConfig.justColorRight = newValue)
-                .build());
-        elytra.addEntry(entryBuilder.startIntField(Component.translatable("text.elytratrails.option.alphaRight"), config.clientPlayerConfig.justAlphaRight)
-                .setDefaultValue(255)
-                .setTooltip(Component.translatable("text.elytratrails.option.alphaRight.@Tooltip"))
-                .setSaveConsumer(newValue -> config.clientPlayerConfig.justAlphaRight = newValue)
-                .build());
-        elytra.addEntry(entryBuilder.startStrField(Component.translatable("text.elytratrails.option.prideTrail"), config.clientPlayerConfig.prideTrail)
-                .setDefaultValue(defaultConfig.prideTrail)
-                .setTooltip(Component.translatable("text.elytratrails.option.prideTrail.@Tooltip"))
-                .setSaveConsumer(newValue -> config.clientPlayerConfig.prideTrail = newValue)
-                .build());
-        elytra.addEntry(entryBuilder.startStrField(Component.translatable("text.elytratrails.option.prideTrailRight"), config.clientPlayerConfig.prideTrailRight)
-                .setDefaultValue(defaultConfig.prideTrailRight)
-                .setTooltip(Component.translatable("text.elytratrails.option.prideTrailRight.@Tooltip"))
-                .setSaveConsumer(newValue -> config.clientPlayerConfig.prideTrailRight = newValue)
-                .build());
-        elytra.addEntry(entryBuilder.startDoubleField(Component.translatable("text.elytratrails.option.randomWidthVariation"), config.clientPlayerConfig.randomWidthVariation)
-                .setDefaultValue(defaultConfig.randomWidthVariation)
-                .setTooltip(Component.translatable("text.elytratrails.option.randomWidthVariation.@Tooltip"))
-                .setSaveConsumer(newValue -> config.clientPlayerConfig.randomWidthVariation = newValue)
-                .build());
-        elytra.addEntry(entryBuilder.startBooleanToggle(Component.translatable("text.elytratrails.option.fadeStart"), config.clientPlayerConfig.fadeStart)
-                .setDefaultValue(defaultConfig.fadeStart)
-                .setTooltip(Component.translatable("text.elytratrails.option.fadeStart.@Tooltip"))
-                .setSaveConsumer(newValue -> config.clientPlayerConfig.fadeStart = newValue)
-                .build());
-        elytra.addEntry(entryBuilder.startDoubleField(Component.translatable("text.elytratrails.option.fadeStartDistance"), config.clientPlayerConfig.fadeStartDistance)
-                .setDefaultValue(defaultConfig.fadeStartDistance)
-                .setTooltip(Component.translatable("text.elytratrails.option.fadeStartDistance.@Tooltip"))
-                .setSaveConsumer(newValue -> config.clientPlayerConfig.fadeStartDistance = newValue)
-                .build());
-        elytra.addEntry(entryBuilder.startBooleanToggle(Component.translatable("text.elytratrails.option.endDistanceFade"), config.clientPlayerConfig.endDistanceFade)
-                .setDefaultValue(defaultConfig.endDistanceFade)
-                .setTooltip(Component.translatable("text.elytratrails.option.endDistanceFade.@Tooltip"))
-                .setSaveConsumer(newValue -> config.clientPlayerConfig.endDistanceFade = newValue)
-                .build());
-        elytra.addEntry(entryBuilder.startDoubleField(Component.translatable("text.elytratrails.option.endDistanceFadeAmount"), config.clientPlayerConfig.endDistanceFadeAmount)
-                .setDefaultValue(defaultConfig.endDistanceFadeAmount)
-                .setTooltip(Component.translatable("text.elytratrails.option.endDistanceFadeAmount.@Tooltip"))
-                .setSaveConsumer(newValue -> config.clientPlayerConfig.endDistanceFadeAmount = newValue)
-                .build());
-        elytra.addEntry(entryBuilder.startBooleanToggle(Component.translatable("text.elytratrails.option.fadeEnd"), config.clientPlayerConfig.fadeEnd)
-                .setDefaultValue(defaultConfig.fadeEnd)
-                .setTooltip(Component.translatable("text.elytratrails.option.fadeEnd.@Tooltip"))
-                .setSaveConsumer(newValue -> config.clientPlayerConfig.fadeEnd = newValue)
-                .build());
-        elytra.addEntry(entryBuilder.startBooleanToggle(Component.translatable("text.elytratrails.option.wireframeTrails"), config.clientPlayerConfig.wireframeTrails)
-                .setDefaultValue(defaultConfig.wireframeTrails)
-                .setTooltip(Component.translatable("text.elytratrails.option.wireframeTrails.@Tooltip"))
-                .setSaveConsumer(newValue -> config.clientPlayerConfig.wireframeTrails = newValue)
-                .build());
-        elytra.addEntry(entryBuilder.startBooleanToggle(Component.translatable("text.elytratrails.option.increaseWidthOverTime"), config.clientPlayerConfig.increaseWidthOverTime)
-                .setDefaultValue(defaultConfig.increaseWidthOverTime)
-                .setTooltip(Component.translatable("text.elytratrails.option.increaseWidthOverTime.@Tooltip"))
-                .setSaveConsumer(newValue -> config.clientPlayerConfig.increaseWidthOverTime = newValue)
-                .build());
-        elytra.addEntry(entryBuilder.startDoubleField(Component.translatable("text.elytratrails.option.startingWidthMultiplier"), config.clientPlayerConfig.startingWidthMultiplier)
-                .setDefaultValue(defaultConfig.startingWidthMultiplier)
-                .setTooltip(Component.translatable("text.elytratrails.option.startingWidthMultiplier.@Tooltip"))
-                .setSaveConsumer(newValue -> config.clientPlayerConfig.startingWidthMultiplier = newValue)
-                .build());
-        elytra.addEntry(entryBuilder.startDoubleField(Component.translatable("text.elytratrails.option.endingWidthMultiplier"), config.clientPlayerConfig.endingWidthMultiplier)
-                .setDefaultValue(defaultConfig.endingWidthMultiplier)
-                .setTooltip(Component.translatable("text.elytratrails.option.endingWidthMultiplier.@Tooltip"))
-                .setSaveConsumer(newValue -> config.clientPlayerConfig.endingWidthMultiplier = newValue)
-                .build());
-        elytra.addEntry(entryBuilder.startDoubleField(Component.translatable("text.elytratrails.option.distanceTillTrailStart"), config.clientPlayerConfig.distanceTillTrailStart)
-                .setDefaultValue(defaultConfig.distanceTillTrailStart)
-                .setTooltip(Component.translatable("text.elytratrails.option.distanceTillTrailStart.@Tooltip"))
-                .setSaveConsumer(newValue -> config.clientPlayerConfig.distanceTillTrailStart = newValue)
-                .build());
-        elytra.addEntry(entryBuilder.startBooleanToggle(Component.translatable("text.elytratrails.option.speedBasedAlpha"), config.clientPlayerConfig.speedBasedAlpha)
-                .setDefaultValue(defaultConfig.speedBasedAlpha)
-                .setTooltip(Component.translatable("text.elytratrails.option.speedBasedAlpha.@Tooltip"))
-                .setSaveConsumer(newValue -> config.clientPlayerConfig.speedBasedAlpha = newValue)
-                .build());
-        elytra.addEntry(entryBuilder.startDoubleField(Component.translatable("text.elytratrails.option.minAlphaSpeed"), config.clientPlayerConfig.minAlphaSpeed)
-                .setDefaultValue(defaultConfig.minAlphaSpeed)
-                .setTooltip(Component.translatable("text.elytratrails.option.minAlphaSpeed.@Tooltip"))
-                .setSaveConsumer(newValue -> config.clientPlayerConfig.minAlphaSpeed = newValue)
-                .build());
-        elytra.addEntry(entryBuilder.startDoubleField(Component.translatable("text.elytratrails.option.maxAlphaSpeed"), config.clientPlayerConfig.maxAlphaSpeed)
-                .setDefaultValue(defaultConfig.maxAlphaSpeed)
-                .setTooltip(Component.translatable("text.elytratrails.option.maxAlphaSpeed.@Tooltip"))
-                .setSaveConsumer(newValue -> config.clientPlayerConfig.maxAlphaSpeed = newValue)
-                .build());
-        elytra.addEntry(entryBuilder.startBooleanToggle(Component.translatable("text.elytratrails.option.speedBasedWidth"), config.clientPlayerConfig.speedBasedWidth)
-                .setDefaultValue(defaultConfig.speedBasedWidth)
-                .setTooltip(Component.translatable("text.elytratrails.option.speedBasedWidth.@Tooltip"))
-                .setSaveConsumer(newValue -> config.clientPlayerConfig.speedBasedWidth = newValue)
-                .build());
-        elytra.addEntry(entryBuilder.startDoubleField(Component.translatable("text.elytratrails.option.minWidthSpeed"), config.clientPlayerConfig.minWidthSpeed)
-                .setDefaultValue(defaultConfig.minWidthSpeed)
-                .setTooltip(Component.translatable("text.elytratrails.option.minWidthSpeed.@Tooltip"))
-                .setSaveConsumer(newValue -> config.clientPlayerConfig.minWidthSpeed = newValue)
-                .build());
-        elytra.addEntry(entryBuilder.startDoubleField(Component.translatable("text.elytratrails.option.maxWidthSpeed"), config.clientPlayerConfig.maxWidthSpeed)
-                .setDefaultValue(defaultConfig.maxWidthSpeed)
-                .setTooltip(Component.translatable("text.elytratrails.option.maxWidthSpeed.@Tooltip"))
-                .setSaveConsumer(newValue -> config.clientPlayerConfig.maxWidthSpeed = newValue)
-                .build());
+
+        addSharedTrailEntries(
+                elytra,
+                entryBuilder,
+                config.clientPlayerConfig,
+                defaultConfig,
+                ""
+        );
+
         elytra.addEntry(entryBuilder.startTextDescription(
                         Component.translatable("text.elytratrails.category.elytra.desc.export"))
                 .build());
+
         elytra.addEntry(entryBuilder.startBooleanToggle(Component.translatable("text.elytratrails.option.export"), config.exportPreset)
                 .setDefaultValue(false)
                 .setTooltip(Component.translatable("text.elytratrails.option.export.@Tooltip"))
                 .setSaveConsumer(newValue -> config.exportPreset = newValue)
                 .build());
+
         elytra.addEntry(entryBuilder.startStrField(Component.translatable("text.elytratrails.option.exportPresetName"), config.exportPresetName)
                 .setDefaultValue("")
                 .setTooltip(Component.translatable("text.elytratrails.option.exportPresetName.@Tooltip"))
@@ -494,210 +324,20 @@ public class ConfigScreenBuilder {
         others.addEntry(entryBuilder.startTextDescription(
                         Component.translatable("text.elytratrails.category.others.desc"))
                 .build());
+
         others.addEntry(entryBuilder.startBooleanToggle(Component.translatable("text.elytratrails.option.useSameDefaultsforOthers"), config.useSameDefaultsForOthers)
                 .setDefaultValue(false)
                 .setTooltip(Component.translatable("text.elytratrails.option.useSameDefaultsforOthers.@Tooltip"))
                 .setSaveConsumer(newValue -> config.useSameDefaultsForOthers = newValue)
                 .build());
-        others.addEntry(entryBuilder.startBooleanToggle(Component.translatable("text.elytratrails.option.enableTrailOthersDefault"), config.otherPlayerConfig.enableTrail)
-                .setDefaultValue(defaultConfig.enableTrail)
-                .setTooltip(Component.translatable("text.elytratrails.option.enableTrailOthersDefault.@Tooltip"))
-                .setSaveConsumer(newValue -> config.otherPlayerConfig.enableTrail = newValue)
-                .build());
-        others.addEntry(entryBuilder.startBooleanToggle(Component.translatable("text.elytratrails.option.translucentTrailsOthersDefault"), config.otherPlayerConfig.translucentTrails)
-                .setDefaultValue(defaultConfig.translucentTrails)
-                .setTooltip(Component.translatable("text.elytratrails.option.translucentTrailsOthersDefault.@Tooltip"))
-                .setSaveConsumer(newValue -> config.otherPlayerConfig.translucentTrails = newValue)
-                .build());
 
-        others.addEntry(entryBuilder.startBooleanToggle(Component.translatable("text.elytratrails.option.glowingTrailsOthersDefault"), config.otherPlayerConfig.glowingTrails)
-                .setDefaultValue(defaultConfig.glowingTrails)
-                .setTooltip(Component.translatable("text.elytratrails.option.glowingTrailsOthersDefault.@Tooltip"))
-                .setSaveConsumer(newValue -> config.otherPlayerConfig.glowingTrails = newValue)
-                .build());
-
-        others.addEntry(entryBuilder.startBooleanToggle(Component.translatable("text.elytratrails.option.enableRandomWidthOthersDefault"), config.otherPlayerConfig.enableRandomWidth)
-                .setDefaultValue(defaultConfig.enableRandomWidth)
-                .setTooltip(Component.translatable("text.elytratrails.option.enableRandomWidthOthersDefault.@Tooltip"))
-                .setSaveConsumer(newValue -> config.otherPlayerConfig.enableRandomWidth = newValue)
-                .build());
-
-        others.addEntry(entryBuilder.startBooleanToggle(Component.translatable("text.elytratrails.option.speedDependentTrailOthersDefault"), config.otherPlayerConfig.speedDependentTrail)
-                .setDefaultValue(defaultConfig.speedDependentTrail)
-                .setTooltip(Component.translatable("text.elytratrails.option.speedDependentTrailOthersDefault.@Tooltip"))
-                .setSaveConsumer(newValue -> config.otherPlayerConfig.speedDependentTrail = newValue)
-                .build());
-
-        others.addEntry(entryBuilder.startBooleanToggle(Component.translatable("text.elytratrails.option.trailMovesWithElytraAngleOthersDefault"), config.otherPlayerConfig.trailMovesWithElytraAngle)
-                .setDefaultValue(defaultConfig.trailMovesWithElytraAngle)
-                .setTooltip(Component.translatable("text.elytratrails.option.trailMovesWithElytraAngleOthersDefault.@Tooltip"))
-                .setSaveConsumer(newValue -> config.otherPlayerConfig.trailMovesWithElytraAngle = newValue)
-                .build());
-        others.addEntry(entryBuilder.startBooleanToggle(Component.translatable("text.elytratrails.option.trailMovesWithAngleOfAttackOthersDefault"), config.otherPlayerConfig.trailMovesWithAngleOfAttack)
-                .setDefaultValue(defaultConfig.trailMovesWithAngleOfAttack)
-                .setTooltip(Component.translatable("text.elytratrails.option.trailMovesWithAngleOfAttackOthersDefault.@Tooltip"))
-                .setSaveConsumer(newValue -> config.otherPlayerConfig.trailMovesWithAngleOfAttack = newValue)
-                .build());
-        others.addEntry(entryBuilder.startDoubleField(Component.translatable("text.elytratrails.option.widthOthersDefault"), config.otherPlayerConfig.maxWidth)
-                .setDefaultValue(defaultConfig.maxWidth)
-                .setTooltip(Component.translatable("text.elytratrails.option.widthOthersDefault.@Tooltip"))
-                .setSaveConsumer(newValue -> config.otherPlayerConfig.maxWidth = newValue)
-                .build());
-
-        others.addEntry(entryBuilder.startDoubleField(Component.translatable("text.elytratrails.option.trailLifetimeOthersDefault"), config.otherPlayerConfig.trailLifetime)
-                .setDefaultValue(defaultConfig.trailLifetime)
-                .setTooltip(Component.translatable("text.elytratrails.option.trailLifetimeOthersDefault.@Tooltip"))
-                .setSaveConsumer(newValue -> config.otherPlayerConfig.trailLifetime = newValue)
-                .build());
-
-        others.addEntry(entryBuilder.startDoubleField(Component.translatable("text.elytratrails.option.trailMinSpeedOthersDefault"), config.otherPlayerConfig.trailMinSpeed)
-                .setDefaultValue(defaultConfig.trailMinSpeed)
-                .setTooltip(Component.translatable("text.elytratrails.option.trailMinSpeedOthersDefault.@Tooltip"))
-                .setSaveConsumer(newValue -> config.otherPlayerConfig.trailMinSpeed = newValue)
-                .build());
-
-        others.addEntry(entryBuilder.startDoubleField(Component.translatable("text.elytratrails.option.startRampDistanceOthersDefault"), config.otherPlayerConfig.startRampDistance)
-                .setDefaultValue(defaultConfig.startRampDistance)
-                .setTooltip(Component.translatable("text.elytratrails.option.startRampDistanceOthersDefault.@Tooltip"))
-                .setSaveConsumer(newValue -> config.otherPlayerConfig.startRampDistance = newValue)
-                .build());
-
-        others.addEntry(entryBuilder.startDoubleField(Component.translatable("text.elytratrails.option.endRampDistanceOthersDefault"), config.otherPlayerConfig.endRampDistance)
-                .setDefaultValue(defaultConfig.endRampDistance)
-                .setTooltip(Component.translatable("text.elytratrails.option.endRampDistanceOthersDefault.@Tooltip"))
-                .setSaveConsumer(newValue -> config.otherPlayerConfig.endRampDistance = newValue)
-                .build());
-
-        others.addEntry(entryBuilder.startColorField(Component.translatable("text.elytratrails.option.colorOthersDefault"), config.otherPlayerConfig.justColor)
-                .setDefaultValue(0xFFFFFF)
-                .setTooltip(Component.translatable("text.elytratrails.option.colorOthersDefault.@Tooltip"))
-                .setSaveConsumer(newValue -> config.otherPlayerConfig.justColor = newValue)
-                .build());
-
-        others.addEntry(entryBuilder.startIntField(Component.translatable("text.elytratrails.option.alphaOthersDefault"), config.otherPlayerConfig.justAlpha)
-                .setDefaultValue(255)
-                .setTooltip(Component.translatable("text.elytratrails.option.alphaOthersDefault.@Tooltip"))
-                .setSaveConsumer(newValue -> config.otherPlayerConfig.justAlpha = newValue)
-                .build());
-        others.addEntry(entryBuilder.startBooleanToggle(Component.translatable("text.elytratrails.option.useColorBothOthersDefault"), config.otherPlayerConfig.useColorBoth)
-                .setDefaultValue(defaultConfig.useColorBoth)
-                .setTooltip(Component.translatable("text.elytratrails.option.useColorBothOthersDefault.@Tooltip"))
-                .setSaveConsumer(newValue -> config.otherPlayerConfig.useColorBoth = newValue)
-                .build());
-        others.addEntry(entryBuilder.startColorField(Component.translatable("text.elytratrails.option.colorRightOthersDefault"), config.otherPlayerConfig.justColorRight)
-                .setDefaultValue(0xFFFFFF)
-                .setTooltip(Component.translatable("text.elytratrails.option.colorRightOthersDefault.@Tooltip"))
-                .setSaveConsumer(newValue -> config.otherPlayerConfig.justColorRight = newValue)
-                .build());
-        others.addEntry(entryBuilder.startIntField(Component.translatable("text.elytratrails.option.alphaRightOthersDefault"), config.otherPlayerConfig.justAlphaRight)
-                .setDefaultValue(255)
-                .setTooltip(Component.translatable("text.elytratrails.option.alphaRightOthersDefault.@Tooltip"))
-                .setSaveConsumer(newValue -> config.otherPlayerConfig.justAlphaRight = newValue)
-                .build());
-        others.addEntry(entryBuilder.startStrField(Component.translatable("text.elytratrails.option.prideTrailOthersDefault"), config.otherPlayerConfig.prideTrail)
-                .setDefaultValue(defaultConfig.prideTrail)
-                .setTooltip(Component.translatable("text.elytratrails.option.prideTrailOthersDefault.@Tooltip"))
-                .setSaveConsumer(newValue -> config.otherPlayerConfig.prideTrail = newValue)
-                .build());
-        others.addEntry(entryBuilder.startStrField(Component.translatable("text.elytratrails.option.prideTrailRightOthersDefault"), config.otherPlayerConfig.prideTrailRight)
-                .setDefaultValue(defaultConfig.prideTrailRight)
-                .setTooltip(Component.translatable("text.elytratrails.option.prideTrailRightOthersDefault.@Tooltip"))
-                .setSaveConsumer(newValue -> config.otherPlayerConfig.prideTrailRight = newValue)
-                .build());
-        others.addEntry(entryBuilder.startDoubleField(Component.translatable("text.elytratrails.option.randomWidthVariationOthersDefault"), config.otherPlayerConfig.randomWidthVariation)
-                .setDefaultValue(defaultConfig.randomWidthVariation)
-                .setTooltip(Component.translatable("text.elytratrails.option.randomWidthVariationOthersDefault.@Tooltip"))
-                .setSaveConsumer(newValue -> config.otherPlayerConfig.randomWidthVariation = newValue)
-                .build());
-        others.addEntry(entryBuilder.startBooleanToggle(Component.translatable("text.elytratrails.option.fadeStartOthersDefault"), config.otherPlayerConfig.fadeStart)
-                .setDefaultValue(defaultConfig.fadeStart)
-                .setTooltip(Component.translatable("text.elytratrails.option.fadeStartOthersDefault.@Tooltip"))
-                .setSaveConsumer(newValue -> config.otherPlayerConfig.fadeStart = newValue)
-                .build());
-        others.addEntry(entryBuilder.startDoubleField(Component.translatable("text.elytratrails.option.fadeStartDistanceOthersDefault"), config.otherPlayerConfig.fadeStartDistance)
-                .setDefaultValue(defaultConfig.fadeStartDistance)
-                .setTooltip(Component.translatable("text.elytratrails.option.fadeStartDistanceOthersDefault.@Tooltip"))
-                .setSaveConsumer(newValue -> config.otherPlayerConfig.fadeStartDistance = newValue)
-                .build());
-        others.addEntry(entryBuilder.startBooleanToggle(Component.translatable("text.elytratrails.option.endDistanceFadeOthersDefault"), config.otherPlayerConfig.endDistanceFade)
-                .setDefaultValue(defaultConfig.endDistanceFade)
-                .setTooltip(Component.translatable("text.elytratrails.option.endDistanceFadeOthersDefault.@Tooltip"))
-                .setSaveConsumer(newValue -> config.otherPlayerConfig.endDistanceFade = newValue)
-                .build());
-        others.addEntry(entryBuilder.startDoubleField(Component.translatable("text.elytratrails.option.endDistanceFadeAmountOthersDefault"), config.otherPlayerConfig.endDistanceFadeAmount)
-                .setDefaultValue(defaultConfig.endDistanceFadeAmount)
-                .setTooltip(Component.translatable("text.elytratrails.option.endDistanceFadeAmountOthersDefault.@Tooltip"))
-                .setSaveConsumer(newValue -> config.otherPlayerConfig.endDistanceFadeAmount = newValue)
-                .build());
-        others.addEntry(entryBuilder.startBooleanToggle(Component.translatable("text.elytratrails.option.fadeEndOthersDefault"), config.otherPlayerConfig.fadeEnd)
-                .setDefaultValue(defaultConfig.fadeEnd)
-                .setTooltip(Component.translatable("text.elytratrails.option.fadeEndOthersDefault.@Tooltip"))
-                .setSaveConsumer(newValue -> config.otherPlayerConfig.fadeEnd = newValue)
-                .build());
-        others.addEntry(entryBuilder.startBooleanToggle(Component.translatable("text.elytratrails.option.wireframeTrailsOthersDefault"), config.otherPlayerConfig.wireframeTrails)
-                .setDefaultValue(defaultConfig.wireframeTrails)
-                .setTooltip(Component.translatable("text.elytratrails.option.wireframeTrailsOthersDefault.@Tooltip"))
-                .setSaveConsumer(newValue -> config.otherPlayerConfig.wireframeTrails = newValue)
-                .build());
-        others.addEntry(entryBuilder.startBooleanToggle(Component.translatable("text.elytratrails.option.increaseWidthOverTimeOthersDefault"), config.otherPlayerConfig.increaseWidthOverTime)
-                .setDefaultValue(defaultConfig.increaseWidthOverTime)
-                .setTooltip(Component.translatable("text.elytratrails.option.increaseWidthOverTimeOthersDefault.@Tooltip"))
-                .setSaveConsumer(newValue -> config.otherPlayerConfig.increaseWidthOverTime = newValue)
-                .build());
-        others.addEntry(entryBuilder.startDoubleField(Component.translatable("text.elytratrails.option.startingWidthMultiplierOthersDefault"), config.otherPlayerConfig.startingWidthMultiplier)
-                .setDefaultValue(defaultConfig.startingWidthMultiplier)
-                .setTooltip(Component.translatable("text.elytratrails.option.startingWidthMultiplierOthersDefault.@Tooltip"))
-                .setSaveConsumer(newValue -> config.otherPlayerConfig.startingWidthMultiplier = newValue)
-                .build());
-        others.addEntry(entryBuilder.startDoubleField(Component.translatable("text.elytratrails.option.endingWidthMultiplierOthersDefault"), config.otherPlayerConfig.endingWidthMultiplier)
-                .setDefaultValue(defaultConfig.endingWidthMultiplier)
-                .setTooltip(Component.translatable("text.elytratrails.option.endingWidthMultiplierOthersDefault.@Tooltip"))
-                .setSaveConsumer(newValue -> config.otherPlayerConfig.endingWidthMultiplier = newValue)
-                .build());
-        others.addEntry(entryBuilder.startDoubleField(Component.translatable("text.elytratrails.option.distanceTillTrailStartOthersDefault"), config.otherPlayerConfig.distanceTillTrailStart)
-                .setDefaultValue(defaultConfig.distanceTillTrailStart)
-                .setTooltip(Component.translatable("text.elytratrails.option.distanceTillTrailStartOthersDefault.@Tooltip"))
-                .setSaveConsumer(newValue -> config.otherPlayerConfig.distanceTillTrailStart = newValue)
-                .build());
-        others.addEntry(entryBuilder.startBooleanToggle(Component.translatable("text.elytratrails.option.speedBasedAlphaOthersDefault"), config.otherPlayerConfig.speedBasedAlpha)
-                .setDefaultValue(defaultConfig.speedBasedAlpha)
-                .setTooltip(Component.translatable("text.elytratrails.option.speedBasedAlphaOthersDefault.@Tooltip"))
-                .setSaveConsumer(newValue -> config.otherPlayerConfig.speedBasedAlpha = newValue)
-                .build());
-        others.addEntry(entryBuilder.startDoubleField(Component.translatable("text.elytratrails.option.minAlphaSpeedOthersDefault"), config.otherPlayerConfig.minAlphaSpeed)
-                .setDefaultValue(defaultConfig.minAlphaSpeed)
-                .setTooltip(Component.translatable("text.elytratrails.option.minAlphaSpeedOthersDefault.@Tooltip"))
-                .setSaveConsumer(newValue -> config.otherPlayerConfig.minAlphaSpeed = newValue)
-                .build());
-        others.addEntry(entryBuilder.startDoubleField(Component.translatable("text.elytratrails.option.maxAlphaSpeedOthersDefault"), config.otherPlayerConfig.maxAlphaSpeed)
-                .setDefaultValue(defaultConfig.maxAlphaSpeed)
-                .setTooltip(Component.translatable("text.elytratrails.option.maxAlphaSpeedOthersDefault.@Tooltip"))
-                .setSaveConsumer(newValue -> config.otherPlayerConfig.maxAlphaSpeed = newValue)
-                .build());
-        others.addEntry(entryBuilder.startBooleanToggle(Component.translatable("text.elytratrails.option.speedBasedWidthOthersDefault"), config.otherPlayerConfig.speedBasedWidth)
-                .setDefaultValue(defaultConfig.speedBasedWidth)
-                .setTooltip(Component.translatable("text.elytratrails.option.speedBasedWidthOthersDefault.@Tooltip"))
-                .setSaveConsumer(newValue -> config.otherPlayerConfig.speedBasedWidth = newValue)
-                .build());
-        others.addEntry(entryBuilder.startDoubleField(Component.translatable("text.elytratrails.option.minWidthSpeedOthersDefault"), config.otherPlayerConfig.minWidthSpeed)
-                .setDefaultValue(defaultConfig.minWidthSpeed)
-                .setTooltip(Component.translatable("text.elytratrails.option.minWidthSpeedOthersDefault.@Tooltip"))
-                .setSaveConsumer(newValue -> config.otherPlayerConfig.minWidthSpeed = newValue)
-                .build());
-        others.addEntry(entryBuilder.startDoubleField(Component.translatable("text.elytratrails.option.maxWidthSpeedOthersDefault"), config.otherPlayerConfig.maxWidthSpeed)
-                .setDefaultValue(defaultConfig.maxWidthSpeed)
-                .setTooltip(Component.translatable("text.elytratrails.option.maxWidthSpeedOthersDefault.@Tooltip"))
-                .setSaveConsumer(newValue -> config.otherPlayerConfig.maxWidthSpeed = newValue)
-                .build());
-
-        particles.addEntry(entryBuilder.startTextDescription(
-                        Component.translatable("text.elytratrails.category.particles.desc"))
-                .build());
-        particles.addEntry(entryBuilder.startBooleanToggle(Component.translatable("text.elytratrails.option.enableParticles"), config.enableParticles)
-                .setDefaultValue(false)
-                .setTooltip(Component.translatable("text.elytratrails.option.enableParticles.@Tooltip"))
-                .setSaveConsumer(newValue -> config.enableParticles = newValue)
-                .build());
+        addSharedTrailEntries(
+                others,
+                entryBuilder,
+                config.otherPlayerConfig,
+                defaultConfig,
+                "OthersDefault"
+        );
 
         particles.addEntry(entryBuilder.startDropdownMenu(
                         Component.translatable("text.elytratrails.option.particle"),
@@ -854,5 +494,236 @@ public class ConfigScreenBuilder {
     {
         config.color = encodeColor(config.justAlpha, config.justColor);
         config.colorRight = encodeColor(config.justAlphaRight, config.justColorRight);
+    }
+    private static void addSharedTrailEntries(
+            ConfigCategory category,
+            ConfigEntryBuilder entryBuilder,
+            ClientConfig targetConfig,
+            ClientConfig defaultConfig,
+            String suffix
+    ) {
+        category.addEntry(entryBuilder.startBooleanToggle(option("enableTrail", suffix), targetConfig.enableTrail)
+                .setDefaultValue(defaultConfig.enableTrail)
+                .setTooltip(tooltip("enableTrail", suffix))
+                .setSaveConsumer(newValue -> targetConfig.enableTrail = newValue)
+                .build());
+
+        category.addEntry(entryBuilder.startBooleanToggle(option("translucentTrails", suffix), targetConfig.translucentTrails)
+                .setDefaultValue(defaultConfig.translucentTrails)
+                .setTooltip(tooltip("translucentTrails", suffix))
+                .setSaveConsumer(newValue -> targetConfig.translucentTrails = newValue)
+                .build());
+
+        category.addEntry(entryBuilder.startBooleanToggle(option("glowingTrails", suffix), targetConfig.glowingTrails)
+                .setDefaultValue(defaultConfig.glowingTrails)
+                .setTooltip(tooltip("glowingTrails", suffix))
+                .setSaveConsumer(newValue -> targetConfig.glowingTrails = newValue)
+                .build());
+
+        category.addEntry(entryBuilder.startBooleanToggle(option("enableRandomWidth", suffix), targetConfig.enableRandomWidth)
+                .setDefaultValue(defaultConfig.enableRandomWidth)
+                .setTooltip(tooltip("enableRandomWidth", suffix))
+                .setSaveConsumer(newValue -> targetConfig.enableRandomWidth = newValue)
+                .build());
+
+        category.addEntry(entryBuilder.startBooleanToggle(option("speedDependentTrail", suffix), targetConfig.speedDependentTrail)
+                .setDefaultValue(defaultConfig.speedDependentTrail)
+                .setTooltip(tooltip("speedDependentTrail", suffix))
+                .setSaveConsumer(newValue -> targetConfig.speedDependentTrail = newValue)
+                .build());
+
+        category.addEntry(entryBuilder.startBooleanToggle(option("trailMovesWithElytraAngle", suffix), targetConfig.trailMovesWithElytraAngle)
+                .setDefaultValue(defaultConfig.trailMovesWithElytraAngle)
+                .setTooltip(tooltip("trailMovesWithElytraAngle", suffix))
+                .setSaveConsumer(newValue -> targetConfig.trailMovesWithElytraAngle = newValue)
+                .build());
+
+        category.addEntry(entryBuilder.startBooleanToggle(option("trailMovesWithAngleOfAttack", suffix), targetConfig.trailMovesWithAngleOfAttack)
+                .setDefaultValue(defaultConfig.trailMovesWithAngleOfAttack)
+                .setTooltip(tooltip("trailMovesWithAngleOfAttack", suffix))
+                .setSaveConsumer(newValue -> targetConfig.trailMovesWithAngleOfAttack = newValue)
+                .build());
+
+        category.addEntry(entryBuilder.startDoubleField(option("width", suffix), targetConfig.maxWidth)
+                .setDefaultValue(defaultConfig.maxWidth)
+                .setTooltip(tooltip("width", suffix))
+                .setSaveConsumer(newValue -> targetConfig.maxWidth = newValue)
+                .build());
+
+        category.addEntry(entryBuilder.startDoubleField(option("trailLifetime", suffix), targetConfig.trailLifetime)
+                .setDefaultValue(defaultConfig.trailLifetime)
+                .setTooltip(tooltip("trailLifetime", suffix))
+                .setSaveConsumer(newValue -> targetConfig.trailLifetime = newValue)
+                .build());
+
+        category.addEntry(entryBuilder.startDoubleField(option("trailMinSpeed", suffix), targetConfig.trailMinSpeed)
+                .setDefaultValue(defaultConfig.trailMinSpeed)
+                .setTooltip(tooltip("trailMinSpeed", suffix))
+                .setSaveConsumer(newValue -> targetConfig.trailMinSpeed = newValue)
+                .build());
+
+        category.addEntry(entryBuilder.startDoubleField(option("startRampDistance", suffix), targetConfig.startRampDistance)
+                .setDefaultValue(defaultConfig.startRampDistance)
+                .setTooltip(tooltip("startRampDistance", suffix))
+                .setSaveConsumer(newValue -> targetConfig.startRampDistance = newValue)
+                .build());
+
+        category.addEntry(entryBuilder.startDoubleField(option("endRampDistance", suffix), targetConfig.endRampDistance)
+                .setDefaultValue(defaultConfig.endRampDistance)
+                .setTooltip(tooltip("endRampDistance", suffix))
+                .setSaveConsumer(newValue -> targetConfig.endRampDistance = newValue)
+                .build());
+
+        category.addEntry(entryBuilder.startColorField(option("color", suffix), targetConfig.justColor)
+                .setDefaultValue(0xFFFFFF)
+                .setTooltip(tooltip("color", suffix))
+                .setSaveConsumer(newValue -> targetConfig.justColor = newValue)
+                .build());
+
+        category.addEntry(entryBuilder.startIntField(option("alpha", suffix), targetConfig.justAlpha)
+                .setDefaultValue(255)
+                .setTooltip(tooltip("alpha", suffix))
+                .setSaveConsumer(newValue -> targetConfig.justAlpha = newValue)
+                .build());
+
+        category.addEntry(entryBuilder.startBooleanToggle(option("useColorBoth", suffix), targetConfig.useColorBoth)
+                .setDefaultValue(defaultConfig.useColorBoth)
+                .setTooltip(tooltip("useColorBoth", suffix))
+                .setSaveConsumer(newValue -> targetConfig.useColorBoth = newValue)
+                .build());
+
+        category.addEntry(entryBuilder.startColorField(option("colorRight", suffix), targetConfig.justColorRight)
+                .setDefaultValue(0xFFFFFF)
+                .setTooltip(tooltip("colorRight", suffix))
+                .setSaveConsumer(newValue -> targetConfig.justColorRight = newValue)
+                .build());
+
+        category.addEntry(entryBuilder.startIntField(option("alphaRight", suffix), targetConfig.justAlphaRight)
+                .setDefaultValue(255)
+                .setTooltip(tooltip("alphaRight", suffix))
+                .setSaveConsumer(newValue -> targetConfig.justAlphaRight = newValue)
+                .build());
+
+        category.addEntry(entryBuilder.startStrField(option("prideTrail", suffix), targetConfig.prideTrail)
+                .setDefaultValue(defaultConfig.prideTrail)
+                .setTooltip(tooltip("prideTrail", suffix))
+                .setSaveConsumer(newValue -> targetConfig.prideTrail = newValue)
+                .build());
+
+        category.addEntry(entryBuilder.startStrField(option("prideTrailRight", suffix), targetConfig.prideTrailRight)
+                .setDefaultValue(defaultConfig.prideTrailRight)
+                .setTooltip(tooltip("prideTrailRight", suffix))
+                .setSaveConsumer(newValue -> targetConfig.prideTrailRight = newValue)
+                .build());
+
+        category.addEntry(entryBuilder.startDoubleField(option("randomWidthVariation", suffix), targetConfig.randomWidthVariation)
+                .setDefaultValue(defaultConfig.randomWidthVariation)
+                .setTooltip(tooltip("randomWidthVariation", suffix))
+                .setSaveConsumer(newValue -> targetConfig.randomWidthVariation = newValue)
+                .build());
+
+        category.addEntry(entryBuilder.startBooleanToggle(option("fadeStart", suffix), targetConfig.fadeStart)
+                .setDefaultValue(defaultConfig.fadeStart)
+                .setTooltip(tooltip("fadeStart", suffix))
+                .setSaveConsumer(newValue -> targetConfig.fadeStart = newValue)
+                .build());
+
+        category.addEntry(entryBuilder.startDoubleField(option("fadeStartDistance", suffix), targetConfig.fadeStartDistance)
+                .setDefaultValue(defaultConfig.fadeStartDistance)
+                .setTooltip(tooltip("fadeStartDistance", suffix))
+                .setSaveConsumer(newValue -> targetConfig.fadeStartDistance = newValue)
+                .build());
+
+        category.addEntry(entryBuilder.startBooleanToggle(option("endDistanceFade", suffix), targetConfig.endDistanceFade)
+                .setDefaultValue(defaultConfig.endDistanceFade)
+                .setTooltip(tooltip("endDistanceFade", suffix))
+                .setSaveConsumer(newValue -> targetConfig.endDistanceFade = newValue)
+                .build());
+
+        category.addEntry(entryBuilder.startDoubleField(option("endDistanceFadeAmount", suffix), targetConfig.endDistanceFadeAmount)
+                .setDefaultValue(defaultConfig.endDistanceFadeAmount)
+                .setTooltip(tooltip("endDistanceFadeAmount", suffix))
+                .setSaveConsumer(newValue -> targetConfig.endDistanceFadeAmount = newValue)
+                .build());
+
+        category.addEntry(entryBuilder.startBooleanToggle(option("fadeEnd", suffix), targetConfig.fadeEnd)
+                .setDefaultValue(defaultConfig.fadeEnd)
+                .setTooltip(tooltip("fadeEnd", suffix))
+                .setSaveConsumer(newValue -> targetConfig.fadeEnd = newValue)
+                .build());
+
+        category.addEntry(entryBuilder.startBooleanToggle(option("wireframeTrails", suffix), targetConfig.wireframeTrails)
+                .setDefaultValue(defaultConfig.wireframeTrails)
+                .setTooltip(tooltip("wireframeTrails", suffix))
+                .setSaveConsumer(newValue -> targetConfig.wireframeTrails = newValue)
+                .build());
+
+        category.addEntry(entryBuilder.startBooleanToggle(option("increaseWidthOverTime", suffix), targetConfig.increaseWidthOverTime)
+                .setDefaultValue(defaultConfig.increaseWidthOverTime)
+                .setTooltip(tooltip("increaseWidthOverTime", suffix))
+                .setSaveConsumer(newValue -> targetConfig.increaseWidthOverTime = newValue)
+                .build());
+
+        category.addEntry(entryBuilder.startDoubleField(option("startingWidthMultiplier", suffix), targetConfig.startingWidthMultiplier)
+                .setDefaultValue(defaultConfig.startingWidthMultiplier)
+                .setTooltip(tooltip("startingWidthMultiplier", suffix))
+                .setSaveConsumer(newValue -> targetConfig.startingWidthMultiplier = newValue)
+                .build());
+
+        category.addEntry(entryBuilder.startDoubleField(option("endingWidthMultiplier", suffix), targetConfig.endingWidthMultiplier)
+                .setDefaultValue(defaultConfig.endingWidthMultiplier)
+                .setTooltip(tooltip("endingWidthMultiplier", suffix))
+                .setSaveConsumer(newValue -> targetConfig.endingWidthMultiplier = newValue)
+                .build());
+
+        category.addEntry(entryBuilder.startDoubleField(option("distanceTillTrailStart", suffix), targetConfig.distanceTillTrailStart)
+                .setDefaultValue(defaultConfig.distanceTillTrailStart)
+                .setTooltip(tooltip("distanceTillTrailStart", suffix))
+                .setSaveConsumer(newValue -> targetConfig.distanceTillTrailStart = newValue)
+                .build());
+
+        category.addEntry(entryBuilder.startBooleanToggle(option("speedBasedAlpha", suffix), targetConfig.speedBasedAlpha)
+                .setDefaultValue(defaultConfig.speedBasedAlpha)
+                .setTooltip(tooltip("speedBasedAlpha", suffix))
+                .setSaveConsumer(newValue -> targetConfig.speedBasedAlpha = newValue)
+                .build());
+
+        category.addEntry(entryBuilder.startDoubleField(option("minAlphaSpeed", suffix), targetConfig.minAlphaSpeed)
+                .setDefaultValue(defaultConfig.minAlphaSpeed)
+                .setTooltip(tooltip("minAlphaSpeed", suffix))
+                .setSaveConsumer(newValue -> targetConfig.minAlphaSpeed = newValue)
+                .build());
+
+        category.addEntry(entryBuilder.startDoubleField(option("maxAlphaSpeed", suffix), targetConfig.maxAlphaSpeed)
+                .setDefaultValue(defaultConfig.maxAlphaSpeed)
+                .setTooltip(tooltip("maxAlphaSpeed", suffix))
+                .setSaveConsumer(newValue -> targetConfig.maxAlphaSpeed = newValue)
+                .build());
+
+        category.addEntry(entryBuilder.startBooleanToggle(option("speedBasedWidth", suffix), targetConfig.speedBasedWidth)
+                .setDefaultValue(defaultConfig.speedBasedWidth)
+                .setTooltip(tooltip("speedBasedWidth", suffix))
+                .setSaveConsumer(newValue -> targetConfig.speedBasedWidth = newValue)
+                .build());
+
+        category.addEntry(entryBuilder.startDoubleField(option("minWidthSpeed", suffix), targetConfig.minWidthSpeed)
+                .setDefaultValue(defaultConfig.minWidthSpeed)
+                .setTooltip(tooltip("minWidthSpeed", suffix))
+                .setSaveConsumer(newValue -> targetConfig.minWidthSpeed = newValue)
+                .build());
+
+        category.addEntry(entryBuilder.startDoubleField(option("maxWidthSpeed", suffix), targetConfig.maxWidthSpeed)
+                .setDefaultValue(defaultConfig.maxWidthSpeed)
+                .setTooltip(tooltip("maxWidthSpeed", suffix))
+                .setSaveConsumer(newValue -> targetConfig.maxWidthSpeed = newValue)
+                .build());
+    }
+
+    private static Component option(String baseKey, String suffix) {
+        return Component.translatable("text.elytratrails.option." + baseKey + suffix);
+    }
+
+    private static Component tooltip(String baseKey, String suffix) {
+        return Component.translatable("text.elytratrails.option." + baseKey + suffix + ".@Tooltip");
     }
 }
