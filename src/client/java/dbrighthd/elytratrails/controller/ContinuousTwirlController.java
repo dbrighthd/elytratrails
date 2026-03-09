@@ -46,6 +46,7 @@ public final class ContinuousTwirlController {
 
     private static boolean reverseQueued = false;
     private static int reverseQueuedDir = 0;
+    private static EaseType easeType;
 
     public static void setDurations()
     {
@@ -53,18 +54,8 @@ public final class ContinuousTwirlController {
         HALF_DURATION_S = DURATION_S * 0.5;
         OMEGA_RAD_S = (Math.PI * Math.PI) / DURATION_S;
         TURN360_DURATION_S = Math.TAU / OMEGA_RAD_S;
-        if(getConfig().clientPlayerConfig.easeType == EasingUtil.EaseType.Back)
-        {
-            HALF_DURATION_S *= 2.993;
-        }
-        if(getConfig().clientPlayerConfig.easeType == EaseType.Cubic)
-        {
-            HALF_DURATION_S *= 1.99;
-        }
-        if(getConfig().clientPlayerConfig.easeType == EasingUtil.EaseType.None)
-        {
-            HALF_DURATION_S /= 1.5;
-        }
+        HALF_DURATION_S *= getEaseMult(getConfig().clientPlayerConfig.easeType);
+        easeType = getConfig().clientPlayerConfig.easeType;
     }
 
     public static void tickContinuousTwirlKey(boolean isDown, int desiredMode) {
@@ -85,7 +76,7 @@ public final class ContinuousTwirlController {
                 && keyDown
                 && pendingMode != 0
                 && pendingMode == -currentDir
-                && getConfig().clientPlayerConfig.easeType == EasingUtil.EaseType.Back) {
+                && easeType == EasingUtil.EaseType.Back) {
 
             long now = TimeUtil.currentNanos();
             double elapsedS = (now - phaseStartNanos) / 1_000_000_000.0;
@@ -155,17 +146,21 @@ public final class ContinuousTwirlController {
 
     private static double rollFirst180(double elapsedS) {
         double u = Mth.clamp(elapsedS / HALF_DURATION_S, 0.0, 1.0);
-        return HALF_TURN * easeIn(u, getConfig().clientPlayerConfig.easeType);
+        return HALF_TURN * easeIn(u, easeType);
     }
 
     private static double rollConstant360(double elapsedS) {
         double a = OMEGA_RAD_S * elapsedS;
+        if(easeType == EaseType.Random)
+        {
+            return EasingUtil.easeRandom(elapsedS)*Math.TAU;
+        }
         return Mth.clamp(a, 0.0, Math.TAU);
     }
 
     private static double rollLast180(double elapsedS) {
         double u = Mth.clamp(elapsedS / HALF_DURATION_S, 0.0, 1.0);
-        return HALF_TURN * easeOut(u, getConfig().clientPlayerConfig.easeType);
+        return HALF_TURN * easeOut(u, easeType);
     }
 
     private static void sendEndOnce() {
@@ -230,7 +225,8 @@ public final class ContinuousTwirlController {
                 case EASE_OUT_180: {
                     double u = Mth.clamp(elapsedS / HALF_DURATION_S, 0.0, 1.0);
 
-                    if (getConfig().clientPlayerConfig.easeType == EasingUtil.EaseType.Back
+                    if (
+                            easeType == EasingUtil.EaseType.Back
                             && reverseQueued
                             && reverseQueuedDir == -currentDir) {
 

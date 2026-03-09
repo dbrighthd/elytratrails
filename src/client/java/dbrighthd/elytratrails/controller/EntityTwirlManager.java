@@ -11,6 +11,7 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.util.Mth;
 
 import static dbrighthd.elytratrails.ElytraTrailsClient.getConfig;
+import static dbrighthd.elytratrails.util.EasingUtil.getEaseMult;
 
 /**
  * this class is for handling twirling from *OTHER PLAYERS* on a server.
@@ -189,17 +190,8 @@ public final class EntityTwirlManager {
         double TURN360_DURATION_S = Math.TAU / OMEGA_RAD_S;
         EasingUtil.EaseType easeType = playerConfig.easeType();
 
-        if (playerConfig.easeType() == EasingUtil.EaseType.Back) {
-            DURATION_S *=2.993;
-            HALF_DURATION_S *= 2.993;
-        }
-        if (playerConfig.easeType() == EasingUtil.EaseType.Cubic) {
-            DURATION_S *=1.99;
-            HALF_DURATION_S *= 1.99;
-        }
-        if (playerConfig.easeType() == EasingUtil.EaseType.None) {
-            HALF_DURATION_S /= 1.5;
-        }
+        DURATION_S *= getEaseMult(easeType);
+        HALF_DURATION_S *= getEaseMult(easeType);
 
         return new TwirlInfo(DURATION_S, HALF_DURATION_S, OMEGA_RAD_S, TURN360_DURATION_S, easeType);
     }
@@ -464,6 +456,10 @@ public final class EntityTwirlManager {
                 yield data.baseAngleRad + data.dir * roll;
             }
             case CONSTANT_360 -> {
+                if(info.easeType == EasingUtil.EaseType.Random)
+                {
+                    yield EasingUtil.easeRandom(elapsedS)*Math.TAU;
+                }
                 double a = Mth.clamp(info.omega_rad_s() * elapsedS, 0.0, Math.TAU);
                 yield data.baseAngleRad + data.dir * a;
             }

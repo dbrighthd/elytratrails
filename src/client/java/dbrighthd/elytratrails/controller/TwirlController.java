@@ -6,6 +6,7 @@ import net.minecraft.util.Mth;
 
 import static dbrighthd.elytratrails.ElytraTrailsClient.getConfig;
 import static dbrighthd.elytratrails.util.EasingUtil.easeBoth;
+import static dbrighthd.elytratrails.util.EasingUtil.getEaseMult;
 
 /**
  * This class is for the single twirls
@@ -16,7 +17,7 @@ public final class TwirlController {
     private static double DURATION_S;
     private static boolean keyDown = false;
     private static int pendingMode = 1;
-
+    private static EasingUtil.EaseType easeType;
     private static int currentDir = 1;
     private static int nextAltDir = 1;
 
@@ -50,7 +51,7 @@ public final class TwirlController {
                 && keyDown
                 && queuedDir != 0
                 && queuedDir == -currentDir
-                && getConfig().clientPlayerConfig.easeType == EasingUtil.EaseType.Back) {
+                && easeType == EasingUtil.EaseType.Back) {
 
             long now = TimeUtil.currentNanos();
             double t = (now - startNanos) / (DURATION_S * 1_000_000_000.0);
@@ -127,7 +128,7 @@ public final class TwirlController {
         long now = TimeUtil.currentNanos();
         double t = (now - startNanos) / (DURATION_S * 1_000_000_000.0);
 
-        if (getConfig().clientPlayerConfig.easeType == EasingUtil.EaseType.Back
+        if (easeType == EasingUtil.EaseType.Back
                 && reverseQueued
                 && reverseQueuedDir == -currentDir) {
             double clampedT = Mth.clamp(t, 0.0, 1.0);
@@ -151,21 +152,15 @@ public final class TwirlController {
         }
 
         t = Mth.clamp(t, 0.0, 1.0);
-        double eased = easeBoth(t, getConfig().clientPlayerConfig.easeType);
+        double eased = easeBoth(t, easeType);
         return (float) (baseAngleRad + currentDir * eased * Math.TAU);
     }
 
     public static void setDurations()
     {
+        easeType = getConfig().clientPlayerConfig.easeType;
         DURATION_S = Math.max(getConfig().clientPlayerConfig.twirlTime,0.0001);
-        if(getConfig().clientPlayerConfig.easeType == EasingUtil.EaseType.Back)
-        {
-            DURATION_S *= 2.993;
-        }
-        if(getConfig().clientPlayerConfig.easeType == EasingUtil.EaseType.Cubic)
-        {
-            DURATION_S *= 1.99;
-        }
+        DURATION_S *= getEaseMult(easeType);
     }
 
     public static boolean isActive() {
