@@ -11,6 +11,7 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.util.Mth;
 
 import static dbrighthd.elytratrails.ElytraTrailsClient.getConfig;
+import static dbrighthd.elytratrails.util.EasingUtil.easeRandom;
 import static dbrighthd.elytratrails.util.EasingUtil.getEaseMult;
 
 /**
@@ -290,7 +291,11 @@ public final class EntityTwirlManager {
                             return (float) data.baseAngleRad;
                         }
                     }
-
+                    if(info.easeType == EasingUtil.EaseType.Random)
+                    {
+                        double a = easeRandom()*Math.TAU;
+                        return (float) (data.baseAngleRad + data.dir * a);
+                    }
                     double a = Mth.clamp(info.omega_rad_s() * elapsedS, 0.0, Math.TAU);
                     return (float) (data.baseAngleRad + data.dir * a);
                 }
