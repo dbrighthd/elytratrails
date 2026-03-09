@@ -355,9 +355,9 @@ public class TrailRenderer {
         return (float) Math.clamp(((t - a) / (b - a)),0,1);
     }
     private float computeWidthScaling(float distFromStart, float distToEnd, ResolvedTrailSettings config) {
-        if(distFromStart < 0)
+        if(distFromStart <= 0)
         {
-            return 0;
+            return 0.0f;
         }
         float endRamp = (float) config.endRampDistance();
         float startRamp = (float) config.startRampDistance();
@@ -367,8 +367,7 @@ public class TrailRenderer {
         }
         else
         {
-            if (distFromStart <= 0f) up = 0f;
-            else if (distFromStart >= startRamp) up = 1f;
+            if (distFromStart >= startRamp) up = 1f;
             else up = (float) Math.sin((distFromStart / startRamp) * (Math.PI / 2.0));
         }
         float down;
