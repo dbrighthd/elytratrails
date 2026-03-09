@@ -40,7 +40,7 @@ public class EasingUtil {
         }
         return (1.0 - Math.cos((Math.PI * 0.5) * t));
     }
-    public static double easeRandom(double t)
+    public static double easeRandom()
     {
         return random.nextDouble();
     }
@@ -83,7 +83,6 @@ public class EasingUtil {
     }
     public static double easeBothElastic(double t)
     {
-        double p = 0.3;
         double p1 = 0.45;
         if(t < 0)
         {
@@ -92,16 +91,16 @@ public class EasingUtil {
         if( t >= 1){
             return 1;
         }
+        double sin = Math.sin((2 * Math.PI * (2 * t - 1.1125) / p1));
         if(t <= 0.5)
         {
-            return -0.5*Math.pow(2,(20*t-10))*Math.sin((2*Math.PI*(2*t-1.1125)/p1));
+            return -0.5*Math.pow(2,(20*t-10))* sin;
         }
-        return 0.5*Math.pow(2,(-20*t+10))*Math.sin((2*Math.PI*(2*t-1.1125)/p1));
+        return 0.5*Math.pow(2,(-20*t+10))* sin;
     }
     public static double easeInElastic(double t)
     {
         double p = 0.45;
-        double p1 = 0.45;
         if(t < 0)
         {
             return 0;
@@ -114,7 +113,6 @@ public class EasingUtil {
     public static double easeOutElastic(double t)
     {
         double p = 0.45;
-        double p1 = 0.45;
         if(t < 0)
         {
             return 0;
@@ -214,7 +212,7 @@ public class EasingUtil {
             case Cubic -> {return easeInCubic(t);}
             case Expo -> {return easeInExpo(t);}
             case Elastic -> {return easeInElastic(t);}
-            case Random -> {return easeRandom(t);}
+            case Random -> {return easeRandom();}
             default -> {return easeInSin(t);}
         }
     }
@@ -227,7 +225,7 @@ public class EasingUtil {
             case Cubic -> {return easeOutCubic(t);}
             case Expo -> {return easeOutExpo(t);}
             case Elastic -> {return easeOutElastic(t);}
-            case Random -> {return easeRandom(t);}
+            case Random -> {return easeRandom();}
             default -> {return easeOutSin(t);}
         }
     }
@@ -240,7 +238,7 @@ public class EasingUtil {
             case Cubic -> {return easeBothCubic(t);}
             case Expo -> {return easeBothExpo(t);}
             case Elastic -> {return easeBothElastic(t);}
-            case Random -> {return easeRandom(t);}
+            case Random -> {return easeRandom();}
             default -> {return easeBothSin(t);}
         }
     }

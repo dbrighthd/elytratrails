@@ -153,7 +153,7 @@ public final class ContinuousTwirlController {
         double a = OMEGA_RAD_S * elapsedS;
         if(easeType == EaseType.Random)
         {
-            return EasingUtil.easeRandom(elapsedS)*Math.TAU;
+            return EasingUtil.easeRandom()*Math.TAU;
         }
         return Mth.clamp(a, 0.0, Math.TAU);
     }

@@ -458,7 +458,7 @@ public final class EntityTwirlManager {
             case CONSTANT_360 -> {
                 if(info.easeType == EasingUtil.EaseType.Random)
                 {
-                    yield EasingUtil.easeRandom(elapsedS)*Math.TAU;
+                    yield EasingUtil.easeRandom()*Math.TAU;
                 }
                 double a = Mth.clamp(info.omega_rad_s() * elapsedS, 0.0, Math.TAU);
                 yield data.baseAngleRad + data.dir * a;
