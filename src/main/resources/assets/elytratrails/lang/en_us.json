@@ -263,6 +263,8 @@
   "text.elytratrails.option.wingtipHorizontalPositionOthersDefault": "Other's Horizontal Wingtip Position",
   "text.elytratrails.option.wingtipHorizontalPositionOthersDefault.@Tooltip" : "Default Horizontal Wingtip Position scale, 1 is end of elytra 0 is base, 0.5 is middle.",
 
+  "text.elytratrails.option.inputBuffer" : "Use Input Buffer",
+  "text.elytratrails.option.inputBuffer.@Tooltip" : "More lenient with button presses for twirls. If laggy then turn it off.",
 
   "text.elytratrails.option.shaderOverride": "Shader Forces Glowing",
   "text.elytratrails.option.shaderOverride.@Tooltip" : "Shaders on makes certain translucent trails glow, to prevent weird visuals",

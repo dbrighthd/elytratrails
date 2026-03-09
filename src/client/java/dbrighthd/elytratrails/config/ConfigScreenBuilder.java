@@ -25,6 +25,7 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 import static dbrighthd.elytratrails.ElytraTrailsClient.getConfig;
+import static dbrighthd.elytratrails.ElytraTrailsClient.refreshConfig;
 import static dbrighthd.elytratrails.config.pack.TrailPackConfigManager.*;
 import static dbrighthd.elytratrails.network.ClientPlayerConfigStore.*;
 
@@ -173,6 +174,12 @@ public class ConfigScreenBuilder {
                 .setTooltip(Component.translatable("text.elytratrails.option.twirlTime.@Tooltip"))
                 .setSaveConsumer(newValue -> config.clientPlayerConfig.twirlTime = newValue)
                 .build());
+        twirling.addEntry(entryBuilder.startBooleanToggle(Component.translatable("text.elytratrails.option.inputBuffer"), config.inputBuffer)
+                .setDefaultValue(true)
+                .setTooltip(Component.translatable("text.elytratrails.option.inputBuffer.@Tooltip"))
+                .setSaveConsumer(newValue -> config.inputBuffer = newValue)
+                .build());
+
         twirling.addEntry(entryBuilder.startEnumSelector(
                         Component.translatable("text.elytratrails.option.easeType"),
                         EasingUtil.EaseType.class,
@@ -181,6 +188,7 @@ public class ConfigScreenBuilder {
                 .setTooltip(Component.translatable("text.elytratrails.option.easeType.@Tooltip"))
                 .setSaveConsumer(newValue -> config.clientPlayerConfig.easeType = newValue)
                 .build());
+
         keybinds.addEntry(entryBuilder.startTextDescription(
                         Component.translatable("text.elytratrails.category.keybinds.desc"))
                 .build());
@@ -425,6 +433,7 @@ public class ConfigScreenBuilder {
             encodeConfigColors(config.otherPlayerConfig);
             exportPreset(config);
             applyPresetsToConfig(config);
+            refreshConfig();
             TwirlController.setDurations();
             ContinuousTwirlController.setDurations();
             AutoConfig.getConfigHolder(ModConfig.class).save();

@@ -31,10 +31,12 @@ import static dbrighthd.elytratrails.network.ClientPlayerConfigStore.refreshLoca
 
 @SuppressWarnings("deprecation")
 public class ElytraTrailsClient implements ClientModInitializer {
+	private static ModConfig modConfig;
 	@Override
 	public void onInitializeClient()
 	{
 		AutoConfig.register(ModConfig.class, GsonConfigSerializer::new);
+		refreshConfig();
 		TimeUtil.init();
 		Compatibility.init();
 		ElytraTrailsKeybind.init();
@@ -85,11 +87,16 @@ public class ElytraTrailsClient implements ClientModInitializer {
 
 	public static ModConfig getConfig()
 	{
-		return AutoConfig.getConfigHolder(ModConfig.class).getConfig();
+		return modConfig;
 	}
 
 	public static void setConfig(ModConfig modConfig)
 	{
 		AutoConfig.getConfigHolder(ModConfig.class).setConfig(modConfig);
+	}
+
+	public static void refreshConfig()
+	{
+		modConfig = AutoConfig.getConfigHolder(ModConfig.class).getConfig();
 	}
 }

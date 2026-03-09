@@ -27,7 +27,7 @@ public class ModConfig implements ConfigData {
     public boolean tryNearTrailFade = false;
     public boolean alwaysSnapTrail = true;
     public boolean logTrails = false;
-
+    public boolean inputBuffer = true;
 
     //fresh took too long to update and people are complaining to me
     public boolean hardCodedFreshAnimationsPlayerWingtips = false;
