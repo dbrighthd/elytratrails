@@ -30,6 +30,7 @@ public class IrisCompat {
         IrisApi.getInstance().assignPipeline(TrailPipelines.PIPELINE_ENTITY_TRANSLUCENT_EMISSIVE_UNLIT, IrisProgram.EMISSIVE_ENTITIES);
         IrisApi.getInstance().assignPipeline(TrailPipelines.PIPELINE_ENTITY_CUTOUT_EMISSIVE_UNLIT_WIREFRAME, IrisProgram.EMISSIVE_ENTITIES);
         IrisApi.getInstance().assignPipeline(TrailPipelines.PIPELINE_ENTITY_TRANSLUCENT_EMISSIVE_UNLIT_WIREFRAME, IrisProgram.EMISSIVE_ENTITIES);
+        IrisApi.getInstance().assignPipeline(TrailPipelines.PIPELINE_ENTITY_CUTOUT_LIT, IrisProgram.ENTITIES);
     }
 
     public static boolean isShadowPassing()

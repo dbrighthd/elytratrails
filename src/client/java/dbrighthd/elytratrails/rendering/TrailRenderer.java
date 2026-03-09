@@ -178,7 +178,15 @@ public class TrailRenderer {
             }
             else
             {
-                return TrailPipelines.entityTranslucentCull(trail.texture());
+                if(trailSettings.translucentTrails())
+                {
+                    return TrailPipelines.entityTranslucentCull(trail.texture());
+                }
+                else
+                {
+                    return TrailPipelines.entityCutoutLit(trail.texture());
+
+                }
             }
         }
     }
