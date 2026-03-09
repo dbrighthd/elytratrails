@@ -6,7 +6,7 @@
   "enableRandomWidth": false,
   "speedDependentTrail": true,
   "fadeFirstPersonTrail": true,
-  "width": 0.1,
+  "maxWidth": 0.1,
   "firstPersonFadeTime": 0.3,
   "trailLifetime": 0.5,
   "maxSamplePerSecond": 60,
@@ -20,5 +20,14 @@
   "fadeStartDistance": 4.0,
   "fadeEnd": false,
   "endDistanceFade": true,
-  "endDistanceFadeAmount": 1
+  "endDistanceFadeAmount": 1,
+  "speedBasedAlpha": false,
+  "minAlphaSpeed": 0.75,
+  "maxAlphaSpeed": 2.0,
+  "speedBasedWidth": false,
+  "minWidthSpeed": 0.75,
+  "maxWidthSpeed": 2.0,
+  "trailMovesWithAngleOfAttack": true,
+  "useColorBoth": true,
+  "colorRight": -1
 }
