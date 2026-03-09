@@ -52,6 +52,7 @@ public class TrailRenderer {
     private static final float CAMERA_FADE_ZERO = 0.5f;
     private static final float CAMERA_FADE_FULL = 0.7f;
     private static float endCorrection = 0f;
+    private static boolean useLightMap;
     private Vec3 cameraPosition;
     long currentTime;
     public TrailRenderer(@NotNull TrailManager manager) {
@@ -93,6 +94,7 @@ public class TrailRenderer {
             final Trail.Point effectiveLastPoint = snappedLastPoint != null ? snappedLastPoint : points.get(last);
 
             ctx.commandQueue().order(1).submitCustomGeometry(stack, renderType, (pose, consumer) -> {
+                useLightMap = renderType == TrailPipelines.entityTranslucentCull(trail.texture()) || renderType == TrailPipelines.entityTranslucentCullWireFrame(trail.texture())  || renderType == TrailPipelines.entityCutoutLit(trail.texture());
                 totalTrailLength = 0f;
                 currentTime = TimeUtil.currentMillis();
                 for (int i = 0; i < last; i++) {
@@ -330,7 +332,7 @@ public class TrailRenderer {
                 v2 += removeDist;
                 v1 /=(float) trailSettings.maxWidth();
                 v2 /= (float) trailSettings.maxWidth();
-                quadBetweenPoints(pose, consumer, startPos, endPos, sideA, sideB, halfWidthStart, halfWidthEnd, v1, v2, alphaStart, alphaEnd, trail.isLeftWing(), color,trailSettings);
+                quadBetweenPoints(pose, consumer, startPos, endPos, sideA, sideB, halfWidthStart, halfWidthEnd, v1, v2, alphaStart, alphaEnd, trail.isLeftWing(), color);
             }
             this.accumDist += segmentLength;
         }
@@ -451,8 +453,8 @@ public class TrailRenderer {
         else return 1.0f - (age / (float) maxLifetime);
     }
 
-    private int computeLightTexture(Vec3 pos, ResolvedTrailSettings trailSettings) { // note: I really hate this method, but I don't feel like managing the state that's required to do this in a better way
-        if (minecraft.level == null || trailSettings.glowingTrails()) return LightTexture.FULL_BRIGHT;
+    private int computeLightTexture(Vec3 pos) { // note: I really hate this method, but I don't feel like managing the state that's required to do this in a better way
+        if (minecraft.level == null) return LightTexture.FULL_BRIGHT;
 
         BlockPos blockPos = BlockPos.containing(pos);
         return LightTexture.pack(minecraft.level.getBrightness(LightLayer.BLOCK, blockPos), minecraft.level.getBrightness(LightLayer.SKY, blockPos));
@@ -461,7 +463,7 @@ public class TrailRenderer {
     private void quadBetweenPoints(
             PoseStack.Pose pose, VertexConsumer consumer,
             Vec3 a, Vec3 b, Vec3 sideA, Vec3 sideB,
-            float halfWidthStart, float halfWidthEnd, float v1, float v2, float alphaStart, float alphaEnd, boolean flipUv, int color, ResolvedTrailSettings trailSettings
+            float halfWidthStart, float halfWidthEnd, float v1, float v2, float alphaStart, float alphaEnd, boolean flipUv, int color
     ) {
         Vector3f p1 = a.add(sideA.scale(halfWidthStart)).toVector3f();
         Vector3f p2 = b.add(sideB.scale(halfWidthEnd)).toVector3f();
@@ -469,8 +471,8 @@ public class TrailRenderer {
         Vector3f p4 = a.subtract(sideA.scale(halfWidthStart)).toVector3f();
 
         int overlay = OverlayTexture.NO_OVERLAY;
-        int lightStart = computeLightTexture(a,trailSettings);
-        int lightEnd = computeLightTexture(b,trailSettings);
+        int lightStart = useLightMap ? computeLightTexture(a) : LightTexture.FULL_BRIGHT;
+        int lightEnd = useLightMap ? computeLightTexture(b) : LightTexture.FULL_BRIGHT;
 
         int colorStart = multiplyAlpha(color, alphaStart);
         int colorEnd = multiplyAlpha(color, alphaEnd);
