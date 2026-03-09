@@ -25,8 +25,8 @@ public class ModelTransformationUtil {
         float wingRollAbs = Math.abs(wingPart.zRot);
 
         float fullyClosed = 0.28766277f;
-        float fullyOpen = 1.5707302f;
-
+        //float fullyOpen = 1.5707302f;
+        float fullyOpen = 1.57f;
         float openness = (wingRollAbs - fullyClosed) / (fullyOpen - fullyClosed);
         return Mth.clamp(openness, 0.0f, 1.0f);
     }
