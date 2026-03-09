@@ -72,7 +72,7 @@
   "text.elytratrails.option.trailMovesWithElytraAngle.@Tooltip": "Whether the calculated wingtip should change based on the elytra's spread",
 
   "text.elytratrails.option.trailMovesWithAngleOfAttack" : "Wingtip AOA Correction",
-  "text.elytratrails.option.trailMovesWithAngleOfAttack.@Tooltip" : "If on, try to position the wingtip to be accurate based on Angle of Attack. if off, trail will always appear from midpoint vertically",
+  "text.elytratrails.option.trailMovesWithAngleOfAttack.@Tooltip" : "If on, try to position the wingtip to be accurate based on Angle of Attack. if off, trail will appear from \"Vertical Wingtip Position\" defined below",
 
   "text.elytratrails.option.enableParticles": "Enable Particles During Flight",
   "text.elytratrails.option.enableParticles.@Tooltip": "Spawns particles around the player during flight, to show speed",
