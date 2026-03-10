@@ -16,13 +16,8 @@ public record Trail(Identifier texture, List<Point> points, ResolvedTrailSetting
 
     public static Trail fromPlayerConfig(int playerId, Emitter emitter, int index, long trailId) {
         PlayerConfig config = ClientPlayerConfigStore.getOrDefault(playerId);
-        ResolvedTrailSettings resolvedTrailSettings =  TrailPackConfigManager.resolve(emitter.modelName(), emitter.boneName(), config);
-
+        ResolvedTrailSettings resolvedTrailSettings =  TrailPackConfigManager.resolve(emitter.modelName(), emitter.boneName(), config, emitter.isLeftWing());
         Identifier texture = TrailTextureRegistry.resolveTextureOrNull(resolvedTrailSettings.prideTrail());
-        if(!emitter.isLeftWing() && (!(resolvedTrailSettings.prideTrailRight() == null || resolvedTrailSettings.prideTrailRight().isEmpty())))
-        {
-            texture = TrailTextureRegistry.resolveTextureOrNull(resolvedTrailSettings.prideTrailRight());
-        }
         if (texture == null) texture = TrailRenderer.DEFAULT_TEXTURE;
         return new Trail(texture, new ArrayList<>(), resolvedTrailSettings, emitter.isLeftWing(), playerId,index, trailId);
     }

@@ -43,7 +43,9 @@ public record PlayerConfig(
         boolean useColorBoth,
         int colorRight,
         double wingtipVerticalPosition,
-        double wingtipHorizontalPosition
+        double wingtipHorizontalPosition,
+        double wingtipDepthPosition,
+        double distanceTillTrailEnd
 ) {
     public static final int WIRE_VERSION = 1; // bump when you change meaning, not when you add fields
 
@@ -91,6 +93,8 @@ public record PlayerConfig(
         tag.putInt("colorRight", colorRight);
         tag.putDouble("wingtipVerticalPosition",wingtipVerticalPosition);
         tag.putDouble("wingtipHorizontalPosition",wingtipHorizontalPosition);
+        tag.putDouble("wingtipDepthPosition",wingtipDepthPosition);
+        tag.putDouble("distanceTillTrailEnd",distanceTillTrailEnd);
 
         return tag;
     }

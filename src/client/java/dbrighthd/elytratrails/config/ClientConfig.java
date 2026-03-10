@@ -49,7 +49,8 @@ public class ClientConfig {
     public int colorRight;
     public double wingtipVerticalPosition;
     public double wingtipHorizontalPosition;
-
+    public double wingtipDepthPosition;
+    public double distanceTillTrailEnd;
 
     public transient int justColor;
     public transient int justAlpha;
@@ -94,7 +95,9 @@ public class ClientConfig {
             boolean useColorBoth,
             int colorRight,
             double wingtipVerticalPosition,
-            double wingtipHorizontalPosition
+            double wingtipHorizontalPosition,
+            double wingtipDepthPosition,
+            double distanceTillTrailEnd
     ) {
         this.enableTrail = enableTrail;
         this.enableRandomWidth = enableRandomWidth;
@@ -135,6 +138,8 @@ public class ClientConfig {
         this.colorRight = colorRight;
         this.wingtipVerticalPosition = wingtipVerticalPosition;
         this.wingtipHorizontalPosition = wingtipHorizontalPosition;
+        this.wingtipDepthPosition = wingtipDepthPosition;
+        this.distanceTillTrailEnd = distanceTillTrailEnd;
     }
 
     public ClientConfig() {
@@ -177,7 +182,9 @@ public class ClientConfig {
                 true,
                 0xFFFFFFFF,
                 0.5,
-                1.0
+                1.0,
+                1.3125,
+                0.0
         );
     }
 
@@ -226,7 +233,9 @@ public class ClientConfig {
                 trailMovesWithAngleOfAttack,
                 useColorBoth,
                 colorRight,wingtipVerticalPosition,
-                wingtipHorizontalPosition);
+                wingtipHorizontalPosition,
+                wingtipDepthPosition,
+                distanceTillTrailEnd);
     }
     public PlayerConfig getHiddenPlayerConfig()
     {
@@ -270,6 +279,8 @@ public class ClientConfig {
                 useColorBoth,
                 colorRight,
                 wingtipVerticalPosition,
-                wingtipHorizontalPosition);
+                wingtipHorizontalPosition,
+                wingtipDepthPosition,
+                distanceTillTrailEnd);
     }
 }

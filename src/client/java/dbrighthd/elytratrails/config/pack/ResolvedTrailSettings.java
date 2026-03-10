@@ -1,8 +1,17 @@
 package dbrighthd.elytratrails.config.pack;
 
 import dbrighthd.elytratrails.network.ClientPlayerConfigStore;
+import dbrighthd.elytratrails.network.PlayerConfig;
+import dbrighthd.elytratrails.rendering.Emitter;
+import dbrighthd.elytratrails.rendering.Trail;
+import dbrighthd.elytratrails.rendering.TrailRenderer;
+import dbrighthd.elytratrails.rendering.TrailTextureRegistry;
+import net.minecraft.resources.Identifier;
+
+import java.util.ArrayList;
 
 import static dbrighthd.elytratrails.config.pack.TrailPackConfigManager.resolveFromPlayerConfig;
+import static dbrighthd.elytratrails.config.pack.TrailPackConfigManager.resolveTrailFromPlayerConfig;
 
 /**
  * ResolvedTrailSettings objects are the "final" state of a trail's settings, where nothing is ambiguous, and it's ready to render
@@ -26,8 +35,6 @@ public record ResolvedTrailSettings(
         boolean translucentTrails,
         boolean wireframeTrails,
         boolean alwaysShowTrailDuringTwirl,
-        String prideTrailRight,
-        double twirlTimeOthersDefault,
         boolean increaseWidthOverTime,
         double startingWidthMultiplier,
         double endingWidthMultiplier,
@@ -39,12 +46,10 @@ public record ResolvedTrailSettings(
         double maxAlphaSpeed,
         boolean speedBasedWidth,
         double minWidthSpeed,
-        double maxWidthSpeed,
-        boolean trailMovesWithAngleOfAttack,
-        boolean useColorBoth,
-        int colorRight
+        double maxWidthSpeed
 ) {
-    public static ResolvedTrailSettings defaults() {
-        return resolveFromPlayerConfig(ClientPlayerConfigStore.getLocalPlayerConfig());
+    public static ResolvedTrailSettings defaults(boolean isLeftWing) {
+        return resolveTrailFromPlayerConfig(ClientPlayerConfigStore.getLocalPlayerConfig(),isLeftWing);
     }
 }
+

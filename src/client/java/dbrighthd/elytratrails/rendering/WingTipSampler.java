@@ -41,6 +41,7 @@ import org.slf4j.LoggerFactory;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.IdentityHashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -50,11 +51,12 @@ import static dbrighthd.elytratrails.util.ModelTransformationUtil.getSignedElytr
 public class WingTipSampler {
     private final SubmitNodeStorage submitStorage = new SubmitNodeStorage();
     private final Map<Integer, EmfInfo> emfCache = new HashMap<>();
+    private final Map<ModelPart, Map<String, ModelPart>> childLookupCache = new IdentityHashMap<>();
 
     private record EmfInfo(String name, int variant, List<SpawnerInfo> spawners){}
     private static final Logger LOGGER = LoggerFactory.getLogger(WingTipSampler.class);
 
-    private record SpawnerInfo(EmfWingTipHooks.SpawnerPath spawner, boolean isLeftWing){}
+    private record SpawnerInfo(EmfWingTipHooks.SpawnerPath spawner, String[] pathSegments, boolean isLeftWing){}
     public Map<Integer, List<Emitter>> gatheredTrailsThisFrame = new HashMap<>();
 
     public void clearFrameCache()
@@ -168,6 +170,7 @@ public class WingTipSampler {
     public void removeAllEmfCache()
     {
         emfCache.clear();
+        childLookupCache.clear();
     }
     @SuppressWarnings({"rawtypes", "unchecked"})
     private static void setupAnimUnchecked(EntityModel<?> model, EntityRenderState state) {
@@ -184,9 +187,15 @@ public class WingTipSampler {
         ArrayList<SpawnerInfo> spawnerInfos = new ArrayList<>();
         for(EmfWingTipHooks.SpawnerPath spawner : spawners)
         {
-            spawnerInfos.add(new SpawnerInfo(spawner, inferLeftWing(spawner.where(), spawner.path())));
+            spawnerInfos.add(new SpawnerInfo(spawner, splitPath(spawner.path()), inferLeftWing(spawner.where(), spawner.path())));
         }
         return spawnerInfos;
+    }
+
+    private String[] splitPath(String path)
+    {
+        if (path == null || path.isEmpty()) return new String[0];
+        return path.split("/");
     }
 
     private @NotNull List<Emitter> getTrailEmittersFromBones(@NotNull PoseStack stack, @Nullable ModelPart elytraRoot, @NotNull ElytraModel model, @NotNull Vec3 cameraPos, @NotNull Vec3 entityWorldOffset, EmfInfo emfInfo) {
@@ -199,7 +208,7 @@ public class WingTipSampler {
             ModelPart wingRoot = (spawner.spawner.where() == EmfWingTipHooks.WhichRoot.LEFT_WING) ? leftWing : rightWing;
 
             Vec3 cameraRelative = transformLocalPointThroughPath(
-                    stack, elytraRoot, wingRoot, spawner.spawner.path(), getEmitterLocalOffset(spawner)
+                    stack, elytraRoot, wingRoot, spawner.pathSegments(), getEmitterLocalOffset(spawner)
             );
             if (cameraRelative == null) continue;
 
@@ -214,7 +223,7 @@ public class WingTipSampler {
         for (SpawnerInfo spawner : spawners) {
 
             Vec3 cameraRelative = transformLocalPointThroughPathGeneric(
-                    stack, elytraRoot, spawner.spawner.path()
+                    stack, elytraRoot, spawner.pathSegments()
             );
             if (cameraRelative == null) continue;
 
@@ -309,10 +318,10 @@ public class WingTipSampler {
             @NotNull PoseStack stack,
             @Nullable ModelPart elytraRoot,
             @NotNull ModelPart wingRoot,
-            @Nullable String childOnlyPath,
+            String[] pathSegments,
             @NotNull Vec3 localOffset
     ) {
-        if (childOnlyPath == null || childOnlyPath.isEmpty()) return null;
+        if (pathSegments.length == 0) return null;
 
         stack.pushPose();
         if (elytraRoot != null && elytraRoot != wingRoot) {
@@ -321,13 +330,8 @@ public class WingTipSampler {
         wingRoot.translateAndRotate(stack);
 
         ModelPart current = wingRoot;
-        int segmentStartIndex = 0;
-
-        while (segmentStartIndex < childOnlyPath.length()) {
-            int nextSlashIndex = childOnlyPath.indexOf('/', segmentStartIndex);
-            String segmentName = (nextSlashIndex == -1)
-                    ? childOnlyPath.substring(segmentStartIndex)
-                    : childOnlyPath.substring(segmentStartIndex, nextSlashIndex);
+        for (String segmentName : pathSegments) {
+            if (segmentName.isEmpty()) continue;
 
             ModelPart child = findChildIgnoreCase(current, segmentName);
             if (child == null) {
@@ -337,9 +341,6 @@ public class WingTipSampler {
 
             child.translateAndRotate(stack);
             current = child;
-
-            if (nextSlashIndex == -1) break;
-            segmentStartIndex = nextSlashIndex + 1;
         }
 
         Vec3 point = ModelTransformationUtil.transformPoint(stack.last().pose(), localOffset);
@@ -359,36 +360,23 @@ public class WingTipSampler {
     private @Nullable Vec3 transformLocalPointThroughPathGeneric(
             @NotNull PoseStack stack,
             @Nullable ModelPart modelRoot,
-            @Nullable String childOnlyPath
+            String[] pathSegments
     ) {
-        if (childOnlyPath == null || childOnlyPath.isEmpty() || modelRoot == null) return null;
+        if (pathSegments.length == 0 || modelRoot == null) return null;
 
         stack.pushPose();
         try {
             modelRoot.translateAndRotate(stack);
 
             ModelPart current = modelRoot;
-            int segmentStartIndex = 0;
-
-            while (segmentStartIndex < childOnlyPath.length()) {
-                int nextSlashIndex = childOnlyPath.indexOf('/', segmentStartIndex);
-                String segmentName = (nextSlashIndex == -1)
-                        ? childOnlyPath.substring(segmentStartIndex)
-                        : childOnlyPath.substring(segmentStartIndex, nextSlashIndex);
-
-                if (segmentName.isEmpty()) {
-                    segmentStartIndex = nextSlashIndex + 1;
-                    continue;
-                }
+            for (String segmentName : pathSegments) {
+                if (segmentName.isEmpty()) continue;
 
                 ModelPart child = findChildIgnoreCase(current, segmentName);
                 if (child == null) return null;
 
                 child.translateAndRotate(stack);
                 current = child;
-
-                if (nextSlashIndex == -1) break;
-                segmentStartIndex = nextSlashIndex + 1;
             }
 
             return ModelTransformationUtil.transformPoint(stack.last().pose(), Vec3.ZERO);
@@ -401,12 +389,15 @@ public class WingTipSampler {
         ModelPart direct = parent.children.get(name);
         if (direct != null) return direct;
 
-        for (var entry : parent.children.entrySet()) {
-            if (entry.getKey().equalsIgnoreCase(name)) {
-                return entry.getValue();
+        Map<String, ModelPart> cachedChildren = childLookupCache.computeIfAbsent(parent, p -> {
+            Map<String, ModelPart> map = new HashMap<>();
+            for (var entry : p.children.entrySet()) {
+                map.put(entry.getKey().toLowerCase(), entry.getValue());
             }
-        }
-        return null;
+            return map;
+        });
+
+        return cachedChildren.get(name.toLowerCase());
     }
 
     private @Nullable ModelPart tryGetAnimatedElytraRoot(ElytraModel model, Player player) {

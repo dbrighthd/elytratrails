@@ -110,7 +110,7 @@ public record TrailOverrides(JsonObject values) {
         return new TrailOverrides(merged);
     }
 
-    public ResolvedTrailSettings resolve() {
+    public ResolvedTrailSettings resolvedTrailSettings(boolean isLeftWing) {
         return new ResolvedTrailSettings(
                 getBoolean("enableTrail"),
                 getBoolean("enableRandomWidth"),
@@ -121,8 +121,8 @@ public record TrailOverrides(JsonObject values) {
                 getDouble("startRampDistance"),
                 getDouble("endRampDistance"),
                 getDouble("randomWidthVariation"),
-                resolveColor("color"),
-                getString("prideTrail"),
+                getTrailColor(isLeftWing),
+                getTexture(isLeftWing),
                 getBoolean("fadeStart"),
                 getDouble("fadeStartDistance"),
                 getBoolean("fadeEnd"),
@@ -130,8 +130,6 @@ public record TrailOverrides(JsonObject values) {
                 getBoolean("translucentTrails"),
                 getBoolean("wireframeTrails"),
                 getBoolean("alwaysShowTrailDuringTwirl"),
-                getString("prideTrailRight"),
-                getDouble("twirlTime"),
                 getBoolean("increaseWidthOverTime"),
                 getDouble("startingWidthMultiplier"),
                 getDouble("endingWidthMultiplier"),
@@ -143,10 +141,7 @@ public record TrailOverrides(JsonObject values) {
                 getDouble("maxAlphaSpeed"),
                 getBoolean("speedBasedWidth"),
                 getDouble("minWidthSpeed"),
-                getDouble("maxWidthSpeed"),
-                getBoolean("trailMovesWithAngleOfAttack"),
-                getBoolean("useColorBoth"),
-                resolveColor("colorRight")
+                getDouble("maxWidthSpeed")
                 );
     }
     public ResolvedSampleSettings resolvedSampleSettings() {
@@ -172,5 +167,19 @@ public record TrailOverrides(JsonObject values) {
         }
 
         return -1; //white
+    }
+
+    private String getTexture(boolean isLeftWing) {
+        String prideTrailRight = getString("prideTrailRight");
+        if(!isLeftWing && (!(prideTrailRight == null || prideTrailRight.isEmpty())))
+        {
+            return prideTrailRight;
+        }
+        return getString("prideTrail");
+    }
+
+    private int getTrailColor(boolean isLeftWing)
+    {
+        return getBoolean("useColorBoth") ? resolveColor("color") : (isLeftWing ? resolveColor("color") : resolveColor("colorRight"));
     }
 }

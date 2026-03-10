@@ -8,7 +8,7 @@ import dbrighthd.elytratrails.rendering.math.SplineInterpolation;
 import dbrighthd.elytratrails.util.TimeUtil;
 import net.fabricmc.fabric.api.client.rendering.v1.world.WorldRenderContext;
 import net.minecraft.client.Camera;
-import net.minecraft.client.Minecraft;
+import net.minecraft .client.Minecraft;
 import net.minecraft.client.renderer.LightTexture;
 import net.minecraft.client.renderer.rendertype.RenderType;
 import net.minecraft.client.renderer.texture.OverlayTexture;
@@ -102,12 +102,20 @@ public class TrailRenderer {
                     int i2 = i + 1;
                     int i3 = (i + 2 < size) ? i + 2 : last;
 
-                    Trail.Point p0 = points.get(i0);
-                    Trail.Point p1 = points.get(i);
-                    Trail.Point p2 = (i2 == last) ? effectiveLastPoint : points.get(i2);
-                    Trail.Point p3 = (i3 == last) ? effectiveLastPoint : points.get(i3);
+                    Trail.Point p0Point = points.get(i0);
+                    Trail.Point p1Point = points.get(i);
+                    Trail.Point p2Point = (i2 == last) ? effectiveLastPoint : points.get(i2);
+                    Trail.Point p3Point = (i3 == last) ? effectiveLastPoint : points.get(i3);
 
-                    calculateSubdivideLength(p0, p1, p2, p3, 0f, 1f);
+                    Vec3 p0 = p0Point.pos();
+                    Vec3 p1 = p1Point.pos();
+                    Vec3 p2 = p2Point.pos();
+                    Vec3 p3 = p3Point.pos();
+
+                    Vec3 startPos = SplineInterpolation.catmullRom(p0, p1, p2, p3, 0f);
+                    Vec3 endPos = SplineInterpolation.catmullRom(p0, p1, p2, p3, 1f);
+
+                    calculateSubdivideLength(p0, p1, p2, p3, 0f, 1f, startPos, endPos);
                 }
 
                 totalTrailLength -= (float) trailSettings.distanceTillTrailStart();
@@ -127,22 +135,27 @@ public class TrailRenderer {
                     int i2 = i + 1;
                     int i3 = (i + 2 < size) ? i + 2 : last;
 
-                    Trail.Point p0 = points.get(i0);
-                    Trail.Point p1 = points.get(i);
-                    Trail.Point p2 = (i2 == last) ? effectiveLastPoint : points.get(i2);
-                    Trail.Point p3 = (i3 == last) ? effectiveLastPoint : points.get(i3);
+                    Trail.Point point0 = points.get(i0);
+                    Trail.Point point1 = points.get(i);
+                    Trail.Point point2 = (i2 == last) ? effectiveLastPoint : points.get(i2);
+                    Trail.Point point3 = (i3 == last) ? effectiveLastPoint : points.get(i3);
 
-                    renderSubdividedSegment(pose, consumer, p0, p1, p2, p3, 0f, 1f, trail, getTrailColor(trailSettings,trail.isLeftWing()), trailSettings);
+                    Vec3 p0 = point0.pos();
+                    Vec3 p1 = point1.pos();
+                    Vec3 p2 = point2.pos();
+                    Vec3 p3 = point3.pos();
+
+                    Vec3 startPos = SplineInterpolation.catmullRom(p0, p1, p2, p3, 0f);
+                    Vec3 endPos = SplineInterpolation.catmullRom(p0, p1, p2, p3, 1f);
+
+                    renderSubdividedSegment(pose, consumer, point0, point1, point2, 0f, 1f, p0, p1, p2, p3, startPos, endPos, trail, trailSettings.color(), trailSettings);
                 }
             });
         }
 
         stack.popPose();
     }
-    private int getTrailColor(ResolvedTrailSettings trailSettings, boolean isLeftWing)
-    {
-        return trailSettings.useColorBoth() ? trailSettings.color() : (isLeftWing ? trailSettings.color() : trailSettings.colorRight());
-    }
+
     private Trail.Point copyTrailPointNewPos(Trail.Point point, Vec3 newPos)
     {
         return new Trail.Point(newPos, point.epoch());
@@ -194,21 +207,16 @@ public class TrailRenderer {
     }
     private void renderSubdividedSegment(
             PoseStack.Pose pose, VertexConsumer consumer,
-            Trail.Point point0, Trail.Point point1, Trail.Point point2, Trail.Point point3,
+            Trail.Point point0, Trail.Point point1, Trail.Point point2,
             float tStart, float tEnd,
+            Vec3 p0, Vec3 p1, Vec3 p2, Vec3 p3,
+            Vec3 startPos, Vec3 endPos,
             Trail trail, int color, ResolvedTrailSettings trailSettings
     ) {
-        Vec3 p0 = point0.pos();
-        Vec3 p1 = point1.pos();
-        Vec3 p2 = point2.pos();
-        Vec3 p3 = point3.pos();
-        Vec3 startPos = SplineInterpolation.catmullRom(p0, p1, p2, p3, tStart);
-        Vec3 endPos = SplineInterpolation.catmullRom(p0, p1, p2, p3, tEnd);
         float midT = (tStart + tEnd) / 2f;
         Vec3 midPos = SplineInterpolation.catmullRom(p0, p1, p2, p3, midT);
 
         Vec3 chord = endPos.subtract(startPos);
-
 
         double chordLenSq = chord.lengthSqr();
         if(chordLenSq > 400)
@@ -231,8 +239,8 @@ public class TrailRenderer {
         }
 
         if (needsSplit) {
-            renderSubdividedSegment(pose, consumer, point0, point1, point2, point3, tStart, midT, trail, color, trailSettings);
-            renderSubdividedSegment(pose, consumer, point0, point1, point2, point3, midT, tEnd, trail, color, trailSettings);
+            renderSubdividedSegment(pose, consumer, point0, point1, point2, tStart, midT, p0, p1, p2, p3, startPos, midPos, trail, color, trailSettings);
+            renderSubdividedSegment(pose, consumer, point0, point1, point2, midT, tEnd, p0, p1, p2, p3, midPos, endPos, trail, color, trailSettings);
         } else {
 
             float segmentLength = (float) startPos.distanceTo(endPos) * 2f;
@@ -241,7 +249,6 @@ public class TrailRenderer {
 
             long epoch0 = point1.epoch();
             long epoch1 = point2.epoch();
-
 
             double start = Mth.lerp(tStart, epoch0, epoch1);
             double end = Mth.lerp(tEnd, epoch0, epoch1);
@@ -274,7 +281,6 @@ public class TrailRenderer {
                 scaleStart *= firstPersonWidthFadeFactor(start, currentTime);
                 scaleEnd *= firstPersonWidthFadeFactor(end, currentTime);
             }
-
 
             if(trailSettings.enableRandomWidth())
             {
@@ -482,7 +488,6 @@ public class TrailRenderer {
         float widthStart = halfWidthStart <= 0 ? 0.5f : 1f;
         float widthEnd = halfWidthEnd <= 0 ? 0.5f : 1f;
 
-
         consumer.addVertex(pose, p1)
                 .setNormal(normalX, normalY, normalZ)
                 .setOverlay(overlay)
@@ -510,16 +515,10 @@ public class TrailRenderer {
     }
 
     private void calculateSubdivideLength(
-            Trail.Point point0, Trail.Point point1, Trail.Point point2, Trail.Point point3,
-            float tStart, float tEnd
+            Vec3 p0, Vec3 p1, Vec3 p2, Vec3 p3,
+            float tStart, float tEnd,
+            Vec3 startPos, Vec3 endPos
     ) {
-        Vec3 p0 = point0.pos();
-        Vec3 p1 = point1.pos();
-        Vec3 p2 = point2.pos();
-        Vec3 p3 = point3.pos();
-
-        Vec3 startPos = SplineInterpolation.catmullRom(p0, p1, p2, p3, tStart);
-        Vec3 endPos = SplineInterpolation.catmullRom(p0, p1, p2, p3, tEnd);
         float midT = (tStart + tEnd) / 2f;
         Vec3 midPos = SplineInterpolation.catmullRom(p0, p1, p2, p3, midT);
 
@@ -537,8 +536,8 @@ public class TrailRenderer {
         }
 
         if (needsSplit) {
-            calculateSubdivideLength(point0, point1, point2, point3, tStart, midT);
-            calculateSubdivideLength(point0, point1, point2, point3, midT, tEnd);
+            calculateSubdivideLength(p0, p1, p2, p3, tStart, midT, startPos, midPos);
+            calculateSubdivideLength(p0, p1, p2, p3, midT, tEnd, midPos, endPos);
         } else {
             this.totalTrailLength += (float) startPos.distanceTo(endPos);
         }

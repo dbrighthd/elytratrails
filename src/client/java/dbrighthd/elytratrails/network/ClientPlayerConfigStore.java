@@ -148,7 +148,9 @@ public final class ClientPlayerConfigStore
                 incomingConfig.useColorBoth(),
                 incomingConfig.colorRight(),
                 incomingConfig.wingtipVerticalPosition(),
-                incomingConfig.wingtipHorizontalPosition()
+                incomingConfig.wingtipHorizontalPosition(),
+                incomingConfig.wingtipDepthPosition(),
+                incomingConfig.distanceTillTrailEnd()
         );
 
         CLIENT_PLAYER_CONFIGS.put(entityId,safe);
@@ -210,6 +212,8 @@ public final class ClientPlayerConfigStore
         int colorRight = tag.getIntOr("colorRight", fallbackConfig.colorRight());
         double wingtipVerticalPosition = tag.getDoubleOr("wingtipVerticalPosition", fallbackConfig.wingtipVerticalPosition());
         double wingtipHorizontalPosition = tag.getDoubleOr("wingtipHorizontalPosition", fallbackConfig.wingtipHorizontalPosition());
+        double wingtipDepthPosition = tag.getDoubleOr("wingtipDepthPosition", fallbackConfig.wingtipDepthPosition());
+        double distanceTillTrailEnd = tag.getDoubleOr("distanceTillTrailEnd", fallbackConfig.distanceTillTrailEnd());
         return new PlayerConfig(
                 enableTrail,
                 enableRandomWidth,
@@ -250,7 +254,9 @@ public final class ClientPlayerConfigStore
                 useColorBoth,
                 colorRight,
                 wingtipVerticalPosition,
-                wingtipHorizontalPosition
+                wingtipHorizontalPosition,
+                wingtipDepthPosition,
+                distanceTillTrailEnd
         );
     }
     public static <E extends Enum<E>> E readEnum(CompoundTag tag, String key, Class<E> enumClass, E fallback) {

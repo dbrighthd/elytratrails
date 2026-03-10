@@ -396,8 +396,8 @@ public final class TrailPackConfigManager {
         }
         return ResolvedSampleSettings.defaults();
     }
-    public static ResolvedTrailSettings resolve(@Nullable String modelName, @Nullable String boneName, @Nullable PlayerConfig baseConfig) {
-        if (baseConfig == null) return ResolvedTrailSettings.defaults();
+    public static ResolvedTrailSettings resolve(@Nullable String modelName, @Nullable String boneName, @Nullable PlayerConfig baseConfig, boolean isLeftWing) {
+        if (baseConfig == null) return ResolvedTrailSettings.defaults(isLeftWing);
         if (boneName != null)
         {
             boneName = boneName.substring(boneName.lastIndexOf('/')+1).replace("EMF_","");
@@ -408,7 +408,7 @@ public final class TrailPackConfigManager {
         TrailOverrides mergedOverrides = TrailOverrides.fromBase(baseConfig);
         if(!mainConfig.resourcePackOverride && (modelName != null && modelName.contains("elytra")))
         {
-            return mergedOverrides.resolve();
+            return mergedOverrides.resolvedTrailSettings(isLeftWing);
         }
         if (modelConfig != null && modelConfig.defaultOverrides != null) {
             String parentPreset = modelConfig.defaultOverrides.getString("parentPreset");
@@ -447,7 +447,7 @@ public final class TrailPackConfigManager {
         }
 
 
-        ResolvedTrailSettings out = mergedOverrides.resolve();
+        ResolvedTrailSettings out = mergedOverrides.resolvedTrailSettings(isLeftWing);
         if(mainConfig.logTrails)
         {
             LOGGER.info("starting trail from model {} on bone {} with configs: {}", modelName, boneName, out);
@@ -672,8 +672,6 @@ public final class TrailPackConfigManager {
                 playerConfig.translucentTrails(),
                 playerConfig.wireframeTrails(),
                 playerConfig.alwaysShowTrailDuringTwirl(),
-                safePride(playerConfig.prideTrailRight()),
-                playerConfig.twirlTime(),
                 playerConfig.increaseWidthOverTime(),
                 playerConfig.startingWidthMultiplier(),
                 playerConfig.endingWidthMultiplier(),
@@ -685,11 +683,54 @@ public final class TrailPackConfigManager {
                 playerConfig.maxAlphaSpeed(),
                 playerConfig.speedBasedWidth(),
                 playerConfig.minWidthSpeed(),
-                playerConfig.maxWidthSpeed(),
-                playerConfig.trailMovesWithAngleOfAttack(),
-                playerConfig.useColorBoth(),
-                playerConfig.color()
+                playerConfig.maxWidthSpeed()
         );
+    }
+    public static ResolvedTrailSettings resolveTrailFromPlayerConfig(PlayerConfig playerConfig, boolean isLeftWing) {
+        return new ResolvedTrailSettings(
+                playerConfig.enableTrail(),
+                playerConfig.enableRandomWidth(),
+                playerConfig.speedDependentTrail(),
+                playerConfig.maxWidth(),
+                playerConfig.trailLifetime(),
+                playerConfig.trailMinSpeed(),
+                playerConfig.startRampDistance(),
+                playerConfig.endRampDistance(),
+                playerConfig.randomWidthVariation(),
+                getTrailColor(playerConfig,isLeftWing),
+                getTexture(playerConfig,isLeftWing),
+                playerConfig.fadeStart(),
+                playerConfig.fadeStartDistance(),
+                playerConfig.fadeEnd(),
+                playerConfig.glowingTrails(),
+                playerConfig.translucentTrails(),
+                playerConfig.wireframeTrails(),
+                playerConfig.alwaysShowTrailDuringTwirl(),
+                playerConfig.increaseWidthOverTime(),
+                playerConfig.startingWidthMultiplier(),
+                playerConfig.endingWidthMultiplier(),
+                playerConfig.distanceTillTrailStart(),
+                playerConfig.endDistanceFade(),
+                playerConfig.endDistanceFadeAmount(),
+                playerConfig.speedBasedAlpha(),
+                playerConfig.minAlphaSpeed(),
+                playerConfig.maxAlphaSpeed(),
+                playerConfig.speedBasedWidth(),
+                playerConfig.minWidthSpeed(),
+                playerConfig.maxWidthSpeed()
+        );
+    }
+    private static String getTexture(PlayerConfig config, boolean isLeftWing) {
+        if(!isLeftWing && (!(config.prideTrailRight() == null || config.prideTrailRight().isEmpty())))
+        {
+            return safePride(config.prideTrailRight());
+        }
+        return safePride(config.prideTrail());
+    }
+
+    private static int getTrailColor(PlayerConfig config, boolean isLeftWing)
+    {
+        return config.useColorBoth() ? config.color() : (isLeftWing ? config.color() : config.colorRight());
     }
 
     private static String safePride(String prideTrail) {
