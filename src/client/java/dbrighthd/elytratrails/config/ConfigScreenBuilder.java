@@ -47,7 +47,6 @@ public class ConfigScreenBuilder {
         config.PresetOthers = presetDefault;
         List<String> presetNames = new ArrayList<>(TrailPackConfigManager.getPresets().keySet());
         Collections.sort(presetNames);
-        presetNames.addFirst("default");
         presetNames.addFirst(presetDefault);
         ConfigBuilder builder = ConfigBuilder.create()
                 .setParentScreen(parent)
@@ -486,26 +485,12 @@ public class ConfigScreenBuilder {
 
         if(!config.PresetOthers.isEmpty())
         {
-            if(config.PresetOthers.equals("default"))
-            {
-                config.otherPlayerConfig = ClientConfig.getDefaultClientConfig();
-            }
-            else
-            {
-                TrailPackConfigManager.applyPreset(false, config.PresetOthers,config);
-            }
+            TrailPackConfigManager.applyPreset(false, config.PresetOthers,config);
             decodeConfigColors(config.otherPlayerConfig);
         }
         if(!config.Preset.isEmpty())
         {
-            if(config.Preset.equals("default"))
-            {
-                config.clientPlayerConfig = ClientConfig.getDefaultClientConfig();
-            }
-            else
-            {
-                TrailPackConfigManager.applyPreset(true, config.Preset,config);
-            }
+            TrailPackConfigManager.applyPreset(true, config.Preset,config);
             decodeConfigColors(config.clientPlayerConfig);
         }
         config.Preset = "";
