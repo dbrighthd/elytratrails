@@ -47,8 +47,8 @@ public class ConfigScreenBuilder {
         config.PresetOthers = presetDefault;
         List<String> presetNames = new ArrayList<>(TrailPackConfigManager.getPresets().keySet());
         Collections.sort(presetNames);
+        presetNames.addFirst("default");
         presetNames.addFirst(presetDefault);
-
         ConfigBuilder builder = ConfigBuilder.create()
                 .setParentScreen(parent)
                 .setTitle(Component.translatable("text.elytratrails.title"));
