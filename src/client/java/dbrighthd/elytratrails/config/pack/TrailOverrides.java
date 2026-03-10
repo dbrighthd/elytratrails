@@ -16,46 +16,32 @@ public record TrailOverrides(JsonObject values) {
         this.values = values == null ? new JsonObject() : values.deepCopy();
     }
 
+    /**
+     * I know reflection is slow but i kept forgetting to add stuff from PlayerConfig to every single usage of TrailOverrides so this was easier for expandablity
+     */
     public static TrailOverrides fromBase(PlayerConfig baseConfig) {
         JsonObject json = new JsonObject();
-        json.addProperty("enableTrail", baseConfig.enableTrail());
-        json.addProperty("enableRandomWidth", baseConfig.enableRandomWidth());
-        json.addProperty("speedDependentTrail", baseConfig.speedDependentTrail());
-        json.addProperty("maxWidth", baseConfig.maxWidth());
-        json.addProperty("trailLifetime", baseConfig.trailLifetime());
-        json.addProperty("trailMinSpeed", baseConfig.trailMinSpeed());
-        json.addProperty("startRampDistance", baseConfig.startRampDistance());
-        json.addProperty("endRampDistance", baseConfig.endRampDistance());
-        json.addProperty("randomWidthVariation", baseConfig.randomWidthVariation());
-        json.addProperty("color", baseConfig.color());
-        json.addProperty("prideTrail", baseConfig.prideTrail());
-        json.addProperty("fadeStart", baseConfig.fadeStart());
-        json.addProperty("fadeStartDistance", baseConfig.fadeStartDistance());
-        json.addProperty("fadeEnd", baseConfig.fadeEnd());
-        json.addProperty("glowingTrails", baseConfig.glowingTrails());
-        json.addProperty("translucentTrails", baseConfig.translucentTrails());
-        json.addProperty("wireframeTrails", baseConfig.wireframeTrails());
-        json.addProperty("alwaysShowTrailDuringTwirl", baseConfig.alwaysShowTrailDuringTwirl());
-        json.addProperty("prideTrailRight", baseConfig.prideTrailRight());
-        json.addProperty("twirlTime", baseConfig.twirlTime());
-        json.addProperty("increaseWidthOverTime", baseConfig.increaseWidthOverTime());
-        json.addProperty("startingWidthMultiplier", baseConfig.startingWidthMultiplier());
-        json.addProperty("endingWidthMultiplier", baseConfig.endingWidthMultiplier());
-        json.addProperty("distanceTillTrailStart", baseConfig.distanceTillTrailStart());
-        json.addProperty("endDistanceFade", baseConfig.endDistanceFade());
-        json.addProperty("endDistanceFadeAmount", baseConfig.endDistanceFadeAmount());
-        json.addProperty("speedBasedAlpha", baseConfig.speedBasedAlpha());
-        json.addProperty("minAlphaSpeed", baseConfig.minAlphaSpeed());
-        json.addProperty("maxAlphaSpeed", baseConfig.maxAlphaSpeed());
-        json.addProperty("speedBasedWidth", baseConfig.speedBasedWidth());
-        json.addProperty("minWidthSpeed", baseConfig.minWidthSpeed());
-        json.addProperty("maxWidthSpeed", baseConfig.maxWidthSpeed());
-        json.addProperty("trailMovesWithAngleOfAttack", baseConfig.trailMovesWithAngleOfAttack());
-        json.addProperty("trailMovesWithElytraAngle", baseConfig.trailMovesWithElytraAngle());
-        json.addProperty("useColorBoth", baseConfig.useColorBoth());
-        json.addProperty("colorRight", baseConfig.colorRight());
-        json.addProperty("wingtipVerticalPosition", baseConfig.wingtipVerticalPosition());
-        json.addProperty("wingtipHorizontalPosition", baseConfig.wingtipHorizontalPosition());
+
+        try
+        {
+            for (java.lang.reflect.RecordComponent component : PlayerConfig.class.getRecordComponents())
+            {
+                String name = component.getName();
+                Object value = component.getAccessor().invoke(baseConfig);
+                switch (value) {
+                    case Boolean b -> json.addProperty(name, b);
+                    case Number n -> json.addProperty(name, n);
+                    case Character c -> json.addProperty(name, c);
+                    case String s -> json.addProperty(name, s);
+                    case Enum<?> e -> json.addProperty(name, e.name());
+                    case null, default -> {}
+                }
+
+            }
+        } catch (ReflectiveOperationException e) {
+            throw new RuntimeException("Failed to copy PlayerConfig into TrailOverrides", e);
+        }
+
         return new TrailOverrides(json);
     }
 
@@ -141,7 +127,8 @@ public record TrailOverrides(JsonObject values) {
                 getDouble("maxAlphaSpeed"),
                 getBoolean("speedBasedWidth"),
                 getDouble("minWidthSpeed"),
-                getDouble("maxWidthSpeed")
+                getDouble("maxWidthSpeed"),
+                getDouble("distanceTillTrailEnd")
                 );
     }
     public ResolvedSampleSettings resolvedSampleSettings() {

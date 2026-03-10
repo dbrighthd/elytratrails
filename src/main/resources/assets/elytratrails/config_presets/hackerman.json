@@ -37,5 +37,7 @@
   "useColorBoth": true,
   "colorRight": "#FFFFFFFF",
   "wingtipVerticalPosition": 0.5,
-  "wingtipHorizontalPosition": 1.0
+  "wingtipHorizontalPosition": 1.0,
+  "wingtipDepthPosition": 1.0,
+  "distanceTillTrailEnd": 0.0
 }

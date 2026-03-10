@@ -1,16 +1,6 @@
 package dbrighthd.elytratrails.config.pack;
 
 import dbrighthd.elytratrails.network.ClientPlayerConfigStore;
-import dbrighthd.elytratrails.network.PlayerConfig;
-import dbrighthd.elytratrails.rendering.Emitter;
-import dbrighthd.elytratrails.rendering.Trail;
-import dbrighthd.elytratrails.rendering.TrailRenderer;
-import dbrighthd.elytratrails.rendering.TrailTextureRegistry;
-import net.minecraft.resources.Identifier;
-
-import java.util.ArrayList;
-
-import static dbrighthd.elytratrails.config.pack.TrailPackConfigManager.resolveFromPlayerConfig;
 import static dbrighthd.elytratrails.config.pack.TrailPackConfigManager.resolveTrailFromPlayerConfig;
 
 /**
@@ -46,7 +36,8 @@ public record ResolvedTrailSettings(
         double maxAlphaSpeed,
         boolean speedBasedWidth,
         double minWidthSpeed,
-        double maxWidthSpeed
+        double maxWidthSpeed,
+        double distanceTillTrailEnd
 ) {
     public static ResolvedTrailSettings defaults(boolean isLeftWing) {
         return resolveTrailFromPlayerConfig(ClientPlayerConfigStore.getLocalPlayerConfig(),isLeftWing);

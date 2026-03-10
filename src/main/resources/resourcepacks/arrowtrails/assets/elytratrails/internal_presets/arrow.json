@@ -29,5 +29,6 @@
   "maxWidthSpeed": 2.0,
   "trailMovesWithAngleOfAttack": true,
   "useColorBoth": true,
-  "colorRight": -1
+  "colorRight": -1,
+  "distanceTillTrailEnd": 1.0
 }

@@ -405,12 +405,21 @@ public final class TrailPackConfigManager {
         ModConfig mainConfig = getConfig();
         String normalizedModelKey = normalizeModelKey(modelName);
         ModelTrailConfig modelConfig = (normalizedModelKey == null) ? null : MODEL_TRAIL_CONFIGS.get(normalizedModelKey);
+        if(modelConfig == null)
+        {
+            if(mainConfig.logTrails)
+            {
+                LOGGER.info("starting trail from model {} on bone {}, no overrides. with configs: {}", modelName, boneName, resolveTrailFromPlayerConfig(baseConfig,isLeftWing));
+
+            }
+            return resolveTrailFromPlayerConfig(baseConfig,isLeftWing);
+        }
         TrailOverrides mergedOverrides = TrailOverrides.fromBase(baseConfig);
-        if(!mainConfig.resourcePackOverride && (modelName != null && modelName.contains("elytra")))
+        if(!mainConfig.resourcePackOverride && modelName.contains("elytra"))
         {
             return mergedOverrides.resolvedTrailSettings(isLeftWing);
         }
-        if (modelConfig != null && modelConfig.defaultOverrides != null) {
+        if (modelConfig.defaultOverrides != null) {
             String parentPreset = modelConfig.defaultOverrides.getString("parentPreset");
             if(parentPreset != null)
             {
@@ -424,7 +433,7 @@ public final class TrailPackConfigManager {
             mergedOverrides = mergedOverrides.with(modelConfig.defaultOverrides);
         }
 
-        if (modelConfig != null && boneName != null) {
+        if (boneName != null) {
             String normalizedBoneKey = normalizeBoneKey(boneName);
             if (normalizedBoneKey != null) {
                 TrailOverrides boneOverrides = modelConfig.boneOverrides.get(normalizedBoneKey);
@@ -683,7 +692,8 @@ public final class TrailPackConfigManager {
                 playerConfig.maxAlphaSpeed(),
                 playerConfig.speedBasedWidth(),
                 playerConfig.minWidthSpeed(),
-                playerConfig.maxWidthSpeed()
+                playerConfig.maxWidthSpeed(),
+                playerConfig.distanceTillTrailEnd()
         );
     }
     public static ResolvedTrailSettings resolveTrailFromPlayerConfig(PlayerConfig playerConfig, boolean isLeftWing) {
@@ -717,7 +727,8 @@ public final class TrailPackConfigManager {
                 playerConfig.maxAlphaSpeed(),
                 playerConfig.speedBasedWidth(),
                 playerConfig.minWidthSpeed(),
-                playerConfig.maxWidthSpeed()
+                playerConfig.maxWidthSpeed(),
+                playerConfig.distanceTillTrailEnd()
         );
     }
     private static String getTexture(PlayerConfig config, boolean isLeftWing) {

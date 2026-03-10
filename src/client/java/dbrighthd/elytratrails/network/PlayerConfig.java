@@ -47,11 +47,11 @@ public record PlayerConfig(
         double wingtipDepthPosition,
         double distanceTillTrailEnd
 ) {
-    public static final int WIRE_VERSION = 1; // bump when you change meaning, not when you add fields
+    public static final int CONFIG_VERSION = 1;
 
     public CompoundTag toTag() {
         CompoundTag tag = new CompoundTag();
-        tag.putInt("v", WIRE_VERSION);
+        tag.putInt("v", CONFIG_VERSION);
 
         tag.putBoolean("enableTrail", enableTrail);
         tag.putBoolean("enableRandomWidth", enableRandomWidth);

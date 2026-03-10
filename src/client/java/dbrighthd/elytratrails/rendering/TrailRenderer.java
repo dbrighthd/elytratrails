@@ -260,20 +260,21 @@ public class TrailRenderer {
             {
                 endCorrection = v2;
             }
-            float scaleStart = computeWidthScaling(totalTrailLength- v1, v1-endCorrection, trailSettings);
-            float scaleEnd = computeWidthScaling(totalTrailLength- v2, v2-endCorrection, trailSettings);
+            float correctedEnd = endCorrection - (float)trailSettings.distanceTillTrailEnd();
+            float scaleStart = computeWidthScaling(totalTrailLength- v1, v1-correctedEnd, trailSettings);
+            float scaleEnd = computeWidthScaling(totalTrailLength- v2, v2-correctedEnd, trailSettings);
             if(trailSettings.startRampDistance() == 0)
             {
                 if(scaleEnd == 0)
                 {
-                    scaleStart =0;
+                    scaleEnd = scaleStart;
                 }
             }
             if(trailSettings.endRampDistance() == 0)
             {
                 if(scaleStart == 0)
                 {
-                    scaleEnd  =0;
+                    scaleStart = scaleEnd;
                 }
             }
             if(isFirstPerson && modConfig.fadeFirstPersonTrail && modConfig.firstPersonFadeTime > 0)
@@ -300,8 +301,8 @@ public class TrailRenderer {
             }
             if(trailSettings.endDistanceFade() && trailSettings.translucentTrails())
             {
-                alphaStart *= computeEndFade(v1-endCorrection, trailSettings);
-                alphaEnd *= computeEndFade(v2-endCorrection, trailSettings);
+                alphaStart *= computeEndFade(v1-correctedEnd, trailSettings);
+                alphaEnd *= computeEndFade(v2-correctedEnd, trailSettings);
             }
             if(trailSettings.speedBasedAlpha())
             {

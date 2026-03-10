@@ -183,7 +183,7 @@ public class ClientConfig {
                 0xFFFFFFFF,
                 0.5,
                 1.0,
-                1.3125,
+                1,
                 0.0
         );
     }

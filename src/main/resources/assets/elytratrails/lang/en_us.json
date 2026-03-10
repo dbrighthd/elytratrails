@@ -92,10 +92,10 @@
   "text.elytratrails.option.particleSpawnsPerTick": "Particles per tick",
   "text.elytratrails.option.particleSpawnsPerTick.@Tooltip": "How many particles should spawn per tick?",
 
-  "text.elytratrails.option.startRampDistance": "Thickness Start Distance",
+  "text.elytratrails.option.startRampDistance": "Thickness Start Ramp Distance",
   "text.elytratrails.option.startRampDistance.@Tooltip": "How long should it take for trails to reach their max width?",
 
-  "text.elytratrails.option.endRampDistance": "Thickness End Distance",
+  "text.elytratrails.option.endRampDistance": "Thickness End Ramp Distance",
   "text.elytratrails.option.endRampDistance.@Tooltip": "How long should it take for trails to reach width 0 from the end?",
 
   "text.elytratrails.option.enableRandomWidth": "Width Variation",
@@ -215,10 +215,10 @@
   "text.elytratrails.option.trailMinSpeedOthersDefault": "Other's Minimum Speed",
   "text.elytratrails.option.trailMinSpeedOthersDefault.@Tooltip": "Default minimum speed for other trails to appear",
 
-  "text.elytratrails.option.startRampDistanceOthersDefault": "Other's Thickness Start Distance",
+  "text.elytratrails.option.startRampDistanceOthersDefault": "Other's Thickness Start Ramp Distance",
   "text.elytratrails.option.startRampDistanceOthersDefault.@Tooltip": "Default: distance for other trails to ramp up to max width",
 
-  "text.elytratrails.option.endRampDistanceOthersDefault": "Other's Thickness End Distance",
+  "text.elytratrails.option.endRampDistanceOthersDefault": "Other's Thickness End Ramp Distance",
   "text.elytratrails.option.endRampDistanceOthersDefault.@Tooltip": "Default: distance for other trails to ramp down to 0 width",
 
   "text.elytratrails.option.colorOthersDefault": "Other's Trail Color",
@@ -252,16 +252,23 @@
   "text.elytratrails.category.elytra.advancedOthers" : "Advanced Settings",
 
   "text.elytratrails.option.wingtipVerticalPosition": "Vertical Wingtip Position",
-  "text.elytratrails.option.wingtipVerticalPosition.@Tooltip" : "Vertical Wingtip Position, 0 is bottom of elytra, 1 is top of elytra, 0.5 is middle.",
+  "text.elytratrails.option.wingtipVerticalPosition.@Tooltip" : "Vertical Wingtip Position, 0 is bottom of elytra, 1 is top of elytra, 0.5 is middle. (Wingtip AOA Correction must be OFF)",
 
   "text.elytratrails.option.wingtipHorizontalPosition": "Horizontal Wingtip Position",
   "text.elytratrails.option.wingtipHorizontalPosition.@Tooltip" : "Horizontal Wingtip Position scale, 1 is end of elytra 0 is base, 0.5 is middle.",
 
+  "text.elytratrails.option.wingtipDepthPosition" : "Depth Wingtip Position",
+  "text.elytratrails.option.wingtipDepthPosition.@Tooltip" : "Wingtip Depth Position scale, 1 is back of elytra 0 is front. (Dynamic Wingtip Position must be OFF)",
+
   "text.elytratrails.option.wingtipVerticalPositionOthersDefault": "Other's Vertical Wingtip Position",
-  "text.elytratrails.option.wingtipVerticalPositionOthersDefault.@Tooltip" : "Default Vertical Wingtip Position, 0 is bottom of elytra, 1 is top of elytra, 0.5 is middle.",
+  "text.elytratrails.option.wingtipVerticalPositionOthersDefault.@Tooltip" : "Default Vertical Wingtip Position, 0 is bottom of elytra, 1 is top of elytra, 0.5 is middle. (Wingtip AOA Correction must be OFF)",
 
   "text.elytratrails.option.wingtipHorizontalPositionOthersDefault": "Other's Horizontal Wingtip Position",
   "text.elytratrails.option.wingtipHorizontalPositionOthersDefault.@Tooltip" : "Default Horizontal Wingtip Position scale, 1 is end of elytra 0 is base, 0.5 is middle.",
+
+  "text.elytratrails.option.wingtipDepthPositionOthersDefault" : "Other's Depth Wingtip Position",
+  "text.elytratrails.option.wingtipDepthPositionOthersDefault.@Tooltip" : "Default Wingtip Depth Position scale, 1 is back of elytra 0 is front. (Dynamic Wingtip Position must be OFF)",
+
 
   "text.elytratrails.option.inputBuffer" : "Use Input Buffer",
   "text.elytratrails.option.inputBuffer.@Tooltip" : "More lenient with button presses for twirls. If laggy then turn it off.",
@@ -370,6 +377,13 @@
 
   "text.elytratrails.option.distanceTillTrailStart": "Distance Before Trail Starts",
   "text.elytratrails.option.distanceTillTrailStart.@Tooltip": "How big the gap between the wingtip and the trail start should be",
+
+  "text.elytratrails.option.distanceTillTrailEnd": "Distance to Subtract from End",
+  "text.elytratrails.option.distanceTillTrailEnd.@Tooltip": "How much shorter to make the trail at the end",
+
+  "text.elytratrails.option.distanceTillTrailEndOthersDefault": "Other's Distance to Subtract from End",
+  "text.elytratrails.option.distanceTillTrailEndOthersDefault.@Tooltip": "Default: How much shorter to make the trail at the end",
+
 
   "text.elytratrails.option.distanceTillTrailStartOthersDefault": "Other's Distance Before Trail Starts",
   "text.elytratrails.option.distanceTillTrailStartOthersDefault.@Tooltip": "Default: How big the gap between the wingtip and the trail start should be",

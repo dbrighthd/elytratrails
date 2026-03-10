@@ -486,12 +486,26 @@ public class ConfigScreenBuilder {
 
         if(!config.PresetOthers.isEmpty())
         {
-            TrailPackConfigManager.applyPreset(false, config.PresetOthers,config);
+            if(config.PresetOthers.equals("default"))
+            {
+                config.otherPlayerConfig = ClientConfig.getDefaultClientConfig();
+            }
+            else
+            {
+                TrailPackConfigManager.applyPreset(false, config.PresetOthers,config);
+            }
             decodeConfigColors(config.otherPlayerConfig);
         }
         if(!config.Preset.isEmpty())
         {
-            TrailPackConfigManager.applyPreset(true, config.Preset,config);
+            if(config.Preset.equals("default"))
+            {
+                config.clientPlayerConfig = ClientConfig.getDefaultClientConfig();
+            }
+            else
+            {
+                TrailPackConfigManager.applyPreset(true, config.Preset,config);
+            }
             decodeConfigColors(config.clientPlayerConfig);
         }
         config.Preset = "";
@@ -573,6 +587,11 @@ public class ConfigScreenBuilder {
                 .setDefaultValue(defaultConfig.wingtipHorizontalPosition)
                 .setTooltip(tooltip("wingtipHorizontalPosition", suffix))
                 .setSaveConsumer(newValue -> targetConfig.wingtipHorizontalPosition = newValue)
+                .build());
+        advancedOptions.add(entryBuilder.startDoubleField(option("wingtipDepthPosition", suffix), targetConfig.wingtipDepthPosition)
+                .setDefaultValue(defaultConfig.wingtipDepthPosition)
+                .setTooltip(tooltip("wingtipDepthPosition", suffix))
+                .setSaveConsumer(newValue -> targetConfig.wingtipDepthPosition = newValue)
                 .build());
         category.addEntry(entryBuilder.startDoubleField(option("width", suffix), targetConfig.maxWidth)
                 .setDefaultValue(defaultConfig.maxWidth)
@@ -702,7 +721,11 @@ public class ConfigScreenBuilder {
                 .setTooltip(tooltip("distanceTillTrailStart", suffix))
                 .setSaveConsumer(newValue -> targetConfig.distanceTillTrailStart = newValue)
                 .build());
-
+        advancedOptions.add(entryBuilder.startDoubleField(option("distanceTillTrailEnd", suffix), targetConfig.distanceTillTrailEnd)
+                .setDefaultValue(defaultConfig.distanceTillTrailEnd)
+                .setTooltip(tooltip("distanceTillTrailEnd", suffix))
+                .setSaveConsumer(newValue -> targetConfig.distanceTillTrailEnd = newValue)
+                .build());
 
         category.addEntry(entryBuilder.startDoubleField(option("trailMinSpeed", suffix), targetConfig.trailMinSpeed)
                 .setDefaultValue(defaultConfig.trailMinSpeed)

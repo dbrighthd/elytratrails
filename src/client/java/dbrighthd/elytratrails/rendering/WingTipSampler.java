@@ -30,7 +30,6 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.util.Mth;
 import net.minecraft.world.entity.Avatar;
 import net.minecraft.world.entity.Entity;
-import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.phys.Vec3;
 import org.jetbrains.annotations.NotNull;
@@ -289,7 +288,7 @@ public class WingTipSampler {
         float wingspread = ModelTransformationUtil.computeWingOpenness(wingRoot);
 
         PlayerConfig config = ClientPlayerConfigStore.getOrDefault(player.getId());
-        float xScale = 1.0f;
+        float xScale = (float)config.wingtipDepthPosition();
         float zScale = (float)((1.0 + (config.wingtipVerticalPosition()*2.0))/3.0);
         float yScale = (float) config.wingtipHorizontalPosition();
         if(config.trailMovesWithElytraAngle())
