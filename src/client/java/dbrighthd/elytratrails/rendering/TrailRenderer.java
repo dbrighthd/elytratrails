@@ -129,7 +129,6 @@ public class TrailRenderer {
                                 && trail.entityId() == minecraft.player.getId())
                                 && minecraft.options.getCameraType().isFirstPerson()
                                 && minecraft.getCameraEntity() == minecraft.player;
-
                 for (int i = 0; i < last; i++) {
                     int i0 = (i > 0) ? i - 1 : 0;
                     int i2 = i + 1;
@@ -260,7 +259,7 @@ public class TrailRenderer {
             {
                 endCorrection = v2;
             }
-            float correctedEnd = endCorrection - (float)trailSettings.distanceTillTrailEnd();
+            float correctedEnd = endCorrection + (float)trailSettings.distanceTillTrailEnd();
             float scaleStart = computeWidthScaling(totalTrailLength- v1, v1-correctedEnd, trailSettings);
             float scaleEnd = computeWidthScaling(totalTrailLength- v2, v2-correctedEnd, trailSettings);
             if(trailSettings.startRampDistance() == 0)
