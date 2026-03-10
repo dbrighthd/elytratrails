@@ -1,5 +1,8 @@
 {
   "defaults": {
-    "parentPreset": "internal:spectral_arrow"
+    "parentPreset": "internal:spectral_arrow",
+    "xOffset": 8.0,
+    "yOffset": 0.0,
+    "zOffset": 0.0
   }
 }

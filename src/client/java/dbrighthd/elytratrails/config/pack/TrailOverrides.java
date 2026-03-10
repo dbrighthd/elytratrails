@@ -149,6 +149,14 @@ public record TrailOverrides(JsonObject values) {
                 resolveColor("colorRight")
                 );
     }
+    public ResolvedSampleSettings resolvedSampleSettings() {
+        return new ResolvedSampleSettings(
+                getBoolean("speedDependentTrail"),
+                getDouble("trailMinSpeed"),
+                getDouble("xOffset"),
+                getDouble("yOffset"),
+                getDouble("zOffset"));
+    }
 
     private int resolveColor(String key) {
         if (!values.has(key) || !values.get(key).isJsonPrimitive()) {

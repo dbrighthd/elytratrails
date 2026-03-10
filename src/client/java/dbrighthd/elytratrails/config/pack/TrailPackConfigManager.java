@@ -6,7 +6,6 @@ import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import dbrighthd.elytratrails.config.ClientConfig;
 import dbrighthd.elytratrails.config.ModConfig;
-import dbrighthd.elytratrails.network.ClientPlayerConfigStore;
 import dbrighthd.elytratrails.network.PlayerConfig;
 import net.fabricmc.loader.api.FabricLoader;
 import net.minecraft.resources.Identifier;
@@ -47,8 +46,8 @@ public final class TrailPackConfigManager {
     private static final ConcurrentHashMap<String, ModelTrailConfig> MODEL_TRAIL_CONFIGS = new ConcurrentHashMap<>();
     private static final ConcurrentHashMap<String, TrailOverrides> CONFIG_PRESETS = new ConcurrentHashMap<>();
     private static final ConcurrentHashMap<String, TrailOverrides> HIDDEN_CONFIG_PRESETS = new ConcurrentHashMap<>();
-    private static final ConcurrentHashMap<EntityType<?>, ResolvedTrailSettings> entityDefaults = new ConcurrentHashMap<>();
-    private static ResolvedTrailSettings defaultResolved;
+    private static final ConcurrentHashMap<EntityType<?>, ResolvedSampleSettings> entityDefaults = new ConcurrentHashMap<>();
+    private static ResolvedSampleSettings defaultResolved;
     public static final Set<EntityType<?>> entitiesWithTrails = new HashSet<>();
     public static final Set<EntityType<?>> entitiesWithTrailOverrides = new HashSet<>();
     private static double maxLifetimeOverrideSeconds = -1.0;
@@ -61,7 +60,7 @@ public final class TrailPackConfigManager {
     {
         return Collections.list(MODEL_TRAIL_CONFIGS.keys());
     }
-    public static ResolvedTrailSettings getDefaultEntitySettings(Entity entity)
+    public static ResolvedSampleSettings getDefaultEntitySettings(Entity entity)
     {
         return entityDefaults.getOrDefault(entity.getType(),defaultResolved);
     }
@@ -69,13 +68,13 @@ public final class TrailPackConfigManager {
     {
         for(EntityType<?> entityType : entitiesWithTrailOverrides)
         {
-            entityDefaults.put(entityType, resolve(entityType.toShortString(), null, ClientPlayerConfigStore.getLocalPlayerConfigOthers()));
+            entityDefaults.put(entityType, resolveSample(entityType.toShortString()));
         }
-        defaultResolved = resolveFromPlayerConfig(ClientPlayerConfigStore.getLocalPlayerConfigOthers());
+        defaultResolved = ResolvedSampleSettings.defaults();
     }
     public static void setEntityDefaultModel(EntityType<?> entityType)
     {
-            entityDefaults.put(entityType, resolve(entityType.toShortString(), null, ClientPlayerConfigStore.getLocalPlayerConfigOthers()));
+            entityDefaults.put(entityType, resolveSample(entityType.toShortString()));
     }
     @SuppressWarnings("BooleanMethodIsAlwaysInverted")
     public static boolean doesEntityHaveEmfTrails(Entity entity)
@@ -384,7 +383,19 @@ public final class TrailPackConfigManager {
         }
         return configDefaultSeconds;
     }
-
+    public static ResolvedSampleSettings resolveSample(@Nullable String entityName) {
+        String normalizedModelKey = normalizeModelKey(entityName);
+        ModelTrailConfig modelConfig = (normalizedModelKey == null) ? null : MODEL_TRAIL_CONFIGS.get(normalizedModelKey);
+        if (modelConfig != null && modelConfig.defaultOverrides != null) {
+            if(modelConfig.defaultOverrides.values().has("parentPreset"))
+            {
+                TrailOverrides merged = modelConfig.defaultOverrides.with(getPresetOverrides(modelConfig.defaultOverrides.getString("parentPreset")));
+                return merged.resolvedSampleSettings();
+            }
+            return modelConfig.defaultOverrides.resolvedSampleSettings();
+        }
+        return ResolvedSampleSettings.defaults();
+    }
     public static ResolvedTrailSettings resolve(@Nullable String modelName, @Nullable String boneName, @Nullable PlayerConfig baseConfig) {
         if (baseConfig == null) return ResolvedTrailSettings.defaults();
         if (boneName != null)

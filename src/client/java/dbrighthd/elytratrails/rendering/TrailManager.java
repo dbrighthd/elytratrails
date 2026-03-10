@@ -1,6 +1,7 @@
 package dbrighthd.elytratrails.rendering;
 
 import dbrighthd.elytratrails.config.ModConfig;
+import dbrighthd.elytratrails.config.pack.ResolvedSampleSettings;
 import dbrighthd.elytratrails.config.pack.ResolvedTrailSettings;
 import dbrighthd.elytratrails.config.pack.TrailPackConfigManager;
 import dbrighthd.elytratrails.network.ClientPlayerConfigStore;
@@ -146,7 +147,7 @@ public class TrailManager {
         for (AbstractClientPlayer player : players) {
             int eid = player.getId();
             ResolvedTrailSettings config = getConfigFromPlayerId(eid);
-            boolean valid = TrailManager.isEntityTrailValid(config, player);
+            boolean valid = TrailManager.isPlayerTrailValid(config, player);
 
             if (valid) {
                 List<Emitter> emitters = sampler.getPlayerTrailEmitterPositions(player, ctx.getDeltaTracker().getGameTimeDeltaPartialTick(false),modConfig);
@@ -215,11 +216,11 @@ public class TrailManager {
                 continue;
             }
             int eid = entity.getId();
-            ResolvedTrailSettings config = getConfigFromEntity(entity);
+            ResolvedSampleSettings config = getConfigFromEntity(entity);
             boolean valid = TrailManager.isEntityTrailValid(config, entity);
 
             if (valid) {
-                List<Emitter> emitters = sampler.getEntityTrailEmitterPositions(entity, ctx.getDeltaTracker().getGameTimeDeltaPartialTick(false));
+                List<Emitter> emitters = sampler.getEntityTrailEmitterPositions(entity, ctx.getDeltaTracker().getGameTimeDeltaPartialTick(false), config);
                 double speed = entity.getDeltaMovement().length();
                 if(entity instanceof Player)
                 {
@@ -274,12 +275,12 @@ public class TrailManager {
     {
         return TrailPackConfigManager.resolveFromPlayerConfig(ClientPlayerConfigStore.getOrDefault(entityId));
     }
-    public static ResolvedTrailSettings getConfigFromEntity(Entity entity)
+    public static ResolvedSampleSettings getConfigFromEntity(Entity entity)
     {
         return TrailPackConfigManager.getDefaultEntitySettings(entity);
     }
 
-    public static boolean isEntityTrailValid(ResolvedTrailSettings config, Entity entity) {
+    public static boolean isPlayerTrailValid(ResolvedTrailSettings config, Entity entity) {
         if (entity instanceof Player player) {
             if(!(player.getPose() == Pose.FALL_FLYING))
             {
@@ -288,7 +289,15 @@ public class TrailManager {
         }
         return (isRolling(entity.getId()) && config.alwaysShowTrailDuringTwirl()) || !config.speedDependentTrail() || (entity.getDeltaMovement().lengthSqr() > config.trailMinSpeed() * config.trailMinSpeed());
     }
-
+    public static boolean isEntityTrailValid(ResolvedSampleSettings config, Entity entity) {
+        if (entity instanceof Player player) {
+            if(!(player.getPose() == Pose.FALL_FLYING))
+            {
+                return false;
+            }
+        }
+        return (!config.speedDependentTrail() || (entity.getDeltaMovement().lengthSqr() > config.trailMinSpeed() * config.trailMinSpeed()));
+    }
     public List<Trail> trails() {
         return trails;
     }

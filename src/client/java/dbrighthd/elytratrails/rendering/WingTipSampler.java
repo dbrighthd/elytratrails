@@ -6,6 +6,7 @@ import dbrighthd.elytratrails.compat.ModStatuses;
 import dbrighthd.elytratrails.compat.emf.EmfAnimationHooks;
 import dbrighthd.elytratrails.compat.emf.EmfWingTipHooks;
 import dbrighthd.elytratrails.config.ModConfig;
+import dbrighthd.elytratrails.config.pack.ResolvedSampleSettings;
 import dbrighthd.elytratrails.mixin.client.ModelFeatureStorageAccessor;
 import dbrighthd.elytratrails.network.ClientPlayerConfigStore;
 import dbrighthd.elytratrails.network.PlayerConfig;
@@ -114,7 +115,7 @@ public class WingTipSampler {
     }
 
 
-    public @NotNull List<Emitter> getEntityTrailEmitterPositions(Entity entity, float partialTick) {
+    public @NotNull List<Emitter> getEntityTrailEmitterPositions(Entity entity, float partialTick, ResolvedSampleSettings sampleSettings) {
         ModConfig config = ElytraTrailsClient.getConfig();
         Minecraft mc = Minecraft.getInstance();
         if (mc.level == null || ShaderChecksUtil.isShadowPass() || entity instanceof Player) return List.of();
@@ -153,7 +154,7 @@ public class WingTipSampler {
                 return gatheredTrails;
             }
         }
-        List<Emitter> gatheredTrails = getVanillaTrailEmittersGeneric(basePose, animatedRoot, entityModel, camera.position(), entityWorldOffset, entity);
+        List<Emitter> gatheredTrails = getVanillaTrailEmittersGeneric(basePose, animatedRoot, entityModel, camera.position(), entityWorldOffset, entity, sampleSettings);
         if(config.alwaysSnapTrail)
         {
             gatheredTrailsThisFrame.put(eid,gatheredTrails);
@@ -249,21 +250,12 @@ public class WingTipSampler {
             @NotNull EntityModel<?> model,
             @NotNull Vec3 cameraPos,
             @NotNull Vec3 entityWorldOffset,
-            Entity entity
+            Entity entity,
+            ResolvedSampleSettings sampleSettings
     ) {
-        Vec3 tip;
-
+        Vec3 offsets = new Vec3(-sampleSettings.xOffset()/16, -sampleSettings.yOffset()/16,-sampleSettings.zOffset()/16);
         ModelPart modelPart = animatedRoot != null ? animatedRoot : model.root();
-        if (entity.getType() == EntityType.ARROW || entity.getType() == EntityType.SPECTRAL_ARROW) {
-            tip = computeTransformedPoint(stack, modelPart, modelPart, ModelTransformationUtil.VANILLA_ARROW_WINGTIP);
-        } else if (entity.getType() == EntityType.ALLAY)
-        {
-            tip = computeTransformedPoint(stack, modelPart, modelPart, ModelTransformationUtil.VANILLA_ALLAY_WINGTIP);
-        }
-        else {
-            tip = computeTransformedPoint(stack, modelPart, modelPart, ModelTransformationUtil.ZERO_WINGTIP);
-        }
-
+        Vec3 tip = computeTransformedPoint(stack, modelPart, modelPart, offsets);
         return List.of(
                 new Emitter(cameraPos.add(tip).add(entityWorldOffset), true, entity.getType().toShortString(), "/trailspawner")
         );

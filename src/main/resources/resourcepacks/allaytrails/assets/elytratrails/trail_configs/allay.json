@@ -1,5 +1,8 @@
 {
   "defaults": {
-    "parentPreset": "internal:allay"
+    "parentPreset": "internal:allay",
+    "xOffset": 0.0,
+    "yOffset": 4.0,
+    "zOffset": 0.0
   }
 }
