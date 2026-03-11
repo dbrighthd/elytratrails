@@ -60,6 +60,11 @@ public class TrailManager {
             {
                 lastSample = TimeUtil.currentMillis();
             }
+            if(!modConfig.enableAllTrails)
+            {
+                removeAllTrails();
+                return;
+            }
             gatherPlayerTrails(Minecraft.getInstance(), recordEmitters);
             if(modConfig.extendedEmfSupport && (!entitiesWithTrails.isEmpty() || !entitiesWithTrailOverrides.isEmpty()))
             {
