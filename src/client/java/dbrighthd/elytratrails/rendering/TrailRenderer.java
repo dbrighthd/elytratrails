@@ -253,8 +253,8 @@ public class TrailRenderer {
             double end = Mth.lerp(tEnd, epoch0, epoch1);
 
             double trailLifetimeMillis = trailSettings.enableTrail() ? trailSettings.trailLifetime()* 1000 : 0;
-            float alphaEnd = trailSettings.fadeEnd() ?  computeLifetimeFadeout(end, currentTime, (long) (trailLifetimeMillis)) : 1f;
-            float alphaStart = trailSettings.fadeEnd() ? computeLifetimeFadeout(start, currentTime, (long) (trailLifetimeMillis)) : 1f;
+            float alphaEnd = trailSettings.lifeTimeFade() ?  computeLifetimeFadeout(end, currentTime, (long) (trailLifetimeMillis)) : 1f;
+            float alphaStart = trailSettings.lifeTimeFade() ? computeLifetimeFadeout(start, currentTime, (long) (trailLifetimeMillis)) : 1f;
             if((currentTime - end) >= trailLifetimeMillis)
             {
                 endCorrection = v2;

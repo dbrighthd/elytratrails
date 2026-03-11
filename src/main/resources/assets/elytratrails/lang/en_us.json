@@ -124,11 +124,8 @@
   "text.elytratrails.option.fadeStartDistance": "Fade-in Distance",
   "text.elytratrails.option.fadeStartDistance.@Tooltip": "How long should it take for the trail to fade in? (REQUIRES TRANSLUCENT TRAILS)",
 
-  "text.elytratrails.option.fadeEnd": "Trail Fades Away Over Time",
-  "text.elytratrails.option.fadeEnd.@Tooltip": "Should the trail fade away at the end? (REQUIRES TRANSLUCENT TRAILS)",
-
-  "text.elytratrails.option.useSplineTrail": "Trail Spline Smoothing",
-  "text.elytratrails.option.useSplineTrail.@Tooltip": "Should the trail interpolate between points to make it smoother?",
+  "text.elytratrails.option.lifeTimeFade": "Trail Lifetime Fadeout",
+  "text.elytratrails.option.lifeTimeFade.@Tooltip": "Should the trail fade away over time? (REQUIRES TRANSLUCENT TRAILS)",
 
   "text.elytratrails.option.firstPersonFadeTime": "First Person Trail Fade Time",
   "text.elytratrails.option.firstPersonFadeTime.@Tooltip": "Time for first person trails to fade in (seconds)",
@@ -286,8 +283,8 @@
   "text.elytratrails.option.fadeStartDistanceOthersDefault": "Other's Fade-in Distance",
   "text.elytratrails.option.fadeStartDistanceOthersDefault.@Tooltip": "Default: How long should it take for the trail to fade in? (REQUIRES TRANSLUCENT TRAILS)",
 
-  "text.elytratrails.option.fadeEndOthersDefault": "Other's Trails Fade Away",
-  "text.elytratrails.option.fadeEndOthersDefault.@Tooltip": "Default: Should the trail fade away at the end? (REQUIRES TRANSLUCENT TRAILS)",
+  "text.elytratrails.option.lifeTimeFadeOthersDefault": "Other's Trail Lifetime Fadeout",
+  "text.elytratrails.option.lifeTimeFadeOthersDefault.@Tooltip": "Default: Should the trail fade away over time? (REQUIRES TRANSLUCENT TRAILS)",
 
 
   "text.elytratrails.option.resourcePackOverride": "Resource Pack Override",

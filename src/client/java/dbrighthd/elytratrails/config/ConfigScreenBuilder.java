@@ -678,10 +678,10 @@ public class ConfigScreenBuilder {
                 .setSaveConsumer(newValue -> targetConfig.endDistanceFadeAmount = newValue)
                 .build());
 
-        advancedOptions.add(entryBuilder.startBooleanToggle(option("fadeEnd", suffix), targetConfig.fadeEnd)
-                .setDefaultValue(ConfigScreenBuilder.defaultConfig.fadeEnd)
-                .setTooltip(tooltip("fadeEnd", suffix))
-                .setSaveConsumer(newValue -> targetConfig.fadeEnd = newValue)
+        advancedOptions.add(entryBuilder.startBooleanToggle(option("lifeTimeFade", suffix), targetConfig.lifeTimeFade)
+                .setDefaultValue(ConfigScreenBuilder.defaultConfig.lifeTimeFade)
+                .setTooltip(tooltip("lifeTimeFade", suffix))
+                .setSaveConsumer(newValue -> targetConfig.lifeTimeFade = newValue)
                 .build());
 
 

@@ -111,7 +111,7 @@ public record TrailOverrides(JsonObject values) {
                 getTexture(isLeftWing),
                 getBoolean("fadeStart"),
                 getDouble("fadeStartDistance"),
-                getBoolean("fadeEnd"),
+                getBoolean("lifeTimeFade"),
                 getBoolean("glowingTrails"),
                 getBoolean("translucentTrails"),
                 getBoolean("wireframeTrails"),

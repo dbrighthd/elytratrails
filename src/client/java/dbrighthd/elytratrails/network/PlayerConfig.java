@@ -18,7 +18,7 @@ public record PlayerConfig(
         String prideTrail,
         boolean fadeStart,
         double fadeStartDistance,
-        boolean fadeEnd,
+        boolean lifeTimeFade,
         boolean glowingTrails,
         boolean translucentTrails,
         boolean wireframeTrails,
@@ -67,7 +67,7 @@ public record PlayerConfig(
         tag.putString("prideTrail", prideTrail);
         tag.putBoolean("fadeStart", fadeStart);
         tag.putDouble("fadeStartDistance", fadeStartDistance);
-        tag.putBoolean("fadeEnd", fadeEnd);
+        tag.putBoolean("lifeTimeFade", lifeTimeFade);
         tag.putBoolean("glowingTrails", glowingTrails);
         tag.putBoolean("translucentTrails", translucentTrails);
         tag.putBoolean("wireframeTrails", wireframeTrails);

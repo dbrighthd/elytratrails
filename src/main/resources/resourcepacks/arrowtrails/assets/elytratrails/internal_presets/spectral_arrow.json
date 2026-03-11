@@ -18,7 +18,7 @@
   "randomWidthVariation": 1.0,
   "fadeStart": false,
   "fadeStartDistance": 4.0,
-  "fadeEnd": false,
+  "lifeTimeFade`": false,
   "endDistanceFade": true,
   "endDistanceFadeAmount": 1,
   "speedBasedAlpha": false,

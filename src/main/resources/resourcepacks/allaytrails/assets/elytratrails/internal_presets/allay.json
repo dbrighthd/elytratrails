@@ -13,7 +13,7 @@
   "prideTrail": "",
   "fadeStart": false,
   "fadeStartDistance": 1.0,
-  "fadeEnd": true,
+  "lifeTimeFade": true,
   "glowingTrails": true,
   "translucentTrails": true,
   "wireframeTrails": false,

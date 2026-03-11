@@ -20,7 +20,7 @@ public record ResolvedTrailSettings(
         String prideTrail,
         boolean fadeStart,
         double fadeStartDistance,
-        boolean fadeEnd,
+        boolean lifeTimeFade,
         boolean glowingTrails,
         boolean translucentTrails,
         boolean wireframeTrails,

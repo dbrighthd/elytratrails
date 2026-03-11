@@ -19,7 +19,7 @@
   "randomWidthVariation": 1.0,
   "fadeStart": false,
   "fadeStartDistance": 4.0,
-  "fadeEnd": true,
+  "lifeTimeFade": true,
   "prideTrailRight": "",
   "increaseWidthOverTime": false,
   "startingWidthMultiplier": 1.0,

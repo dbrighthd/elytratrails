@@ -123,7 +123,7 @@ public final class ClientPlayerConfigStore
                 safePride,
                 incomingConfig.fadeStart(),
                 incomingConfig.fadeStartDistance(),
-                incomingConfig.fadeEnd(),
+                incomingConfig.lifeTimeFade(),
                 incomingConfig.glowingTrails(),
                 incomingConfig.translucentTrails(),
                 incomingConfig.wireframeTrails(),
@@ -180,7 +180,7 @@ public final class ClientPlayerConfigStore
         String prideTrail = tag.getStringOr("prideTrail", fallbackConfig.prideTrail());
         boolean fadeStart = tag.getBooleanOr("fadeStart", fallbackConfig.fadeStart());
         double fadeStartDistance = tag.getDoubleOr("fadeStartDistance", fallbackConfig.fadeStartDistance());
-        boolean fadeEnd = tag.getBooleanOr("fadeEnd", fallbackConfig.fadeEnd());
+        boolean lifeTimeFade = tag.getBooleanOr("lifeTimeFade", fallbackConfig.lifeTimeFade());
 
         boolean glowingTrails = tag.getBooleanOr("glowingTrails", fallbackConfig.glowingTrails());
         boolean translucentTrails = tag.getBooleanOr("translucentTrails", fallbackConfig.translucentTrails());
@@ -229,7 +229,7 @@ public final class ClientPlayerConfigStore
                 prideTrail,
                 fadeStart,
                 fadeStartDistance,
-                fadeEnd,
+                lifeTimeFade,
                 glowingTrails,
                 translucentTrails,
                 wireframeTrails,

@@ -24,7 +24,7 @@ public class ClientConfig {
     public String prideTrail;
     public boolean fadeStart;
     public double fadeStartDistance;
-    public boolean fadeEnd;
+    public boolean lifeTimeFade;
     public boolean glowingTrails;
     public boolean translucentTrails;
     public boolean wireframeTrails;
@@ -113,7 +113,7 @@ public class ClientConfig {
         this.prideTrail = prideTrail;
         this.fadeStart = fadeStart;
         this.fadeStartDistance = fadeStartDistance;
-        this.fadeEnd = fadeEnd;
+        this.lifeTimeFade = fadeEnd;
         this.glowingTrails = glowingTrails;
         this.translucentTrails = translucentTrails;
         this.wireframeTrails = wireframeTrails;
@@ -209,7 +209,7 @@ public class ClientConfig {
                 prideTrail,
                 fadeStart,
                 fadeStartDistance,
-                fadeEnd,
+                lifeTimeFade,
                 glowingTrails,
                 translucentTrails,
                 wireframeTrails,
@@ -254,7 +254,7 @@ public class ClientConfig {
                 prideTrail,
                 fadeStart,
                 fadeStartDistance,
-                fadeEnd,
+                lifeTimeFade,
                 false,
                 false,
                 false,
