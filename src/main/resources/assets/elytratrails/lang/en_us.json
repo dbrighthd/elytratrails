@@ -151,7 +151,7 @@
   "text.elytratrails.option.alpha": "Trail Alpha",
   "text.elytratrails.option.alpha.@Tooltip": "Trail Alpha",
 
-  "text.elytratrails.option.useColorBoth" : "Use Same Color for Both Wings",
+  "text.elytratrails.option.useColorBoth" : "Use Same Color for Both Sides",
   "text.elytratrails.option.useColorBoth.@Tooltip" : "Use the \"Trail Color\" and \"Trail Alpha\" fields for both left and right trails",
 
   "text.elytratrails.option.colorRight": "Right Trail Color",
@@ -224,7 +224,7 @@
   "text.elytratrails.option.colorOthersDefault": "Other's Trail Color",
   "text.elytratrails.option.colorOthersDefault.@Tooltip": "Default color for other trails as hex (example: #FFFFFF)",
 
-  "text.elytratrails.option.useColorBothOthersDefault" : "Other's Use Same Color for Both Wings",
+  "text.elytratrails.option.useColorBothOthersDefault" : "Other's Use Same Color for Both Sides",
   "text.elytratrails.option.useColorBothOthersDefault.@Tooltip" : "Default: Use the \"Trail Color\" and \"Trail Alpha\" fields for both left and right trails",
 
   "text.elytratrails.option.colorRightOthersDefault": "Other's Right Trail Color",

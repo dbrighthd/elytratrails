@@ -538,17 +538,6 @@ public class ConfigScreenBuilder {
                 .setTooltip(tooltip("wireframeTrails", suffix))
                 .setSaveConsumer(newValue -> targetConfig.wireframeTrails = newValue)
                 .build());
-        category.addEntry(entryBuilder.startBooleanToggle(option("enableRandomWidth", suffix), targetConfig.enableRandomWidth)
-                .setDefaultValue(ConfigScreenBuilder.defaultConfig.enableRandomWidth)
-                .setTooltip(tooltip("enableRandomWidth", suffix))
-                .setSaveConsumer(newValue -> targetConfig.enableRandomWidth = newValue)
-                .build());
-
-        category.addEntry(entryBuilder.startBooleanToggle(option("speedDependentTrail", suffix), targetConfig.speedDependentTrail)
-                .setDefaultValue(ConfigScreenBuilder.defaultConfig.speedDependentTrail)
-                .setTooltip(tooltip("speedDependentTrail", suffix))
-                .setSaveConsumer(newValue -> targetConfig.speedDependentTrail = newValue)
-                .build());
 
         advancedOptions.add(entryBuilder.startBooleanToggle(option("trailMovesWithElytraAngle", suffix), targetConfig.trailMovesWithElytraAngle)
                 .setDefaultValue(ConfigScreenBuilder.defaultConfig.trailMovesWithElytraAngle)
@@ -582,12 +571,28 @@ public class ConfigScreenBuilder {
                 .setSaveConsumer(newValue -> targetConfig.maxWidth = newValue)
                 .build());
 
+        category.addEntry(entryBuilder.startBooleanToggle(option("enableRandomWidth", suffix), targetConfig.enableRandomWidth)
+                .setDefaultValue(ConfigScreenBuilder.defaultConfig.enableRandomWidth)
+                .setTooltip(tooltip("enableRandomWidth", suffix))
+                .setSaveConsumer(newValue -> targetConfig.enableRandomWidth = newValue)
+                .build());
         category.addEntry(entryBuilder.startDoubleField(option("trailLifetime", suffix), targetConfig.trailLifetime)
                 .setDefaultValue(ConfigScreenBuilder.defaultConfig.trailLifetime)
                 .setTooltip(tooltip("trailLifetime", suffix))
                 .setSaveConsumer(newValue -> targetConfig.trailLifetime = newValue)
                 .build());
 
+        category.addEntry(entryBuilder.startBooleanToggle(option("speedDependentTrail", suffix), targetConfig.speedDependentTrail)
+                .setDefaultValue(ConfigScreenBuilder.defaultConfig.speedDependentTrail)
+                .setTooltip(tooltip("speedDependentTrail", suffix))
+                .setSaveConsumer(newValue -> targetConfig.speedDependentTrail = newValue)
+                .build());
+
+        category.addEntry(entryBuilder.startDoubleField(option("trailMinSpeed", suffix), targetConfig.trailMinSpeed)
+                .setDefaultValue(ConfigScreenBuilder.defaultConfig.trailMinSpeed)
+                .setTooltip(tooltip("trailMinSpeed", suffix))
+                .setSaveConsumer(newValue -> targetConfig.trailMinSpeed = newValue)
+                .build());
 
         advancedOptions.add(entryBuilder.startDoubleField(option("startRampDistance", suffix), targetConfig.startRampDistance)
                 .setDefaultValue(ConfigScreenBuilder.defaultConfig.startRampDistance)
@@ -600,7 +605,17 @@ public class ConfigScreenBuilder {
                 .setTooltip(tooltip("endRampDistance", suffix))
                 .setSaveConsumer(newValue -> targetConfig.endRampDistance = newValue)
                 .build());
+        category.addEntry(entryBuilder.startStrField(option("prideTrail", suffix), targetConfig.prideTrail)
+                .setDefaultValue(ConfigScreenBuilder.defaultConfig.prideTrail)
+                .setTooltip(tooltip("prideTrail", suffix))
+                .setSaveConsumer(newValue -> targetConfig.prideTrail = newValue)
+                .build());
 
+        category.addEntry(entryBuilder.startStrField(option("prideTrailRight", suffix), targetConfig.prideTrailRight)
+                .setDefaultValue(ConfigScreenBuilder.defaultConfig.prideTrailRight)
+                .setTooltip(tooltip("prideTrailRight", suffix))
+                .setSaveConsumer(newValue -> targetConfig.prideTrailRight = newValue)
+                .build());
         category.addEntry(entryBuilder.startColorField(option("color", suffix), targetConfig.justColor)
                 .setDefaultValue(0xFFFFFF)
                 .setTooltip(tooltip("color", suffix))
@@ -613,35 +628,24 @@ public class ConfigScreenBuilder {
                 .setSaveConsumer(newValue -> targetConfig.justAlpha = newValue)
                 .build());
 
-        advancedOptions.add(entryBuilder.startBooleanToggle(option("useColorBoth", suffix), targetConfig.useColorBoth)
+        category.addEntry(entryBuilder.startBooleanToggle(option("useColorBoth", suffix), targetConfig.useColorBoth)
                 .setDefaultValue(ConfigScreenBuilder.defaultConfig.useColorBoth)
                 .setTooltip(tooltip("useColorBoth", suffix))
                 .setSaveConsumer(newValue -> targetConfig.useColorBoth = newValue)
                 .build());
 
-        advancedOptions.add(entryBuilder.startColorField(option("colorRight", suffix), targetConfig.justColorRight)
+        category.addEntry(entryBuilder.startColorField(option("colorRight", suffix), targetConfig.justColorRight)
                 .setDefaultValue(0xFFFFFF)
                 .setTooltip(tooltip("colorRight", suffix))
                 .setSaveConsumer(newValue -> targetConfig.justColorRight = newValue)
                 .build());
 
-        advancedOptions.add(entryBuilder.startIntField(option("alphaRight", suffix), targetConfig.justAlphaRight)
+        category.addEntry(entryBuilder.startIntField(option("alphaRight", suffix), targetConfig.justAlphaRight)
                 .setDefaultValue(255)
                 .setTooltip(tooltip("alphaRight", suffix))
                 .setSaveConsumer(newValue -> targetConfig.justAlphaRight = newValue)
                 .build());
 
-        category.addEntry(entryBuilder.startStrField(option("prideTrail", suffix), targetConfig.prideTrail)
-                .setDefaultValue(ConfigScreenBuilder.defaultConfig.prideTrail)
-                .setTooltip(tooltip("prideTrail", suffix))
-                .setSaveConsumer(newValue -> targetConfig.prideTrail = newValue)
-                .build());
-
-        category.addEntry(entryBuilder.startStrField(option("prideTrailRight", suffix), targetConfig.prideTrailRight)
-                .setDefaultValue(ConfigScreenBuilder.defaultConfig.prideTrailRight)
-                .setTooltip(tooltip("prideTrailRight", suffix))
-                .setSaveConsumer(newValue -> targetConfig.prideTrailRight = newValue)
-                .build());
 
         advancedOptions.add(entryBuilder.startDoubleField(option("randomWidthVariation", suffix), targetConfig.randomWidthVariation)
                 .setDefaultValue(ConfigScreenBuilder.defaultConfig.randomWidthVariation)
@@ -710,11 +714,6 @@ public class ConfigScreenBuilder {
                 .setSaveConsumer(newValue -> targetConfig.distanceTillTrailEnd = newValue)
                 .build());
 
-        category.addEntry(entryBuilder.startDoubleField(option("trailMinSpeed", suffix), targetConfig.trailMinSpeed)
-                .setDefaultValue(ConfigScreenBuilder.defaultConfig.trailMinSpeed)
-                .setTooltip(tooltip("trailMinSpeed", suffix))
-                .setSaveConsumer(newValue -> targetConfig.trailMinSpeed = newValue)
-                .build());
         advancedOptions.add(entryBuilder.startBooleanToggle(option("speedBasedAlpha", suffix), targetConfig.speedBasedAlpha)
                 .setDefaultValue(ConfigScreenBuilder.defaultConfig.speedBasedAlpha)
                 .setTooltip(tooltip("speedBasedAlpha", suffix))
