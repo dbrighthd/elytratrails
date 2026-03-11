@@ -396,27 +396,20 @@ public class TrailRenderer {
 
     private float computeStartFade(float distFromStart, ResolvedTrailSettings cfg) {
         float startRamp = (float) cfg.fadeStartDistance();
-        float up;
-        if (startRamp < 1e-6f){
-            up = 1f;
-        }
-        else
-        {
-            if (distFromStart <= 0f) up = 0f;
-            else if (distFromStart >= startRamp) up = 1f;
-            else up = (float) Math.sin((distFromStart / startRamp) * (Math.PI / 2.0));
-        }
-        return up;
-    }
-    private float computeEndFade(float distToEnd, ResolvedTrailSettings cfg) {
-        float endRamp = (float) cfg.endDistanceFadeAmount();
-        float down;
-        if (distToEnd <= 0f) down = 0f;
-        else if (distToEnd >= endRamp) down = 1f;
-        else down = (float) Math.sin((distToEnd / endRamp) * (Math.PI / 2.0));
-        return down;
+        if (startRamp <= 0) return 1f;
+        return slowStartRamp(distFromStart, startRamp);
     }
 
+    private float computeEndFade(float distToEnd, ResolvedTrailSettings cfg) {
+        return slowStartRamp(distToEnd, (float) cfg.endDistanceFadeAmount());
+    }
+
+    private static float slowStartRamp(float dist, float ramp) {
+        if (ramp <= 0) return dist > 0f ? 1f : 0f;
+
+        float t = Mth.clamp(dist / ramp, 0.0f, 1.0f);
+        return t * t;
+    }
     @SuppressWarnings("unused")
     private float computeWidthScalingButGood(float distFromStart, float distToEnd, ResolvedTrailSettings config)
     {
