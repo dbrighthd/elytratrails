@@ -124,7 +124,7 @@
   "text.elytratrails.option.fadeStartDistance": "Fade-in Distance",
   "text.elytratrails.option.fadeStartDistance.@Tooltip": "How long should it take for the trail to fade in? (REQUIRES TRANSLUCENT TRAILS)",
 
-  "text.elytratrails.option.fadeEnd": "Trail Fades Away",
+  "text.elytratrails.option.fadeEnd": "Trail Fades Away Over Time",
   "text.elytratrails.option.fadeEnd.@Tooltip": "Should the trail fade away at the end? (REQUIRES TRANSLUCENT TRAILS)",
 
   "text.elytratrails.option.useSplineTrail": "Trail Spline Smoothing",
