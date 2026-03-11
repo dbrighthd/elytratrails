@@ -23,7 +23,7 @@ public class ModelTransformationUtil {
 
         float fullyClosed = 0.28766277f;
         //float fullyOpen = 1.5707302f;
-        float fullyOpen = 1.57f;
+        float fullyOpen = 1.5f;
         float openness = (wingRollAbs - fullyClosed) / (fullyOpen - fullyClosed);
         return Mth.clamp(openness, 0.0f, 1.0f);
     }
@@ -44,23 +44,18 @@ public class ModelTransformationUtil {
         }
 
         double invSpeed = Mth.invSqrt((float) speedSqr);
-        double velHoriz = Math.sqrt(vx * vx + vz * vz) * invSpeed; // cos(velPitch)
-        double velVert  = vy * invSpeed;                           // sin(velPitch)
+        double velHoriz = Math.sqrt(vx * vx + vz * vz) * invSpeed;
+        double velVert  = vy * invSpeed;
 
-        // Minecraft XRot is positive when looking downward.
-        // Convert to standard math pitch where up is positive.
         float pitch = -entity.getXRot() * Mth.DEG_TO_RAD;
 
-        float lookHoriz = Mth.cos(pitch); // cos(lookPitch)
-        float lookVert  = Mth.sin(pitch); // sin(lookPitch)
+        float lookHoriz = Mth.cos(pitch);
+        float lookVert  = Mth.sin(pitch);
 
-        // cos(lookPitch - velPitch)
         float cosAoA = (float) (lookHoriz * velHoriz + lookVert * velVert);
 
-        // sin(lookPitch - velPitch)
         float sinAoA = (float) (lookVert * velHoriz - lookHoriz * velVert);
 
-        // AoA < 0  <=>  sin(AoA) < 0   (assuming normal small flight-angle ranges, which this is)
         return Math.abs(sinAoA < 0.0f ? cosAoA : 1.0f);
     }
 }
