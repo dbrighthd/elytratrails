@@ -110,13 +110,13 @@
   "text.elytratrails.option.endDistanceFade": "Trail Fade-out at End",
   "text.elytratrails.option.endDistanceFade.@Tooltip": "Should the trail fade out at the end based on how far it is from the end? (REQUIRES TRANSLUCENT TRAILS)",
 
-  "text.elytratrails.option.endDistanceFadeAmount": "Trail Fade-out Distance",
+  "text.elytratrails.option.endDistanceFadeAmount": "Fade-out Distance",
   "text.elytratrails.option.endDistanceFadeAmount.@Tooltip": "At what distance near the end should the trail start to fade out?",
 
   "text.elytratrails.option.endDistanceFadeOthersDefault": "Other's Trail Fade-out at End",
   "text.elytratrails.option.endDistanceFadeOthersDefault.@Tooltip": "Default: Should the trail fade out at the end based on how far it is from the end? (REQUIRES TRANSLUCENT TRAILS)",
 
-  "text.elytratrails.option.endDistanceFadeAmountOthersDefault": "Other's Trail Fade-out Distance",
+  "text.elytratrails.option.endDistanceFadeAmountOthersDefault": "Other's Fade-out Distance",
   "text.elytratrails.option.endDistanceFadeAmountOthersDefault.@Tooltip": "Default: zAt what distance near the end should the trail start to fade out?",
 
 
@@ -313,10 +313,10 @@
   "text.elytratrails.option.easeType" : "Easing Type",
   "text.elytratrails.option.easeType.@Tooltip" : "Type of easing function to use",
 
-  "text.elytratrails.option.increaseWidthOverTime": "Width changes over lifetime",
+  "text.elytratrails.option.increaseWidthOverTime": "Width Changes Over Lifetime",
   "text.elytratrails.option.increaseWidthOverTime.@Tooltip": "Whether width should be multiplied based on age (define below)",
 
-  "text.elytratrails.option.increaseWidthOverTimeOthersDefault": "Other's Width changes over lifetime",
+  "text.elytratrails.option.increaseWidthOverTimeOthersDefault": "Other's Width Changes Over Lifetime",
   "text.elytratrails.option.increaseWidthOverTimeOthersDefault.@Tooltip": "Default: Whether width should be multiplied based on age (define below)",
 
   "text.elytratrails.option.startingWidthMultiplier": "Width Start Multiplier",
