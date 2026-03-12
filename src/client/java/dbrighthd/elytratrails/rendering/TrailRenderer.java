@@ -86,7 +86,8 @@ public class TrailRenderer {
                 if (emitters != null && manager.isActiveTrail(trail)) {
                     snappedLastPoint = copyTrailPointNewPos(
                             points.get(last),
-                            emitters.get(trail.emitterIndex()).position()
+                            emitters.get(trail.emitterIndex()).position(),
+                            emitters.get(trail.emitterIndex()).visible()
                     );
                 }
             }
@@ -155,9 +156,9 @@ public class TrailRenderer {
         stack.popPose();
     }
 
-    private Trail.Point copyTrailPointNewPos(Trail.Point point, Vec3 newPos)
+    private Trail.Point copyTrailPointNewPos(Trail.Point point, Vec3 newPos, boolean visible)
     {
-        return new Trail.Point(newPos, point.epoch());
+        return new Trail.Point(newPos, point.epoch(), visible);
     }
     private RenderType getRenderType(Trail trail, ResolvedTrailSettings trailSettings)
     {
@@ -325,7 +326,14 @@ public class TrailRenderer {
             }
             float halfWidthStart = (float) (trailSettings.maxWidth() / 2f) * scaleStart;
             float halfWidthEnd = (float) (trailSettings.maxWidth() / 2f) * scaleEnd;
-
+            if(!point0.visible())
+            {
+                alphaStart = 0;
+            }
+            if(!point1.visible())
+            {
+                alphaEnd = 0;
+            }
             if ((scaleStart != 0 || scaleEnd != 0) && (alphaEnd != 0 || alphaStart != 0)) {
                 if(!trailSettings.translucentTrails())
                 {

@@ -15,7 +15,6 @@ import net.minecraft.client.player.AbstractClientPlayer;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.Pose;
 import net.minecraft.world.entity.player.Player;
-import net.minecraft.world.phys.Vec3;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -78,7 +77,7 @@ public class TrailManager {
     }
     public boolean isActiveTrail(Trail trail)
     {
-        return (activeTrails.containsKey(trail.entityId()) && activeTrails.get(trail.entityId()).trails().contains(trail));
+        return (activeTrails.containsKey(trail.entityId()) && activeTrails.get(trail.entityId()).containsTrail(trail));
     }
 
     @SuppressWarnings("unused")
@@ -128,11 +127,18 @@ public class TrailManager {
             }
         }
     }
-    public boolean removeTrailFromMap(Trail trail)
-    {
+    public boolean removeTrailFromMap(Trail trail) {
         deadPointDistance.remove(trail.trailId());
-        return true;
+        EntityTrailGroup group = activeTrails.get(trail.entityId());
+        if (group != null) {
+            group.elytraTrails().remove(trail);
+            group.genericTrails().remove(trail);
+            if (group.elytraTrails().isEmpty() && group.genericTrails().isEmpty()) {
+                activeTrails.remove(trail.entityId());
+            }
+        }
 
+        return true;
     }
 
     public void removeTrail(int entityId)
@@ -168,7 +174,7 @@ public class TrailManager {
                 }
                 if(!recordEmitter)
                 {
-                    return;
+                    continue;
                 }
                 EntityTrailGroup trailGroup = activeTrails.computeIfAbsent(eid, id -> {
                     List<Trail> emittedTrails = new ArrayList<>();
@@ -184,18 +190,18 @@ public class TrailManager {
                         LOGGER.info("Created new trail group with {} trails for entity {} (player)", emittedTrails.size(), id);
                     }
                     return new EntityTrailGroup(
-                            emittedTrails
+                            emittedTrails, new ArrayList<>()
                     );
                 });
-                if (trailGroup.trails().size() != emitters.size()) {
+                if (trailGroup.elytraTrails().size() != emitters.size()) {
                     activeTrails.remove(eid);
                     return;
                 }
-                for (int i = 0; i < trailGroup.trails().size(); i++)  {
+                for (int i = 0; i < trailGroup.elytraTrails().size(); i++)  {
 
-                    Trail trail = trailGroup.trails().get(i);
-                    Vec3 emitter = emitters.get(i).position();
-                    trail.points().add(new Trail.Point(emitter,speed));
+                    Trail trail = trailGroup.elytraTrails().get(i);
+                    Emitter emitter = emitters.get(i);
+                    trail.points().add(new Trail.Point(emitter.position(),speed,emitter.visible()));
                 }
             } else {
                 removeTrail(eid);
@@ -204,7 +210,9 @@ public class TrailManager {
     }
     public int activeTrailsNumber() {
         return activeTrails.values().stream()
-                .mapToInt(group -> group.trails().size())
+                .mapToInt(group -> group.elytraTrails().size())
+                .sum() + activeTrails.values().stream()
+                .mapToInt(group -> group.genericTrails().size())
                 .sum();
     }
     public int trailsNumber()
@@ -213,11 +221,10 @@ public class TrailManager {
     }
     private void gatherEntityTrails(Minecraft ctx, boolean recordEmitter) {
         if (ctx.level == null) return;
-        for (Entity entity :  ctx.level.entitiesForRendering()) {
+        for (Entity entity : ctx.level.entitiesForRendering()) {
 
             if(!TrailPackConfigManager.doesEntityHaveEmfTrails(entity) && ((!modConfig.tryWithoutEmf) && doesEntityHaveOverrides(entity)) || (!doesEntityHaveOverrides(entity) && !doesEntityHaveEmfTrails(entity)))
             {
-
                 continue;
             }
             int eid = entity.getId();
@@ -227,10 +234,7 @@ public class TrailManager {
             if (valid) {
                 List<Emitter> emitters = sampler.getEntityTrailEmitterPositions(entity, ctx.getDeltaTracker().getGameTimeDeltaPartialTick(false), config);
                 double speed = entity.getDeltaMovement().length();
-                if(entity instanceof Player)
-                {
-                    continue;
-                }
+
                 if (emitters.isEmpty())
                 {
                     if(modConfig.logTrails)
@@ -244,32 +248,59 @@ public class TrailManager {
                 {
                     return;
                 }
+                int baseEmitterId = 0;
+                List<Emitter> mergedEmitters = sampler.gatheredTrailsThisFrame.get(eid);
+                if (mergedEmitters != null) {
+                    baseEmitterId = mergedEmitters.size() - emitters.size();
+                    if (baseEmitterId < 0) {
+                        baseEmitterId = 0;
+                    }
+                }
+                final int emitterIdOffset = baseEmitterId;
+
                 EntityTrailGroup trailGroup = activeTrails.computeIfAbsent(eid, id -> {
-                    List<Trail> emittedTrails = new ArrayList<>();
+                    List<Trail> genericTrails = new ArrayList<>();
                     int emitterId = 0;
                     for (Emitter emitter : emitters) {
-                        emittedTrails.add(Trail.fromPlayerConfig(entity.getId(), emitter,emitterId, newTrailId()));
+                        genericTrails.add(Trail.fromPlayerConfig(entity.getId(), emitter, emitterIdOffset + emitterId, newTrailId()));
                         emitterId++;
                     }
 
-                    trails.addAll(emittedTrails);
+                    trails.addAll(genericTrails);
                     if(modConfig.logTrails)
                     {
-                        LOGGER.info("Created new trail group with {} trails for entity {} ({}})", emittedTrails.size(), id, entity.getType());
+                        LOGGER.info("Created new generic trail group with {} trails for entity {} ({})", genericTrails.size(), id, entity.getType());
                     }
                     return new EntityTrailGroup(
-                            emittedTrails
+                            new ArrayList<>(),
+                            genericTrails
                     );
                 });
-                if (trailGroup.trails().size() != emitters.size()) {
+
+                if (trailGroup.genericTrails().isEmpty()) {
+                    int emitterId = 0;
+                    for (Emitter emitter : emitters) {
+                        Trail newTrail = Trail.fromPlayerConfig(entity.getId(), emitter, emitterIdOffset + emitterId, newTrailId());
+                        trailGroup.genericTrails().add(newTrail);
+                        trails.add(newTrail);
+                        emitterId++;
+                    }
+
+                    if(modConfig.logTrails)
+                    {
+                        LOGGER.info("Initialized generic trails for existing entity {} ({}) with {} trails", eid, entity.getType(), trailGroup.genericTrails().size());
+                    }
+                }
+
+                if (trailGroup.genericTrails().size() != emitters.size()) {
                     activeTrails.remove(eid);
                     return;
                 }
-                for (int i = 0; i < trailGroup.trails().size(); i++)  {
 
-                    Trail trail = trailGroup.trails().get(i);
-                    Vec3 emitter = emitters.get(i).position();
-                    trail.points().add(new Trail.Point(emitter,speed));
+                for (int i = 0; i < trailGroup.genericTrails().size(); i++)  {
+                    Trail trail = trailGroup.genericTrails().get(i);
+                    Emitter emitter = emitters.get(i);
+                    trail.points().add(new Trail.Point(emitter.position(),speed,emitter.visible()));
                 }
             } else {
                 removeTrail(eid);
