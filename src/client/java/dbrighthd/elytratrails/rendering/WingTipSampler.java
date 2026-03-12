@@ -164,6 +164,9 @@ public class WingTipSampler {
                 return gatheredTrails;
             }
         }
+        if(!sampleSettings.useWithoutEmf()) {
+            return List.of();
+        }
         List<Emitter> gatheredTrails = getVanillaTrailEmittersGeneric(basePose, animatedRoot, entityModel, camera.position(), entityWorldOffset, entity, sampleSettings);
         if (config.alwaysSnapTrail) {
             putOrAppendGatheredThisFrame(eid, gatheredTrails);

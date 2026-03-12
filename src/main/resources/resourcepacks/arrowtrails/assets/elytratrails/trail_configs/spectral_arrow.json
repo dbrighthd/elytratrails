@@ -1,6 +1,7 @@
 {
   "defaults": {
     "parentPreset": "internal:spectral_arrow",
+    "useWithoutEmf": true,
     "speedDependentTrail": true,
     "trailMinSpeed" : 0.05,
     "xOffset": 8.0,

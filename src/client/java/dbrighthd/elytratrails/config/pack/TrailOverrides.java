@@ -132,6 +132,7 @@ public record TrailOverrides(JsonObject values) {
 
     public ResolvedSampleSettings resolvedSampleSettings() {
         return new ResolvedSampleSettings(
+                getBoolean("useWithoutEmf"),
                 getBoolean("speedDependentTrail"),
                 getDouble("trailMinSpeed"),
                 getDouble("xOffset"),

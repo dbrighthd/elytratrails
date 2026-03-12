@@ -1,5 +1,6 @@
 {
   "defaults": {
+    "useWithoutEmf": true,
     "parentPreset": "internal:allay",
     "xOffset": 0.0,
     "yOffset": 4.0,
