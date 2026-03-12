@@ -138,10 +138,11 @@ public class TrailManager {
         for (AbstractClientPlayer player : players) {
             int eid = player.getId();
             ResolvedTrailSettings config = getConfigFromPlayerId(eid);
+            ResolvedSampleSettings sampleSettings = getDefaultEntitySettings(player);
             boolean valid = TrailManager.isPlayerTrailValid(config, player);
 
             if (valid) {
-                List<Emitter> emitters = sampler.getPlayerTrailEmitterPositions(player, ctx.getDeltaTracker().getGameTimeDeltaPartialTick(false), modConfig);
+                List<Emitter> emitters = new ArrayList<>(sampler.getPlayerTrailEmitterPositions(player, ctx.getDeltaTracker().getGameTimeDeltaPartialTick(false), modConfig));
                 double speed = player.getDeltaMovement().length();
                 if (emitters.isEmpty()) {
                     if (modConfig.logTrails) {
@@ -150,8 +151,18 @@ public class TrailManager {
                     activeTrails.remove(eid);
                     continue;
                 }
+                if(modConfig.emfSupport)
+                {
+                    WingTipSampler.EntityEmitters modelEmitters = sampler.getEntityTrailEmitterPositions(player, ctx.getDeltaTracker().getGameTimeDeltaPartialTick(false),sampleSettings);
+                    if(modelEmitters.changedModelVariant())
+                    {
+                        activeTrails.remove(eid);
+                        continue;
+                    }
+                    emitters.addAll(modelEmitters.emitters());
+                }
                 if (!recordEmitter) {
-                    return;
+                    continue;
                 }
                 EntityTrailGroup trailGroup = activeTrails.computeIfAbsent(eid, id -> {
                     List<Trail> emittedTrails = new ArrayList<>();
@@ -207,7 +218,7 @@ public class TrailManager {
             boolean valid = TrailManager.isEntityTrailValid(config, entity);
 
             if (valid) {
-                List<Emitter> emitters = sampler.getEntityTrailEmitterPositions(entity, ctx.getDeltaTracker().getGameTimeDeltaPartialTick(false), config);
+                List<Emitter> emitters = sampler.getEntityTrailEmitterPositions(entity, ctx.getDeltaTracker().getGameTimeDeltaPartialTick(false), config).emitters();
                 double speed = entity.getDeltaMovement().length();
                 if (entity instanceof Player) {
                     continue;
@@ -220,7 +231,7 @@ public class TrailManager {
                     continue;
                 }
                 if (!recordEmitter) {
-                    return;
+                    continue;
                 }
                 EntityTrailGroup trailGroup = activeTrails.computeIfAbsent(eid, id -> {
                     List<Trail> emittedTrails = new ArrayList<>();

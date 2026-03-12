@@ -85,6 +85,10 @@ public class TrailRenderer {
             if (modConfig.alwaysSnapTrail && size > 4) {
                 List<Emitter> emitters = gatheredThisFrame.get(trail.entityId());
                 if (emitters != null && manager.isActiveTrail(trail)) {
+                    if(emitters.size() <= trail.emitterIndex())
+                    {
+                        manager.removeTrail(trail.entityId());
+                    }
                     Emitter emitter = emitters.get(trail.emitterIndex());
                     snappedLastPoint = copyTrailPointNewPos(points.get(last), emitter.position(), emitter.visible());
                 }

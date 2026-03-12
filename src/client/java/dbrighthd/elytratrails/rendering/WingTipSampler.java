@@ -60,6 +60,7 @@ public class WingTipSampler {
 
     private record ResolvedEmitterPoint(Vec3 position, boolean visible) {
     }
+    public record EntityEmitters(List<Emitter> emitters, boolean changedModelVariant){}
 
     public Map<Integer, List<Emitter>> gatheredTrailsThisFrame = new HashMap<>();
 
@@ -128,16 +129,16 @@ public class WingTipSampler {
         gatheredTrailsThisFrame.put(eid, emitters);
     }
 
-    public @NotNull List<Emitter> getEntityTrailEmitterPositions(Entity entity, float partialTick, ResolvedSampleSettings sampleSettings) {
+    public @NotNull EntityEmitters getEntityTrailEmitterPositions(Entity entity, float partialTick, ResolvedSampleSettings sampleSettings) {
         ModConfig config = getConfig();
         Minecraft mc = Minecraft.getInstance();
-        if (mc.level == null || ShaderChecksUtil.isShadowPass()) return List.of();
+        if (mc.level == null || ShaderChecksUtil.isShadowPass())  return new EntityEmitters(List.of(),false);
 
         Camera camera = mc.gameRenderer.getMainCamera();
         CameraRenderState cameraState = buildCameraState(camera);
         SubmitNodeStorage.ModelSubmit<?> entitySubmit = extractEntityRenderState(entity, mc, cameraState, partialTick);
         if (entitySubmit == null || !(entitySubmit.model() instanceof EntityModel<?> entityModel) || !(entitySubmit.state() instanceof EntityRenderState entityRenderState))
-            return List.of();
+            return new EntityEmitters(List.of(), false);
         setupAnyModelAnim(entityModel, entityRenderState);
         PoseStack basePose = new PoseStack();
         basePose.last().set(entitySubmit.pose());
@@ -151,7 +152,7 @@ public class WingTipSampler {
             if (!emfCacheGeneric.containsKey(eid) || !(emfCacheGeneric.get(eid).variant() == variant)) {
                 List<EmfWingTipHooks.SpawnerPath> found = EmfWingTipHooks.findAllSpawnerPathsGeneric(animatedRoot, false);
                 emfCacheGeneric.put(eid, new EmfInfo(entity.getType().toShortString(), variant, getSpawnersInfo(found)));
-                return List.of();
+                return new EntityEmitters(List.of(), true);
             }
 
             EmfInfo emfInfo = emfCacheGeneric.get(eid);
@@ -161,17 +162,17 @@ public class WingTipSampler {
                 if (config.alwaysSnapTrail) {
                     putOrAppendGatheredThisFrame(eid, gatheredTrails);
                 }
-                return gatheredTrails;
+                return new EntityEmitters(gatheredTrails,false);
             }
         }
         if(!sampleSettings.useWithoutEmf()) {
-            return List.of();
+            return new EntityEmitters(List.of(), false);
         }
         List<Emitter> gatheredTrails = getVanillaTrailEmittersGeneric(basePose, animatedRoot, entityModel, camera.position(), entityWorldOffset, entity, sampleSettings);
         if (config.alwaysSnapTrail) {
             putOrAppendGatheredThisFrame(eid, gatheredTrails);
         }
-        return gatheredTrails;
+        return new EntityEmitters(gatheredTrails,false);
     }
 
     public void removeFromEmfCache(int eid) {
@@ -469,6 +470,10 @@ public class WingTipSampler {
         List<SubmitNodeStorage.ModelSubmit<?>> submits = getAllModelSubmits();
         SubmitNodeStorage.ModelSubmit<?> fallback = null;
         for (SubmitNodeStorage.ModelSubmit<?> submit : submits) {
+            if(submit.model() instanceof ElytraModel)
+            {
+                continue;
+            }
             if (!(submit.model() instanceof EntityModel<?> entityModel)) continue;
             if (!(submit.state() instanceof EntityRenderState entityRenderState)) continue;
 
