@@ -1,6 +1,7 @@
 package dbrighthd.elytratrails.config.pack;
 
 import dbrighthd.elytratrails.network.ClientPlayerConfigStore;
+
 import static dbrighthd.elytratrails.config.pack.TrailPackConfigManager.resolveTrailFromPlayerConfig;
 
 /**
@@ -40,7 +41,7 @@ public record ResolvedTrailSettings(
         double distanceTillTrailEnd
 ) {
     public static ResolvedTrailSettings defaults(boolean isLeftWing) {
-        return resolveTrailFromPlayerConfig(ClientPlayerConfigStore.getLocalPlayerConfig(),isLeftWing);
+        return resolveTrailFromPlayerConfig(ClientPlayerConfigStore.getLocalPlayerConfig(), isLeftWing);
     }
 }
 

@@ -293,9 +293,9 @@ public final class ElytraTrailsKeybind {
 
     /**
      * -1: for left
-     *  1: for right
-     *  0: for alernating
-     *  else Integer.MIN_VALUE
+     * 1: for right
+     * 0: for alernating
+     * else Integer.MIN_VALUE
      */
     private static int firstPressedMode(boolean leftPressed, boolean rightPressed, boolean randomPressed, boolean allowRandom) {
         if (leftPressed) return -1;
@@ -311,5 +311,6 @@ public final class ElytraTrailsKeybind {
         return 1;
     }
 
-    private ElytraTrailsKeybind() {}
+    private ElytraTrailsKeybind() {
+    }
 }

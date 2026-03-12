@@ -16,11 +16,11 @@ import traben.entity_model_features.models.parts.EMFModelPartWithState;
 
 import java.util.*;
 
-import static dbrighthd.elytratrails.ElytraTrailsClient.getConfig;
 import static dbrighthd.elytratrails.config.pack.TrailPackConfigManager.entitiesWithTrails;
 
 public final class EmfTrailSpawnerRegistry {
-    private EmfTrailSpawnerRegistry() {}
+    private EmfTrailSpawnerRegistry() {
+    }
 
     private static volatile boolean initialized = false;
 
@@ -44,8 +44,7 @@ public final class EmfTrailSpawnerRegistry {
         }
     }
 
-    public static int getModelVariantFromModel(ModelPart emfRoot)
-    {
+    public static int getModelVariantFromModel(ModelPart emfRoot) {
         int variant = 1;
         if (emfRoot instanceof EMFModelPartWithState withState) {
             variant = Math.max(1, withState.currentModelVariant);
@@ -53,7 +52,8 @@ public final class EmfTrailSpawnerRegistry {
         return variant;
     }
 
-    public record TypeDef(List<Locator> locators) {}
+    public record TypeDef(List<Locator> locators) {
+    }
 
     public static void onResourceReload() {
         if (!ModStatuses.EMF_LOADED) return;
@@ -75,7 +75,7 @@ public final class EmfTrailSpawnerRegistry {
         SPAWNER_PATHS_BY_TYPE.put(typeString, spawnerPaths);
 
         if (!spawnerPaths.isEmpty()) {
-            Optional<EntityType<?>> entityType = EntityType.byString(typeString.substring(typeString.lastIndexOf(".")+1));
+            Optional<EntityType<?>> entityType = EntityType.byString(typeString.substring(typeString.lastIndexOf(".") + 1));
             entityType.ifPresent(entitiesWithTrails::add);
             entityType.ifPresent(TrailPackConfigManager::setEntityDefaultModel);
             TYPES_WITH_SPAWNERS.add(typeString);
@@ -329,5 +329,6 @@ public final class EmfTrailSpawnerRegistry {
         return lower.contains("wingtip") || lower.contains("trailspawner");
     }
 
-    private record PathNode(ModelPart part, String path) {}
+    private record PathNode(ModelPart part, String path) {
+    }
 }

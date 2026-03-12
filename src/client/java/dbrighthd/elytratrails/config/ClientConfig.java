@@ -1,7 +1,7 @@
 package dbrighthd.elytratrails.config;
 
-import dbrighthd.elytratrails.util.EasingUtil;
 import dbrighthd.elytratrails.network.PlayerConfig;
+import dbrighthd.elytratrails.util.EasingUtil;
 import net.minecraft.client.Minecraft;
 
 /**
@@ -56,6 +56,7 @@ public class ClientConfig {
     public transient int justAlpha;
     public transient int justColorRight;
     public transient int justAlphaRight;
+
     public ClientConfig(
             boolean enableTrail,
             boolean enableRandomWidth,
@@ -192,8 +193,7 @@ public class ClientConfig {
         return new ClientConfig();
     }
 
-    public PlayerConfig getPlayerConfig()
-    {
+    public PlayerConfig getPlayerConfig() {
         return new PlayerConfig(
                 enableTrail,
                 enableRandomWidth,
@@ -232,13 +232,13 @@ public class ClientConfig {
                 maxWidthSpeed,
                 trailMovesWithAngleOfAttack,
                 useColorBoth,
-                colorRight,wingtipVerticalPosition,
+                colorRight, wingtipVerticalPosition,
                 wingtipHorizontalPosition,
                 wingtipDepthPosition,
                 distanceTillTrailEnd);
     }
-    public PlayerConfig getHiddenPlayerConfig()
-    {
+
+    public PlayerConfig getHiddenPlayerConfig() {
         return new PlayerConfig(
                 false,
                 enableRandomWidth,

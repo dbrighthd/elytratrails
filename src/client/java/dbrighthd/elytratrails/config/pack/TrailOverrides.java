@@ -9,7 +9,6 @@ import static dbrighthd.elytratrails.config.pack.TrailPackConfigManager.parseHex
 /**
  * TrailOverrides store a json object that can have any or none of the properties in ResolvedTrailSettings. exists to have stuff override eachotheer,
  * useful for presets and also resource packs.
- *
  */
 public record TrailOverrides(JsonObject values) {
     public TrailOverrides(@Nullable JsonObject values) {
@@ -22,10 +21,8 @@ public record TrailOverrides(JsonObject values) {
     public static TrailOverrides fromBase(PlayerConfig baseConfig) {
         JsonObject json = new JsonObject();
 
-        try
-        {
-            for (java.lang.reflect.RecordComponent component : PlayerConfig.class.getRecordComponents())
-            {
+        try {
+            for (java.lang.reflect.RecordComponent component : PlayerConfig.class.getRecordComponents()) {
                 String name = component.getName();
                 Object value = component.getAccessor().invoke(baseConfig);
                 switch (value) {
@@ -34,7 +31,8 @@ public record TrailOverrides(JsonObject values) {
                     case Character c -> json.addProperty(name, c);
                     case String s -> json.addProperty(name, s);
                     case Enum<?> e -> json.addProperty(name, e.name());
-                    case null, default -> {}
+                    case null, default -> {
+                    }
                 }
 
             }
@@ -129,8 +127,9 @@ public record TrailOverrides(JsonObject values) {
                 getDouble("minWidthSpeed"),
                 getDouble("maxWidthSpeed"),
                 getDouble("distanceTillTrailEnd")
-                );
+        );
     }
+
     public ResolvedSampleSettings resolvedSampleSettings() {
         return new ResolvedSampleSettings(
                 getBoolean("speedDependentTrail"),
@@ -158,15 +157,13 @@ public record TrailOverrides(JsonObject values) {
 
     private String getTexture(boolean isLeftWing) {
         String prideTrailRight = getString("prideTrailRight");
-        if(!isLeftWing && (!(prideTrailRight == null || prideTrailRight.isEmpty())))
-        {
+        if (!isLeftWing && (!(prideTrailRight == null || prideTrailRight.isEmpty()))) {
             return prideTrailRight;
         }
         return getString("prideTrail");
     }
 
-    private int getTrailColor(boolean isLeftWing)
-    {
+    private int getTrailColor(boolean isLeftWing) {
         return getBoolean("useColorBoth") ? resolveColor("color") : (isLeftWing ? resolveColor("color") : resolveColor("colorRight"));
     }
 }

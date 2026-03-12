@@ -8,7 +8,7 @@ import dbrighthd.elytratrails.rendering.math.SplineInterpolation;
 import dbrighthd.elytratrails.util.TimeUtil;
 import net.fabricmc.fabric.api.client.rendering.v1.world.WorldRenderContext;
 import net.minecraft.client.Camera;
-import net.minecraft .client.Minecraft;
+import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.LightTexture;
 import net.minecraft.client.renderer.rendertype.RenderType;
 import net.minecraft.client.renderer.texture.OverlayTexture;
@@ -30,7 +30,8 @@ import java.util.Map;
 import static dbrighthd.elytratrails.ElytraTrailsClient.getConfig;
 import static java.lang.Math.max;
 import static java.lang.Math.min;
-import static net.minecraft.util.ARGB.*;
+import static net.minecraft.util.ARGB.alphaFloat;
+import static net.minecraft.util.ARGB.color;
 
 /**
  * Handles trail rendering
@@ -43,7 +44,7 @@ public class TrailRenderer {
 
     private float accumDist = 0.0f;
     private ModConfig modConfig;
-    private final PerlinNoise perlinNoise =  PerlinNoise.create(RandomSource.create(), List.of(1));
+    private final PerlinNoise perlinNoise = PerlinNoise.create(RandomSource.create(), List.of(1));
     private float totalTrailLength;
     boolean isFirstPerson;
     boolean atEnd;
@@ -55,11 +56,11 @@ public class TrailRenderer {
     private static boolean useLightMap;
     private Vec3 cameraPosition;
     long currentTime;
+
     public TrailRenderer(@NotNull TrailManager manager) {
         this.manager = manager;
     }
 
-    @SuppressWarnings("resource")
     public void renderAllTrails(@NotNull WorldRenderContext ctx, Map<Integer, List<Emitter>> gatheredThisFrame) {
         PoseStack stack = ctx.matrices();
         minecraft = Minecraft.getInstance();
@@ -94,7 +95,7 @@ public class TrailRenderer {
             final Trail.Point effectiveLastPoint = snappedLastPoint != null ? snappedLastPoint : points.get(last);
 
             ctx.commandQueue().order(1).submitCustomGeometry(stack, renderType, (pose, consumer) -> {
-                useLightMap = renderType == TrailPipelines.entityTranslucentCull(trail.texture()) || renderType == TrailPipelines.entityTranslucentCullWireFrame(trail.texture())  || renderType == TrailPipelines.entityCutoutLit(trail.texture());
+                useLightMap = renderType == TrailPipelines.entityTranslucentCull(trail.texture()) || renderType == TrailPipelines.entityTranslucentCullWireFrame(trail.texture()) || renderType == TrailPipelines.entityCutoutLit(trail.texture());
                 totalTrailLength = 0f;
                 currentTime = TimeUtil.currentMillis();
                 for (int i = 0; i < last; i++) {
@@ -155,55 +156,39 @@ public class TrailRenderer {
         stack.popPose();
     }
 
-    private Trail.Point copyTrailPointNewPos(Trail.Point point, Vec3 newPos)
-    {
+    private Trail.Point copyTrailPointNewPos(Trail.Point point, Vec3 newPos) {
         return new Trail.Point(newPos, point.epoch());
     }
-    private RenderType getRenderType(Trail trail, ResolvedTrailSettings trailSettings)
-    {
-        if(trailSettings.glowingTrails())
-        {
-            if(trailSettings.translucentTrails())
-            {
-                if(trailSettings.wireframeTrails())
-                {
+
+    private RenderType getRenderType(Trail trail, ResolvedTrailSettings trailSettings) {
+        if (trailSettings.glowingTrails()) {
+            if (trailSettings.translucentTrails()) {
+                if (trailSettings.wireframeTrails()) {
                     return TrailPipelines.entityTranslucentEmissiveWireFrame(trail.texture());
                 }
                 return TrailPipelines.entityTranslucentEmissiveUnlit(trail.texture());
-            }
-            else
-            {
-                if(trailSettings.wireframeTrails())
-                {
+            } else {
+                if (trailSettings.wireframeTrails()) {
                     return TrailPipelines.entityCutoutEmissiveUnlitWireframe(trail.texture());
-                }
-                else
-                {
+                } else {
                     return TrailPipelines.entityCutoutEmissiveUnlit(trail.texture());
 
                 }
             }
-        }
-        else
-        {
-            if(trailSettings.wireframeTrails())
-            {
+        } else {
+            if (trailSettings.wireframeTrails()) {
                 return TrailPipelines.entityTranslucentCullWireFrame(trail.texture());
-            }
-            else
-            {
-                if(trailSettings.translucentTrails())
-                {
+            } else {
+                if (trailSettings.translucentTrails()) {
                     return TrailPipelines.entityTranslucentCull(trail.texture());
-                }
-                else
-                {
+                } else {
                     return TrailPipelines.entityCutoutLit(trail.texture());
 
                 }
             }
         }
     }
+
     private void renderSubdividedSegment(
             PoseStack.Pose pose, VertexConsumer consumer,
             Trail.Point point0, Trail.Point point1, Trail.Point point2,
@@ -218,10 +203,8 @@ public class TrailRenderer {
         Vec3 chord = endPos.subtract(startPos);
 
         double chordLenSq = chord.lengthSqr();
-        if(chordLenSq > 400)
-        {
-            if(modConfig.logTrails)
-            {
+        if (chordLenSq > 400) {
+            if (modConfig.logTrails) {
                 LOGGER.info("Trail removed for entity {}, trail segment was too long and discarded as invalid.", trail.entityId());
             }
             manager.removeTrail(trail.entityId());
@@ -229,8 +212,7 @@ public class TrailRenderer {
         }
         boolean needsSplit = false;
 
-        if(modConfig.useSplines)
-        {
+        if (modConfig.useSplines) {
             if (chordLenSq > 0.0001) {
                 Vec3 toMid = midPos.subtract(startPos);
                 double distFromChord = toMid.cross(chord).lengthSqr() / chordLenSq;
@@ -257,78 +239,64 @@ public class TrailRenderer {
             double start = Mth.lerp(tStart, epoch0, epoch1);
             double end = Mth.lerp(tEnd, epoch0, epoch1);
 
-            double trailLifetimeMillis = trailSettings.enableTrail() ? trailSettings.trailLifetime()* 1000 : 0;
-            float alphaEnd = trailSettings.lifeTimeFade() ?  computeLifetimeFadeout(end, currentTime, (long) (trailLifetimeMillis)) : 1f;
+            double trailLifetimeMillis = trailSettings.enableTrail() ? trailSettings.trailLifetime() * 1000 : 0;
+            float alphaEnd = trailSettings.lifeTimeFade() ? computeLifetimeFadeout(end, currentTime, (long) (trailLifetimeMillis)) : 1f;
             float alphaStart = trailSettings.lifeTimeFade() ? computeLifetimeFadeout(start, currentTime, (long) (trailLifetimeMillis)) : 1f;
-            if((currentTime - end) >= trailLifetimeMillis)
-            {
+            if ((currentTime - end) >= trailLifetimeMillis) {
                 endCorrection = v2;
             }
-            float correctedEnd = endCorrection + (float)trailSettings.distanceTillTrailEnd();
-            float scaleStart = computeWidthScaling(totalTrailLength- v1, v1-correctedEnd, trailSettings);
-            float scaleEnd = computeWidthScaling(totalTrailLength- v2, v2-correctedEnd, trailSettings);
-            if(trailSettings.startRampDistance() == 0)
-            {
-                if(scaleEnd == 0)
-                {
+            float correctedEnd = endCorrection + (float) trailSettings.distanceTillTrailEnd();
+            float scaleStart = computeWidthScaling(totalTrailLength - v1, v1 - correctedEnd, trailSettings);
+            float scaleEnd = computeWidthScaling(totalTrailLength - v2, v2 - correctedEnd, trailSettings);
+            if (trailSettings.startRampDistance() == 0) {
+                if (scaleEnd == 0) {
                     scaleEnd = scaleStart;
                 }
             }
-            if(trailSettings.endRampDistance() == 0)
-            {
-                if(scaleStart == 0)
-                {
+            if (trailSettings.endRampDistance() == 0) {
+                if (scaleStart == 0) {
                     scaleStart = scaleEnd;
                 }
             }
-            if(isFirstPerson && modConfig.fadeFirstPersonTrail && modConfig.firstPersonFadeTime > 0)
-            {
+            if (isFirstPerson && modConfig.fadeFirstPersonTrail && modConfig.firstPersonFadeTime > 0) {
                 scaleStart *= firstPersonWidthFadeFactor(start, currentTime);
                 scaleEnd *= firstPersonWidthFadeFactor(end, currentTime);
             }
 
-            if(trailSettings.enableRandomWidth())
-            {
-                scaleStart = scaleStart * (float)trailSettings.randomWidthVariation() *((float)( perlinNoise.getValue(startPos.x,startPos.y,startPos.z)) + 1);
-                scaleEnd = scaleEnd * (float)trailSettings.randomWidthVariation() *((float)( perlinNoise.getValue(endPos.x,endPos.y,endPos.z)) + 1);
+            if (trailSettings.enableRandomWidth()) {
+                scaleStart = scaleStart * (float) trailSettings.randomWidthVariation() * ((float) (perlinNoise.getValue(startPos.x, startPos.y, startPos.z)) + 1);
+                scaleEnd = scaleEnd * (float) trailSettings.randomWidthVariation() * ((float) (perlinNoise.getValue(endPos.x, endPos.y, endPos.z)) + 1);
 
             }
-            if(trailSettings.increaseWidthOverTime())
-            {
+            if (trailSettings.increaseWidthOverTime()) {
                 scaleStart *= getWidthOverTimeScale(start, currentTime, (long) (trailLifetimeMillis), trailSettings);
                 scaleEnd *= getWidthOverTimeScale(end, currentTime, (long) (trailLifetimeMillis), trailSettings);
             }
-            if(trailSettings.fadeStart() && trailSettings.translucentTrails())
-            {
-                alphaStart *= computeStartFade(totalTrailLength- v1, trailSettings);
-                alphaEnd *= computeStartFade(totalTrailLength- v2, trailSettings);
+            if (trailSettings.fadeStart() && trailSettings.translucentTrails()) {
+                alphaStart *= computeStartFade(totalTrailLength - v1, trailSettings);
+                alphaEnd *= computeStartFade(totalTrailLength - v2, trailSettings);
             }
-            if(trailSettings.endDistanceFade() && trailSettings.translucentTrails())
-            {
-                alphaStart *= computeEndFade(v1-correctedEnd, trailSettings);
-                alphaEnd *= computeEndFade(v2-correctedEnd, trailSettings);
+            if (trailSettings.endDistanceFade() && trailSettings.translucentTrails()) {
+                alphaStart *= computeEndFade(v1 - correctedEnd, trailSettings);
+                alphaEnd *= computeEndFade(v2 - correctedEnd, trailSettings);
             }
-            if(trailSettings.speedBasedAlpha())
-            {
-                alphaStart *= inverseLerpTwoVals(point0.speedAtEmission(),trailSettings.minAlphaSpeed(),trailSettings.maxAlphaSpeed());
-                alphaEnd *= inverseLerpTwoVals(point1.speedAtEmission(),trailSettings.minAlphaSpeed(),trailSettings.maxAlphaSpeed());
+            if (trailSettings.speedBasedAlpha()) {
+                alphaStart *= inverseLerpTwoVals(point0.speedAtEmission(), trailSettings.minAlphaSpeed(), trailSettings.maxAlphaSpeed());
+                alphaEnd *= inverseLerpTwoVals(point1.speedAtEmission(), trailSettings.minAlphaSpeed(), trailSettings.maxAlphaSpeed());
             }
-            if(trailSettings.speedBasedWidth())
-            {
-                scaleStart *= inverseLerpTwoVals(point0.speedAtEmission(),trailSettings.minWidthSpeed(),trailSettings.maxWidthSpeed());
-                scaleEnd *= inverseLerpTwoVals(point1.speedAtEmission(),trailSettings.minWidthSpeed(),trailSettings.maxWidthSpeed());
+            if (trailSettings.speedBasedWidth()) {
+                scaleStart *= inverseLerpTwoVals(point0.speedAtEmission(), trailSettings.minWidthSpeed(), trailSettings.maxWidthSpeed());
+                scaleEnd *= inverseLerpTwoVals(point1.speedAtEmission(), trailSettings.minWidthSpeed(), trailSettings.maxWidthSpeed());
             }
-            if(modConfig.tryNearTrailFade)
-            {
-                alphaStart *= cameraDistanceFade((float)startPos.distanceTo(cameraPosition));
-                alphaEnd *= cameraDistanceFade((float)endPos.distanceTo(cameraPosition));
+            if (modConfig.tryNearTrailFade) {
+                alphaStart *= cameraDistanceFade((float) startPos.distanceTo(cameraPosition));
+                alphaEnd *= cameraDistanceFade((float) endPos.distanceTo(cameraPosition));
             }
             float halfWidthStart = (float) (trailSettings.maxWidth() / 2f) * scaleStart;
             float halfWidthEnd = (float) (trailSettings.maxWidth() / 2f) * scaleEnd;
 
             if ((scaleStart != 0 || scaleEnd != 0) && (alphaEnd != 0 || alphaStart != 0)) {
-                if(!trailSettings.translucentTrails())
-                {
+                if (!trailSettings.translucentTrails()) {
                     alphaEnd = 1;
                     alphaStart = 1;
                 }
@@ -338,10 +306,10 @@ public class TrailRenderer {
                 Vec3 sideA = startTan.cross(startPos.subtract(cameraPosition).normalize()).normalize();
                 Vec3 sideB = endTan.cross(endPos.subtract(cameraPosition).normalize()).normalize();
 
-                float removeDist = manager.deadPointDistance.getOrDefault(trail.trailId(),0f);
+                float removeDist = manager.deadPointDistance.getOrDefault(trail.trailId(), 0f);
                 v1 += removeDist;
                 v2 += removeDist;
-                v1 /=(float) trailSettings.maxWidth();
+                v1 /= (float) trailSettings.maxWidth();
                 v2 /= (float) trailSettings.maxWidth();
                 quadBetweenPoints(pose, consumer, startPos, endPos, sideA, sideB, halfWidthStart, halfWidthEnd, v1, v2, alphaStart, alphaEnd, trail.isLeftWing(), color);
             }
@@ -351,15 +319,15 @@ public class TrailRenderer {
 
     private float getWidthOverTimeScale(double epoch, long currentTime, long maxLifetime, ResolvedTrailSettings trailSettings) {
         long age = (long) (currentTime - epoch);
-        return (float)Mth.lerp((double) age /maxLifetime, trailSettings.startingWidthMultiplier(), trailSettings.endingWidthMultiplier());
+        return (float) Mth.lerp((double) age / maxLifetime, trailSettings.startingWidthMultiplier(), trailSettings.endingWidthMultiplier());
     }
 
     private float firstPersonWidthFadeFactor(double epoch, long currentTime) {
-        float fadeAmount = ((float)(currentTime - epoch))/1000;
+        float fadeAmount = ((float) (currentTime - epoch)) / 1000;
 
-        float fpCameraFadeFull = (float)modConfig.firstPersonFadeTime + 0.2f;
-        float fpCameraFadeZero = (float)modConfig.firstPersonFadeTime;
-        float fadeRange = fpCameraFadeFull - (float)modConfig.firstPersonFadeTime;
+        float fpCameraFadeFull = (float) modConfig.firstPersonFadeTime + 0.2f;
+        float fpCameraFadeZero = (float) modConfig.firstPersonFadeTime;
+        float fadeRange = fpCameraFadeFull - (float) modConfig.firstPersonFadeTime;
         if (fadeRange <= 1e-6f) {
             return (fadeAmount >= fpCameraFadeFull) ? 1.0f : 0.0f;
         }
@@ -370,24 +338,21 @@ public class TrailRenderer {
         return normalizedFade;
     }
 
-    private float inverseLerpTwoVals(double t, double a, double b)
-    {
+    private float inverseLerpTwoVals(double t, double a, double b) {
         if (a == b) return 1.0f;
-        return (float) Math.clamp(((t - a) / (b - a)),0,1);
+        return (float) Math.clamp(((t - a) / (b - a)), 0, 1);
     }
+
     private float computeWidthScaling(float distFromStart, float distToEnd, ResolvedTrailSettings config) {
-        if(distFromStart <= 0)
-        {
+        if (distFromStart <= 0) {
             return 0.0f;
         }
         float endRamp = (float) config.endRampDistance();
         float startRamp = (float) config.startRampDistance();
         float up;
-        if (startRamp < 1e-6f){
+        if (startRamp < 1e-6f) {
             up = 1f;
-        }
-        else
-        {
+        } else {
             if (distFromStart >= startRamp) up = 1f;
             else up = (float) Math.sin((distFromStart / startRamp) * (Math.PI / 2.0));
         }
@@ -415,35 +380,32 @@ public class TrailRenderer {
         float t = Mth.clamp(dist / ramp, 0.0f, 1.0f);
         return t * t;
     }
+
     @SuppressWarnings("unused")
-    private float computeWidthScalingButGood(float distFromStart, float distToEnd, ResolvedTrailSettings config)
-    {
+    private float computeWidthScalingButGood(float distFromStart, float distToEnd, ResolvedTrailSettings config) {
         return computeWidthScalingStart(distFromStart, config) * computeWidthScalingEnd(distToEnd, config);
     }
-    private float computeWidthScalingStart(float distFromStart, ResolvedTrailSettings config)
-    {
-        if(distFromStart > config.startRampDistance())
-        {
+
+    private float computeWidthScalingStart(float distFromStart, ResolvedTrailSettings config) {
+        if (distFromStart > config.startRampDistance()) {
             return 1f;
         }
-        if(distFromStart <= 0)
-        {
+        if (distFromStart <= 0) {
             return 0f;
         }
         return (float) Math.sin(distFromStart / ((config.startRampDistance()) * (2 / Math.PI)));
     }
-    private float computeWidthScalingEnd(float distToEnd, ResolvedTrailSettings config)
-    {
-        if(distToEnd > config.endRampDistance())
-        {
+
+    private float computeWidthScalingEnd(float distToEnd, ResolvedTrailSettings config) {
+        if (distToEnd > config.endRampDistance()) {
             return 1f;
         }
-        if(distToEnd <= 0)
-        {
+        if (distToEnd <= 0) {
             return 0;
         }
         return (float) Math.sin(distToEnd / ((config.endRampDistance()) * (2 / Math.PI)));
     }
+
     private float computeLifetimeFadeout(double epoch, long currentTime, long maxLifetime) {
         long age = (long) (currentTime - epoch);
         if (age >= maxLifetime) return 0.0f;
@@ -521,8 +483,7 @@ public class TrailRenderer {
         Vec3 midPos = SplineInterpolation.catmullRom(p0, p1, p2, p3, midT);
         boolean needsSplit = false;
 
-        if(modConfig.useSplines)
-        {
+        if (modConfig.useSplines) {
             Vec3 chord = endPos.subtract(startPos);
 
             double chordLenSq = chord.lengthSqr();
@@ -543,15 +504,16 @@ public class TrailRenderer {
             this.totalTrailLength += (float) startPos.distanceTo(endPos);
         }
     }
+
     private float cameraDistanceFade(float cameraDistBlocks) {
         float denom = (CAMERA_FADE_FULL - CAMERA_FADE_ZERO);
         float t = (cameraDistBlocks - CAMERA_FADE_ZERO) / denom;
         t = Mth.clamp(t, 0f, 1f);
         return t * t * (3f - 2f * t);
     }
+
     // minecraft's alpha multiply function sets color to 0 when alpha is 0, which breaks with our interpolation. this function does the same but just sets alpha to be min 0
-    private int multiplyAlpha(int color, float alpha)
-    {
-        return alpha >= 1.0F ? color : color(alphaFloat(color) * max(0,alpha), color);
+    private int multiplyAlpha(int color, float alpha) {
+        return alpha >= 1.0F ? color : color(alphaFloat(color) * max(0, alpha), color);
     }
 }

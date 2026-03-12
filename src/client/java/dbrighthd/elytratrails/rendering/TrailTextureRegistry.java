@@ -10,7 +10,8 @@ import java.util.Set;
 
 
 public final class TrailTextureRegistry {
-    private TrailTextureRegistry() {}
+    private TrailTextureRegistry() {
+    }
 
     private static volatile Set<String> AVAILABLE = Collections.emptySet();
 

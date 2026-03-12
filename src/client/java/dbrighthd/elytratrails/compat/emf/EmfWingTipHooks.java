@@ -2,21 +2,16 @@ package dbrighthd.elytratrails.compat.emf;
 
 import net.minecraft.client.model.geom.ModelPart;
 
-import java.util.ArrayDeque;
-import java.util.ArrayList;
-import java.util.Deque;
-import java.util.Comparator;
-import java.util.List;
-import java.util.Map;
-
-import static dbrighthd.elytratrails.ElytraTrailsClient.getConfig;
+import java.util.*;
 
 public final class EmfWingTipHooks {
-    private EmfWingTipHooks() {}
+    private EmfWingTipHooks() {
+    }
 
-    public enum WhichRoot { LEFT_WING, RIGHT_WING }
+    public enum WhichRoot {LEFT_WING, RIGHT_WING}
 
-    public record SpawnerPath(WhichRoot where, String path, String key) {}
+    public record SpawnerPath(WhichRoot where, String path, String key) {
+    }
 
 
     public static List<SpawnerPath> findAllSpawnerPaths(ModelPart leftWingRoot, ModelPart rightWingRoot, boolean FAPlayerCheck) {
@@ -31,6 +26,7 @@ public final class EmfWingTipHooks {
 
         return out;
     }
+
     public static List<SpawnerPath> findAllSpawnerPathsGeneric(ModelPart modelRoot, boolean FAPlayerCheck) {
         ArrayList<SpawnerPath> out = new ArrayList<>();
         if (modelRoot != null) out.addAll(findSpawnerPaths(modelRoot, WhichRoot.LEFT_WING, FAPlayerCheck));
@@ -74,7 +70,8 @@ public final class EmfWingTipHooks {
         return lower.contains("wingtip") || lower.contains("trailspawner") || (FAPlayerCheck && (lower.contains("left_wing2") || lower.contains("right_wing2")));
     }
 
-    private record Found(WhichRoot where, String path, String key, ModelPart part) {}
+    private record Found(WhichRoot where, String path, String key, ModelPart part) {
+    }
 
 
     @SuppressWarnings("unused")
@@ -109,5 +106,6 @@ public final class EmfWingTipHooks {
         return false;
     }
 
-    private record Node(ModelPart part, String path) {}
+    private record Node(ModelPart part, String path) {
+    }
 }

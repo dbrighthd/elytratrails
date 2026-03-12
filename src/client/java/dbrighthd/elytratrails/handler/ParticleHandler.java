@@ -1,6 +1,5 @@
 package dbrighthd.elytratrails.handler;
 
-import com.ibm.icu.text.MessagePattern;
 import dbrighthd.elytratrails.config.ModConfig;
 import me.shedaniel.autoconfig.AutoConfig;
 import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents;

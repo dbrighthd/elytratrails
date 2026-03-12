@@ -33,7 +33,8 @@ import java.util.stream.Stream;
 import static dbrighthd.elytratrails.ElytraTrailsClient.getConfig;
 
 public final class TrailPackConfigManager {
-    private TrailPackConfigManager() {}
+    private TrailPackConfigManager() {
+    }
 
     @SuppressWarnings("deprecation")
     private static final Gson GSON = new GsonBuilder().setLenient().create();
@@ -56,35 +57,35 @@ public final class TrailPackConfigManager {
         MODEL_TRAIL_CONFIGS.clear();
         maxLifetimeOverrideSeconds = -1.0;
     }
-    public static List<String> getModelStrings()
-    {
+
+    public static List<String> getModelStrings() {
         return Collections.list(MODEL_TRAIL_CONFIGS.keys());
     }
-    public static ResolvedSampleSettings getDefaultEntitySettings(Entity entity)
-    {
-        return entityDefaults.getOrDefault(entity.getType(),defaultResolved);
+
+    public static ResolvedSampleSettings getDefaultEntitySettings(Entity entity) {
+        return entityDefaults.getOrDefault(entity.getType(), defaultResolved);
     }
-    public static void setDefaultEntitySettingsOverrides()
-    {
-        for(EntityType<?> entityType : entitiesWithTrailOverrides)
-        {
+
+    public static void setDefaultEntitySettingsOverrides() {
+        for (EntityType<?> entityType : entitiesWithTrailOverrides) {
             entityDefaults.put(entityType, resolveSample(entityType.toShortString()));
         }
         defaultResolved = ResolvedSampleSettings.defaults();
     }
-    public static void setEntityDefaultModel(EntityType<?> entityType)
-    {
-            entityDefaults.put(entityType, resolveSample(entityType.toShortString()));
+
+    public static void setEntityDefaultModel(EntityType<?> entityType) {
+        entityDefaults.put(entityType, resolveSample(entityType.toShortString()));
     }
+
     @SuppressWarnings("BooleanMethodIsAlwaysInverted")
-    public static boolean doesEntityHaveEmfTrails(Entity entity)
-    {
+    public static boolean doesEntityHaveEmfTrails(Entity entity) {
         return entitiesWithTrails.contains(entity.getType());
     }
-    public static boolean doesEntityHaveOverrides(Entity entity)
-    {
+
+    public static boolean doesEntityHaveOverrides(Entity entity) {
         return entitiesWithTrailOverrides.contains(entity.getType());
     }
+
     public static void reload(@Nullable ResourceManager resourceManager) {
         clear();
         entitiesWithTrailOverrides.clear();
@@ -171,39 +172,32 @@ public final class TrailPackConfigManager {
         } catch (Throwable ignored) {
         }
     }
-    public static void applyPreset(boolean self, String presetName, ModConfig modConfig)
-    {
-        if(!CONFIG_PRESETS.containsKey(presetName))
-        {
+
+    public static void applyPreset(boolean self, String presetName, ModConfig modConfig) {
+        if (!CONFIG_PRESETS.containsKey(presetName)) {
             return;
         }
         TrailOverrides overrides = CONFIG_PRESETS.get(presetName);
-        if(self)
-        {
+        if (self) {
             applyPresetToConfig(overrides, modConfig.clientPlayerConfig);
-        }
-        else
-        {
-            applyPresetToConfig(overrides,modConfig.otherPlayerConfig);
+        } else {
+            applyPresetToConfig(overrides, modConfig.otherPlayerConfig);
         }
     }
-    public static void applyPresetToConfig(TrailOverrides preset, ClientConfig config)
-    {
+
+    public static void applyPresetToConfig(TrailOverrides preset, ClientConfig config) {
         try {
             Map<String, Field> configFields = new HashMap<>();
-            for (Field field : ClientConfig.class.getDeclaredFields())
-            {
+            for (Field field : ClientConfig.class.getDeclaredFields()) {
                 field.setAccessible(true);
                 configFields.put(field.getName(), field);
             }
 
             JsonObject values = preset.values();
 
-            for (var entry : values.entrySet())
-            {
+            for (var entry : values.entrySet()) {
                 Field configField = configFields.get(entry.getKey());
-                if (configField == null)
-                {
+                if (configField == null) {
                     continue;
                 }
 
@@ -238,6 +232,7 @@ public final class TrailPackConfigManager {
             throw new RuntimeException("Failed to apply preset to config", e);
         }
     }
+
     private static @Nullable String presetKeyFromPresetPath(String rawPath) {
         String normalizedPath = rawPath.replace('\\', '/');
         if (!normalizedPath.startsWith(PRESETS_FOLDER + "/")) return null;
@@ -278,12 +273,9 @@ public final class TrailPackConfigManager {
             TrailOverrides overrides = TrailOverrides.fromJson(rootObject);
             if (overrides.isEmpty()) return;
 
-            if(!hidden)
-            {
+            if (!hidden) {
                 CONFIG_PRESETS.put(presetKey, overrides);
-            }
-            else
-            {
+            } else {
                 HIDDEN_CONFIG_PRESETS.put(presetKey, overrides);
 
             }
@@ -359,6 +351,7 @@ public final class TrailPackConfigManager {
         } catch (Throwable ignored) {
         }
     }
+
     private static void loadAndCacheDiskPresetFile(Path file) {
         try (BufferedReader reader = Files.newBufferedReader(file, StandardCharsets.UTF_8)) {
             JsonElement rootElement = GSON.fromJson(reader, JsonElement.class);
@@ -383,12 +376,12 @@ public final class TrailPackConfigManager {
         }
         return configDefaultSeconds;
     }
+
     public static ResolvedSampleSettings resolveSample(@Nullable String entityName) {
         String normalizedModelKey = normalizeModelKey(entityName);
         ModelTrailConfig modelConfig = (normalizedModelKey == null) ? null : MODEL_TRAIL_CONFIGS.get(normalizedModelKey);
         if (modelConfig != null && modelConfig.defaultOverrides != null) {
-            if(modelConfig.defaultOverrides.values().has("parentPreset"))
-            {
+            if (modelConfig.defaultOverrides.values().has("parentPreset")) {
                 TrailOverrides merged = modelConfig.defaultOverrides.with(getPresetOverrides(modelConfig.defaultOverrides.getString("parentPreset")));
                 return merged.resolvedSampleSettings();
             }
@@ -396,35 +389,30 @@ public final class TrailPackConfigManager {
         }
         return ResolvedSampleSettings.defaults();
     }
+
     public static ResolvedTrailSettings resolve(@Nullable String modelName, @Nullable String boneName, @Nullable PlayerConfig baseConfig, boolean isLeftWing) {
         if (baseConfig == null) return ResolvedTrailSettings.defaults(isLeftWing);
-        if (boneName != null)
-        {
-            boneName = boneName.substring(boneName.lastIndexOf('/')+1).replace("EMF_","");
+        if (boneName != null) {
+            boneName = boneName.substring(boneName.lastIndexOf('/') + 1).replace("EMF_", "");
         }
         ModConfig mainConfig = getConfig();
         String normalizedModelKey = normalizeModelKey(modelName);
         ModelTrailConfig modelConfig = (normalizedModelKey == null) ? null : MODEL_TRAIL_CONFIGS.get(normalizedModelKey);
-        if(modelConfig == null)
-        {
-            if(mainConfig.logTrails)
-            {
-                LOGGER.info("starting trail from model {} on bone {}, no overrides. with configs: {}", modelName, boneName, resolveTrailFromPlayerConfig(baseConfig,isLeftWing));
+        if (modelConfig == null) {
+            if (mainConfig.logTrails) {
+                LOGGER.info("starting trail from model {} on bone {}, no overrides. with configs: {}", modelName, boneName, resolveTrailFromPlayerConfig(baseConfig, isLeftWing));
 
             }
-            return resolveTrailFromPlayerConfig(baseConfig,isLeftWing);
+            return resolveTrailFromPlayerConfig(baseConfig, isLeftWing);
         }
         TrailOverrides mergedOverrides = TrailOverrides.fromBase(baseConfig);
-        if(!mainConfig.resourcePackOverride && modelName.contains("elytra"))
-        {
+        if (!mainConfig.resourcePackOverride && modelName.contains("elytra")) {
             return mergedOverrides.resolvedTrailSettings(isLeftWing);
         }
         if (modelConfig.defaultOverrides != null) {
             String parentPreset = modelConfig.defaultOverrides.getString("parentPreset");
-            if(parentPreset != null)
-            {
-                if(mainConfig.logTrails)
-                {
+            if (parentPreset != null) {
+                if (mainConfig.logTrails) {
                     LOGGER.info("Parent default preset found in model {}, preset name: {}", modelName, parentPreset);
                 }
                 TrailOverrides preset = getPresetOverrides(parentPreset);
@@ -447,9 +435,7 @@ public final class TrailPackConfigManager {
                         mergedOverrides = mergedOverrides.with(preset);
                     }
                     mergedOverrides = mergedOverrides.with(boneOverrides);
-                }
-                else if(mainConfig.logTrails)
-                {
+                } else if (mainConfig.logTrails) {
                     LOGGER.info("No bone override found for bone {} in model {}, using defaults.", boneName, modelName);
                 }
             }
@@ -457,8 +443,7 @@ public final class TrailPackConfigManager {
 
 
         ResolvedTrailSettings out = mergedOverrides.resolvedTrailSettings(isLeftWing);
-        if(mainConfig.logTrails)
-        {
+        if (mainConfig.logTrails) {
             LOGGER.info("starting trail from model {} on bone {} with configs: {}", modelName, boneName, out);
 
         }
@@ -490,6 +475,7 @@ public final class TrailPackConfigManager {
         } catch (Throwable ignored) {
         }
     }
+
     @SuppressWarnings("unused")
     private static void loadAndCachePresets(String modelKey, Resource resource) {
         try (BufferedReader reader = new BufferedReader(new InputStreamReader(resource.open(), StandardCharsets.UTF_8))) {
@@ -502,11 +488,12 @@ public final class TrailPackConfigManager {
         } catch (Throwable ignored) {
         }
     }
+
     @SuppressWarnings("unused")
-    public static String sanitizeModelKey(String modelKey)
-    {
-        return modelKey.replaceAll("[0-9]","");
+    public static String sanitizeModelKey(String modelKey) {
+        return modelKey.replaceAll("[0-9]", "");
     }
+
     private static @Nullable String normalizeModelKey(@Nullable String rawName) {
         if (rawName == null) return null;
 
@@ -610,8 +597,7 @@ public final class TrailPackConfigManager {
         if (name == null) return null;
         String key = name.trim().toLowerCase(Locale.ROOT);
         if (key.isEmpty()) return null;
-        if(name.startsWith("internal:"))
-        {
+        if (name.startsWith("internal:")) {
             return HIDDEN_CONFIG_PRESETS.get(key.substring("internal:".length()));
         }
         return CONFIG_PRESETS.get(key);
@@ -636,10 +622,12 @@ public final class TrailPackConfigManager {
         }
         return 0xFFFFFFFF;
     }
+
     @SuppressWarnings("unused")
     public static String toHexColorString(int color) {
         return String.format("#%06X", color);
     }
+
     public static int getAlpha(int argb) {
         return (argb >>> 24) & 0xFF;
     }
@@ -654,6 +642,7 @@ public final class TrailPackConfigManager {
         int c = rgb & 0xFFFFFF;
         return (a << 24) | c;
     }
+
     @SuppressWarnings("unused")
     public static String withAlphaAndColorToHexString(int alpha, int rgb) {
         int a = alpha & 0xFF;
@@ -661,6 +650,7 @@ public final class TrailPackConfigManager {
         int argb = (a << 24) | c;
         return String.format("#%08X", argb); // #AARRGGBB
     }
+
     public static ResolvedTrailSettings resolveFromPlayerConfig(PlayerConfig playerConfig) {
         return new ResolvedTrailSettings(
                 playerConfig.enableTrail(),
@@ -696,6 +686,7 @@ public final class TrailPackConfigManager {
                 playerConfig.distanceTillTrailEnd()
         );
     }
+
     public static ResolvedTrailSettings resolveTrailFromPlayerConfig(PlayerConfig playerConfig, boolean isLeftWing) {
         return new ResolvedTrailSettings(
                 playerConfig.enableTrail(),
@@ -707,8 +698,8 @@ public final class TrailPackConfigManager {
                 playerConfig.startRampDistance(),
                 playerConfig.endRampDistance(),
                 playerConfig.randomWidthVariation(),
-                getTrailColor(playerConfig,isLeftWing),
-                getTexture(playerConfig,isLeftWing),
+                getTrailColor(playerConfig, isLeftWing),
+                getTexture(playerConfig, isLeftWing),
                 playerConfig.fadeStart(),
                 playerConfig.fadeStartDistance(),
                 playerConfig.lifeTimeFade(),
@@ -731,16 +722,15 @@ public final class TrailPackConfigManager {
                 playerConfig.distanceTillTrailEnd()
         );
     }
+
     private static String getTexture(PlayerConfig config, boolean isLeftWing) {
-        if(!isLeftWing && (!(config.prideTrailRight() == null || config.prideTrailRight().isEmpty())))
-        {
+        if (!isLeftWing && (!(config.prideTrailRight() == null || config.prideTrailRight().isEmpty()))) {
             return safePride(config.prideTrailRight());
         }
         return safePride(config.prideTrail());
     }
 
-    private static int getTrailColor(PlayerConfig config, boolean isLeftWing)
-    {
+    private static int getTrailColor(PlayerConfig config, boolean isLeftWing) {
         return config.useColorBoth() ? config.color() : (isLeftWing ? config.color() : config.colorRight());
     }
 

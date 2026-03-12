@@ -29,8 +29,9 @@ public final class EntityTwirlManager {
     //private static final double BACK_NORMAL_PEAK_T = 0.7593905;
     private static final double BACK_NORMAL_START_T = 0.2406095;
 
-    private enum Kind { NORMAL, CONTINUOUS }
-    private enum Phase { EASE_IN_180, CONSTANT_360, EASE_OUT_180 }
+    private enum Kind {NORMAL, CONTINUOUS}
+
+    private enum Phase {EASE_IN_180, CONSTANT_360, EASE_OUT_180}
 
     private static final class TwirlData {
         final int entityId;
@@ -171,7 +172,8 @@ public final class EntityTwirlManager {
                 }
             }
 
-            default -> {}
+            default -> {
+            }
         }
     }
 
@@ -181,7 +183,8 @@ public final class EntityTwirlManager {
             double omega_rad_s,
             double turn360_duration,
             EasingUtil.EaseType easeType
-    ) {}
+    ) {
+    }
 
     private static TwirlInfo getEntityTwirlConfigs(int entityId) {
         PlayerConfig playerConfig = ClientPlayerConfigStore.getOrDefault(entityId);
@@ -291,9 +294,8 @@ public final class EntityTwirlManager {
                             return (float) data.baseAngleRad;
                         }
                     }
-                    if(info.easeType == EasingUtil.EaseType.Random)
-                    {
-                        double a = easeRandom()*Math.TAU;
+                    if (info.easeType == EasingUtil.EaseType.Random) {
+                        double a = easeRandom() * Math.TAU;
                         return (float) (data.baseAngleRad + data.dir * a);
                     }
                     double a = Mth.clamp(info.omega_rad_s() * elapsedS, 0.0, Math.TAU);
@@ -461,9 +463,8 @@ public final class EntityTwirlManager {
                 yield data.baseAngleRad + data.dir * roll;
             }
             case CONSTANT_360 -> {
-                if(info.easeType == EasingUtil.EaseType.Random)
-                {
-                    yield EasingUtil.easeRandom()*Math.TAU;
+                if (info.easeType == EasingUtil.EaseType.Random) {
+                    yield EasingUtil.easeRandom() * Math.TAU;
                 }
                 double a = Mth.clamp(info.omega_rad_s() * elapsedS, 0.0, Math.TAU);
                 yield data.baseAngleRad + data.dir * a;
@@ -527,5 +528,6 @@ public final class EntityTwirlManager {
         return data != null && data.active;
     }
 
-    private EntityTwirlManager() {}
+    private EntityTwirlManager() {
+    }
 }

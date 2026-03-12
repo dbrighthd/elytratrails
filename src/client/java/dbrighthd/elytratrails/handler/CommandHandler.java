@@ -18,8 +18,7 @@ import static dbrighthd.elytratrails.network.ClientPlayerConfigStore.CLIENT_PLAY
  * Sets up some handy client commands
  */
 public class CommandHandler {
-    public static void init()
-    {
+    public static void init() {
         ClientCommandRegistrationCallback.EVENT.register((dispatcher, registryAccess) -> dispatcher.register(
                 ClientCommandManager.literal("elytratrails").then(ClientCommandManager.literal("debug")
                         .executes(CommandHandler::debugCommand))
@@ -43,8 +42,8 @@ public class CommandHandler {
                                 .executes(CommandHandler::requestTrailConfigs))
         ));
     }
-    private static int clearCommand(CommandContext<FabricClientCommandSource> context)
-    {
+
+    private static int clearCommand(CommandContext<FabricClientCommandSource> context) {
         int trailcount = TrailSystem.getTrailManager().trailsNumber();
         int activetrailcount = TrailSystem.getTrailManager().activeTrailsNumber(); // or whatever your real method is
         TrailSystem.getTrailManager().removeAllTrails();
@@ -54,43 +53,40 @@ public class CommandHandler {
         );
         return Command.SINGLE_SUCCESS;
     }
-    private static int debugCommand(CommandContext<FabricClientCommandSource> context)
-    {
+
+    private static int debugCommand(CommandContext<FabricClientCommandSource> context) {
         int trailcount = TrailSystem.getTrailManager().trailsNumber();
         int activetrailcount = TrailSystem.getTrailManager().activeTrailsNumber();
         context.getSource().sendFeedback(Component.literal("Stored Configs: " + CLIENT_PLAYER_CONFIGS.size()));
-        for(var pair : CLIENT_PLAYER_CONFIGS.entrySet())
-        {
+        for (var pair : CLIENT_PLAYER_CONFIGS.entrySet()) {
             context.getSource().sendFeedback(Component.literal(pair.getValue().playerName()));
         }
         context.getSource().sendFeedback(Component.literal("Current Trails: " + trailcount));
         context.getSource().sendFeedback(Component.literal("Active Trails:  " + activetrailcount));
         return Command.SINGLE_SUCCESS;
     }
-    private static int debugOverridesCommand(CommandContext<FabricClientCommandSource> context)
-    {
+
+    private static int debugOverridesCommand(CommandContext<FabricClientCommandSource> context) {
         context.getSource().sendFeedback(Component.literal("Current Model Overrides: "));
 
-        for(String model : TrailPackConfigManager.getModelStrings())
-        {
+        for (String model : TrailPackConfigManager.getModelStrings()) {
             context.getSource().sendFeedback(Component.literal(model));
 
         }
         return Command.SINGLE_SUCCESS;
     }
-    private static int debugModelsCommand(CommandContext<FabricClientCommandSource> context)
-    {
+
+    private static int debugModelsCommand(CommandContext<FabricClientCommandSource> context) {
         context.getSource().sendFeedback(Component.literal("Current Models With Trails Defined: "));
 
-        for(EntityType<?> entityType : TrailPackConfigManager.entitiesWithTrails)
-        {
+        for (EntityType<?> entityType : TrailPackConfigManager.entitiesWithTrails) {
             context.getSource().sendFeedback(Component.literal(entityType.toShortString()));
 
         }
         return Command.SINGLE_SUCCESS;
     }
-    private static int requestTrailConfigs(CommandContext<FabricClientCommandSource> context)
-    {
+
+    private static int requestTrailConfigs(CommandContext<FabricClientCommandSource> context) {
         ClientPlayNetworking.send(new GetAllRequestC2SPayload());
         return Command.SINGLE_SUCCESS;
     }

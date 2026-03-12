@@ -1,11 +1,11 @@
-
 package dbrighthd.elytratrails.controller;
 
 /**
  * Unified calls for twirling
  */
 public final class TwirlRoll {
-    private TwirlRoll() {}
+    private TwirlRoll() {
+    }
 
     public static boolean isAnyActive() {
         return TwirlController.isActive() || ContinuousTwirlController.isActive();

@@ -3,15 +3,16 @@ package dbrighthd.elytratrails.config;
 import dbrighthd.elytratrails.ElytraTrailsKeybind;
 import dbrighthd.elytratrails.config.pack.TrailPackConfigManager;
 import dbrighthd.elytratrails.controller.ContinuousTwirlController;
-import dbrighthd.elytratrails.util.EasingUtil;
 import dbrighthd.elytratrails.controller.TwirlController;
 import dbrighthd.elytratrails.network.GetAllRequestC2SPayload;
 import dbrighthd.elytratrails.network.PlayerConfigC2SPayload;
 import dbrighthd.elytratrails.network.RemoveFromStoreC2SPayload;
 import dbrighthd.elytratrails.rendering.TrailSystem;
+import dbrighthd.elytratrails.util.EasingUtil;
 import me.shedaniel.autoconfig.AutoConfig;
 import me.shedaniel.clothconfig2.api.ConfigBuilder;
 import me.shedaniel.clothconfig2.api.ConfigCategory;
+import me.shedaniel.clothconfig2.api.ConfigEntryBuilder;
 import me.shedaniel.clothconfig2.impl.builders.DropdownMenuBuilder;
 import me.shedaniel.clothconfig2.impl.builders.SubCategoryBuilder;
 import net.fabricmc.fabric.api.client.networking.v1.ClientPlayNetworking;
@@ -19,14 +20,14 @@ import net.minecraft.client.KeyMapping;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.network.chat.Component;
-import me.shedaniel.clothconfig2.api.ConfigEntryBuilder;
 
 import java.util.*;
 import java.util.stream.Collectors;
 
 import static dbrighthd.elytratrails.ElytraTrailsClient.getConfig;
 import static dbrighthd.elytratrails.ElytraTrailsClient.refreshConfig;
-import static dbrighthd.elytratrails.config.pack.TrailPackConfigManager.*;
+import static dbrighthd.elytratrails.config.pack.TrailPackConfigManager.exportTrailPresetToDisk;
+import static dbrighthd.elytratrails.config.pack.TrailPackConfigManager.withAlphaAndColor;
 import static dbrighthd.elytratrails.network.ClientPlayerConfigStore.*;
 
 /**
@@ -36,8 +37,8 @@ public class ConfigScreenBuilder {
 
     private static final ModConfig defaultModConfig = new ModConfig();
     private static final ClientConfig defaultConfig = defaultModConfig.clientPlayerConfig;
-    public static Screen buildConfigScreen(Screen parent, ModConfig config)
-    {
+
+    public static Screen buildConfigScreen(Screen parent, ModConfig config) {
         decodeConfigColors(config.clientPlayerConfig);
         decodeConfigColors(config.otherPlayerConfig);
 
@@ -146,7 +147,7 @@ public class ConfigScreenBuilder {
                         config.clearTrailsOption)
                 .setTooltip(Component.translatable("text.elytratrails.option.clearTrails.@Tooltip"))
                 .setSaveConsumer(newValue -> {
-                    if(newValue == ModConfig.ClearTrails.CLEAR)
+                    if (newValue == ModConfig.ClearTrails.CLEAR)
                         TrailSystem.getTrailManager().removeAllTrails();
                 })
                 .build());
@@ -277,7 +278,6 @@ public class ConfigScreenBuilder {
                 .build());
 
 
-
         elytra.addEntry(entryBuilder.startTextDescription(
                         Component.translatable("text.elytratrails.category.elytra.desc"))
                 .build());
@@ -307,7 +307,6 @@ public class ConfigScreenBuilder {
                 .build());
 
 
-
         server.addEntry(entryBuilder.startTextDescription(
                         Component.translatable("text.elytratrails.category.server.desc"))
                 .build());
@@ -318,7 +317,7 @@ public class ConfigScreenBuilder {
                 .build());
         server.addEntry(entryBuilder.startBooleanToggle(Component.translatable("text.elytratrails.option.shareTrail"), config.shareTrail)
                 .setDefaultValue(defaultModConfig.shareTrail)
-                .setTooltip(Component.translatable("text.elytratrails.option.shareTrail.@Tooltip[0]"),Component.translatable("text.elytratrails.option.shareTrail.@Tooltip[1]"))
+                .setTooltip(Component.translatable("text.elytratrails.option.shareTrail.@Tooltip[0]"), Component.translatable("text.elytratrails.option.shareTrail.@Tooltip[1]"))
                 .setSaveConsumer(newValue -> config.shareTrail = newValue)
                 .build());
         server.addEntry(entryBuilder.startBooleanToggle(Component.translatable("text.elytratrails.option.showTrailToOtherPlayers"), config.showTrailToOtherPlayers)
@@ -368,7 +367,7 @@ public class ConfigScreenBuilder {
                                 },
                                 v -> Component.nullToEmpty(v.name())
                         ),
-                        DropdownMenuBuilder.CellCreatorBuilder.of(14,160, 8, v -> Component.nullToEmpty((v).name())
+                        DropdownMenuBuilder.CellCreatorBuilder.of(14, 160, 8, v -> Component.nullToEmpty((v).name())
                         )
                 )
                 .setDefaultValue(ModConfig.ParticleChoice.POOF)
@@ -440,78 +439,73 @@ public class ConfigScreenBuilder {
             TwirlController.setDurations();
             ContinuousTwirlController.setDurations();
             AutoConfig.getConfigHolder(ModConfig.class).save();
-                    var mc = Minecraft.getInstance();
-                    refreshLocalConfigs();
-                    if (mc.getConnection() != null && mc.player != null && mc.level != null) {
-                        TrailSystem.getTrailManager().removeTrail(mc.player.getId());
-                        TrailSystem.getWingtipSampler().removeAllEmfCache();
+            var mc = Minecraft.getInstance();
+            refreshLocalConfigs();
+            if (mc.getConnection() != null && mc.player != null && mc.level != null) {
+                TrailSystem.getTrailManager().removeTrail(mc.player.getId());
+                TrailSystem.getWingtipSampler().removeAllEmfCache();
 
-                        if(getConfig().shareTrail || !getConfig().showTrailToOtherPlayers)
-                        {
-                            ClientPlayNetworking.send(new PlayerConfigC2SPayload(getLocalPlayerConfigToSend().toTag()));
-                        }
-                        else
-                        {
-                            ClientPlayNetworking.send(new RemoveFromStoreC2SPayload());
-                        }
-                        if (!getConfig().syncWithServer) {
-                            CLIENT_PLAYER_CONFIGS.clear();
-                        } else if (CLIENT_PLAYER_CONFIGS.isEmpty()) {
-                            ClientPlayNetworking.send(new GetAllRequestC2SPayload());
-                        }
-                    }
+                if (getConfig().shareTrail || !getConfig().showTrailToOtherPlayers) {
+                    ClientPlayNetworking.send(new PlayerConfigC2SPayload(getLocalPlayerConfigToSend().toTag()));
+                } else {
+                    ClientPlayNetworking.send(new RemoveFromStoreC2SPayload());
+                }
+                if (!getConfig().syncWithServer) {
+                    CLIENT_PLAYER_CONFIGS.clear();
+                } else if (CLIENT_PLAYER_CONFIGS.isEmpty()) {
+                    ClientPlayNetworking.send(new GetAllRequestC2SPayload());
+                }
+            }
         });
         return builder.build();
     }
-    private static void exportPreset(ModConfig config)
-    {
-        if(config.exportPreset)
-        {
-            exportTrailPresetToDisk(config.exportPresetName,config);
+
+    private static void exportPreset(ModConfig config) {
+        if (config.exportPreset) {
+            exportTrailPresetToDisk(config.exportPresetName, config);
         }
         config.exportPresetName = "";
         config.exportPreset = false;
     }
-    private static int encodeColor(int alpha, int color)
-    {
-        return withAlphaAndColor(alpha,color);
+
+    private static int encodeColor(int alpha, int color) {
+        return withAlphaAndColor(alpha, color);
     }
-    private static int decodeColors(int color)
-    {
+
+    private static int decodeColors(int color) {
         return TrailPackConfigManager.getColorRgb(color);
     }
-    private static int decodeAlpha(int color)
-    {
+
+    private static int decodeAlpha(int color) {
         return TrailPackConfigManager.getAlpha(color);
     }
-    private  static void applyPresetsToConfig(ModConfig config)
-    {
 
-        if(!config.PresetOthers.isEmpty())
-        {
-            TrailPackConfigManager.applyPreset(false, config.PresetOthers,config);
+    private static void applyPresetsToConfig(ModConfig config) {
+
+        if (!config.PresetOthers.isEmpty()) {
+            TrailPackConfigManager.applyPreset(false, config.PresetOthers, config);
             decodeConfigColors(config.otherPlayerConfig);
         }
-        if(!config.Preset.isEmpty())
-        {
-            TrailPackConfigManager.applyPreset(true, config.Preset,config);
+        if (!config.Preset.isEmpty()) {
+            TrailPackConfigManager.applyPreset(true, config.Preset, config);
             decodeConfigColors(config.clientPlayerConfig);
         }
         config.Preset = "";
         config.PresetOthers = "";
     }
-    private static void decodeConfigColors(ClientConfig config)
-    {
+
+    private static void decodeConfigColors(ClientConfig config) {
         config.justColor = decodeColors(config.color);
-        config.justAlpha  = decodeAlpha(config.color);
+        config.justAlpha = decodeAlpha(config.color);
         config.justColorRight = decodeColors(config.colorRight);
-        config.justAlphaRight  = decodeAlpha(config.colorRight);
+        config.justAlphaRight = decodeAlpha(config.colorRight);
     }
-    private static void encodeConfigColors(ClientConfig config)
-    {
+
+    private static void encodeConfigColors(ClientConfig config) {
         config.color = encodeColor(config.justAlpha, config.justColor);
         config.colorRight = encodeColor(config.justAlphaRight, config.justColorRight);
     }
+
     private static void addSharedTrailEntries(
             ConfigCategory category,
             ConfigEntryBuilder entryBuilder,

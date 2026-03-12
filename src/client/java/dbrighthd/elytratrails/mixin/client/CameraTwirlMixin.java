@@ -24,17 +24,19 @@ import static dbrighthd.elytratrails.ElytraTrailsClient.getConfig;
 public class CameraTwirlMixin {
 
 
-    @Shadow @Final private Quaternionf rotation;
+    @Shadow
+    @Final
+    private Quaternionf rotation;
 
-    @Shadow private Entity entity;
+    @Shadow
+    private Entity entity;
 
     @Inject(method = "setRotation(FF)V", at = @At("TAIL"))
     private void twirl_applyExtraRotation(float yRot, float xRot, CallbackInfo ci) {
         if (!getConfig().enableTwirls) return;
         boolean fishysStupidCameraRoll = getConfig().fishysStupidCameraRoll;
         boolean fishysStupidThirdPersonCameraRoll = getConfig().fishysStupidThirdPersonCameraRoll;
-        if(!(fishysStupidCameraRoll || fishysStupidThirdPersonCameraRoll))
-        {
+        if (!(fishysStupidCameraRoll || fishysStupidThirdPersonCameraRoll)) {
             return;
         }
 
@@ -46,12 +48,10 @@ public class CameraTwirlMixin {
         boolean isFirstPerson = Minecraft.getInstance().options.getCameraType().isFirstPerson();
 
         boolean frontView = (mc.options.getCameraType() == net.minecraft.client.CameraType.THIRD_PERSON_FRONT);
-        if(isFirstPerson && !fishysStupidCameraRoll)
-        {
+        if (isFirstPerson && !fishysStupidCameraRoll) {
             return;
         }
-        if(!isFirstPerson && !fishysStupidThirdPersonCameraRoll)
-        {
+        if (!isFirstPerson && !fishysStupidThirdPersonCameraRoll) {
             return;
         }
         float extra;
@@ -61,8 +61,7 @@ public class CameraTwirlMixin {
             extra = -EntityTwirlManager.getExtraRollRadians(camEntity.getId());
         }
 
-        if(frontView)
-        {
+        if (frontView) {
             extra *= -1;
         }
         if (extra != 0f) {

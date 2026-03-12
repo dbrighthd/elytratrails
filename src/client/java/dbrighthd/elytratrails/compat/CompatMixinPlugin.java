@@ -23,13 +23,11 @@ public class CompatMixinPlugin implements IMixinConfigPlugin {
 
     @Override
     public boolean shouldApplyMixin(String targetClassName, String mixinClassName) {
-        if(!FabricLoader.getInstance().isModLoaded("elytratrails"))
-        {
+        if (!FabricLoader.getInstance().isModLoaded("elytratrails")) {
             return false;
         }
 
-        if(mixinClassName.contains("dbrighthd.elytratrails.mixin.client.compat"))
-        {
+        if (mixinClassName.contains("dbrighthd.elytratrails.mixin.client.compat")) {
             try {
                 MixinService.getService().getBytecodeProvider().getClassNode(targetClassName);
             } catch (ClassNotFoundException | IOException e) {

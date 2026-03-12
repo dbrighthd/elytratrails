@@ -32,6 +32,7 @@ public class ModConfig implements ConfigData {
     //fresh took too long to update and people are complaining to me
     public boolean hardCodedFreshAnimationsPlayerWingtips = false;
     public ClearTrails clearTrailsOption = ClearTrails.NO;
+
     public enum ClearTrails {
         NO,
         CLEAR,

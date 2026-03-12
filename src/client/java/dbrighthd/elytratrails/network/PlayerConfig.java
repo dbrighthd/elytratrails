@@ -77,24 +77,24 @@ public record PlayerConfig(
         tag.putBoolean("increaseWidthOverTime", increaseWidthOverTime);
         tag.putDouble("startingWidthMultiplier", startingWidthMultiplier);
         tag.putDouble("endingWidthMultiplier", endingWidthMultiplier);
-        tag.putDouble("distanceTillTrailStart",distanceTillTrailStart);
+        tag.putDouble("distanceTillTrailStart", distanceTillTrailStart);
         tag.putString("easeType", easeType.name());
         tag.putBoolean("endDistanceFade", endDistanceFade);
         tag.putDouble("endDistanceFadeAmount", endDistanceFadeAmount);
         tag.putString("playerName", playerName);
         tag.putBoolean("speedBasedAlpha", speedBasedAlpha);
-        tag.putDouble("minAlphaSpeed",minAlphaSpeed);
-        tag.putDouble("maxAlphaSpeed",maxAlphaSpeed);
-        tag.putBoolean("speedBasedWidth",speedBasedWidth);
-        tag.putDouble("minWidthSpeed",minWidthSpeed);
-        tag.putDouble("maxWidthSpeed",minWidthSpeed);
-        tag.putBoolean("trailMovesWithAngleOfAttack",trailMovesWithAngleOfAttack);
-        tag.putBoolean("useColorBoth",useColorBoth);
+        tag.putDouble("minAlphaSpeed", minAlphaSpeed);
+        tag.putDouble("maxAlphaSpeed", maxAlphaSpeed);
+        tag.putBoolean("speedBasedWidth", speedBasedWidth);
+        tag.putDouble("minWidthSpeed", minWidthSpeed);
+        tag.putDouble("maxWidthSpeed", minWidthSpeed);
+        tag.putBoolean("trailMovesWithAngleOfAttack", trailMovesWithAngleOfAttack);
+        tag.putBoolean("useColorBoth", useColorBoth);
         tag.putInt("colorRight", colorRight);
-        tag.putDouble("wingtipVerticalPosition",wingtipVerticalPosition);
-        tag.putDouble("wingtipHorizontalPosition",wingtipHorizontalPosition);
-        tag.putDouble("wingtipDepthPosition",wingtipDepthPosition);
-        tag.putDouble("distanceTillTrailEnd",distanceTillTrailEnd);
+        tag.putDouble("wingtipVerticalPosition", wingtipVerticalPosition);
+        tag.putDouble("wingtipHorizontalPosition", wingtipHorizontalPosition);
+        tag.putDouble("wingtipDepthPosition", wingtipDepthPosition);
+        tag.putDouble("distanceTillTrailEnd", distanceTillTrailEnd);
 
         return tag;
     }

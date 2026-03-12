@@ -199,7 +199,8 @@ public class TrailPipelines {
         return RENDER_TYPE_ENTITY_CUTOUT_LIT.apply(texture, false);
     }
 
-    public static void init() {}
+    public static void init() {
+    }
 
     public static RenderType entityTranslucentCull(Identifier texture) {
         return ENTITY_TRANSLUCENT_CULL.apply(texture);

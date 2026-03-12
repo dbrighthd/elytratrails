@@ -11,7 +11,8 @@ import org.joml.Vector4f;
 public class ModelTransformationUtil {
 
     public static Vec3 VANILLA_LEFT_WING_TIP = new Vec3(-11.0 / 16.0, 21.0 / 16.0, 3.0 / 16.0);
-    public static Vec3 VANILLA_RIGHT_WING_TIP = new Vec3( 11.0 / 16.0, 21.0 / 16.0, 3.0 / 16.0);
+    public static Vec3 VANILLA_RIGHT_WING_TIP = new Vec3(11.0 / 16.0, 21.0 / 16.0, 3.0 / 16.0);
+
     public static Vec3 transformPoint(Matrix4f matrix, Vec3 localPoint) {
         Vector4f homogeneous = new Vector4f((float) localPoint.x, (float) localPoint.y, (float) localPoint.z, 1.0f);
         homogeneous.mul(matrix);
@@ -45,12 +46,12 @@ public class ModelTransformationUtil {
 
         double invSpeed = Mth.invSqrt((float) speedSqr);
         double velHoriz = Math.sqrt(vx * vx + vz * vz) * invSpeed;
-        double velVert  = vy * invSpeed;
+        double velVert = vy * invSpeed;
 
         float pitch = -entity.getXRot() * Mth.DEG_TO_RAD;
 
         float lookHoriz = Mth.cos(pitch);
-        float lookVert  = Mth.sin(pitch);
+        float lookVert = Mth.sin(pitch);
 
         float cosAoA = (float) (lookHoriz * velHoriz + lookVert * velVert);
 

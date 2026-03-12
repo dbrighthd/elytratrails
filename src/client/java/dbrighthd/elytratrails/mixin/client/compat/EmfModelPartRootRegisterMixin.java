@@ -20,6 +20,6 @@ public abstract class EmfModelPartRootRegisterMixin {
         if (state == null) return;
 
         String type = state.typeString();
-        EmfTrailSpawnerRegistry.onEmfRootRegistered(type, (ModelPart)(Object)this);
+        EmfTrailSpawnerRegistry.onEmfRootRegistered(type, (ModelPart) (Object) this);
     }
 }

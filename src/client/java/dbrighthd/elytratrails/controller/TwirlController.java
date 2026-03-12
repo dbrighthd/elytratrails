@@ -82,14 +82,12 @@ public final class TwirlController {
                 return;
             }
 
-            if (t < BACK_TWIRL_PEAK_T)
-            {
+            if (t < BACK_TWIRL_PEAK_T) {
                 return;
             }
         }
 
-        if (!reverseQueued || reverseQueuedDir != -currentDir)
-        {
+        if (!reverseQueued || reverseQueuedDir != -currentDir) {
             reverseQueued = false;
             reverseQueuedDir = 0;
         }
@@ -105,8 +103,7 @@ public final class TwirlController {
         return pendingMode;
     }
 
-    public static void bufferReverseRequest(int dir, int ticks)
-    {
+    public static void bufferReverseRequest(int dir, int ticks) {
         dir = Integer.compare(dir, 0);
         if (dir == 0 || ticks <= 0) return;
 
@@ -114,16 +111,14 @@ public final class TwirlController {
         bufferedReverseDir = dir;
     }
 
-    public static boolean canBufferBackReverse(int dir)
-    {
+    public static boolean canBufferBackReverse(int dir) {
         dir = Integer.compare(dir, 0);
         return active
                 && easeType == EasingUtil.EaseType.Back
                 && dir == -currentDir;
     }
 
-    public static boolean canStillReverseFromBufferedBackInput(int dir)
-    {
+    public static boolean canStillReverseFromBufferedBackInput(int dir) {
         dir = Integer.compare(dir, 0);
         if (!active || easeType != EasingUtil.EaseType.Back || dir != -currentDir) {
             return false;
@@ -135,8 +130,7 @@ public final class TwirlController {
         return t < BACK_TWIRL_PEAK_T;
     }
 
-    private static void startSpin()
-    {
+    private static void startSpin() {
         active = true;
         startNanos = TimeUtil.currentNanos();
         baseAngleRad = 0.0;
@@ -217,8 +211,7 @@ public final class TwirlController {
         return (float) (baseAngleRad + currentDir * eased * Math.TAU);
     }
 
-    public static void setDurations()
-    {
+    public static void setDurations() {
         easeType = getConfig().clientPlayerConfig.easeType;
         DURATION_S = Math.max(getConfig().clientPlayerConfig.twirlTime, 0.0001);
         DURATION_S *= getEaseMult(easeType);
@@ -228,5 +221,6 @@ public final class TwirlController {
         return active;
     }
 
-    private TwirlController() {}
+    private TwirlController() {
+    }
 }

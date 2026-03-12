@@ -51,8 +51,7 @@ public final class ContinuousTwirlController {
     private static int bufferedReverseTicks = 0;
     private static int bufferedReverseDir = 0;
 
-    public static void setDurations()
-    {
+    public static void setDurations() {
         double DURATION_S = Math.max(getConfig().clientPlayerConfig.twirlTime, 0.0001);
         HALF_DURATION_S = DURATION_S * 0.5;
         OMEGA_RAD_S = (Math.PI * Math.PI) / DURATION_S;
@@ -65,11 +64,9 @@ public final class ContinuousTwirlController {
         boolean wasDown = keyDown;
         keyDown = isDown;
 
-        if (bufferedReverseTicks > 0)
-        {
+        if (bufferedReverseTicks > 0) {
             bufferedReverseTicks--;
-            if (bufferedReverseTicks == 0)
-            {
+            if (bufferedReverseTicks == 0) {
                 bufferedReverseDir = 0;
             }
         }
@@ -85,12 +82,9 @@ public final class ContinuousTwirlController {
 
         int effectiveOppositeRequest = 0;
 
-        if (keyDown && pendingMode != 0 && pendingMode == -currentDir)
-        {
+        if (keyDown && pendingMode != 0 && pendingMode == -currentDir) {
             effectiveOppositeRequest = pendingMode;
-        }
-        else if (bufferedReverseTicks > 0 && bufferedReverseDir == -currentDir)
-        {
+        } else if (bufferedReverseTicks > 0 && bufferedReverseDir == -currentDir) {
             effectiveOppositeRequest = bufferedReverseDir;
         }
 
@@ -107,18 +101,15 @@ public final class ContinuousTwirlController {
                 reverseQueued = true;
                 reverseQueuedDir = effectiveOppositeRequest;
 
-                if (bufferedReverseDir == effectiveOppositeRequest)
-                {
+                if (bufferedReverseDir == effectiveOppositeRequest) {
                     bufferedReverseTicks = 0;
                     bufferedReverseDir = 0;
                 }
             }
         }
 
-        if (!active || (!keyDown && bufferedReverseTicks == 0))
-        {
-            if (!reverseQueued || reverseQueuedDir != -currentDir)
-            {
+        if (!active || (!keyDown && bufferedReverseTicks == 0)) {
+            if (!reverseQueued || reverseQueuedDir != -currentDir) {
                 reverseQueued = false;
                 reverseQueuedDir = 0;
             }
@@ -332,10 +323,10 @@ public final class ContinuousTwirlController {
         return active;
     }
 
-    public static int getCurrentDir()
-    {
+    public static int getCurrentDir() {
         return currentDir;
     }
 
-    private ContinuousTwirlController() {}
+    private ContinuousTwirlController() {
+    }
 }

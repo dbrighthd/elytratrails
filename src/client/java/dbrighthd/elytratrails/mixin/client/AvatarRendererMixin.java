@@ -25,8 +25,7 @@ public abstract class AvatarRendererMixin {
             at = @At("TAIL")
     )
     private void elytratrails$addSpinRoll(AvatarRenderState state, PoseStack poseStack, float f, float g, CallbackInfo ci) {
-        if (!getConfig().enableTwirls)
-        {
+        if (!getConfig().enableTwirls) {
             return;
         }
         if (!state.isFallFlying) return;

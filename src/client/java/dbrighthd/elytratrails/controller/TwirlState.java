@@ -26,9 +26,11 @@ public enum TwirlState {
         }
         return OFF;
     }
+
     public int signedId(int dir) {
         return Math.abs(id) * (dir < 0 ? -1 : 1);
     }
+
     public static int dirFromId(int id) {
         if (id == 0) return 1;
         return id < 0 ? -1 : 1;

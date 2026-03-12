@@ -13,16 +13,14 @@ import static dbrighthd.elytratrails.ElytraTrailsClient.getConfig;
 import static java.lang.Math.clamp;
 
 
-public final class ClientPlayerConfigStore
-{
+public final class ClientPlayerConfigStore {
     public static final ConcurrentHashMap<Integer, PlayerConfig> CLIENT_PLAYER_CONFIGS = new ConcurrentHashMap<>();
     public static final boolean FLASHBACK_LOADED = FabricLoader.getInstance().isModLoaded("flashback");
     public static PlayerConfig CLIENT_CONFIG;
 
     public static PlayerConfig CLIENT_OTHERS_CONFIG;
 
-    public static void refreshLocalConfigs()
-    {
+    public static void refreshLocalConfigs() {
         setLocalPlayerConfig();
         setClientOthersConfig();
     }
@@ -32,33 +30,28 @@ public final class ClientPlayerConfigStore
         CLIENT_CONFIG = config.clientPlayerConfig.getPlayerConfig();
     }
 
-    public static void setClientOthersConfig ()
-    {
+    public static void setClientOthersConfig() {
 
         CLIENT_OTHERS_CONFIG = getConfig().otherPlayerConfig.getPlayerConfig();
     }
 
     public static PlayerConfig getLocalPlayerConfig() {
-        if(CLIENT_CONFIG != null)
-        {
+        if (CLIENT_CONFIG != null) {
             return CLIENT_CONFIG;
         }
         setLocalPlayerConfig();
         return CLIENT_CONFIG;
     }
 
-    public static PlayerConfig getLocalPlayerConfigToSend()
-    {
+    public static PlayerConfig getLocalPlayerConfigToSend() {
         var config = getConfig();
-        if(config.showTrailToOtherPlayers)
-        {
+        if (config.showTrailToOtherPlayers) {
             return getLocalPlayerConfig();
-        }
-        else
-        {
+        } else {
             return config.clientPlayerConfig.getHiddenPlayerConfig();
         }
     }
+
     public static PlayerConfig getLocalPlayerConfigOthers() {
         var config = getConfig();
 
@@ -66,8 +59,7 @@ public final class ClientPlayerConfigStore
             return getLocalPlayerConfig();
         }
 
-        if(CLIENT_OTHERS_CONFIG != null)
-        {
+        if (CLIENT_OTHERS_CONFIG != null) {
             return CLIENT_OTHERS_CONFIG;
         }
         setClientOthersConfig();
@@ -80,11 +72,10 @@ public final class ClientPlayerConfigStore
             CLIENT_PLAYER_CONFIGS.remove(entityId);
             return;
         }
-        if (!getConfig().syncWithServer)
-        {
+        if (!getConfig().syncWithServer) {
             return;
         }
-        PlayerConfig incomingConfig = fromTag(configTag,entityId);
+        PlayerConfig incomingConfig = fromTag(configTag, entityId);
 
         double safeMaxWidth = clamp(incomingConfig.maxWidth(), 0, getConfig().maxOnlineWidth);
         double safeLifetime = clamp(incomingConfig.trailLifetime(), 0, getConfig().maxOnlineLifetime);
@@ -153,7 +144,7 @@ public final class ClientPlayerConfigStore
                 incomingConfig.distanceTillTrailEnd()
         );
 
-        CLIENT_PLAYER_CONFIGS.put(entityId,safe);
+        CLIENT_PLAYER_CONFIGS.put(entityId, safe);
     }
 
     public static PlayerConfig fromTag(CompoundTag tag, int eid) {
@@ -203,12 +194,12 @@ public final class ClientPlayerConfigStore
         String playerName = tag.getStringOr("playerName", fallbackConfig.playerName());
         boolean speedBasedAlpha = tag.getBooleanOr("speedBasedAlpha", fallbackConfig.speedBasedAlpha());
         double minAlphaSpeed = tag.getDoubleOr("minAlphaSpeed", fallbackConfig.minAlphaSpeed());
-        double maxAlphaSpeed = tag.getDoubleOr("maxAlphaSpeed",fallbackConfig.maxAlphaSpeed());
+        double maxAlphaSpeed = tag.getDoubleOr("maxAlphaSpeed", fallbackConfig.maxAlphaSpeed());
         boolean speedBasedWidth = tag.getBooleanOr("speedBasedWidth", fallbackConfig.speedBasedWidth());
         double minWidthSpeed = tag.getDoubleOr("minWidthSpeed", fallbackConfig.minWidthSpeed());
         double maxWidthSpeed = tag.getDoubleOr("maxWidthSpeed", fallbackConfig.maxWidthSpeed());
-        boolean trailMovesWithAngleOfAttack = tag.getBooleanOr("trailMovesWithAngleOfAttack",fallbackConfig.trailMovesWithAngleOfAttack());
-        boolean useColorBoth = tag.getBooleanOr("useColorBoth",fallbackConfig.useColorBoth());
+        boolean trailMovesWithAngleOfAttack = tag.getBooleanOr("trailMovesWithAngleOfAttack", fallbackConfig.trailMovesWithAngleOfAttack());
+        boolean useColorBoth = tag.getBooleanOr("useColorBoth", fallbackConfig.useColorBoth());
         int colorRight = tag.getIntOr("colorRight", fallbackConfig.colorRight());
         double wingtipVerticalPosition = tag.getDoubleOr("wingtipVerticalPosition", fallbackConfig.wingtipVerticalPosition());
         double wingtipHorizontalPosition = tag.getDoubleOr("wingtipHorizontalPosition", fallbackConfig.wingtipHorizontalPosition());
@@ -259,31 +250,28 @@ public final class ClientPlayerConfigStore
                 distanceTillTrailEnd
         );
     }
+
     public static <E extends Enum<E>> E readEnum(CompoundTag tag, String key, Class<E> enumClass, E fallback) {
         if (!tag.contains(key)) return fallback;
 
-        String s = tag.getStringOr(key,"Sine");
+        String s = tag.getStringOr(key, "Sine");
         try {
             return Enum.valueOf(enumClass, s);
         } catch (IllegalArgumentException ignored) {
             return fallback;
         }
     }
-    public static PlayerConfig getOrDefault(int entityId)
-    {
-        if(Minecraft.getInstance().player != null && Minecraft.getInstance().player.getId() == entityId)
-        {
-            if(FLASHBACK_LOADED && FlashbackCompat.isInReplay()) //return the config that was set at the time if it exists
+
+    public static PlayerConfig getOrDefault(int entityId) {
+        if (Minecraft.getInstance().player != null && Minecraft.getInstance().player.getId() == entityId) {
+            if (FLASHBACK_LOADED && FlashbackCompat.isInReplay()) //return the config that was set at the time if it exists
             {
-                if (CLIENT_PLAYER_CONFIGS.containsKey(entityId))
-                {
+                if (CLIENT_PLAYER_CONFIGS.containsKey(entityId)) {
                     return CLIENT_PLAYER_CONFIGS.get(entityId);
                 }
             }
             return getLocalPlayerConfig();
-        }
-        else if (CLIENT_PLAYER_CONFIGS.containsKey(entityId))
-        {
+        } else if (CLIENT_PLAYER_CONFIGS.containsKey(entityId)) {
             return CLIENT_PLAYER_CONFIGS.get(entityId);
         }
         return getLocalPlayerConfigOthers();

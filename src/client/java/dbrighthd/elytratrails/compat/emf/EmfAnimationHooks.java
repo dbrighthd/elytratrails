@@ -13,7 +13,8 @@ import traben.entity_model_features.models.parts.EMFModelPartRoot;
 import traben.entity_model_features.utils.EMFEntity;
 
 public final class EmfAnimationHooks {
-    private EmfAnimationHooks() {}
+    private EmfAnimationHooks() {
+    }
 
     @SuppressWarnings("deprecation")
     public static @Nullable ModelPart applyManualAnimationAndGetRoot(Model<?> model, Entity entity) {

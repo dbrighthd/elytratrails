@@ -8,21 +8,17 @@ import net.irisshaders.iris.api.v0.IrisProgram;
 import static dbrighthd.elytratrails.ElytraTrailsClient.getConfig;
 
 public class IrisCompat {
-    static{
-        if(!FabricLoader.getInstance().isModLoaded("iris"))
-        {
+    static {
+        if (!FabricLoader.getInstance().isModLoaded("iris")) {
             throw new RuntimeException("iris isn't loaded.");
         }
     }
 
     public static void registerPipelines() {
-        if(getConfig().alwaysGlowWhenShaderTranslucent)
-        {
+        if (getConfig().alwaysGlowWhenShaderTranslucent) {
             IrisApi.getInstance().assignPipeline(TrailPipelines.PIPELINE_ENTITY_TRANSLUCENT_CULL, IrisProgram.EMISSIVE_ENTITIES);
             IrisApi.getInstance().assignPipeline(TrailPipelines.PIPELINE_ENTITY_TRANSLUCENT_CULL_WIREFRAME, IrisProgram.EMISSIVE_ENTITIES);
-        }
-        else
-        {
+        } else {
             IrisApi.getInstance().assignPipeline(TrailPipelines.PIPELINE_ENTITY_TRANSLUCENT_CULL, IrisProgram.ENTITIES_TRANSLUCENT);
             IrisApi.getInstance().assignPipeline(TrailPipelines.PIPELINE_ENTITY_TRANSLUCENT_CULL_WIREFRAME, IrisProgram.ENTITIES_TRANSLUCENT);
         }
@@ -33,13 +29,11 @@ public class IrisCompat {
         IrisApi.getInstance().assignPipeline(TrailPipelines.PIPELINE_ENTITY_CUTOUT_LIT, IrisProgram.ENTITIES);
     }
 
-    public static boolean isShadowPassing()
-    {
+    public static boolean isShadowPassing() {
         return IrisApi.getInstance().isRenderingShadowPass();
     }
 
-    public static boolean isUsingShaders()
-    {
+    public static boolean isUsingShaders() {
         return IrisApi.getInstance().isShaderPackInUse();
     }
 

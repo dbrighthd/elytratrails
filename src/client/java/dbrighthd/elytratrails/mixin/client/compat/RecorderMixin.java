@@ -13,11 +13,12 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 public abstract class RecorderMixin {
     @Unique
     private boolean elytratrails$wasReadyLastTick = false;
-    @Unique private boolean elytratrails$sentForThisRecording = false;
+    @Unique
+    private boolean elytratrails$sentForThisRecording = false;
 
     @Inject(method = "endTick", at = @At("TAIL"))
     private void elytratrails$tailEndTick(boolean close, CallbackInfo ci) {
-        Recorder self = (Recorder)(Object) this;
+        Recorder self = (Recorder) (Object) this;
         boolean ready = self.readyToWrite();
 
         if (!this.elytratrails$sentForThisRecording

@@ -5,10 +5,12 @@ import dbrighthd.elytratrails.config.ModConfig;
 import dbrighthd.elytratrails.config.pack.TrailPackConfigManager;
 import dbrighthd.elytratrails.controller.ContinuousTwirlController;
 import dbrighthd.elytratrails.controller.TwirlController;
+import dbrighthd.elytratrails.handler.CommandHandler;
 import dbrighthd.elytratrails.handler.ParticleHandler;
 import dbrighthd.elytratrails.network.RegisterPacketsClient;
-import dbrighthd.elytratrails.rendering.*;
-import dbrighthd.elytratrails.handler.CommandHandler;
+import dbrighthd.elytratrails.rendering.TrailPipelines;
+import dbrighthd.elytratrails.rendering.TrailSystem;
+import dbrighthd.elytratrails.rendering.TrailTextureRegistry;
 import dbrighthd.elytratrails.util.TimeUtil;
 import me.shedaniel.autoconfig.AutoConfig;
 import me.shedaniel.autoconfig.serializer.GsonConfigSerializer;
@@ -31,70 +33,67 @@ import static dbrighthd.elytratrails.network.ClientPlayerConfigStore.refreshLoca
 
 @SuppressWarnings("deprecation")
 public class ElytraTrailsClient implements ClientModInitializer {
-	private static ModConfig modConfig;
-	@Override
-	public void onInitializeClient()
-	{
-		AutoConfig.register(ModConfig.class, GsonConfigSerializer::new);
-		refreshConfig();
-		TimeUtil.init();
-		Compatibility.init();
-		ElytraTrailsKeybind.init();
-		TrailPipelines.init();
-		TrailSystem.init();
-		ParticleHandler.init();
-		refreshLocalConfigs();
-		RegisterPacketsClient.initClient();
-		CommandHandler.init();
-		ContinuousTwirlController.setDurations();
-		TwirlController.setDurations();
-		ResourceManagerHelper.get(PackType.CLIENT_RESOURCES).registerReloadListener(
-			new SimpleSynchronousResourceReloadListener() {
-				@Override
-				public @NotNull Identifier getFabricId() {
-					return Objects.requireNonNull(Identifier.tryParse("elytratrails:trail_pack_configs"));
-				}
+    private static ModConfig modConfig;
 
-				@Override
-				public void onResourceManagerReload(@NotNull ResourceManager manager) {
-					TrailTextureRegistry
-							.reloadNow(manager);
+    @Override
+    public void onInitializeClient() {
+        AutoConfig.register(ModConfig.class, GsonConfigSerializer::new);
+        refreshConfig();
+        TimeUtil.init();
+        Compatibility.init();
+        ElytraTrailsKeybind.init();
+        TrailPipelines.init();
+        TrailSystem.init();
+        ParticleHandler.init();
+        refreshLocalConfigs();
+        RegisterPacketsClient.initClient();
+        CommandHandler.init();
+        ContinuousTwirlController.setDurations();
+        TwirlController.setDurations();
+        ResourceManagerHelper.get(PackType.CLIENT_RESOURCES).registerReloadListener(
+                new SimpleSynchronousResourceReloadListener() {
+                    @Override
+                    public @NotNull Identifier getFabricId() {
+                        return Objects.requireNonNull(Identifier.tryParse("elytratrails:trail_pack_configs"));
+                    }
 
-					TrailSystem.getWingtipSampler().removeAllEmfCache();
-					if (FabricLoader.getInstance().isModLoaded("entity_model_features")) {
-						onResourceReload();
-					}
-					TrailPackConfigManager.reload(manager);
-					TrailPackConfigManager.reloadPresets(manager);
-				}
-			}
-		);
-		FabricLoader.getInstance().getModContainer("elytratrails").ifPresent(container -> ResourceManagerHelper.registerBuiltinResourcePack(
+                    @Override
+                    public void onResourceManagerReload(@NotNull ResourceManager manager) {
+                        TrailTextureRegistry
+                                .reloadNow(manager);
+
+                        TrailSystem.getWingtipSampler().removeAllEmfCache();
+                        if (FabricLoader.getInstance().isModLoaded("entity_model_features")) {
+                            onResourceReload();
+                        }
+                        TrailPackConfigManager.reload(manager);
+                        TrailPackConfigManager.reloadPresets(manager);
+                    }
+                }
+        );
+        FabricLoader.getInstance().getModContainer("elytratrails").ifPresent(container -> ResourceManagerHelper.registerBuiltinResourcePack(
                 Identifier.fromNamespaceAndPath("elytratrails", "arrowtrails"),
                 container,
                 Component.literal("Arrow Trails"),
                 ResourcePackActivationType.NORMAL
         ));
-		FabricLoader.getInstance().getModContainer("elytratrails").ifPresent(container -> ResourceManagerHelper.registerBuiltinResourcePack(
+        FabricLoader.getInstance().getModContainer("elytratrails").ifPresent(container -> ResourceManagerHelper.registerBuiltinResourcePack(
                 Identifier.fromNamespaceAndPath("elytratrails", "allaytrails"),
                 container,
                 Component.literal("Allay Trails"),
                 ResourcePackActivationType.NORMAL
         ));
-	}
+    }
 
-	public static ModConfig getConfig()
-	{
-		return modConfig;
-	}
+    public static ModConfig getConfig() {
+        return modConfig;
+    }
 
-	public static void setConfig(ModConfig modConfig)
-	{
-		AutoConfig.getConfigHolder(ModConfig.class).setConfig(modConfig);
-	}
+    public static void setConfig(ModConfig modConfig) {
+        AutoConfig.getConfigHolder(ModConfig.class).setConfig(modConfig);
+    }
 
-	public static void refreshConfig()
-	{
-		modConfig = AutoConfig.getConfigHolder(ModConfig.class).getConfig();
-	}
+    public static void refreshConfig() {
+        modConfig = AutoConfig.getConfigHolder(ModConfig.class).getConfig();
+    }
 }
