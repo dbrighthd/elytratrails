@@ -15,7 +15,6 @@ import net.minecraft.client.player.AbstractClientPlayer;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.Pose;
 import net.minecraft.world.entity.player.Player;
-import net.minecraft.world.phys.Vec3;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -172,13 +171,13 @@ public class TrailManager {
                 });
                 if (trailGroup.trails().size() != emitters.size()) {
                     activeTrails.remove(eid);
-                    return;
+                    continue;
                 }
                 for (int i = 0; i < trailGroup.trails().size(); i++) {
 
                     Trail trail = trailGroup.trails().get(i);
-                    Vec3 emitter = emitters.get(i).position();
-                    trail.points().add(new Trail.Point(emitter, speed));
+                    Emitter emitter = emitters.get(i);
+                    trail.points().add(new Trail.Point(emitter.position(), speed,emitter.visible()));
                 }
             } else {
                 removeTrail(eid);
@@ -241,13 +240,13 @@ public class TrailManager {
                 });
                 if (trailGroup.trails().size() != emitters.size()) {
                     activeTrails.remove(eid);
-                    return;
+                    continue;
                 }
                 for (int i = 0; i < trailGroup.trails().size(); i++) {
 
                     Trail trail = trailGroup.trails().get(i);
-                    Vec3 emitter = emitters.get(i).position();
-                    trail.points().add(new Trail.Point(emitter, speed));
+                    Emitter emitter = emitters.get(i);
+                    trail.points().add(new Trail.Point(emitter.position(), speed, emitter.visible()));
                 }
             } else {
                 removeTrail(eid);
