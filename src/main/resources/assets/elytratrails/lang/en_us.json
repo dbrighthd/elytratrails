@@ -370,6 +370,8 @@
   "text.elytratrails.option.maxWidthSpeed.@Tooltip" : "Speed at which width is set to max",
 
 
+  "text.elytratrails.option.useSplines": "Trail Spline Smoothing",
+  "text.elytratrails.option.useSplines.@Tooltip": "Should the trail interpolate between points to make it smoother?",
 
 
   "text.elytratrails.option.distanceTillTrailStart": "Distance Before Trail Starts",

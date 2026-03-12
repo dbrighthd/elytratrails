@@ -53,7 +53,7 @@ public class ModConfig implements ConfigData {
     public boolean useSameDefaultsForOthers = false;
 
     public boolean enableParticles = false;
-
+    public boolean useSplines = true;
 
     public ParticleChoice particle = ParticleChoice.POOF;
     public String Preset = "";

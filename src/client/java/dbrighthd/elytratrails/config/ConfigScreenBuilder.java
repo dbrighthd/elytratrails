@@ -94,6 +94,11 @@ public class ConfigScreenBuilder {
                 .setTooltip(Component.translatable("text.elytratrails.option.maxSamplePerSecond.@Tooltip"))
                 .setSaveConsumer(newValue -> config.maxSamplePerSecond = newValue)
                 .build());
+        general.addEntry(entryBuilder.startBooleanToggle(Component.translatable("text.elytratrails.option.useSplines"), config.useSplines)
+                .setDefaultValue(defaultModConfig.useSplines)
+                .setTooltip(Component.translatable("text.elytratrails.option.useSplines.@Tooltip"))
+                .setSaveConsumer(newValue -> config.useSplines = newValue)
+                .build());
         general.addEntry(entryBuilder.startBooleanToggle(Component.translatable("text.elytratrails.option.fadeFirstPersonTrail"), config.fadeFirstPersonTrail)
                 .setDefaultValue(defaultModConfig.fadeFirstPersonTrail)
                 .setTooltip(Component.translatable("text.elytratrails.option.fadeFirstPersonTrail.@Tooltip"))

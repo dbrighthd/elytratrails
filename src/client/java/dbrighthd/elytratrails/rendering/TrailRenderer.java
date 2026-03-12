@@ -228,14 +228,19 @@ public class TrailRenderer {
             return;
         }
         boolean needsSplit = false;
-        if (chordLenSq > 0.0001) {
-            Vec3 toMid = midPos.subtract(startPos);
-            double distFromChord = toMid.cross(chord).lengthSqr() / chordLenSq;
 
-            if (distFromChord > 0.0004 && (tEnd - tStart) > 0.05) {
-                needsSplit = true;
+        if(modConfig.useSplines)
+        {
+            if (chordLenSq > 0.0001) {
+                Vec3 toMid = midPos.subtract(startPos);
+                double distFromChord = toMid.cross(chord).lengthSqr() / chordLenSq;
+
+                if (distFromChord > 0.0004 && (tEnd - tStart) > 0.05) {
+                    needsSplit = true;
+                }
             }
         }
+
 
         if (needsSplit) {
             renderSubdividedSegment(pose, consumer, point0, point1, point2, tStart, midT, p0, p1, p2, p3, startPos, midPos, trail, color, trailSettings);
@@ -514,17 +519,20 @@ public class TrailRenderer {
     ) {
         float midT = (tStart + tEnd) / 2f;
         Vec3 midPos = SplineInterpolation.catmullRom(p0, p1, p2, p3, midT);
-
-        Vec3 chord = endPos.subtract(startPos);
-
-        double chordLenSq = chord.lengthSqr();
         boolean needsSplit = false;
-        if (chordLenSq > 0.0001) {
-            Vec3 toMid = midPos.subtract(startPos);
-            double distFromChord = toMid.cross(chord).lengthSqr() / chordLenSq;
 
-            if (distFromChord > 0.0004 && (tEnd - tStart) > 0.05) {
-                needsSplit = true;
+        if(modConfig.useSplines)
+        {
+            Vec3 chord = endPos.subtract(startPos);
+
+            double chordLenSq = chord.lengthSqr();
+            if (chordLenSq > 0.0001) {
+                Vec3 toMid = midPos.subtract(startPos);
+                double distFromChord = toMid.cross(chord).lengthSqr() / chordLenSq;
+
+                if (distFromChord > 0.0004 && (tEnd - tStart) > 0.05) {
+                    needsSplit = true;
+                }
             }
         }
 
