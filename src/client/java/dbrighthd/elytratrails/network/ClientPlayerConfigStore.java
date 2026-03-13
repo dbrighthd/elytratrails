@@ -172,25 +172,19 @@ public final class ClientPlayerConfigStore {
         boolean fadeStart = tag.getBooleanOr("fadeStart", fallbackConfig.fadeStart());
         double fadeStartDistance = tag.getDoubleOr("fadeStartDistance", fallbackConfig.fadeStartDistance());
         boolean lifeTimeFade = tag.getBooleanOr("lifeTimeFade", fallbackConfig.lifeTimeFade());
-
         boolean glowingTrails = tag.getBooleanOr("glowingTrails", fallbackConfig.glowingTrails());
         boolean translucentTrails = tag.getBooleanOr("translucentTrails", fallbackConfig.translucentTrails());
         boolean wireframeTrails = tag.getBooleanOr("wireframeTrails", fallbackConfig.wireframeTrails());
-
         boolean alwaysShowTrailDuringTwirl = tag.getBooleanOr("alwaysShowTrailDuringTwirl", fallbackConfig.alwaysShowTrailDuringTwirl());
         String prideTrailRight = tag.getStringOr("prideTrailRight", fallbackConfig.prideTrailRight());
         double twirlTime = tag.getDoubleOr("twirlTime", fallbackConfig.twirlTime());
         boolean increaseWidthOverTime = tag.getBooleanOr("increaseWidthOverTime", fallbackConfig.increaseWidthOverTime());
         double startingWidthMultiplier = tag.getDoubleOr("startingWidthMultiplier", fallbackConfig.startingWidthMultiplier());
         double endingWidthMultiplier = tag.getDoubleOr("endingWidthMultiplier", fallbackConfig.endingWidthMultiplier());
-
         double distanceTillTrailStart = tag.getDoubleOr("distanceTillTrailStart", fallbackConfig.distanceTillTrailStart());
-
         EasingUtil.EaseType easeType = readEnum(tag, "easeType", EasingUtil.EaseType.class, fallbackConfig.easeType());
-
         boolean endDistanceFade = tag.getBooleanOr("endDistanceFade", fallbackConfig.endDistanceFade());
         double endDistanceFadeAmount = tag.getDoubleOr("endDistanceFadeAmount", fallbackConfig.endDistanceFadeAmount());
-
         String playerName = tag.getStringOr("playerName", fallbackConfig.playerName());
         boolean speedBasedAlpha = tag.getBooleanOr("speedBasedAlpha", fallbackConfig.speedBasedAlpha());
         double minAlphaSpeed = tag.getDoubleOr("minAlphaSpeed", fallbackConfig.minAlphaSpeed());

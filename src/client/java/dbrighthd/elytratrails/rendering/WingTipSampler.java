@@ -42,7 +42,7 @@ import java.util.*;
 
 import static dbrighthd.elytratrails.ElytraTrailsClient.getConfig;
 import static dbrighthd.elytratrails.compat.emf.EmfTrailSpawnerRegistry.getModelVariantFromModel;
-import static dbrighthd.elytratrails.util.ModelTransformationUtil.getSignedElytraAoARadiansFast;
+import static dbrighthd.elytratrails.util.ModelTransformationUtil.*;
 
 public class WingTipSampler {
     private final SubmitNodeStorage submitStorage = new SubmitNodeStorage();
@@ -186,17 +186,6 @@ public class WingTipSampler {
         childLookupCache.clear();
     }
 
-    @SuppressWarnings({"rawtypes", "unchecked"})
-    private static void setupAnimUnchecked(EntityModel<?> model, EntityRenderState state) {
-        ((EntityModel) model).setupAnim(state);
-    }
-
-    private static void setupAnyModelAnim(Object modelObj, Object stateObj) {
-        if (!(modelObj instanceof EntityModel<?> model)) return;
-        if (!(stateObj instanceof EntityRenderState state)) return;
-
-        setupAnimUnchecked(model, state);
-    }
 
     private List<SpawnerInfo> getSpawnersInfo(List<EmfWingTipHooks.SpawnerPath> spawners) {
         ArrayList<SpawnerInfo> spawnerInfos = new ArrayList<>();
@@ -267,15 +256,7 @@ public class WingTipSampler {
         );
     }
 
-    private @NotNull List<Emitter> getVanillaTrailEmittersGeneric(
-            @NotNull PoseStack stack,
-            @Nullable ModelPart animatedRoot,
-            @NotNull EntityModel<?> model,
-            @NotNull Vec3 cameraPos,
-            @NotNull Vec3 entityWorldOffset,
-            Entity entity,
-            ResolvedSampleSettings sampleSettings
-    ) {
+    private @NotNull List<Emitter> getVanillaTrailEmittersGeneric(@NotNull PoseStack stack, @Nullable ModelPart animatedRoot, @NotNull EntityModel<?> model, @NotNull Vec3 cameraPos, @NotNull Vec3 entityWorldOffset, Entity entity, ResolvedSampleSettings sampleSettings) {
         Vec3 offsets = new Vec3(-sampleSettings.xOffset() / 16, -sampleSettings.yOffset() / 16, -sampleSettings.zOffset() / 16);
         ModelPart modelPart = animatedRoot != null ? animatedRoot : model.root();
         Vec3 tip = computeTransformedPoint(stack, modelPart, modelPart, offsets);
@@ -284,16 +265,10 @@ public class WingTipSampler {
         );
     }
 
-    private static final Vec3 FRESH_ANIMATIONS_LEFT_WINGTIP_OFFSET =
-            new Vec3(-11.0 / 16.0, 21.0 / 16.0, 3.0 / 16.0);
-
-    private static final Vec3 FRESH_ANIMATIONS_RIGHT_WINGTIP_OFFSET =
-            new Vec3(11.0 / 16.0, 21.0 / 16.0, 3.0 / 16.0);
 
     private static Vec3 getEmitterLocalOffset(SpawnerInfo spawner) {
         String key = spawner.spawner.key();
         if (key == null) return Vec3.ZERO;
-
         return switch (key.toLowerCase()) {
             case "emf_left_wing2" -> FRESH_ANIMATIONS_LEFT_WINGTIP_OFFSET;
             case "emf_right_wing2" -> FRESH_ANIMATIONS_RIGHT_WINGTIP_OFFSET;
@@ -329,13 +304,7 @@ public class WingTipSampler {
         return point;
     }
 
-    private @Nullable ResolvedEmitterPoint transformLocalPointThroughPath(
-            @NotNull PoseStack stack,
-            @Nullable ModelPart elytraRoot,
-            @NotNull ModelPart wingRoot,
-            String[] pathSegments,
-            @NotNull Vec3 localOffset
-    ) {
+    private @Nullable ResolvedEmitterPoint transformLocalPointThroughPath(@NotNull PoseStack stack, @Nullable ModelPart elytraRoot, @NotNull ModelPart wingRoot, String[] pathSegments, @NotNull Vec3 localOffset) {
         if (pathSegments.length == 0) return null;
 
         stack.pushPose();
@@ -375,11 +344,7 @@ public class WingTipSampler {
         return point;
     }
 
-    private @Nullable ResolvedEmitterPoint transformLocalPointThroughPathGeneric(
-            @NotNull PoseStack stack,
-            @Nullable ModelPart modelRoot,
-            String[] pathSegments
-    ) {
+    private @Nullable ResolvedEmitterPoint transformLocalPointThroughPathGeneric(@NotNull PoseStack stack, @Nullable ModelPart modelRoot, String[] pathSegments) {
         if (pathSegments.length == 0 || modelRoot == null) return null;
 
         stack.pushPose();

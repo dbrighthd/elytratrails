@@ -35,10 +35,10 @@ public abstract class AvatarRendererMixin {
 
         float extra;
         if (state.id == localId) {
-            // local: old feel
+            //Local player twirling uses its own system
             extra = TwirlRoll.getExtraRollRadians();
         } else {
-            // remote: packet-driven per-entity timeline
+            //twirling for other entities
             extra = -EntityTwirlManager.getExtraRollRadians(state.id);
         }
 

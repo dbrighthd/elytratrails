@@ -21,16 +21,6 @@ public record Trail(Identifier texture, List<Point> points, ResolvedTrailSetting
         if (texture == null) texture = TrailRenderer.DEFAULT_TEXTURE;
         return new Trail(texture, new ArrayList<>(), resolvedTrailSettings, emitter.isLeftWing(), playerId, index, trailId);
     }
-
-    @SuppressWarnings("unused")
-    public float length() {
-        float length = 0;
-        for (int i = 0; i < points.size() - 1; i++) {
-            length += (float) points.get(i).pos().distanceTo(points.get(i + 1).pos());
-        }
-        return length;
-    }
-
     /**
      * @param pos   position of trail point
      * @param epoch time of creation, in milliseconds

@@ -1,6 +1,8 @@
 package dbrighthd.elytratrails.util;
 
+import net.minecraft.client.model.EntityModel;
 import net.minecraft.client.model.geom.ModelPart;
+import net.minecraft.client.renderer.entity.state.EntityRenderState;
 import net.minecraft.util.Mth;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.phys.Vec3;
@@ -10,8 +12,10 @@ import org.joml.Vector4f;
 
 public class ModelTransformationUtil {
 
-    public static Vec3 VANILLA_LEFT_WING_TIP = new Vec3(-11.0 / 16.0, 21.0 / 16.0, 3.0 / 16.0);
-    public static Vec3 VANILLA_RIGHT_WING_TIP = new Vec3(11.0 / 16.0, 21.0 / 16.0, 3.0 / 16.0);
+    public static final Vec3 VANILLA_LEFT_WING_TIP = new Vec3(-11.0 / 16.0, 21.0 / 16.0, 3.0 / 16.0);
+    public static final Vec3 VANILLA_RIGHT_WING_TIP = new Vec3(11.0 / 16.0, 21.0 / 16.0, 3.0 / 16.0);
+    public static final Vec3 FRESH_ANIMATIONS_LEFT_WINGTIP_OFFSET = new Vec3(-11.0 / 16.0, 21.0 / 16.0, 3.0 / 16.0);
+    public static final Vec3 FRESH_ANIMATIONS_RIGHT_WINGTIP_OFFSET = new Vec3(11.0 / 16.0, 21.0 / 16.0, 3.0 / 16.0);
 
     public static Vec3 transformPoint(Matrix4f matrix, Vec3 localPoint) {
         Vector4f homogeneous = new Vector4f((float) localPoint.x, (float) localPoint.y, (float) localPoint.z, 1.0f);
@@ -47,16 +51,25 @@ public class ModelTransformationUtil {
         double invSpeed = Mth.invSqrt((float) speedSqr);
         double velHoriz = Math.sqrt(vx * vx + vz * vz) * invSpeed;
         double velVert = vy * invSpeed;
-
         float pitch = -entity.getXRot() * Mth.DEG_TO_RAD;
-
         float lookHoriz = Mth.cos(pitch);
         float lookVert = Mth.sin(pitch);
-
         float cosAoA = (float) (lookHoriz * velHoriz + lookVert * velVert);
-
         float sinAoA = (float) (lookVert * velHoriz - lookHoriz * velVert);
-
         return Math.abs(sinAoA < 0.0f ? cosAoA : 1.0f);
     }
+
+
+    @SuppressWarnings({"rawtypes", "unchecked"})
+    private static void setupAnimUnchecked(EntityModel<?> model, EntityRenderState state) {
+        ((EntityModel) model).setupAnim(state);
+    }
+
+    public static void setupAnyModelAnim(Object modelObj, Object stateObj) {
+        if (!(modelObj instanceof EntityModel<?> model)) return;
+        if (!(stateObj instanceof EntityRenderState state)) return;
+        setupAnimUnchecked(model, state);
+    }
+
+
 }
