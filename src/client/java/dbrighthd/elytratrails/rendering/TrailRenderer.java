@@ -77,7 +77,7 @@ public class TrailRenderer {
             if (size < 4) continue;
 
             ResolvedTrailSettings trailSettings = trail.config();
-            RenderType renderType = getRenderType(trail, trailSettings);
+            RenderType renderType = trail.renderType();
 
             final int last = size - 1;
 
@@ -115,9 +115,8 @@ public class TrailRenderer {
                     Vec3 p2 = p2Point.pos();
                     Vec3 p3 = p3Point.pos();
 
-                    Vec3 startPos = SplineInterpolation.catmullRom(p0, p1, p2, p3, 0f);
-                    Vec3 endPos = SplineInterpolation.catmullRom(p0, p1, p2, p3, 1f);
-
+                    Vec3 startPos = modConfig.useSplines ? SplineInterpolation.catmullRom(p0, p1, p2, p3, 0f) : p1;
+                    Vec3 endPos = modConfig.useSplines ? SplineInterpolation.catmullRom(p0, p1, p2, p3, 1f) : p2;
                     calculateSubdivideLength(p0, p1, p2, p3, 0f, 1f, startPos, endPos);
                 }
 
@@ -147,8 +146,8 @@ public class TrailRenderer {
                     Vec3 p2 = point2.pos();
                     Vec3 p3 = point3.pos();
 
-                    Vec3 startPos = SplineInterpolation.catmullRom(p0, p1, p2, p3, 0f);
-                    Vec3 endPos = SplineInterpolation.catmullRom(p0, p1, p2, p3, 1f);
+                    Vec3 startPos = modConfig.useSplines ? SplineInterpolation.catmullRom(p0, p1, p2, p3, 0f) : p1;
+                    Vec3 endPos = modConfig.useSplines ? SplineInterpolation.catmullRom(p0, p1, p2, p3, 1f) : p2;
 
                     renderSubdividedSegment(pose, consumer, point0, point1, point2, 0f, 1f, p0, p1, p2, p3, startPos, endPos, trail, trailSettings.color(), trailSettings);
                 }
@@ -162,34 +161,7 @@ public class TrailRenderer {
         return new Trail.Point(newPos, point.epoch(), visible);
     }
 
-    private RenderType getRenderType(Trail trail, ResolvedTrailSettings trailSettings) {
-        if (trailSettings.glowingTrails()) {
-            if (trailSettings.translucentTrails()) {
-                if (trailSettings.wireframeTrails()) {
-                    return TrailPipelines.entityTranslucentEmissiveWireFrame(trail.texture());
-                }
-                return TrailPipelines.entityTranslucentEmissiveUnlit(trail.texture());
-            } else {
-                if (trailSettings.wireframeTrails()) {
-                    return TrailPipelines.entityCutoutEmissiveUnlitWireframe(trail.texture());
-                } else {
-                    return TrailPipelines.entityCutoutEmissiveUnlit(trail.texture());
 
-                }
-            }
-        } else {
-            if (trailSettings.wireframeTrails()) {
-                return TrailPipelines.entityTranslucentCullWireFrame(trail.texture());
-            } else {
-                if (trailSettings.translucentTrails()) {
-                    return TrailPipelines.entityTranslucentCull(trail.texture());
-                } else {
-                    return TrailPipelines.entityCutoutLit(trail.texture());
-
-                }
-            }
-        }
-    }
 
     private void renderSubdividedSegment(
             PoseStack.Pose pose, VertexConsumer consumer,
