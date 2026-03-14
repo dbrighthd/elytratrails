@@ -50,6 +50,7 @@ public class ElytraTrailsClient implements ClientModInitializer {
         CommandHandler.init();
         ContinuousTwirlController.setDurations();
         TwirlController.setDurations();
+        TrailPackConfigManager.setDefaultSampleSettings();
         ResourceManagerHelper.get(PackType.CLIENT_RESOURCES).registerReloadListener(
                 new SimpleSynchronousResourceReloadListener() {
                     @Override

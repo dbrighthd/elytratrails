@@ -73,6 +73,11 @@ public final class TrailPackConfigManager {
         defaultResolved = ResolvedSampleSettings.defaults();
     }
 
+    public static void setDefaultSampleSettings()
+    {
+        defaultResolved = ResolvedSampleSettings.defaults();
+    }
+
     public static void setEntityDefaultModel(EntityType<?> entityType) {
         entityDefaults.put(entityType, resolveSample(entityType.toShortString()));
     }
