@@ -106,8 +106,8 @@ public final class ElytraTrailsKeybind {
             boolean twirlRPhysicalDown = DO_A_LIL_TWIRL_R.isDown();
             boolean twirlRandomPhysicalDown = DO_A_LIL_TWIRL_RANDOM.isDown();
 
-            boolean continuousLPhysicalDown = DO_A_LIL_CONTINUOUS_TWIRL_L.isDown();
-            boolean continuousRPhysicalDown = DO_A_LIL_CONTINUOUS_TWIRL_R.isDown();
+            boolean continuousLPhysicalDown = DO_A_LIL_CONTINUOUS_TWIRL_R.isDown();
+            boolean continuousRPhysicalDown = DO_A_LIL_CONTINUOUS_TWIRL_L.isDown();
 
             boolean twirlLPressed = twirlLPhysicalDown && !prevTwirlLDown;
             boolean twirlRPressed = twirlRPhysicalDown && !prevTwirlRDown;
