@@ -1,5 +1,6 @@
 package dbrighthd.elytratrails.handler;
 
+import dbrighthd.elytratrails.ElytraTrails;
 import dbrighthd.elytratrails.config.ModConfig;
 import me.shedaniel.autoconfig.AutoConfig;
 import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents;
@@ -60,7 +61,7 @@ public class ParticleHandler {
     }
 
     private static ParticleOptions chosenParticle() {
-        var cfg = AutoConfig.getConfigHolder(ModConfig.class).getConfig();
+        var cfg = getConfig();
         return switch (cfg.particle) {
             case ANGRY_VILLAGER -> ParticleTypes.ANGRY_VILLAGER;
             case ASH -> ParticleTypes.ASH;

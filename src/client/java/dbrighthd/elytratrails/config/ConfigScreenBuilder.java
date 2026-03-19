@@ -9,7 +9,6 @@ import dbrighthd.elytratrails.network.PlayerConfigC2SPayload;
 import dbrighthd.elytratrails.network.RemoveFromStoreC2SPayload;
 import dbrighthd.elytratrails.rendering.TrailSystem;
 import dbrighthd.elytratrails.util.EasingUtil;
-import me.shedaniel.autoconfig.AutoConfig;
 import me.shedaniel.clothconfig2.api.ConfigBuilder;
 import me.shedaniel.clothconfig2.api.ConfigCategory;
 import me.shedaniel.clothconfig2.api.ConfigEntryBuilder;
@@ -438,7 +437,7 @@ public class ConfigScreenBuilder {
             refreshConfig();
             TwirlController.setDurations();
             ContinuousTwirlController.setDurations();
-            AutoConfig.getConfigHolder(ModConfig.class).save();
+            ConfigManager.save();
             var mc = Minecraft.getInstance();
             refreshLocalConfigs();
             if (mc.getConnection() != null && mc.player != null && mc.level != null) {

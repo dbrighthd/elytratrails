@@ -1,6 +1,7 @@
 package dbrighthd.elytratrails;
 
 import dbrighthd.elytratrails.compat.Compatibility;
+import dbrighthd.elytratrails.config.ConfigManager;
 import dbrighthd.elytratrails.config.ModConfig;
 import dbrighthd.elytratrails.config.pack.TrailPackConfigManager;
 import dbrighthd.elytratrails.controller.ContinuousTwirlController;
@@ -12,8 +13,6 @@ import dbrighthd.elytratrails.rendering.TrailPipelines;
 import dbrighthd.elytratrails.rendering.TrailSystem;
 import dbrighthd.elytratrails.rendering.TrailTextureRegistry;
 import dbrighthd.elytratrails.util.TimeUtil;
-import me.shedaniel.autoconfig.AutoConfig;
-import me.shedaniel.autoconfig.serializer.GsonConfigSerializer;
 import net.fabricmc.api.ClientModInitializer;
 import net.fabricmc.fabric.api.resource.ResourceManagerHelper;
 import net.fabricmc.fabric.api.resource.ResourcePackActivationType;
@@ -37,7 +36,7 @@ public class ElytraTrailsClient implements ClientModInitializer {
 
     @Override
     public void onInitializeClient() {
-        AutoConfig.register(ModConfig.class, GsonConfigSerializer::new);
+        ConfigManager.load();
         refreshConfig();
         TimeUtil.init();
         Compatibility.init();
@@ -86,15 +85,16 @@ public class ElytraTrailsClient implements ClientModInitializer {
         ));
     }
 
+    //eventually this call will be replaced with the call directly from ConfigManager
     public static ModConfig getConfig() {
         return modConfig;
     }
 
     public static void setConfig(ModConfig modConfig) {
-        AutoConfig.getConfigHolder(ModConfig.class).setConfig(modConfig);
+        ConfigManager.save(modConfig);
     }
 
     public static void refreshConfig() {
-        modConfig = AutoConfig.getConfigHolder(ModConfig.class).getConfig();
+        modConfig = ConfigManager.getConfig();
     }
 }

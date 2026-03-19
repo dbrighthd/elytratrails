@@ -6,8 +6,7 @@ import me.shedaniel.autoconfig.annotation.Config;
 /**
  * The config that gets serialized and stored
  */
-@Config(name = "elytratrails")
-public class ModConfig implements ConfigData {
+public class ModConfig {
 
     public ClientConfig clientPlayerConfig = ClientConfig.getDefaultClientConfig();
     public ClientConfig otherPlayerConfig = ClientConfig.getDefaultClientConfig();
@@ -168,4 +167,33 @@ public class ModConfig implements ConfigData {
     public double particlesVelocityAhead = 3;
 
     public double particlesVelocityBackwards = 0;
+
+    public void validate() {
+        if (clientPlayerConfig == null) {
+            clientPlayerConfig = ClientConfig.getDefaultClientConfig();
+        }
+        if (otherPlayerConfig == null) {
+            otherPlayerConfig = ClientConfig.getDefaultClientConfig();
+        }
+
+        //these next three dont matter and will be set to "" on config screen opening
+        if (exportPresetName == null) {
+            exportPresetName = "";
+        }
+        if (Preset == null) {
+            Preset = "";
+        }
+        if (PresetOthers == null) {
+            PresetOthers = "";
+        }
+        if (clearTrailsOption == null) {
+            clearTrailsOption = ClearTrails.NO;
+        }
+        if (particle == null) {
+            particle = ParticleChoice.POOF;
+        }
+
+        clientPlayerConfig.validate();
+        otherPlayerConfig.validate();
+    }
 }

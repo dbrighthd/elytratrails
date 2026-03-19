@@ -283,4 +283,15 @@ public class ClientConfig {
                 wingtipDepthPosition,
                 distanceTillTrailEnd);
     }
+    public void validate() {
+        if (prideTrail == null) {
+            prideTrail = "";
+        }
+        if (prideTrailRight == null) {
+            prideTrailRight = "";
+        }
+        if (easeType == null) {
+            easeType = EasingUtil.EaseType.Back;
+        }
+    }
 }
