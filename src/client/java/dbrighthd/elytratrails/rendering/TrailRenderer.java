@@ -9,6 +9,7 @@ import dbrighthd.elytratrails.util.TimeUtil;
 import net.fabricmc.fabric.api.client.rendering.v1.world.WorldRenderContext;
 import net.minecraft.client.Camera;
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.renderer.LevelRenderer;
 import net.minecraft.client.renderer.LightTexture;
 import net.minecraft.client.renderer.rendertype.RenderType;
 import net.minecraft.client.renderer.texture.OverlayTexture;
@@ -402,11 +403,11 @@ public class TrailRenderer {
         else return 1.0f - (age / (float) maxLifetime);
     }
 
-    private int computeLightTexture(Vec3 pos) { // note: I really hate this method, but I don't feel like managing the state that's required to do this in a better way
+    private int computeLightTexture(Vec3 pos) {
         if (minecraft.level == null) return LightTexture.FULL_BRIGHT;
 
         BlockPos blockPos = BlockPos.containing(pos);
-        return LightTexture.pack(minecraft.level.getBrightness(LightLayer.BLOCK, blockPos), minecraft.level.getBrightness(LightLayer.SKY, blockPos));
+        return LevelRenderer.getLightColor(minecraft.level,blockPos);
     }
 
     private void quadBetweenPoints(
