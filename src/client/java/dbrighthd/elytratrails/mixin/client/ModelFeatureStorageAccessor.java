@@ -1,5 +1,6 @@
 package dbrighthd.elytratrails.mixin.client;
 
+import dbrighthd.elytratrails.accessor.ModelFeatureStorageAccess;
 import net.minecraft.client.renderer.SubmitNodeStorage;
 import net.minecraft.client.renderer.rendertype.RenderType;
 import org.spongepowered.asm.mixin.Mixin;
@@ -12,10 +13,12 @@ import java.util.Map;
  * model submits for extracting models in WingTipSampler
  */
 @Mixin(targets = "net.minecraft.client.renderer.feature.ModelFeatureRenderer$Storage")
-public interface ModelFeatureStorageAccessor {
-    @Accessor("opaqueModelSubmits")
-    Map<RenderType, List<SubmitNodeStorage.ModelSubmit<?>>> elytratrails$getOpaqueModelSubmits();
+public interface ModelFeatureStorageAccessor extends ModelFeatureStorageAccess {
+    @Override
+    @Accessor("solidModelSubmits")
+    Map<RenderType, List<SubmitNodeStorage.ModelSubmit<?>>> elytratrails$getSolidModelSubmits();
 
+    @Override
     @Accessor("translucentModelSubmits")
     List<SubmitNodeStorage.TranslucentModelSubmit<?>> elytratrails$getTranslucentModelSubmits();
 }

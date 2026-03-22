@@ -8,13 +8,9 @@
     "CameraTwirlMixin",
     "ClientLevelEntityRemovalMixin",
     "ClientPacketListenerRemoveEntitiesMixin",
-    "ModelFeatureStorageAccessor",
-    "compat.EmfModelPartRootRegisterMixin"
+    "ModelFeatureStorageAccessor"
   ],
   "injectors": {
     "defaultRequire": 1
-  },
-  "mixins": [
-    "compat.RecorderMixin"
-  ]
+  }
 }

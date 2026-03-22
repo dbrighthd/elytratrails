@@ -2,8 +2,7 @@ package dbrighthd.elytratrails.rendering;
 
 import dbrighthd.elytratrails.ElytraTrailsClient;
 import dbrighthd.elytratrails.config.ModConfig;
-import net.fabricmc.fabric.api.client.rendering.v1.world.WorldRenderEvents;
-
+import net.fabricmc.fabric.api.client.rendering.v1.level.LevelRenderEvents;
 public class TrailSystem {
 
     private static final WingTipSampler sampler = new WingTipSampler();
@@ -11,7 +10,7 @@ public class TrailSystem {
     private static final TrailRenderer renderer = new TrailRenderer(manager);
 
     public static void init() {
-        WorldRenderEvents.AFTER_ENTITIES.register(ctx -> {
+        LevelRenderEvents.AFTER_TRANSLUCENT_TERRAIN.register(ctx -> {
             ModConfig config = ElytraTrailsClient.getConfig();
             if (!config.enableAllTrails) return;
             renderer.renderAllTrails(ctx, sampler.gatheredTrailsThisFrame);

@@ -2,7 +2,7 @@ package dbrighthd.elytratrails.handler;
 
 import dbrighthd.elytratrails.ElytraTrails;
 import dbrighthd.elytratrails.config.ModConfig;
-import me.shedaniel.autoconfig.AutoConfig;
+//import me.shedaniel.autoconfig.AutoConfig;
 import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents;
 import net.minecraft.client.multiplayer.ClientLevel;
 import net.minecraft.client.player.LocalPlayer;

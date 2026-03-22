@@ -1,6 +1,6 @@
 package dbrighthd.elytratrails;
 
-import dbrighthd.elytratrails.compat.Compatibility;
+//import dbrighthd.elytratrails.compat.Compatibility;
 import dbrighthd.elytratrails.config.ConfigManager;
 import dbrighthd.elytratrails.config.ModConfig;
 import dbrighthd.elytratrails.config.pack.TrailPackConfigManager;
@@ -26,7 +26,7 @@ import org.jetbrains.annotations.NotNull;
 
 import java.util.Objects;
 
-import static dbrighthd.elytratrails.compat.emf.EmfTrailSpawnerRegistry.onResourceReload;
+//import static dbrighthd.elytratrails.compat.emf.EmfTrailSpawnerRegistry.onResourceReload;
 import static dbrighthd.elytratrails.network.ClientPlayerConfigStore.refreshLocalConfigs;
 
 
@@ -39,7 +39,7 @@ public class ElytraTrailsClient implements ClientModInitializer {
         ConfigManager.load();
         refreshConfig();
         TimeUtil.init();
-        Compatibility.init();
+        //Compatibility.init();
         ElytraTrailsKeybind.init();
         TrailPipelines.init();
         TrailSystem.init();
@@ -63,9 +63,9 @@ public class ElytraTrailsClient implements ClientModInitializer {
                                 .reloadNow(manager);
 
                         TrailSystem.getWingtipSampler().removeAllEmfCache();
-                        if (FabricLoader.getInstance().isModLoaded("entity_model_features")) {
-                            onResourceReload();
-                        }
+//                        if (FabricLoader.getInstance().isModLoaded("entity_model_features")) {
+//                            onResourceReload();
+//                        }
                         TrailPackConfigManager.reload(manager);
                         TrailPackConfigManager.reloadPresets(manager);
                     }

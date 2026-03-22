@@ -9,7 +9,7 @@ import dbrighthd.elytratrails.util.TimeUtil;
 import it.unimi.dsi.fastutil.ints.Int2ObjectMap;
 import it.unimi.dsi.fastutil.ints.Int2ObjectOpenHashMap;
 import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents;
-import net.fabricmc.fabric.api.client.rendering.v1.world.WorldRenderEvents;
+import net.fabricmc.fabric.api.client.rendering.v1.level.LevelRenderEvents;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.player.AbstractClientPlayer;
 import net.minecraft.world.entity.Entity;
@@ -41,7 +41,7 @@ public class TrailManager {
     public TrailManager(WingTipSampler sampler) {
         this.sampler = sampler;
         ClientTickEvents.END_CLIENT_TICK.register(this::removeDeadPoints);
-        WorldRenderEvents.AFTER_ENTITIES.register(cxt -> {
+        LevelRenderEvents.AFTER_TRANSLUCENT_FEATURES.register(cxt -> {
             modConfig = getConfig();
             float now = TimeUtil.currentMillis();
             boolean recordEmitters = true;

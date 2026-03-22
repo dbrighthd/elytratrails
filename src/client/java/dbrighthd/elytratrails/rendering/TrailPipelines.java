@@ -1,7 +1,10 @@
 package dbrighthd.elytratrails.rendering;
 
 import com.mojang.blaze3d.pipeline.BlendFunction;
+import com.mojang.blaze3d.pipeline.ColorTargetState;
+import com.mojang.blaze3d.pipeline.DepthStencilState;
 import com.mojang.blaze3d.pipeline.RenderPipeline;
+import com.mojang.blaze3d.platform.CompareOp;
 import com.mojang.blaze3d.platform.PolygonMode;
 import dbrighthd.elytratrails.ElytraTrails;
 import net.minecraft.client.renderer.RenderPipelines;
@@ -14,12 +17,16 @@ import java.util.function.BiFunction;
 import java.util.function.Function;
 
 public class TrailPipelines {
+    public static final ColorTargetState TRANSLUCENT_COLOR_STATE = new ColorTargetState(BlendFunction.TRANSLUCENT);
+    public static final DepthStencilState DEFAULT_STENCIL_WITH_FALSE_DEPTHWRITE = new DepthStencilState(CompareOp.LESS_THAN_OR_EQUAL, false);
     public static final RenderPipeline PIPELINE_ENTITY_TRANSLUCENT_CULL = RenderPipelines.register(RenderPipeline.builder(RenderPipelines.ENTITY_SNIPPET)
             .withLocation(Identifier.fromNamespaceAndPath(ElytraTrails.MOD_ID, "pipeline/entity_translucent_cull"))
             .withShaderDefine("ALPHA_CUTOUT", 0.1F)
             .withShaderDefine("PER_FACE_LIGHTING")
             .withSampler("Sampler1")
-            .withBlend(BlendFunction.TRANSLUCENT)
+            //.withBlend(BlendFunction.TRANSLUCENT)
+            .withColorTargetState(new ColorTargetState(BlendFunction.TRANSLUCENT))
+            .withDepthStencilState(DEFAULT_STENCIL_WITH_FALSE_DEPTHWRITE)
             .withCull(false)
             .build());
 
@@ -43,7 +50,8 @@ public class TrailPipelines {
             .withShaderDefine("PER_FACE_LIGHTING")
             .withPolygonMode(PolygonMode.WIREFRAME)
             .withSampler("Sampler1")
-            .withBlend(BlendFunction.TRANSLUCENT)
+            .withColorTargetState(TRANSLUCENT_COLOR_STATE)
+            .withDepthStencilState(DEFAULT_STENCIL_WITH_FALSE_DEPTHWRITE)
             .withCull(false)
             .build());
 
@@ -68,9 +76,9 @@ public class TrailPipelines {
                     .withShaderDefine("ALPHA_CUTOUT", 0.1F)
                     .withShaderDefine("NO_CARDINAL_LIGHTING")
                     .withSampler("Sampler1")
-                    .withBlend(BlendFunction.TRANSLUCENT)
+                    .withColorTargetState(TRANSLUCENT_COLOR_STATE)
                     .withCull(false)
-                    .withDepthWrite(false)
+                    .withDepthStencilState(DEFAULT_STENCIL_WITH_FALSE_DEPTHWRITE)
                     .build());
 
     public static final RenderPipeline PIPELINE_ENTITY_TRANSLUCENT_EMISSIVE_UNLIT_WIREFRAME =
@@ -80,9 +88,9 @@ public class TrailPipelines {
                     .withShaderDefine("NO_CARDINAL_LIGHTING")
                     .withSampler("Sampler1")
                     .withPolygonMode(PolygonMode.WIREFRAME)
-                    .withBlend(BlendFunction.TRANSLUCENT)
+                    .withColorTargetState(TRANSLUCENT_COLOR_STATE)
                     .withCull(false)
-                    .withDepthWrite(false)
+                    .withDepthStencilState(DEFAULT_STENCIL_WITH_FALSE_DEPTHWRITE)
                     .build());
 
     public static final RenderPipeline PIPELINE_ENTITY_CUTOUT_EMISSIVE_UNLIT =
@@ -92,7 +100,6 @@ public class TrailPipelines {
                     .withShaderDefine("NO_CARDINAL_LIGHTING")
                     .withSampler("Sampler1")
                     .withCull(false)
-                    .withDepthWrite(true)
                     .build());
 
     public static final RenderPipeline PIPELINE_ENTITY_CUTOUT_EMISSIVE_UNLIT_WIREFRAME =
@@ -103,7 +110,6 @@ public class TrailPipelines {
                     .withPolygonMode(PolygonMode.WIREFRAME)
                     .withSampler("Sampler1")
                     .withCull(false)
-                    .withDepthWrite(true)
                     .build());
 
 
@@ -114,7 +120,6 @@ public class TrailPipelines {
                     .withSampler("Sampler1")
                     .withShaderDefine("PER_FACE_LIGHTING")
                     .withCull(false)
-                    .withDepthWrite(true)
                     // Intentionally no blend (cutout)
                     .build());
     private static final BiFunction<Identifier, Boolean, RenderType> RENDER_TYPE_ENTITY_TRANSLUCENT_EMISSIVE_UNLIT =

@@ -5,8 +5,8 @@ import com.mojang.brigadier.context.CommandContext;
 import dbrighthd.elytratrails.config.pack.TrailPackConfigManager;
 import dbrighthd.elytratrails.network.GetAllRequestC2SPayload;
 import dbrighthd.elytratrails.rendering.TrailSystem;
-import net.fabricmc.fabric.api.client.command.v2.ClientCommandManager;
 import net.fabricmc.fabric.api.client.command.v2.ClientCommandRegistrationCallback;
+import net.fabricmc.fabric.api.client.command.v2.ClientCommands;
 import net.fabricmc.fabric.api.client.command.v2.FabricClientCommandSource;
 import net.fabricmc.fabric.api.client.networking.v1.ClientPlayNetworking;
 import net.minecraft.network.chat.Component;
@@ -20,25 +20,25 @@ import static dbrighthd.elytratrails.network.ClientPlayerConfigStore.CLIENT_PLAY
 public class CommandHandler {
     public static void init() {
         ClientCommandRegistrationCallback.EVENT.register((dispatcher, registryAccess) -> dispatcher.register(
-                ClientCommandManager.literal("elytratrails").then(ClientCommandManager.literal("debug")
+                ClientCommands.literal("elytratrails").then(ClientCommands.literal("debug")
                         .executes(CommandHandler::debugCommand))
         ));
         ClientCommandRegistrationCallback.EVENT.register((dispatcher, registryAccess) -> dispatcher.register(
-                ClientCommandManager.literal("elytratrails").then(ClientCommandManager.literal("debugmoverrides")
+                ClientCommands.literal("elytratrails").then(ClientCommands.literal("debugmoverrides")
                         .executes(CommandHandler::debugOverridesCommand))
         ));
         ClientCommandRegistrationCallback.EVENT.register((dispatcher, registryAccess) -> dispatcher.register(
-                ClientCommandManager.literal("elytratrails").then(ClientCommandManager.literal("debugmodels")
+                ClientCommands.literal("elytratrails").then(ClientCommands.literal("debugmodels")
                         .executes(CommandHandler::debugModelsCommand))
         ));
         ClientCommandRegistrationCallback.EVENT.register((dispatcher, registryAccess) -> dispatcher.register(
-                ClientCommandManager.literal("elytratrails")
-                        .then(ClientCommandManager.literal("clear")
+                ClientCommands.literal("elytratrails")
+                        .then(ClientCommands.literal("clear")
                                 .executes(CommandHandler::clearCommand))
         ));
         ClientCommandRegistrationCallback.EVENT.register((dispatcher, registryAccess) -> dispatcher.register(
-                ClientCommandManager.literal("elytratrails")
-                        .then(ClientCommandManager.literal("getconfigs")
+                ClientCommands.literal("elytratrails")
+                        .then(ClientCommands.literal("getconfigs")
                                 .executes(CommandHandler::requestTrailConfigs))
         ));
     }

@@ -1,12 +1,12 @@
 package dbrighthd.elytratrails.rendering;
 
 import com.mojang.blaze3d.vertex.PoseStack;
-import dbrighthd.elytratrails.compat.ModStatuses;
-import dbrighthd.elytratrails.compat.emf.EmfAnimationHooks;
-import dbrighthd.elytratrails.compat.emf.EmfWingTipHooks;
+//import dbrighthd.elytratrails.compat.emf.EmfAnimationHooks;
+//import dbrighthd.elytratrails.compat.emf.EmfWingTipHooks;
+import com.mojang.math.Axis;
 import dbrighthd.elytratrails.config.ModConfig;
 import dbrighthd.elytratrails.config.pack.ResolvedSampleSettings;
-import dbrighthd.elytratrails.mixin.client.ModelFeatureStorageAccessor;
+import dbrighthd.elytratrails.accessor.ModelFeatureStorageAccess;
 import dbrighthd.elytratrails.network.ClientPlayerConfigStore;
 import dbrighthd.elytratrails.network.PlayerConfig;
 import dbrighthd.elytratrails.util.ModelTransformationUtil;
@@ -25,7 +25,7 @@ import net.minecraft.client.renderer.entity.state.EntityRenderState;
 import net.minecraft.client.renderer.entity.state.HumanoidRenderState;
 import net.minecraft.client.renderer.feature.ModelFeatureRenderer;
 import net.minecraft.client.renderer.rendertype.RenderType;
-import net.minecraft.client.renderer.state.CameraRenderState;
+import net.minecraft.client.renderer.state.level.CameraRenderState;
 import net.minecraft.core.BlockPos;
 import net.minecraft.util.Mth;
 import net.minecraft.world.entity.Avatar;
@@ -41,22 +41,22 @@ import org.slf4j.LoggerFactory;
 import java.util.*;
 
 import static dbrighthd.elytratrails.ElytraTrailsClient.getConfig;
-import static dbrighthd.elytratrails.compat.emf.EmfTrailSpawnerRegistry.getModelVariantFromModel;
+//import static dbrighthd.elytratrails.compat.emf.EmfTrailSpawnerRegistry.getModelVariantFromModel;
 import static dbrighthd.elytratrails.util.ModelTransformationUtil.*;
 
 public class WingTipSampler {
     private final SubmitNodeStorage submitStorage = new SubmitNodeStorage();
-    private final Map<Integer, EmfInfo> emfCache = new HashMap<>();
-    private final Map<Integer, EmfInfo> emfCacheGeneric = new HashMap<>();
+//    private final Map<Integer, EmfInfo> emfCache = new HashMap<>();
+//    private final Map<Integer, EmfInfo> emfCacheGeneric = new HashMap<>();
     private final Map<ModelPart, Map<String, ModelPart>> childLookupCache = new IdentityHashMap<>();
 
-    private record EmfInfo(String name, int variant, List<SpawnerInfo> spawners) {
-    }
+//    private record EmfInfo(String name, int variant, List<SpawnerInfo> spawners) {
+//    }
 
     private static final Logger LOGGER = LoggerFactory.getLogger(WingTipSampler.class);
 
-    private record SpawnerInfo(EmfWingTipHooks.SpawnerPath spawner, String[] pathSegments, boolean isLeftWing) {
-    }
+//    private record SpawnerInfo(EmfWingTipHooks.SpawnerPath spawner, String[] pathSegments, boolean isLeftWing) {
+//    }
 
     private record ResolvedEmitterPoint(Vec3 position, boolean visible) {
     }
@@ -90,28 +90,29 @@ public class WingTipSampler {
         basePose.last().set(elytraSubmit.pose());
 
         Vec3 entityWorldOffset = new Vec3(humanoidState.x, humanoidState.y, humanoidState.z);
-        ModelPart animatedElytraRoot = tryGetAnimatedElytraRoot(elytraModel, player);
+        //ModelPart animatedElytraRoot = tryGetAnimatedElytraRoot(elytraModel, player);
+        ModelPart animatedElytraRoot = elytraModel.root(); // 26.1 NO EMF SHORTCUT
         int eid = player.getId();
-        if (ModStatuses.EMF_LOADED && config.emfSupport) {
-
-            int variant = getModelVariantFromModel(animatedElytraRoot);
-
-            if (!emfCache.containsKey(eid) || !(emfCache.get(eid).variant() == variant)) {
-                if (config.logTrails) {
-                    LOGGER.info("Entity {}, New elytra equipped with model variant {}", eid, variant);
-                }
-                emfCache.put(eid, new EmfInfo("elytra", variant, getSpawnersInfo(EmfWingTipHooks.findAllSpawnerPaths(leftWing, rightWing, modConfig.hardCodedFreshAnimationsPlayerWingtips))));
-                return List.of();
-            }
-            EmfInfo emfInfo = emfCache.get(eid);
-            if (!emfInfo.spawners.isEmpty()) {
-                List<Emitter> gatheredTrails = getTrailEmittersFromBones(basePose, animatedElytraRoot, elytraModel, camera.position(), entityWorldOffset, emfInfo);
-                if (config.alwaysSnapTrail) {
-                    putOrAppendGatheredThisFrame(eid, gatheredTrails);
-                }
-                return gatheredTrails;
-            }
-        }
+//        if (ModStatuses.EMF_LOADED && config.emfSupport) {
+//
+//            int variant = getModelVariantFromModel(animatedElytraRoot);
+//
+//            if (!emfCache.containsKey(eid) || !(emfCache.get(eid).variant() == variant)) {
+//                if (config.logTrails) {
+//                    LOGGER.info("Entity {}, New elytra equipped with model variant {}", eid, variant);
+//                }
+//                emfCache.put(eid, new EmfInfo("elytra", variant, getSpawnersInfo(EmfWingTipHooks.findAllSpawnerPaths(leftWing, rightWing, modConfig.hardCodedFreshAnimationsPlayerWingtips))));
+//                return List.of();
+//            }
+//            EmfInfo emfInfo = emfCache.get(eid);
+//            if (!emfInfo.spawners.isEmpty()) {
+//                List<Emitter> gatheredTrails = getTrailEmittersFromBones(basePose, animatedElytraRoot, elytraModel, camera.position(), entityWorldOffset, emfInfo);
+//                if (config.alwaysSnapTrail) {
+//                    putOrAppendGatheredThisFrame(eid, gatheredTrails);
+//                }
+//                return gatheredTrails;
+//            }
+//        }
         List<Emitter> gatheredTrails = getVanillaTrailEmitters(basePose, animatedElytraRoot, elytraModel, camera.position(), entityWorldOffset, player);
         if (config.alwaysSnapTrail) {
             gatheredTrailsThisFrame.put(eid, gatheredTrails);
@@ -144,27 +145,28 @@ public class WingTipSampler {
         basePose.last().set(entitySubmit.pose());
 
         Vec3 entityWorldOffset = new Vec3(entityRenderState.x, entityRenderState.y, entityRenderState.z);
-        ModelPart animatedRoot = tryGetAnimatedEntityRoot(entityModel, entity);
+//        ModelPart animatedRoot = tryGetAnimatedEntityRoot(entityModel, entity);
+        ModelPart animatedRoot = entityModel.root(); // 26.1 NO EMF SHORTCUT
         int eid = entity.getId();
-        if (ModStatuses.EMF_LOADED && config.emfSupport) {
-            int variant = getModelVariantFromModel(animatedRoot);
-
-            if (!emfCacheGeneric.containsKey(eid) || !(emfCacheGeneric.get(eid).variant() == variant)) {
-                List<EmfWingTipHooks.SpawnerPath> found = EmfWingTipHooks.findAllSpawnerPathsGeneric(animatedRoot, false);
-                emfCacheGeneric.put(eid, new EmfInfo(entity.getType().toShortString(), variant, getSpawnersInfo(found)));
-                return new EntityEmitters(List.of(), true);
-            }
-
-            EmfInfo emfInfo = emfCacheGeneric.get(eid);
-
-            if (!emfInfo.spawners.isEmpty()) {
-                List<Emitter> gatheredTrails = getTrailEmittersFromBonesGeneric(basePose, animatedRoot, camera.position(), entityWorldOffset, emfInfo);
-                if (config.alwaysSnapTrail) {
-                    putOrAppendGatheredThisFrame(eid, gatheredTrails);
-                }
-                return new EntityEmitters(gatheredTrails,false);
-            }
-        }
+//        if (ModStatuses.EMF_LOADED && config.emfSupport) {
+//            int variant = getModelVariantFromModel(animatedRoot);
+//
+//            if (!emfCacheGeneric.containsKey(eid) || !(emfCacheGeneric.get(eid).variant() == variant)) {
+//                List<EmfWingTipHooks.SpawnerPath> found = EmfWingTipHooks.findAllSpawnerPathsGeneric(animatedRoot, false);
+//                emfCacheGeneric.put(eid, new EmfInfo(entity.getType().toShortString(), variant, getSpawnersInfo(found)));
+//                return new EntityEmitters(List.of(), true);
+//            }
+//
+//            EmfInfo emfInfo = emfCacheGeneric.get(eid);
+//
+//            if (!emfInfo.spawners.isEmpty()) {
+//                List<Emitter> gatheredTrails = getTrailEmittersFromBonesGeneric(basePose, animatedRoot, camera.position(), entityWorldOffset, emfInfo);
+//                if (config.alwaysSnapTrail) {
+//                    putOrAppendGatheredThisFrame(eid, gatheredTrails);
+//                }
+//                return new EntityEmitters(gatheredTrails,false);
+//            }
+//        }
         if(!sampleSettings.useWithoutEmf()) {
             return new EntityEmitters(List.of(), false);
         }
@@ -176,72 +178,72 @@ public class WingTipSampler {
     }
 
     public void removeFromEmfCache(int eid) {
-        emfCache.remove(eid);
-        emfCacheGeneric.remove(eid);
+//        emfCache.remove(eid);
+//        emfCacheGeneric.remove(eid);
     }
 
     public void removeAllEmfCache() {
-        emfCache.clear();
-        emfCacheGeneric.clear();
+//        emfCache.clear();
+//        emfCacheGeneric.clear();
         childLookupCache.clear();
     }
 
 
-    private List<SpawnerInfo> getSpawnersInfo(List<EmfWingTipHooks.SpawnerPath> spawners) {
-        ArrayList<SpawnerInfo> spawnerInfos = new ArrayList<>();
-        for (EmfWingTipHooks.SpawnerPath spawner : spawners) {
-            spawnerInfos.add(new SpawnerInfo(spawner, splitPath(spawner.path()), inferLeftWing(spawner.where(), spawner.path())));
-        }
-        return spawnerInfos;
-    }
+//    private List<SpawnerInfo> getSpawnersInfo(List<EmfWingTipHooks.SpawnerPath> spawners) {
+//        ArrayList<SpawnerInfo> spawnerInfos = new ArrayList<>();
+//        for (EmfWingTipHooks.SpawnerPath spawner : spawners) {
+//            spawnerInfos.add(new SpawnerInfo(spawner, splitPath(spawner.path()), inferLeftWing(spawner.where(), spawner.path())));
+//        }
+//        return spawnerInfos;
+//    }
 
     private String[] splitPath(String path) {
         if (path == null || path.isEmpty()) return new String[0];
         return path.split("/");
     }
 
-    private @NotNull List<Emitter> getTrailEmittersFromBones(@NotNull PoseStack stack, @Nullable ModelPart elytraRoot, @NotNull ElytraModel model, @NotNull Vec3 cameraPos, @NotNull Vec3 entityWorldOffset, EmfInfo emfInfo) {
-        ModelPart leftWing = model.leftWing;
-        ModelPart rightWing = model.rightWing;
-        List<SpawnerInfo> spawners = emfInfo.spawners;
+//    private @NotNull List<Emitter> getTrailEmittersFromBones(@NotNull PoseStack stack, @Nullable ModelPart elytraRoot, @NotNull ElytraModel model, @NotNull Vec3 cameraPos, @NotNull Vec3 entityWorldOffset, EmfInfo emfInfo) {
+//        ModelPart leftWing = model.leftWing;
+//        ModelPart rightWing = model.rightWing;
+//        List<SpawnerInfo> spawners = emfInfo.spawners;
+//
+//        List<Emitter> emitters = new ArrayList<>();
+//        for (SpawnerInfo spawner : spawners) {
+//            ModelPart wingRoot = (spawner.spawner.where() == EmfWingTipHooks.WhichRoot.LEFT_WING) ? leftWing : rightWing;
+//
+//            ResolvedEmitterPoint cameraRelative = transformLocalPointThroughPath(stack, elytraRoot, wingRoot, spawner.pathSegments(), getEmitterLocalOffset(spawner));
+//            if (cameraRelative == null) continue;
+//
+//            emitters.add(new Emitter(cameraPos.add(cameraRelative.position()).add(entityWorldOffset), spawner.isLeftWing, "elytra" + (emfInfo.variant > 1 ? emfInfo.variant : ""), spawner.spawner.path(), cameraRelative.visible));
+//        }
+//        return emitters;
+//    }
 
-        List<Emitter> emitters = new ArrayList<>();
-        for (SpawnerInfo spawner : spawners) {
-            ModelPart wingRoot = (spawner.spawner.where() == EmfWingTipHooks.WhichRoot.LEFT_WING) ? leftWing : rightWing;
-
-            ResolvedEmitterPoint cameraRelative = transformLocalPointThroughPath(stack, elytraRoot, wingRoot, spawner.pathSegments(), getEmitterLocalOffset(spawner));
-            if (cameraRelative == null) continue;
-
-            emitters.add(new Emitter(cameraPos.add(cameraRelative.position()).add(entityWorldOffset), spawner.isLeftWing, "elytra" + (emfInfo.variant > 1 ? emfInfo.variant : ""), spawner.spawner.path(), cameraRelative.visible));
-        }
-        return emitters;
-    }
-
-    private @NotNull List<Emitter> getTrailEmittersFromBonesGeneric(@NotNull PoseStack stack, @Nullable ModelPart elytraRoot, @NotNull Vec3 cameraPos, @NotNull Vec3 entityWorldOffset, EmfInfo emfInfo) {
-        List<SpawnerInfo> spawners = emfInfo.spawners;
-
-        List<Emitter> emitters = new ArrayList<>();
-        for (SpawnerInfo spawner : spawners) {
-
-            ResolvedEmitterPoint cameraRelative = transformLocalPointThroughPathGeneric(
-                    stack, elytraRoot, spawner.pathSegments()
-            );
-            if (cameraRelative == null) continue;
-
-            emitters.add(new Emitter(cameraPos.add(cameraRelative.position()).add(entityWorldOffset), spawner.isLeftWing, emfInfo.name + (emfInfo.variant > 1 ? emfInfo.variant : ""), spawner.spawner.path(), cameraRelative.visible));
-        }
-        return emitters;
-    }
-
-    private static boolean inferLeftWing(EmfWingTipHooks.WhichRoot modelRoot, String spawnerOrBoneName) {
-
-        if (spawnerOrBoneName != null) {
-            String bone = spawnerOrBoneName.substring(spawnerOrBoneName.lastIndexOf('/')).toLowerCase();
-            return bone.contains("left");
-        }
-
-        return (modelRoot == EmfWingTipHooks.WhichRoot.LEFT_WING);
-    }
+//    private @NotNull List<Emitter> getTrailEmittersFromBonesGeneric(@NotNull PoseStack stack, @Nullable ModelPart elytraRoot, @NotNull Vec3 cameraPos, @NotNull Vec3 entityWorldOffset, EmfInfo emfInfo) {
+//        List<SpawnerInfo> spawners = emfInfo.spawners;
+//
+//        List<Emitter> emitters = new ArrayList<>();
+//        for (SpawnerInfo spawner : spawners) {
+//
+//            ResolvedEmitterPoint cameraRelative = transformLocalPointThroughPathGeneric(
+//                    stack, elytraRoot, spawner.pathSegments()
+//            );
+//            if (cameraRelative == null) continue;
+//
+//            emitters.add(new Emitter(cameraPos.add(cameraRelative.position()).add(entityWorldOffset), spawner.isLeftWing, emfInfo.name + (emfInfo.variant > 1 ? emfInfo.variant : ""), spawner.spawner.path(), cameraRelative.visible));
+//        }
+//        return emitters;
+//    }
+//
+//    private static boolean inferLeftWing(EmfWingTipHooks.WhichRoot modelRoot, String spawnerOrBoneName) {
+//
+//        if (spawnerOrBoneName != null) {
+//            String bone = spawnerOrBoneName.substring(spawnerOrBoneName.lastIndexOf('/')).toLowerCase();
+//            return bone.contains("left");
+//        }
+//
+//        return (modelRoot == EmfWingTipHooks.WhichRoot.LEFT_WING);
+//    }
 
     private @NotNull List<Emitter> getVanillaTrailEmitters(@NotNull PoseStack stack, @Nullable ModelPart elytraRoot, @NotNull ElytraModel model, @NotNull Vec3 cameraPos, @NotNull Vec3 entityWorldOffset, Player player) {
         ModelPart leftWing = model.leftWing;
@@ -266,15 +268,15 @@ public class WingTipSampler {
     }
 
 
-    private static Vec3 getEmitterLocalOffset(SpawnerInfo spawner) {
-        String key = spawner.spawner.key();
-        if (key == null) return Vec3.ZERO;
-        return switch (key.toLowerCase()) {
-            case "emf_left_wing2" -> FRESH_ANIMATIONS_LEFT_WINGTIP_OFFSET;
-            case "emf_right_wing2" -> FRESH_ANIMATIONS_RIGHT_WINGTIP_OFFSET;
-            default -> Vec3.ZERO;
-        };
-    }
+//    private static Vec3 getEmitterLocalOffset(SpawnerInfo spawner) {
+//        String key = spawner.spawner.key();
+//        if (key == null) return Vec3.ZERO;
+//        return switch (key.toLowerCase()) {
+//            case "emf_left_wing2" -> FRESH_ANIMATIONS_LEFT_WINGTIP_OFFSET;
+//            case "emf_right_wing2" -> FRESH_ANIMATIONS_RIGHT_WINGTIP_OFFSET;
+//            default -> Vec3.ZERO;
+//        };
+//    }
 
     private @NotNull Vec3 computeTransformedWingTip(@NotNull PoseStack stack, @Nullable ModelPart elytraRoot, @NotNull ModelPart wingRoot, @NotNull Vec3 localPos, Player player) {
         float wingspread = ModelTransformationUtil.computeWingOpenness(wingRoot);
@@ -383,28 +385,27 @@ public class WingTipSampler {
         return cachedChildren.get(name.toLowerCase());
     }
 
-    private @Nullable ModelPart tryGetAnimatedElytraRoot(ElytraModel model, Player player) {
-        if (!ModStatuses.EMF_LOADED || !getConfig().emfSupport) return null;
-        try {
-            return EmfAnimationHooks.applyManualAnimationAndGetRoot(model, player);
-        } catch (Throwable ignored) {
-            return null;
-        }
-    }
+//    private @Nullable ModelPart tryGetAnimatedElytraRoot(ElytraModel model, Player player) {
+//        if (!ModStatuses.EMF_LOADED || !getConfig().emfSupport) return null;
+//        try {
+//            return EmfAnimationHooks.applyManualAnimationAndGetRoot(model, player);
+//        } catch (Throwable ignored) {
+//            return null;
+//        }
+//    }
 
-    private @Nullable ModelPart tryGetAnimatedEntityRoot(EntityModel<?> model, Entity entity) {
-        if (!ModStatuses.EMF_LOADED || !getConfig().emfSupport) return null;
-        try {
-            return EmfAnimationHooks.applyManualAnimationAndGetRoot(model, entity);
-        } catch (Throwable e) {
-            return null;
-        }
-    }
+//    private @Nullable ModelPart tryGetAnimatedEntityRoot(EntityModel<?> model, Entity entity) {
+//        if (!ModStatuses.EMF_LOADED || !getConfig().emfSupport) return null;
+//        try {
+//            return EmfAnimationHooks.applyManualAnimationAndGetRoot(model, entity);
+//        } catch (Throwable e) {
+//            return null;
+//        }
+//    }
 
     private @NotNull CameraRenderState buildCameraState(@NotNull Camera camera) {
         CameraRenderState state = new CameraRenderState();
         state.pos = camera.position();
-        state.entityPos = camera.position();
         state.blockPos = BlockPos.containing(camera.position());
         state.initialized = true;
         state.orientation = new Quaternionf(camera.rotation());
@@ -443,16 +444,17 @@ public class WingTipSampler {
             if (!(submit.state() instanceof EntityRenderState entityRenderState)) continue;
 
             setupAnyModelAnim(entityModel, entityRenderState);
-            ModelPart animatedRoot = tryGetAnimatedEntityRoot(entityModel, entity);
-            if (fallback == null) {
-                fallback = submit;
-            }
-            if (animatedRoot == null) continue;
-            List<EmfWingTipHooks.SpawnerPath> found = EmfWingTipHooks.findAllSpawnerPathsGeneric(animatedRoot, false);
-            if (!found.isEmpty()) {
-                return submit;
-
-            }
+//            ModelPart animatedRoot = tryGetAnimatedEntityRoot(entityModel, entity);
+//            if (fallback == null) {
+//                fallback = submit;
+//            }
+            fallback = submit; // 26.1 NO EMF SHORTCUT
+            //            if (animatedRoot == null) continue;
+//            List<EmfWingTipHooks.SpawnerPath> found = EmfWingTipHooks.findAllSpawnerPathsGeneric(animatedRoot, false);
+//            if (!found.isEmpty()) {
+//                return submit;
+//
+//            }
 
         }
         return fallback;
@@ -464,10 +466,10 @@ public class WingTipSampler {
     private SubmitNodeStorage.@Nullable ModelSubmit<?> findElytraModelSubmit() {
         for (SubmitNodeCollection collection : submitStorage.getSubmitsPerOrder().values()) {
             ModelFeatureRenderer.Storage modelStorage = collection.getModelSubmits();
-            ModelFeatureStorageAccessor accessor = (ModelFeatureStorageAccessor) modelStorage;
+            ModelFeatureStorageAccess accessor = (ModelFeatureStorageAccess) modelStorage;
 
             Map<RenderType, List<SubmitNodeStorage.ModelSubmit<?>>> opaqueByType =
-                    accessor.elytratrails$getOpaqueModelSubmits();
+                    accessor.elytratrails$getSolidModelSubmits();
             for (List<SubmitNodeStorage.ModelSubmit<?>> submits : opaqueByType.values()) {
                 for (SubmitNodeStorage.ModelSubmit<?> submit : submits) {
                     if (submit.model() instanceof ElytraModel) return submit;
@@ -489,10 +491,10 @@ public class WingTipSampler {
 
         for (SubmitNodeCollection collection : submitStorage.getSubmitsPerOrder().values()) {
             ModelFeatureRenderer.Storage modelStorage = collection.getModelSubmits();
-            ModelFeatureStorageAccessor accessor = (ModelFeatureStorageAccessor) modelStorage;
+            ModelFeatureStorageAccess accessor = (ModelFeatureStorageAccess) modelStorage;
 
             Map<RenderType, List<SubmitNodeStorage.ModelSubmit<?>>> opaqueByType =
-                    accessor.elytratrails$getOpaqueModelSubmits();
+                    accessor.elytratrails$getSolidModelSubmits();
             for (List<SubmitNodeStorage.ModelSubmit<?>> submits : opaqueByType.values()) {
                 out.addAll(submits);
             }

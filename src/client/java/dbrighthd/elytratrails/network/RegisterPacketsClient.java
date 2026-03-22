@@ -37,9 +37,8 @@ public class RegisterPacketsClient {
         {
             if (!hasRecievedThisSession) {
                 assert Minecraft.getInstance().player != null;
-                Minecraft.getInstance().player.displayClientMessage(
-                        net.minecraft.network.chat.Component.literal("§cThe server is using an outdated ElytraTrails mod or plugin. Please ask the server owner to update it to at least version 1.4.0 to work with your client."),
-                        false
+                Minecraft.getInstance().player.sendSystemMessage(
+                        net.minecraft.network.chat.Component.literal("§cThe server is using an outdated ElytraTrails mod or plugin. Please ask the server owner to update it to at least version 1.4.0 to work with your client.")
                 );
             }
             hasRecievedThisSession = true;

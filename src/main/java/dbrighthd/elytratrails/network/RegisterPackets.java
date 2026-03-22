@@ -15,15 +15,15 @@ import java.util.UUID;
 public class RegisterPackets {
     public static Set<UUID> playersReceivedWarnings = new HashSet<>();
     public static void initCommon() {
-        PayloadTypeRegistry.playS2C().register(TwirlStateS2CPayload.ID,TwirlStateS2CPayload.CODEC);
-        PayloadTypeRegistry.playC2S().register(TwirlStateC2SPayload.ID,TwirlStateC2SPayload.CODEC);
-        PayloadTypeRegistry.playS2C().register(PlayerConfigS2CPayload.ID,PlayerConfigS2CPayload.CODEC);
-        PayloadTypeRegistry.playC2S().register(PlayerConfigC2SPayload.ID,PlayerConfigC2SPayload.CODEC);
-        PayloadTypeRegistry.playC2S().register(GetAllRequestC2SPayload.ID,GetAllRequestC2SPayload.CODEC);
-        PayloadTypeRegistry.playS2C().register(RemoveFromStoreS2CPayload.ID,RemoveFromStoreS2CPayload.CODEC);
-        PayloadTypeRegistry.playC2S().register(RemoveFromStoreC2SPayload.ID,RemoveFromStoreC2SPayload.CODEC);
-        PayloadTypeRegistry.playS2C().register(LegacyPlayerConfigS2CPayload.ID,LegacyPlayerConfigS2CPayload.CODEC);
-        PayloadTypeRegistry.playC2S().register(LegacyPlayerConfigC2SPayload.ID,LegacyPlayerConfigC2SPayload.CODEC);
+        PayloadTypeRegistry.clientboundPlay().register(TwirlStateS2CPayload.ID,TwirlStateS2CPayload.CODEC);
+        PayloadTypeRegistry.serverboundPlay().register(TwirlStateC2SPayload.ID,TwirlStateC2SPayload.CODEC);
+        PayloadTypeRegistry.clientboundPlay().register(PlayerConfigS2CPayload.ID,PlayerConfigS2CPayload.CODEC);
+        PayloadTypeRegistry.serverboundPlay().register(PlayerConfigC2SPayload.ID,PlayerConfigC2SPayload.CODEC);
+        PayloadTypeRegistry.serverboundPlay().register(GetAllRequestC2SPayload.ID,GetAllRequestC2SPayload.CODEC);
+        PayloadTypeRegistry.clientboundPlay().register(RemoveFromStoreS2CPayload.ID,RemoveFromStoreS2CPayload.CODEC);
+        PayloadTypeRegistry.serverboundPlay().register(RemoveFromStoreC2SPayload.ID,RemoveFromStoreC2SPayload.CODEC);
+        PayloadTypeRegistry.clientboundPlay().register(LegacyPlayerConfigS2CPayload.ID,LegacyPlayerConfigS2CPayload.CODEC);
+        PayloadTypeRegistry.serverboundPlay().register(LegacyPlayerConfigC2SPayload.ID,LegacyPlayerConfigC2SPayload.CODEC);
     }
     public static void initServer() {
         ServerPlayNetworking.registerGlobalReceiver(TwirlStateC2SPayload.ID, (payload, context) -> {
@@ -44,9 +44,8 @@ public class RegisterPackets {
         ServerPlayNetworking.registerGlobalReceiver(LegacyPlayerConfigC2SPayload.ID, (payload, context) -> {
             if(!playersReceivedWarnings.contains(context.player().getUUID()))
             {
-                context.player().displayClientMessage(
-                        net.minecraft.network.chat.Component.literal("§cYou are using an outdated version of Elytra Contrails. To sync with this server, you must update to Elytra Contrails 1.4.0+"),
-                        false
+                context.player().sendSystemMessage(
+                        net.minecraft.network.chat.Component.literal("§cYou are using an outdated version of Elytra Contrails. To sync with this server, you must update to Elytra Contrails 1.4.0+")
                 );
             }
             playersReceivedWarnings.add(context.player().getUUID());

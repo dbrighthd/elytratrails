@@ -1,12 +1,12 @@
 package dbrighthd.elytratrails;
 
 import com.mojang.blaze3d.platform.InputConstants;
-import dbrighthd.elytratrails.config.ConfigScreenBuilder;
+//import dbrighthd.elytratrails.config.ConfigScreenBuilder;
 import dbrighthd.elytratrails.config.ModConfig;
 import dbrighthd.elytratrails.controller.ContinuousTwirlController;
 import dbrighthd.elytratrails.controller.TwirlController;
 import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents;
-import net.fabricmc.fabric.api.client.keybinding.v1.KeyBindingHelper;
+import net.fabricmc.fabric.api.client.keymapping.v1.KeyMappingHelper;
 import net.minecraft.client.KeyMapping;
 import net.minecraft.resources.Identifier;
 
@@ -47,48 +47,48 @@ public final class ElytraTrailsKeybind {
     private static int queuedContinuousMode = 1;
 
     public static void init() {
-        DO_A_LIL_TWIRL_RANDOM = KeyBindingHelper.registerKeyBinding(new KeyMapping(
+        DO_A_LIL_TWIRL_RANDOM = KeyMappingHelper.registerKeyMapping(new KeyMapping(
                 "key.elytratrails.twirl_random",
                 InputConstants.Type.KEYSYM,
                 InputConstants.UNKNOWN.getValue(),
                 CATEGORY
         ));
-        OPEN_SETTINGS = KeyBindingHelper.registerKeyBinding(new KeyMapping(
+        OPEN_SETTINGS = KeyMappingHelper.registerKeyMapping(new KeyMapping(
                 "key.elytratrails.open_settings",
                 InputConstants.Type.KEYSYM,
                 InputConstants.UNKNOWN.getValue(),
                 CATEGORY
         ));
 
-        DO_A_LIL_TWIRL_L = KeyBindingHelper.registerKeyBinding(new KeyMapping(
+        DO_A_LIL_TWIRL_L = KeyMappingHelper.registerKeyMapping(new KeyMapping(
                 "key.elytratrails.twirl_l",
                 InputConstants.Type.KEYSYM,
                 InputConstants.UNKNOWN.getValue(),
                 CATEGORY
         ));
 
-        DO_A_LIL_TWIRL_R = KeyBindingHelper.registerKeyBinding(new KeyMapping(
+        DO_A_LIL_TWIRL_R = KeyMappingHelper.registerKeyMapping(new KeyMapping(
                 "key.elytratrails.twirl_r",
                 InputConstants.Type.KEYSYM,
                 InputConstants.UNKNOWN.getValue(),
                 CATEGORY
         ));
 
-        DO_A_LIL_CONTINUOUS_TWIRL_L = KeyBindingHelper.registerKeyBinding(new KeyMapping(
+        DO_A_LIL_CONTINUOUS_TWIRL_L = KeyMappingHelper.registerKeyMapping(new KeyMapping(
                 "key.elytratrails.continuous_twirl_l",
                 InputConstants.Type.KEYSYM,
                 InputConstants.UNKNOWN.getValue(),
                 CATEGORY
         ));
 
-        DO_A_LIL_CONTINUOUS_TWIRL_R = KeyBindingHelper.registerKeyBinding(new KeyMapping(
+        DO_A_LIL_CONTINUOUS_TWIRL_R = KeyMappingHelper.registerKeyMapping(new KeyMapping(
                 "key.elytratrails.continuous_twirl_r",
                 InputConstants.Type.KEYSYM,
                 InputConstants.UNKNOWN.getValue(),
                 CATEGORY
         ));
 
-        TOGGLE_TRAILS = KeyBindingHelper.registerKeyBinding(new KeyMapping(
+        TOGGLE_TRAILS = KeyMappingHelper.registerKeyMapping(new KeyMapping(
                 "key.elytratrails.toggle",
                 InputConstants.Type.KEYSYM,
                 InputConstants.UNKNOWN.getValue(),
@@ -210,7 +210,7 @@ public final class ElytraTrailsKeybind {
             }
 
             while (OPEN_SETTINGS.consumeClick()) {
-                client.setScreen(ConfigScreenBuilder.buildConfigScreen(client.screen, modConfig));
+//                client.setScreen(ConfigScreenBuilder.buildConfigScreen(client.screen, modConfig));
             }
 
             while (TOGGLE_TRAILS.consumeClick()) {
