@@ -19,24 +19,24 @@ import static dbrighthd.elytratrails.network.ClientPlayerConfigStore.CLIENT_PLAY
  */
 public class CommandHandler {
     public static void init() {
-        ClientCommandRegistrationCallback.EVENT.register((dispatcher, registryAccess) -> dispatcher.register(
+        ClientCommandRegistrationCallback.EVENT.register((dispatcher, _) -> dispatcher.register(
                 ClientCommands.literal("elytratrails").then(ClientCommands.literal("debug")
                         .executes(CommandHandler::debugCommand))
         ));
-        ClientCommandRegistrationCallback.EVENT.register((dispatcher, registryAccess) -> dispatcher.register(
+        ClientCommandRegistrationCallback.EVENT.register((dispatcher, _) -> dispatcher.register(
                 ClientCommands.literal("elytratrails").then(ClientCommands.literal("debugmoverrides")
                         .executes(CommandHandler::debugOverridesCommand))
         ));
-        ClientCommandRegistrationCallback.EVENT.register((dispatcher, registryAccess) -> dispatcher.register(
+        ClientCommandRegistrationCallback.EVENT.register((dispatcher, _) -> dispatcher.register(
                 ClientCommands.literal("elytratrails").then(ClientCommands.literal("debugmodels")
                         .executes(CommandHandler::debugModelsCommand))
         ));
-        ClientCommandRegistrationCallback.EVENT.register((dispatcher, registryAccess) -> dispatcher.register(
+        ClientCommandRegistrationCallback.EVENT.register((dispatcher, _) -> dispatcher.register(
                 ClientCommands.literal("elytratrails")
                         .then(ClientCommands.literal("clear")
                                 .executes(CommandHandler::clearCommand))
         ));
-        ClientCommandRegistrationCallback.EVENT.register((dispatcher, registryAccess) -> dispatcher.register(
+        ClientCommandRegistrationCallback.EVENT.register((dispatcher, _) -> dispatcher.register(
                 ClientCommands.literal("elytratrails")
                         .then(ClientCommands.literal("getconfigs")
                                 .executes(CommandHandler::requestTrailConfigs))
@@ -45,7 +45,7 @@ public class CommandHandler {
 
     private static int clearCommand(CommandContext<FabricClientCommandSource> context) {
         int trailcount = TrailSystem.getTrailManager().trailsNumber();
-        int activetrailcount = TrailSystem.getTrailManager().activeTrailsNumber(); // or whatever your real method is
+        int activetrailcount = TrailSystem.getTrailManager().activeTrailsNumber();
         TrailSystem.getTrailManager().removeAllTrails();
 
         context.getSource().sendFeedback(
