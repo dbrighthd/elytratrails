@@ -12,6 +12,7 @@ import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents;
 import net.fabricmc.fabric.api.client.rendering.v1.world.WorldRenderEvents;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.player.AbstractClientPlayer;
+import net.minecraft.world.entity.Avatar;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.Pose;
 import net.minecraft.world.entity.player.Player;
@@ -132,10 +133,11 @@ public class TrailManager {
 
     private void gatherPlayerTrails(Minecraft ctx, boolean recordEmitter) {
         if (ctx.level == null) return;
-
-        List<AbstractClientPlayer> players = ctx.level.players();
         sampler.clearFrameCache();
-        for (AbstractClientPlayer player : players) {
+        for (Entity entity : ctx.level.entitiesForRendering()) {
+            if (!(entity instanceof Avatar player)) {
+                continue;
+            }
             int eid = player.getId();
             ResolvedTrailSettings config = getConfigFromPlayerId(eid);
             ResolvedSampleSettings sampleSettings = getDefaultEntitySettings(player);
@@ -218,11 +220,11 @@ public class TrailManager {
             boolean valid = TrailManager.isEntityTrailValid(config, entity);
 
             if (valid) {
-                List<Emitter> emitters = sampler.getEntityTrailEmitterPositions(entity, ctx.getDeltaTracker().getGameTimeDeltaPartialTick(false), config).emitters();
-                double speed = entity.getDeltaMovement().length();
                 if (entity instanceof Player) {
                     continue;
                 }
+                double speed = entity.getDeltaMovement().length();
+                List<Emitter> emitters = sampler.getEntityTrailEmitterPositions(entity, ctx.getDeltaTracker().getGameTimeDeltaPartialTick(false), config).emitters();
                 if (emitters.isEmpty()) {
                     if (modConfig.logTrails) {
                         LOGGER.info("Empty Emitters from non-player entity {} ({}), resetting trails if exist", eid, entity.getType());

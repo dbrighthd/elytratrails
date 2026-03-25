@@ -69,7 +69,7 @@ public class WingTipSampler {
         gatheredTrailsThisFrame.clear();
     }
 
-    public @NotNull List<Emitter> getPlayerTrailEmitterPositions(Player player, float partialTick, ModConfig modConfig) {
+    public @NotNull List<Emitter> getPlayerTrailEmitterPositions(Avatar player, float partialTick, ModConfig modConfig) {
         ModConfig config = getConfig();
         Minecraft mc = Minecraft.getInstance();
         if (mc.level == null || ShaderChecksUtil.isShadowPass()) return List.of();
@@ -243,7 +243,7 @@ public class WingTipSampler {
         return (modelRoot == EmfWingTipHooks.WhichRoot.LEFT_WING);
     }
 
-    private @NotNull List<Emitter> getVanillaTrailEmitters(@NotNull PoseStack stack, @Nullable ModelPart elytraRoot, @NotNull ElytraModel model, @NotNull Vec3 cameraPos, @NotNull Vec3 entityWorldOffset, Player player) {
+    private @NotNull List<Emitter> getVanillaTrailEmitters(@NotNull PoseStack stack, @Nullable ModelPart elytraRoot, @NotNull ElytraModel model, @NotNull Vec3 cameraPos, @NotNull Vec3 entityWorldOffset, Avatar player) {
         ModelPart leftWing = model.leftWing;
         ModelPart rightWing = model.rightWing;
 
@@ -276,7 +276,7 @@ public class WingTipSampler {
         };
     }
 
-    private @NotNull Vec3 computeTransformedWingTip(@NotNull PoseStack stack, @Nullable ModelPart elytraRoot, @NotNull ModelPart wingRoot, @NotNull Vec3 localPos, Player player) {
+    private @NotNull Vec3 computeTransformedWingTip(@NotNull PoseStack stack, @Nullable ModelPart elytraRoot, @NotNull ModelPart wingRoot, @NotNull Vec3 localPos, Avatar player) {
         float wingspread = ModelTransformationUtil.computeWingOpenness(wingRoot);
 
         PlayerConfig config = ClientPlayerConfigStore.getOrDefault(player.getId());
@@ -383,7 +383,7 @@ public class WingTipSampler {
         return cachedChildren.get(name.toLowerCase());
     }
 
-    private @Nullable ModelPart tryGetAnimatedElytraRoot(ElytraModel model, Player player) {
+    private @Nullable ModelPart tryGetAnimatedElytraRoot(ElytraModel model, Avatar player) {
         if (!ModStatuses.EMF_LOADED || !getConfig().emfSupport) return null;
         try {
             return EmfAnimationHooks.applyManualAnimationAndGetRoot(model, player);
@@ -412,7 +412,7 @@ public class WingTipSampler {
     }
 
     @SuppressWarnings("unchecked")
-    private SubmitNodeStorage.ModelSubmit<?> extractElytraRenderState(Player player, Minecraft mc, CameraRenderState cameraRenderState, float partialTick) {
+    private SubmitNodeStorage.ModelSubmit<?> extractElytraRenderState(Avatar player, Minecraft mc, CameraRenderState cameraRenderState, float partialTick) {
         EntityRenderDispatcher dispatcher = mc.getEntityRenderDispatcher();
         AvatarRenderState state = new AvatarRenderState();
 
