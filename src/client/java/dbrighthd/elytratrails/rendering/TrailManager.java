@@ -12,8 +12,8 @@ import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents;
 import net.fabricmc.fabric.api.client.rendering.v1.level.LevelRenderEvents;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.player.AbstractClientPlayer;
+import net.minecraft.world.entity.Avatar;
 import net.minecraft.world.entity.Entity;
-import net.minecraft.world.entity.Pose;
 import net.minecraft.world.entity.player.Player;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -218,11 +218,11 @@ public class TrailManager {
             boolean valid = TrailManager.isEntityTrailValid(config, entity);
 
             if (valid) {
-                List<Emitter> emitters = sampler.getEntityTrailEmitterPositions(entity, ctx.getDeltaTracker().getGameTimeDeltaPartialTick(false), config).emitters();
-                double speed = entity.getDeltaMovement().length();
                 if (entity instanceof Player) {
                     continue;
                 }
+                List<Emitter> emitters = sampler.getEntityTrailEmitterPositions(entity, ctx.getDeltaTracker().getGameTimeDeltaPartialTick(false), config).emitters();
+                double speed = entity.getDeltaMovement().length();
                 if (emitters.isEmpty()) {
                     if (modConfig.logTrails) {
                         LOGGER.info("Empty Emitters from non-player entity {} ({}), resetting trails if exist", eid, entity.getType());
@@ -274,8 +274,8 @@ public class TrailManager {
     }
 
     public static boolean isPlayerTrailValid(ResolvedTrailSettings config, Entity entity) {
-        if (entity instanceof Player player) {
-            if (!(player.getPose() == Pose.FALL_FLYING)) {
+        if (entity instanceof Avatar player) {
+            if (!player.isFallFlying()) {
                 return false;
             }
         }
@@ -283,8 +283,8 @@ public class TrailManager {
     }
 
     public static boolean isEntityTrailValid(ResolvedSampleSettings config, Entity entity) {
-        if (entity instanceof Player player) {
-            if (!(player.getPose() == Pose.FALL_FLYING)) {
+        if (entity instanceof Avatar player) {
+            if (!player.isFallFlying()) {
                 return false;
             }
         }
