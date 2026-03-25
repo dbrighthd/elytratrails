@@ -11,10 +11,8 @@ import it.unimi.dsi.fastutil.ints.Int2ObjectOpenHashMap;
 import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents;
 import net.fabricmc.fabric.api.client.rendering.v1.world.WorldRenderEvents;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.player.AbstractClientPlayer;
 import net.minecraft.world.entity.Avatar;
 import net.minecraft.world.entity.Entity;
-import net.minecraft.world.entity.Pose;
 import net.minecraft.world.entity.player.Player;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -277,7 +275,7 @@ public class TrailManager {
 
     public static boolean isPlayerTrailValid(ResolvedTrailSettings config, Entity entity) {
         if (entity instanceof Player player) {
-            if (!(player.getPose() == Pose.FALL_FLYING)) {
+            if (!(player.isFallFlying())) {
                 return false;
             }
         }
@@ -286,7 +284,7 @@ public class TrailManager {
 
     public static boolean isEntityTrailValid(ResolvedSampleSettings config, Entity entity) {
         if (entity instanceof Player player) {
-            if (!(player.getPose() == Pose.FALL_FLYING)) {
+            if (!(player.isFallFlying())) {
                 return false;
             }
         }
