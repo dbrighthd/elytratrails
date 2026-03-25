@@ -2,7 +2,6 @@ package dbrighthd.elytratrails.rendering;
 
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.blaze3d.vertex.VertexConsumer;
-import com.mojang.math.Axis;
 import dbrighthd.elytratrails.config.ModConfig;
 import dbrighthd.elytratrails.config.pack.ResolvedTrailSettings;
 import dbrighthd.elytratrails.rendering.math.SplineInterpolation;
@@ -18,12 +17,9 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.resources.Identifier;
 import net.minecraft.util.Mth;
 import net.minecraft.util.RandomSource;
-import net.minecraft.world.entity.Pose;
-import net.minecraft.world.level.LightLayer;
 import net.minecraft.world.level.levelgen.synth.PerlinNoise;
 import net.minecraft.world.phys.Vec3;
 import org.jetbrains.annotations.NotNull;
-import org.joml.Quaternionf;
 import org.joml.Vector3f;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -458,7 +454,7 @@ public class TrailRenderer {
         else return 1.0f - (age / (float) maxLifetime);
     }
 
-    private int computeLightTexture(Vec3 pos) { // note: I really hate this method, but I don't feel like managing the state that's required to do this in a better way
+    private int computeLightTexture(Vec3 pos) {
         if (minecraft.level == null) return LightCoordsUtil.FULL_BRIGHT;
 
         BlockPos blockPos = BlockPos.containing(pos);

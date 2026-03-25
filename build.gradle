@@ -51,7 +51,7 @@ dependencies {
 	// 	exclude(group: "net.fabricmc.fabric-api")
 	// }
 
-	// compileOnly "maven.modrinth:iris:<26.1 version>"
+	compileOnly "maven.modrinth:iris:${project.iris_version}"
 	// compileOnly "maven.modrinth:entity-model-features:<26.1 version>"
 	// compileOnly "maven.modrinth:entitytexturefeatures:<26.1 version>"
 }

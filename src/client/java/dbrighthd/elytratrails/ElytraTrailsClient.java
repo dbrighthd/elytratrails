@@ -1,6 +1,7 @@
 package dbrighthd.elytratrails;
 
 //import dbrighthd.elytratrails.compat.Compatibility;
+import dbrighthd.elytratrails.compat.Compatibility;
 import dbrighthd.elytratrails.config.ConfigManager;
 import dbrighthd.elytratrails.config.ModConfig;
 import dbrighthd.elytratrails.config.pack.TrailPackConfigManager;
@@ -39,7 +40,7 @@ public class ElytraTrailsClient implements ClientModInitializer {
         ConfigManager.load();
         refreshConfig();
         TimeUtil.init();
-        //Compatibility.init();
+        Compatibility.init();
         ElytraTrailsKeybind.init();
         TrailPipelines.init();
         TrailSystem.init();
