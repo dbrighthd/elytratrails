@@ -45,7 +45,7 @@ public class CommandHandler {
 
     private static int clearCommand(CommandContext<FabricClientCommandSource> context) {
         int trailcount = TrailSystem.getTrailManager().trailsNumber();
-        int activetrailcount = TrailSystem.getTrailManager().activeTrailsNumber(); // or whatever your real method is
+        int activetrailcount = TrailSystem.getTrailManager().activeTrailsNumber();
         TrailSystem.getTrailManager().removeAllTrails();
 
         context.getSource().sendFeedback(

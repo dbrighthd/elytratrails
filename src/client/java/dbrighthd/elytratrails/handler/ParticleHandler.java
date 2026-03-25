@@ -1,8 +1,5 @@
 package dbrighthd.elytratrails.handler;
 
-import dbrighthd.elytratrails.ElytraTrails;
-import dbrighthd.elytratrails.config.ModConfig;
-import me.shedaniel.autoconfig.AutoConfig;
 import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents;
 import net.minecraft.client.multiplayer.ClientLevel;
 import net.minecraft.client.player.LocalPlayer;
@@ -36,17 +33,13 @@ public class ParticleHandler {
             int cubeRadiusBlocks = (int) Math.max(0, Math.floor(cfg.particlesBlockRadius));
             int perTick = Math.max(0, cfg.particleSpawnsPerTick);
 
-            // Center: player's blockpos shifted forward/back along velocity
-            // (use full velocity vector; multiplier is “how many blocks worth of vel”)
             Vec3 shiftedCenterPos = player.position()
                     .add(vel.scale(cfg.particlesVelocityAhead))
                     .subtract(vel.scale(cfg.particlesVelocityBackwards));
 
             BlockPos shiftedCenterBlock = BlockPos.containing(shiftedCenterPos);
 
-            // Particle motion inherits player velocity (multiplier)
-            // NOTE: Using particlesVelocityBackwards as "inherit multiplier" too (no dedicated config field provided).
-            Vec3 particleVel = vel.scale(cfg.particlesVelocityBackwards);
+           Vec3 particleVel = vel.scale(cfg.particlesVelocityBackwards);
 
             for (BlockPos blockPos : BlockPos.randomInCube(player.getRandom(), perTick, shiftedCenterBlock, cubeRadiusBlocks)) {
                 Vec3 pos = Vec3.atCenterOf(blockPos).offsetRandom(player.getRandom(), 2);
@@ -73,7 +66,7 @@ public class ParticleHandler {
             case CHERRY_LEAVES -> ParticleTypes.CHERRY_LEAVES;
             case CLOUD -> ParticleTypes.CLOUD;
             case COMPOSTER -> ParticleTypes.COMPOSTER;
-            case COPPER_FLAME -> ParticleTypes.COPPER_FIRE_FLAME; // naming mismatch handled here
+            case COPPER_FLAME -> ParticleTypes.COPPER_FIRE_FLAME;
             case CRIMSON_SPORE -> ParticleTypes.CRIMSON_SPORE;
             case CRIT -> ParticleTypes.CRIT;
             case CURRENT_DOWN -> ParticleTypes.CURRENT_DOWN;
