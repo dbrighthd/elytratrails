@@ -1,8 +1,5 @@
 package dbrighthd.elytratrails.config;
 
-//import me.shedaniel.autoconfig.ConfigData;
-//import me.shedaniel.autoconfig.annotation.Config;
-
 /**
  * The config that gets serialized and stored
  */
