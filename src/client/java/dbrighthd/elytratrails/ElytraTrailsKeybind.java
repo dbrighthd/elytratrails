@@ -2,6 +2,7 @@ package dbrighthd.elytratrails;
 
 import com.mojang.blaze3d.platform.InputConstants;
 import dbrighthd.elytratrails.config.ConfigScreenBuilder;
+import dbrighthd.elytratrails.config.FallbackConfigMessageScreen;
 import dbrighthd.elytratrails.config.ModConfig;
 import dbrighthd.elytratrails.controller.ContinuousTwirlController;
 import dbrighthd.elytratrails.controller.TwirlController;
@@ -214,6 +215,10 @@ public final class ElytraTrailsKeybind {
                 if(CLOTH_LOADED)
                 {
                     client.setScreen(ConfigScreenBuilder.buildConfigScreen(client.screen, modConfig));
+                }
+                else
+                {
+                    client.setScreen(new FallbackConfigMessageScreen(client.screen));
                 }
             }
 
