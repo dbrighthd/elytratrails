@@ -3,19 +3,18 @@ package dbrighthd.elytratrails.network;
 import dbrighthd.elytratrails.compat.flashback.FlashbackCompat;
 import dbrighthd.elytratrails.config.ModConfig;
 import dbrighthd.elytratrails.util.EasingUtil;
-import net.fabricmc.loader.api.FabricLoader;
 import net.minecraft.client.Minecraft;
 import net.minecraft.nbt.CompoundTag;
 
 import java.util.concurrent.ConcurrentHashMap;
 
 import static dbrighthd.elytratrails.ElytraTrailsClient.getConfig;
+import static dbrighthd.elytratrails.compat.ModStatuses.FLASHBACK_LOADED;
 import static java.lang.Math.clamp;
 
 
 public final class ClientPlayerConfigStore {
     public static final ConcurrentHashMap<Integer, PlayerConfig> CLIENT_PLAYER_CONFIGS = new ConcurrentHashMap<>();
-    public static final boolean FLASHBACK_LOADED = FabricLoader.getInstance().isModLoaded("flashback");
     public static PlayerConfig CLIENT_CONFIG;
 
     public static PlayerConfig CLIENT_OTHERS_CONFIG;

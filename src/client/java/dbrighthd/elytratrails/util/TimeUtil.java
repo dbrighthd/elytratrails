@@ -13,7 +13,6 @@ public class TimeUtil {
             if (client.isPaused()) {
                 return;
             }
-
             tickCounter++;
         });
     }

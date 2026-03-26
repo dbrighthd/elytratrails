@@ -2,6 +2,7 @@ package dbrighthd.elytratrails;
 
 import com.mojang.blaze3d.platform.InputConstants;
 import dbrighthd.elytratrails.config.ConfigScreenBuilder;
+import dbrighthd.elytratrails.config.FallbackConfigMessageScreen;
 import dbrighthd.elytratrails.config.ModConfig;
 import dbrighthd.elytratrails.controller.ContinuousTwirlController;
 import dbrighthd.elytratrails.controller.TwirlController;
@@ -12,6 +13,7 @@ import net.minecraft.resources.Identifier;
 
 import static dbrighthd.elytratrails.ElytraTrailsClient.getConfig;
 import static dbrighthd.elytratrails.ElytraTrailsClient.setConfig;
+import static dbrighthd.elytratrails.compat.ModStatuses.CLOTH_LOADED;
 
 public final class ElytraTrailsKeybind {
     public static final KeyMapping.Category CATEGORY =
@@ -210,7 +212,14 @@ public final class ElytraTrailsKeybind {
             }
 
             while (OPEN_SETTINGS.consumeClick()) {
-                client.setScreen(ConfigScreenBuilder.buildConfigScreen(client.screen, modConfig));
+                if(CLOTH_LOADED)
+                {
+                    client.setScreen(ConfigScreenBuilder.buildConfigScreen(client.screen, modConfig));
+                }
+                else
+                {
+                    client.setScreen(new FallbackConfigMessageScreen(client.screen));
+                }
             }
 
             while (TOGGLE_TRAILS.consumeClick()) {
