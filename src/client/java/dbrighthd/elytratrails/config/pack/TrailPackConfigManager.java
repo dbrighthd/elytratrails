@@ -284,7 +284,8 @@ public final class TrailPackConfigManager {
                 HIDDEN_CONFIG_PRESETS.put(presetKey, overrides);
 
             }
-        } catch (Throwable ignored) {
+        } catch (Throwable throwable) {
+            LOGGER.warn("Loading presets failed: {}", throwable.getMessage());
         }
     }
 
@@ -323,7 +324,9 @@ public final class TrailPackConfigManager {
                 gson.toJson(root, writer);
             }
 
-        } catch (IOException ignored) {
+        } catch (IOException exception) {
+
+            LOGGER.warn("Exporting presets failed: {}", exception.getMessage());
         }
     }
 
@@ -345,7 +348,8 @@ public final class TrailPackConfigManager {
 
         try {
             Files.createDirectories(presetDir); // okay if already exists
-        } catch (IOException ignored) {
+        } catch (IOException exception) {
+            LOGGER.warn("Creating presets directory failed: {}", exception.getMessage());
             return;
         }
 
@@ -353,7 +357,9 @@ public final class TrailPackConfigManager {
             paths.filter(Files::isRegularFile)
                     .filter(path -> path.getFileName().toString().toLowerCase(Locale.ROOT).endsWith(".json"))
                     .forEach(TrailPackConfigManager::loadAndCacheDiskPresetFile);
-        } catch (Throwable ignored) {
+        } catch (Throwable exception) {
+            LOGGER.warn("Loading presets failed: {}", exception.getMessage());
+
         }
     }
 
@@ -370,7 +376,8 @@ public final class TrailPackConfigManager {
             if (fallbackName.isEmpty()) return;
 
             CONFIG_PRESETS.put(fallbackName, overrides);
-        } catch (Throwable ignored) {
+        } catch (Throwable exception) {
+            LOGGER.warn("Failed to load presets from disk: {}", exception.getMessage());
         }
     }
 
@@ -477,7 +484,8 @@ public final class TrailPackConfigManager {
             if (parsed == null) return;
             MODEL_TRAIL_CONFIGS.put(modelKey, parsed);
             maxLifetimeOverrideSeconds = Math.max(maxLifetimeOverrideSeconds, parsed.maxLifetimeSeconds());
-        } catch (Throwable ignored) {
+        } catch (Throwable throwable) {
+            LOGGER.warn("Failed to load model config for {}, : {}", modelKey, throwable.getMessage());
         }
     }
 

@@ -2,6 +2,7 @@ package dbrighthd.elytratrails;
 
 import com.mojang.blaze3d.platform.InputConstants;
 //import dbrighthd.elytratrails.config.ConfigScreenBuilder;
+import dbrighthd.elytratrails.config.ConfigScreenBuilder;
 import dbrighthd.elytratrails.config.ModConfig;
 import dbrighthd.elytratrails.controller.ContinuousTwirlController;
 import dbrighthd.elytratrails.controller.TwirlController;
@@ -210,7 +211,7 @@ public final class ElytraTrailsKeybind {
             }
 
             while (OPEN_SETTINGS.consumeClick()) {
-//                client.setScreen(ConfigScreenBuilder.buildConfigScreen(client.screen, modConfig));
+                client.setScreen(ConfigScreenBuilder.buildConfigScreen(client.screen, modConfig));
             }
 
             while (TOGGLE_TRAILS.consumeClick()) {

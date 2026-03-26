@@ -18,14 +18,14 @@ import java.util.function.Function;
 
 public class TrailPipelines {
     public static final ColorTargetState TRANSLUCENT_COLOR_STATE = new ColorTargetState(BlendFunction.TRANSLUCENT);
-    public static final DepthStencilState DEFAULT_STENCIL_WITH_FALSE_DEPTHWRITE = new DepthStencilState(CompareOp.LESS_THAN_OR_EQUAL, false);
+    public static final DepthStencilState DEFAULT_STENCIL_WITH_FALSE_DEPTHWRITE = new DepthStencilState(CompareOp.LESS_THAN_OR_EQUAL, true);
     public static final RenderPipeline PIPELINE_ENTITY_TRANSLUCENT_CULL = RenderPipelines.register(RenderPipeline.builder(RenderPipelines.ENTITY_SNIPPET)
             .withLocation(Identifier.fromNamespaceAndPath(ElytraTrails.MOD_ID, "pipeline/entity_translucent_cull"))
             .withShaderDefine("ALPHA_CUTOUT", 0.1F)
             .withShaderDefine("PER_FACE_LIGHTING")
             .withSampler("Sampler1")
             //.withBlend(BlendFunction.TRANSLUCENT)
-            .withColorTargetState(new ColorTargetState(BlendFunction.TRANSLUCENT))
+            .withColorTargetState(TRANSLUCENT_COLOR_STATE)
             .withDepthStencilState(DEFAULT_STENCIL_WITH_FALSE_DEPTHWRITE)
             .withCull(false)
             .build());
