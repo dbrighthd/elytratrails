@@ -353,6 +353,15 @@ public class ConfigScreenBuilder {
                 "OthersDefault"
         );
 
+
+        particles.addEntry(entryBuilder.startTextDescription(
+                        Component.translatable("text.elytratrails.category.particles.desc"))
+                .build());
+        particles.addEntry(entryBuilder.startBooleanToggle(Component.translatable("text.elytratrails.option.enableParticles"), config.enableParticles)
+                .setDefaultValue(defaultModConfig.enableParticles)
+                .setTooltip(Component.translatable("text.elytratrails.option.enableParticles.@Tooltip"))
+                .setSaveConsumer(newValue -> config.enableParticles = newValue)
+                .build());
         particles.addEntry(entryBuilder.startDropdownMenu(
                         Component.translatable("text.elytratrails.option.particle"),
                         DropdownMenuBuilder.TopCellElementBuilder.of(
