@@ -63,6 +63,7 @@ dependencies {
 	modCompileOnly("maven.modrinth:entity-model-features:${project.emf_version}")
 	modCompileOnly("maven.modrinth:entitytexturefeatures:${project.etf_version}")
 	modCompileOnly("maven.modrinth:flashback:${project.flashback_version}")
+	modCompileOnly "maven.modrinth:custom-player-models:${project.cpm_version}"
 
 	modApi(modApi "me.shedaniel.cloth:cloth-config-fabric:${project.cloth_version}") {
 		exclude(group: "net.fabricmc.fabric-api")

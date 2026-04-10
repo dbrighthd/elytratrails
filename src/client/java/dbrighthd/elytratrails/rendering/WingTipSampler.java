@@ -2,6 +2,7 @@ package dbrighthd.elytratrails.rendering;
 
 import com.mojang.blaze3d.vertex.PoseStack;
 import dbrighthd.elytratrails.compat.ModStatuses;
+import dbrighthd.elytratrails.compat.cpm.CpmModelStorage;
 import dbrighthd.elytratrails.compat.emf.EmfAnimationHooks;
 import dbrighthd.elytratrails.compat.emf.EmfWingTipHooks;
 import dbrighthd.elytratrails.config.ModConfig;
@@ -41,6 +42,8 @@ import org.slf4j.LoggerFactory;
 import java.util.*;
 
 import static dbrighthd.elytratrails.ElytraTrailsClient.getConfig;
+import static dbrighthd.elytratrails.compat.ModStatuses.CPM_LOADED;
+import static dbrighthd.elytratrails.compat.cpm.CpmModelStorage.findCPMElytraModelSubmit;
 import static dbrighthd.elytratrails.compat.emf.EmfTrailSpawnerRegistry.getModelVariantFromModel;
 import static dbrighthd.elytratrails.util.ModelTransformationUtil.*;
 
@@ -67,9 +70,17 @@ public class WingTipSampler {
 
     public void clearFrameCache() {
         gatheredTrailsThisFrame.clear();
+        if(CPM_LOADED)
+        {
+            CpmModelStorage.resetSubmits();
+        }
     }
 
     public @NotNull List<Emitter> getPlayerTrailEmitterPositions(Avatar player, float partialTick, ModConfig modConfig) {
+        if(CPM_LOADED)
+        {
+            CpmModelStorage.resetSubmits();
+        }
         ModConfig config = getConfig();
         Minecraft mc = Minecraft.getInstance();
         if (mc.level == null || ShaderChecksUtil.isShadowPass()) return List.of();
@@ -480,6 +491,10 @@ public class WingTipSampler {
                 SubmitNodeStorage.ModelSubmit<?> submit = translucent.modelSubmit();
                 if (submit.model() instanceof ElytraModel) return submit;
             }
+        }
+        if(CPM_LOADED)
+        {
+            return findCPMElytraModelSubmit();
         }
         return null;
     }

@@ -15,6 +15,7 @@
     "defaultRequire": 1
   },
   "mixins": [
-    "compat.RecorderMixin"
+    "compat.RecorderMixin",
+    "compat.cpm.CPMOrderedSubmitNodeCollectorMixin"
   ]
 }
