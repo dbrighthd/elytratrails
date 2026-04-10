@@ -2,6 +2,7 @@ package dbrighthd.elytratrails.rendering;
 
 import com.mojang.blaze3d.vertex.PoseStack;
 import dbrighthd.elytratrails.compat.ModStatuses;
+import dbrighthd.elytratrails.compat.cpm.CpmModelStorage;
 import dbrighthd.elytratrails.compat.emf.EmfAnimationHooks;
 import dbrighthd.elytratrails.compat.emf.EmfWingTipHooks;
 import dbrighthd.elytratrails.config.ModConfig;
@@ -40,6 +41,8 @@ import org.slf4j.LoggerFactory;
 import java.util.*;
 
 import static dbrighthd.elytratrails.ElytraTrailsClient.getConfig;
+import static dbrighthd.elytratrails.compat.ModStatuses.CPM_LOADED;
+import static dbrighthd.elytratrails.compat.cpm.CpmModelStorage.findCPMElytraModelSubmit;
 import static dbrighthd.elytratrails.compat.emf.EmfTrailSpawnerRegistry.getModelVariantFromModel;
 import static dbrighthd.elytratrails.util.ModelTransformationUtil.*;
 
@@ -66,19 +69,37 @@ public class WingTipSampler {
 
     public void clearFrameCache() {
         gatheredTrailsThisFrame.clear();
+        if(CPM_LOADED)
+        {
+            CpmModelStorage.resetSubmits();
+        }
     }
 
     public @NotNull List<Emitter> getPlayerTrailEmitterPositions(Avatar player, float partialTick, ModConfig modConfig) {
+        if(CPM_LOADED)
+        {
+            CpmModelStorage.resetSubmits();
+        }
         ModConfig config = getConfig();
         Minecraft mc = Minecraft.getInstance();
         if (mc.level == null || ShaderChecksUtil.isShadowPass()) return List.of();
 
         Camera camera = mc.gameRenderer.getMainCamera();
         CameraRenderState cameraState = buildCameraState(camera);
-
         SubmitNodeStorage.ModelSubmit<?> elytraSubmit = extractElytraRenderState(player, mc, cameraState, partialTick);
+        if(elytraSubmit == null)
+        {
+            elytraSubmit = extractElytraRenderState(player, mc, cameraState, partialTick);
+            LOGGER.info("elytraSubmit was null, try again");
+        }
         if (elytraSubmit == null || !(elytraSubmit.model() instanceof ElytraModel elytraModel) || !(elytraSubmit.state() instanceof HumanoidRenderState humanoidState))
+        {
+            if(elytraSubmit == null)
+            {
+                LOGGER.info("elytraSubmit was still null.");
+            }
             return List.of();
+        }
 
         elytraModel.setupAnim(humanoidState);
 
@@ -100,6 +121,7 @@ public class WingTipSampler {
                     LOGGER.info("Entity {}, New elytra equipped with model variant {}", eid, variant);
                 }
                 emfCache.put(eid, new EmfInfo("elytra", variant, getSpawnersInfo(EmfWingTipHooks.findAllSpawnerPaths(leftWing, rightWing, modConfig.hardCodedFreshAnimationsPlayerWingtips))));
+                LOGGER.info("Returning empty list for {} because no emf cache", eid);
                 return List.of();
             }
             EmfInfo emfInfo = emfCache.get(eid);
@@ -108,6 +130,7 @@ public class WingTipSampler {
                 if (config.alwaysSnapTrail) {
                     putOrAppendGatheredThisFrame(eid, gatheredTrails);
                 }
+                LOGGER.info("Returning gathered trails for {} in emf thingy", eid);
                 return gatheredTrails;
             }
         }
@@ -115,6 +138,7 @@ public class WingTipSampler {
         if (config.alwaysSnapTrail) {
             gatheredTrailsThisFrame.put(eid, gatheredTrails);
         }
+        LOGGER.info("Returning gathered trails for {} in fallback thingy", eid);
         return gatheredTrails;
     }
 
@@ -419,7 +443,6 @@ public class WingTipSampler {
 
         submitStorage.clear();
         dispatcher.submit(state, cameraRenderState, -cameraRenderState.pos.x, -cameraRenderState.pos.y, -cameraRenderState.pos.z, new PoseStack(), submitStorage);
-
         return findElytraModelSubmit();
     }
 
@@ -463,7 +486,6 @@ public class WingTipSampler {
         for (SubmitNodeCollection collection : submitStorage.getSubmitsPerOrder().values()) {
             ModelFeatureRenderer.Storage modelStorage = collection.getModelSubmits();
             ModelFeatureStorageAccess accessor = (ModelFeatureStorageAccess) modelStorage;
-
             Map<RenderType, List<SubmitNodeStorage.ModelSubmit<?>>> opaqueByType =
                     accessor.elytratrails$getSolidModelSubmits();
             for (List<SubmitNodeStorage.ModelSubmit<?>> submits : opaqueByType.values()) {
@@ -478,6 +500,10 @@ public class WingTipSampler {
                 SubmitNodeStorage.ModelSubmit<?> submit = translucent.modelSubmit();
                 if (submit.model() instanceof ElytraModel) return submit;
             }
+        }
+        if(CPM_LOADED)
+        {
+            return findCPMElytraModelSubmit();
         }
         return null;
     }

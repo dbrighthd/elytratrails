@@ -53,6 +53,8 @@ dependencies {
 
 	compileOnly "maven.modrinth:iris:${project.iris_version}"
 	compileOnly "maven.modrinth:entity-model-features:${project.emf_version}"
+	compileOnly "maven.modrinth:custom-player-models:${project.cpm_version}"
+
 	compileOnly "maven.modrinth:entitytexturefeatures:${project.etf_version}"
 }
 
