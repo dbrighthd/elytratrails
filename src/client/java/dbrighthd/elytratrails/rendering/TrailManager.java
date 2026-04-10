@@ -135,7 +135,10 @@ public class TrailManager {
 
         List<AbstractClientPlayer> players = ctx.level.players();
         sampler.clearFrameCache();
-        for (AbstractClientPlayer player : players) {
+        for (Entity entity : ctx.level.entitiesForRendering()) {
+            if (!(entity instanceof Avatar player)) {
+                continue;
+            }
             int eid = player.getId();
             ResolvedTrailSettings config = getConfigFromPlayerId(eid);
             ResolvedSampleSettings sampleSettings = getDefaultEntitySettings(player);
