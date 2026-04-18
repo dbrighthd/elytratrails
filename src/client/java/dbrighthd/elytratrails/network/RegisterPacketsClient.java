@@ -55,7 +55,10 @@ public class RegisterPacketsClient {
             if (pendingConfigRequestTicks > 0) {
                 pendingConfigRequestTicks--;
                 if (pendingConfigRequestTicks == 0) {
-                    ClientPlayNetworking.send(new GetAllRequestC2SPayload());
+                    if(Minecraft.getInstance().level != null)
+                    {
+                        ClientPlayNetworking.send(new GetAllRequestC2SPayload());
+                    }
                 }
             }
         });
