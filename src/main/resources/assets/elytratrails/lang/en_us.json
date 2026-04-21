@@ -87,7 +87,7 @@
   "text.elytratrails.option.particlesVelocityBackwards.@Tooltip": "Multiple of player velocity to make particles move backwards",
 
   "text.elytratrails.option.particle": "Particle Shown",
-  "text.elytratrails.option.particle.@Tooltip": "Which particle should appear during flight",
+  "text.elytratrails.option.particle.@Tooltip": "Which particle should appear during flight, this uses the same syntax as the /particle command",
 
   "text.elytratrails.option.particleSpawnsPerTick": "Particles per tick",
   "text.elytratrails.option.particleSpawnsPerTick.@Tooltip": "How many particles should spawn per tick?",
