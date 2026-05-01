@@ -130,7 +130,6 @@ public class WingTipSampler {
                 if (config.alwaysSnapTrail) {
                     putOrAppendGatheredThisFrame(eid, gatheredTrails);
                 }
-                LOGGER.info("Returning gathered trails for {} in emf thingy", eid);
                 return gatheredTrails;
             }
         }
@@ -138,7 +137,6 @@ public class WingTipSampler {
         if (config.alwaysSnapTrail) {
             gatheredTrailsThisFrame.put(eid, gatheredTrails);
         }
-        LOGGER.info("Returning gathered trails for {} in fallback thingy", eid);
         return gatheredTrails;
     }
 
