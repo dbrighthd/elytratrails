@@ -5,6 +5,8 @@ import com.google.gson.GsonBuilder;
 import com.google.gson.JsonParseException;
 import dbrighthd.elytratrails.ElytraTrails;
 import net.fabricmc.loader.api.FabricLoader;
+import net.minecraft.core.particles.ParticleOptions;
+
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.IOException;
@@ -15,7 +17,7 @@ import java.util.Objects;
 public class ConfigManager {
 
     //using GSON instead of codecs so I dont need to make subclasses
-    private static final Gson GSON = new GsonBuilder().setPrettyPrinting().create();
+    private static final Gson GSON = new GsonBuilder().setPrettyPrinting().registerTypeAdapter(ParticleOptions.class,new ParticleAdapter()).create();
 
     //I was initially going to just make it getDir/config im glad theres a built in way i may be stupid
     private static final Path CONFIG_PATH = FabricLoader.getInstance().getConfigDir().resolve("elytratrails.json");

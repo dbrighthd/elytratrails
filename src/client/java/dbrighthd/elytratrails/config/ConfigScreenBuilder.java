@@ -12,7 +12,6 @@ import dbrighthd.elytratrails.network.RemoveFromStoreC2SPayload;
 import dbrighthd.elytratrails.rendering.TrailSystem;
 import dbrighthd.elytratrails.util.EasingUtil;
 import me.shedaniel.clothconfig2.api.*;
-import me.shedaniel.clothconfig2.impl.builders.DropdownMenuBuilder;
 import me.shedaniel.clothconfig2.impl.builders.SubCategoryBuilder;
 import net.fabricmc.fabric.api.client.networking.v1.ClientPlayNetworking;
 import net.minecraft.client.KeyMapping;
@@ -363,7 +362,8 @@ public class ConfigScreenBuilder {
                 "OthersDefault"
         );
 
-
+        String encodedParticle = encodeParticle(config.particle);
+        HolderLookup.Provider lookup = VanillaRegistries.createLookup();
         particles.addEntry(entryBuilder.startTextDescription(
                         Component.translatable("text.elytratrails.category.particles.desc"))
                 .build());
@@ -372,32 +372,7 @@ public class ConfigScreenBuilder {
                 .setTooltip(Component.translatable("text.elytratrails.option.enableParticles.@Tooltip"))
                 .setSaveConsumer(newValue -> config.enableParticles = newValue)
                 .build());
-
-        // it's better if you don't look too closely at this and just know that it works
-        @SuppressWarnings("rawtypes")
-        ParticleType type = config.particle.getType();
-        var codec = type.codec().codec();
-        Identifier id = BuiltInRegistries.PARTICLE_TYPE.getResourceKey(type).map(ResourceKey::identifier).orElse(Identifier.withDefaultNamespace("poof"));
-
-        HolderLookup.Provider lookup = VanillaRegistries.createLookup();
-        //noinspection unchecked
-        String encodedParticle = id.toString() + codec.encodeStart(NbtOps.INSTANCE, config.particle != null ? config.particle : ParticleTypes.POOF).result().map(o -> ((Tag)o).toString()).orElse("");
-        particles.addEntry(entryBuilder.startDropdownMenu(
-                        Component.translatable("text.elytratrails.option.particle"),
-                        DropdownMenuBuilder.TopCellElementBuilder.of(
-                                encodedParticle,
-                                s -> {
-                                    try {
-                                        ParticleOptions ignored = ParticleArgument.readParticle(new StringReader(s), lookup);
-                                        return s;
-                                    } catch (Throwable ignored) {
-                                        return null;
-                                    }
-                                },
-                                (String v) -> v != null ? Component.literal(v) : Component.empty()
-                        ),
-                        DropdownMenuBuilder.CellCreatorBuilder.of(14, 160, 8, Component::literal)
-                )
+        particles.addEntry(entryBuilder.startStrField(Component.translatable("text.elytratrails.option.particle"), encodedParticle)
                 .setErrorSupplier(s -> {
                     try {
                         ParticleOptions ignored = ParticleArgument.readParticle(new StringReader(s), lookup);
@@ -409,11 +384,7 @@ public class ConfigScreenBuilder {
                 .setDefaultValue(encodedParticle)
                 .setTooltip(Component.translatable("text.elytratrails.option.particle.@Tooltip"))
                 .setSaveConsumer(newValue -> {
-                    try {
-                        config.particle = ParticleArgument.readParticle(new StringReader(newValue), lookup);
-                    } catch (CommandSyntaxException e) {
-                        config.particle = null;
-                    }
+                    config.particle = decodeParticle(newValue);
                 })
                 .build());
 
@@ -801,5 +772,29 @@ public class ConfigScreenBuilder {
 
     private static Component tooltip(String baseKey, String suffix) {
         return Component.translatable("text.elytratrails.option." + baseKey + suffix + ".@Tooltip");
+    }
+    public static String encodeParticle(ParticleOptions particleOptions)
+    {
+
+        // it's better if you don't look too closely at this and just know that it works
+        @SuppressWarnings("rawtypes")
+        ParticleType type = particleOptions.getType();
+        var codec = type.codec().codec();
+        Identifier id = BuiltInRegistries.PARTICLE_TYPE.getResourceKey(type).map(ResourceKey::identifier).orElse(Identifier.withDefaultNamespace("poof"));
+
+
+        //noinspection unchecked
+        return id.toString() + codec.encodeStart(NbtOps.INSTANCE, particleOptions != null ? particleOptions : ParticleTypes.POOF).result().map(o -> ((Tag)o).toString()).orElse("");
+    }
+
+    public static ParticleOptions decodeParticle(String newValue)
+    {
+        HolderLookup.Provider lookup = VanillaRegistries.createLookup();
+
+        try {
+            return ParticleArgument.readParticle(new StringReader(newValue), lookup);
+        } catch (CommandSyntaxException e) {
+            return null;
+        }
     }
 }
