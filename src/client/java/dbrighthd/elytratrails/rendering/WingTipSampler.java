@@ -90,14 +90,9 @@ public class WingTipSampler {
         if(elytraSubmit == null)
         {
             elytraSubmit = extractElytraRenderState(player, mc, cameraState, partialTick);
-            LOGGER.info("elytraSubmit was null, try again");
         }
         if (elytraSubmit == null || !(elytraSubmit.model() instanceof ElytraModel elytraModel) || !(elytraSubmit.state() instanceof HumanoidRenderState humanoidState))
         {
-            if(elytraSubmit == null)
-            {
-                LOGGER.info("elytraSubmit was still null.");
-            }
             return List.of();
         }
 
@@ -118,10 +113,8 @@ public class WingTipSampler {
 
             if (!emfCache.containsKey(eid) || !(emfCache.get(eid).variant() == variant)) {
                 if (config.logTrails) {
-                    LOGGER.info("Entity {}, New elytra equipped with model variant {}", eid, variant);
                 }
                 emfCache.put(eid, new EmfInfo("elytra", variant, getSpawnersInfo(EmfWingTipHooks.findAllSpawnerPaths(leftWing, rightWing, modConfig.hardCodedFreshAnimationsPlayerWingtips))));
-                LOGGER.info("Returning empty list for {} because no emf cache", eid);
                 return List.of();
             }
             EmfInfo emfInfo = emfCache.get(eid);

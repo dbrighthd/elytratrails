@@ -1,5 +1,7 @@
 package dbrighthd.elytratrails.config;
 
+import com.mojang.brigadier.StringReader;
+import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import dbrighthd.elytratrails.ElytraTrailsKeybind;
 import dbrighthd.elytratrails.config.pack.TrailPackConfigManager;
 import dbrighthd.elytratrails.controller.ContinuousTwirlController;
@@ -9,19 +11,26 @@ import dbrighthd.elytratrails.network.PlayerConfigC2SPayload;
 import dbrighthd.elytratrails.network.RemoveFromStoreC2SPayload;
 import dbrighthd.elytratrails.rendering.TrailSystem;
 import dbrighthd.elytratrails.util.EasingUtil;
-import me.shedaniel.clothconfig2.api.ConfigBuilder;
-import me.shedaniel.clothconfig2.api.ConfigCategory;
-import me.shedaniel.clothconfig2.api.ConfigEntryBuilder;
-import me.shedaniel.clothconfig2.impl.builders.DropdownMenuBuilder;
+import me.shedaniel.clothconfig2.api.*;
 import me.shedaniel.clothconfig2.impl.builders.SubCategoryBuilder;
 import net.fabricmc.fabric.api.client.networking.v1.ClientPlayNetworking;
 import net.minecraft.client.KeyMapping;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.screens.Screen;
+import net.minecraft.commands.arguments.ParticleArgument;
+import net.minecraft.core.HolderLookup;
+import net.minecraft.core.particles.ParticleOptions;
+import net.minecraft.core.particles.ParticleType;
+import net.minecraft.core.particles.ParticleTypes;
+import net.minecraft.core.registries.BuiltInRegistries;
+import net.minecraft.data.registries.VanillaRegistries;
+import net.minecraft.nbt.NbtOps;
+import net.minecraft.nbt.Tag;
 import net.minecraft.network.chat.Component;
+import net.minecraft.resources.Identifier;
+import net.minecraft.resources.ResourceKey;
 
 import java.util.*;
-import java.util.stream.Collectors;
 
 import static dbrighthd.elytratrails.ElytraTrailsClient.getConfig;
 import static dbrighthd.elytratrails.ElytraTrailsClient.refreshConfig;
@@ -353,6 +362,8 @@ public class ConfigScreenBuilder {
                 "OthersDefault"
         );
 
+        String encodedParticle = encodeParticle(config.particle);
+        HolderLookup.Provider lookup = VanillaRegistries.createLookup();
         particles.addEntry(entryBuilder.startTextDescription(
                         Component.translatable("text.elytratrails.category.particles.desc"))
                 .build());
@@ -361,29 +372,20 @@ public class ConfigScreenBuilder {
                 .setTooltip(Component.translatable("text.elytratrails.option.enableParticles.@Tooltip"))
                 .setSaveConsumer(newValue -> config.enableParticles = newValue)
                 .build());
-        particles.addEntry(entryBuilder.startDropdownMenu(
-                        Component.translatable("text.elytratrails.option.particle"),
-                        DropdownMenuBuilder.TopCellElementBuilder.of(
-                                config.particle,
-                                s -> {
-                                    try {
-                                        return ModConfig.ParticleChoice.valueOf(s.trim().toUpperCase(Locale.ROOT));
-                                    } catch (IllegalArgumentException ignored) {
-                                        return null;
-                                    }
-                                },
-                                v -> {
-                                    assert v != null;
-                                    return Component.nullToEmpty(v.name());
-                                }
-                        ),
-                        DropdownMenuBuilder.CellCreatorBuilder.of(14, 160, 8, v -> Component.nullToEmpty((v).name())
-                        )
-                )
-                .setDefaultValue(ModConfig.ParticleChoice.POOF)
+        particles.addEntry(entryBuilder.startStrField(Component.translatable("text.elytratrails.option.particle"), encodedParticle)
+                .setErrorSupplier(s -> {
+                    try {
+                        ParticleOptions ignored = ParticleArgument.readParticle(new StringReader(s), lookup);
+                        return Optional.empty();
+                    } catch (CommandSyntaxException exception) {
+                        return Optional.of(Component.translatable(exception.getLocalizedMessage()));
+                    }
+                })
+                .setDefaultValue(encodedParticle)
                 .setTooltip(Component.translatable("text.elytratrails.option.particle.@Tooltip"))
-                .setSelections(Arrays.stream(ModConfig.ParticleChoice.values()).collect(Collectors.toSet()))
-                .setSaveConsumer(newValue -> config.particle = newValue)
+                .setSaveConsumer(newValue -> {
+                    config.particle = decodeParticle(newValue);
+                })
                 .build());
 
         particles.addEntry(entryBuilder.startIntField(Component.translatable("text.elytratrails.option.particleSpawnsPerTick"), config.particleSpawnsPerTick)
@@ -770,5 +772,29 @@ public class ConfigScreenBuilder {
 
     private static Component tooltip(String baseKey, String suffix) {
         return Component.translatable("text.elytratrails.option." + baseKey + suffix + ".@Tooltip");
+    }
+    public static String encodeParticle(ParticleOptions particleOptions)
+    {
+
+        // it's better if you don't look too closely at this and just know that it works
+        @SuppressWarnings("rawtypes")
+        ParticleType type = particleOptions.getType();
+        var codec = type.codec().codec();
+        Identifier id = BuiltInRegistries.PARTICLE_TYPE.getResourceKey(type).map(ResourceKey::identifier).orElse(Identifier.withDefaultNamespace("poof"));
+
+
+        //noinspection unchecked
+        return id.toString() + codec.encodeStart(NbtOps.INSTANCE, particleOptions != null ? particleOptions : ParticleTypes.POOF).result().map(o -> ((Tag)o).toString()).orElse("");
+    }
+
+    public static ParticleOptions decodeParticle(String newValue)
+    {
+        HolderLookup.Provider lookup = VanillaRegistries.createLookup();
+
+        try {
+            return ParticleArgument.readParticle(new StringReader(newValue), lookup);
+        } catch (CommandSyntaxException e) {
+            return null;
+        }
     }
 }
