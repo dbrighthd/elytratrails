@@ -36,6 +36,8 @@ import static dbrighthd.elytratrails.ElytraTrailsClient.getConfig;
 import static dbrighthd.elytratrails.ElytraTrailsClient.refreshConfig;
 import static dbrighthd.elytratrails.config.pack.TrailPackConfigManager.exportTrailPresetToDisk;
 import static dbrighthd.elytratrails.config.pack.TrailPackConfigManager.withAlphaAndColor;
+import static dbrighthd.elytratrails.handler.ParticleHandler.decodeParticle;
+import static dbrighthd.elytratrails.handler.ParticleHandler.encodeParticle;
 import static dbrighthd.elytratrails.network.ClientPlayerConfigStore.*;
 
 /**
@@ -772,29 +774,5 @@ public class ConfigScreenBuilder {
 
     private static Component tooltip(String baseKey, String suffix) {
         return Component.translatable("text.elytratrails.option." + baseKey + suffix + ".@Tooltip");
-    }
-    public static String encodeParticle(ParticleOptions particleOptions)
-    {
-
-        // it's better if you don't look too closely at this and just know that it works
-        @SuppressWarnings("rawtypes")
-        ParticleType type = particleOptions.getType();
-        var codec = type.codec().codec();
-        Identifier id = BuiltInRegistries.PARTICLE_TYPE.getResourceKey(type).map(ResourceKey::identifier).orElse(Identifier.withDefaultNamespace("poof"));
-
-
-        //noinspection unchecked
-        return id.toString() + codec.encodeStart(NbtOps.INSTANCE, particleOptions != null ? particleOptions : ParticleTypes.POOF).result().map(o -> ((Tag)o).toString()).orElse("");
-    }
-
-    public static ParticleOptions decodeParticle(String newValue)
-    {
-        HolderLookup.Provider lookup = VanillaRegistries.createLookup();
-
-        try {
-            return ParticleArgument.readParticle(new StringReader(newValue), lookup);
-        } catch (CommandSyntaxException e) {
-            return null;
-        }
     }
 }

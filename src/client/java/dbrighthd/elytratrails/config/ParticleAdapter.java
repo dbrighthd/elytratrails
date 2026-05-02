@@ -8,8 +8,8 @@ import net.minecraft.core.particles.ParticleOptions;
 
 import java.io.IOException;
 
-import static dbrighthd.elytratrails.config.ConfigScreenBuilder.decodeParticle;
-import static dbrighthd.elytratrails.config.ConfigScreenBuilder.encodeParticle;
+import static dbrighthd.elytratrails.handler.ParticleHandler.decodeParticle;
+import static dbrighthd.elytratrails.handler.ParticleHandler.encodeParticle;
 
 public class ParticleAdapter extends TypeAdapter<ParticleOptions> {
     @Override
