@@ -301,7 +301,7 @@ public class WingTipSampler {
             xScale = Mth.lerp(wingspread, 0.33333f, 1.0f);
         }
         if (config.trailMovesWithAngleOfAttack()) {
-            zScale = Mth.lerp(getSignedElytraAoARadiansFast(player), 0.33333f, 1.0f);
+            zScale = Mth.lerp(getSignedElytraAoACalculation(player), 0.33333f, 1.0f);
         }
         Vec3 scaledLocalTip = new Vec3(localPos.x * xScale, localPos.y * yScale, localPos.z * zScale);
         return transformLocalPoint(stack, elytraRoot, wingRoot, scaledLocalTip);

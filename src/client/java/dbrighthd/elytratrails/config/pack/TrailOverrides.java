@@ -126,7 +126,13 @@ public record TrailOverrides(JsonObject values) {
                 getBoolean("speedBasedWidth"),
                 getDouble("minWidthSpeed"),
                 getDouble("maxWidthSpeed"),
-                getDouble("distanceTillTrailEnd")
+                getDouble("distanceTillTrailEnd"),
+                getBoolean("aoaBasedAlpha"),
+                getDouble("minAlphaAOA"),
+                getDouble("maxAlphaAOA"),
+                getBoolean("aoaBasedWidth"),
+                getDouble("minWidthAOA"),
+                getDouble("maxWidthAOA")
         );
     }
 

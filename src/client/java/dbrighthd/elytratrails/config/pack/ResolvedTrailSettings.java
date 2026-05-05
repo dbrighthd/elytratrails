@@ -38,7 +38,13 @@ public record ResolvedTrailSettings(
         boolean speedBasedWidth,
         double minWidthSpeed,
         double maxWidthSpeed,
-        double distanceTillTrailEnd
+        double distanceTillTrailEnd,
+        boolean aoaBasedAlpha,
+        double minAlphaAOA,
+        double maxAlphaAOA,
+        boolean aoaBasedWidth,
+        double minWidthAOA,
+        double maxWidthAOA
 ) {
     public static ResolvedTrailSettings defaults(boolean isLeftWing) {
         return resolveTrailFromPlayerConfig(ClientPlayerConfigStore.getLocalPlayerConfig(), isLeftWing);

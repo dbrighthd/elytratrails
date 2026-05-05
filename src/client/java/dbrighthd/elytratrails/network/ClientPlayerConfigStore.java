@@ -141,7 +141,13 @@ public final class ClientPlayerConfigStore {
                 incomingConfig.wingtipVerticalPosition(),
                 incomingConfig.wingtipHorizontalPosition(),
                 incomingConfig.wingtipDepthPosition(),
-                incomingConfig.distanceTillTrailEnd()
+                incomingConfig.distanceTillTrailEnd(),
+                incomingConfig.aoaBasedAlpha(),
+                incomingConfig.minAlphaAOA(),
+                incomingConfig.maxAlphaAOA(),
+                incomingConfig.aoaBasedWidth(),
+                incomingConfig.minWidthAOA(),
+                incomingConfig.maxWidthAOA()
         );
 
         CLIENT_PLAYER_CONFIGS.put(entityId, safe);
@@ -199,6 +205,12 @@ public final class ClientPlayerConfigStore {
         double wingtipHorizontalPosition = tag.getDoubleOr("wingtipHorizontalPosition", fallbackConfig.wingtipHorizontalPosition());
         double wingtipDepthPosition = tag.getDoubleOr("wingtipDepthPosition", fallbackConfig.wingtipDepthPosition());
         double distanceTillTrailEnd = tag.getDoubleOr("distanceTillTrailEnd", fallbackConfig.distanceTillTrailEnd());
+        boolean aoaBasedAlpha = tag.getBooleanOr("aoaBasedAlpha", fallbackConfig.aoaBasedAlpha());
+        double minAlphaAOA = tag.getDoubleOr("minAlphaAOA",fallbackConfig.minAlphaAOA());
+        double maxAlphaAOA = tag.getDoubleOr("maxAlphaAOA",fallbackConfig.maxAlphaAOA());
+        boolean aoaBasedWidth = tag.getBooleanOr("aoaBasedWidth", fallbackConfig.aoaBasedWidth());
+        double minWidthAOA = tag.getDoubleOr("minWidthAOA",fallbackConfig.minWidthAOA());
+        double maxWidthAOA = tag.getDoubleOr("maxAlphaAOA",fallbackConfig.maxWidthAOA());
         return new PlayerConfig(
                 enableTrail,
                 enableRandomWidth,
@@ -241,7 +253,13 @@ public final class ClientPlayerConfigStore {
                 wingtipVerticalPosition,
                 wingtipHorizontalPosition,
                 wingtipDepthPosition,
-                distanceTillTrailEnd
+                distanceTillTrailEnd,
+                aoaBasedAlpha,
+                minAlphaAOA,
+                maxAlphaAOA,
+                aoaBasedWidth,
+                minWidthAOA,
+                maxWidthAOA
         );
     }
 

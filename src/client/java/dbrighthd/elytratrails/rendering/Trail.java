@@ -25,8 +25,8 @@ public record Trail(Identifier texture, List<Point> points, ResolvedTrailSetting
      * @param pos   position of trail point
      * @param epoch time of creation, in milliseconds
      */
-    public record Point(Vec3 pos, long epoch, double speedAtEmission, boolean visible) {
-        public Point(Vec3 pos, double speed, boolean visible) {
+    public record Point(Vec3 pos, long epoch, PlayerSpeedData speedData, boolean visible) {
+        public Point(Vec3 pos, PlayerSpeedData speed, boolean visible) {
             this(pos, TimeUtil.currentMillis(), speed, visible);
         }
     }

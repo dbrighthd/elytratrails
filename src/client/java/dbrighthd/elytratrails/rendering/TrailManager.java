@@ -11,9 +11,9 @@ import it.unimi.dsi.fastutil.ints.Int2ObjectOpenHashMap;
 import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents;
 import net.fabricmc.fabric.api.client.rendering.v1.level.LevelRenderEvents;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.player.AbstractClientPlayer;
 import net.minecraft.world.entity.Avatar;
 import net.minecraft.world.entity.Entity;
+import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Player;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -26,6 +26,8 @@ import java.util.Map;
 import static dbrighthd.elytratrails.ElytraTrailsClient.getConfig;
 import static dbrighthd.elytratrails.config.pack.TrailPackConfigManager.*;
 import static dbrighthd.elytratrails.controller.EntityTwirlManager.isRolling;
+import static dbrighthd.elytratrails.util.ModelTransformationUtil.getSignedElytraAoACalculation;
+import static dbrighthd.elytratrails.util.ModelTransformationUtil.getUnsignedAOA;
 
 public class TrailManager {
     private static final Logger LOGGER = LoggerFactory.getLogger(TrailManager.class);
@@ -71,6 +73,18 @@ public class TrailManager {
 
     public boolean isActiveTrail(Trail trail) {
         return (activeTrails.containsKey(trail.entityId()) && activeTrails.get(trail.entityId()).trails().contains(trail));
+    }
+
+    public PlayerSpeedData getPlayerSpeedData(LivingEntity entity, ResolvedTrailSettings trailSettings)
+    {
+        if(trailSettings.aoaBasedAlpha() || trailSettings.aoaBasedWidth())
+        {
+            return new PlayerSpeedData(entity.getDeltaMovement().length(), (float)Math.abs(Math.toDegrees(getUnsignedAOA(entity))), true);
+        }
+        else
+        {
+            return new PlayerSpeedData(entity.getDeltaMovement().length(), 0, false);
+        }
     }
 
     @SuppressWarnings("unused")
@@ -132,8 +146,6 @@ public class TrailManager {
 
     private void gatherPlayerTrails(Minecraft ctx, boolean recordEmitter) {
         if (ctx.level == null) return;
-
-        List<AbstractClientPlayer> players = ctx.level.players();
         sampler.clearFrameCache();
         for (Entity entity : ctx.level.entitiesForRendering()) {
             if (!(entity instanceof Avatar player)) {
@@ -146,7 +158,7 @@ public class TrailManager {
 
             if (valid) {
                 List<Emitter> emitters = new ArrayList<>(sampler.getPlayerTrailEmitterPositions(player, ctx.getDeltaTracker().getGameTimeDeltaPartialTick(false), modConfig));
-                double speed = player.getDeltaMovement().length();
+                PlayerSpeedData speedData = getPlayerSpeedData(player, config);
                 if (emitters.isEmpty()) {
                     if (modConfig.logTrails) {
                         LOGGER.info("Empty Emitters from {}, resetting trails if exist", eid);
@@ -191,7 +203,8 @@ public class TrailManager {
 
                     Trail trail = trailGroup.trails().get(i);
                     Emitter emitter = emitters.get(i);
-                    trail.points().add(new Trail.Point(emitter.position(), speed,emitter.visible()));
+                    trail.points().add(new Trail.Point(emitter.position(), speedData,emitter.visible()));
+                    System.out.println(speedData.aoa());
                 }
             } else {
                 removeTrail(eid);
@@ -260,7 +273,7 @@ public class TrailManager {
 
                     Trail trail = trailGroup.trails().get(i);
                     Emitter emitter = emitters.get(i);
-                    trail.points().add(new Trail.Point(emitter.position(), speed, emitter.visible()));
+                    trail.points().add(new Trail.Point(emitter.position(), new PlayerSpeedData(speed, 0, false), emitter.visible()));
                 }
             } else {
                 removeTrail(eid);

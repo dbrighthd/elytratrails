@@ -33,7 +33,33 @@ public class ModelTransformationUtil {
         return Mth.clamp(openness, 0.0f, 1.0f);
     }
 
-    public static float getSignedElytraAoARadiansFast(LivingEntity entity) {
+    public static float getUnsignedAOA(LivingEntity entity)
+    {
+        if (!entity.isFallFlying())
+        {
+            return 0.0f;
+        }
+
+        Vec3 vel = entity.getDeltaMovement();
+        double vx = vel.x;
+        double vy = vel.y;
+        double vz = vel.z;
+
+        double speedSqr = vx * vx + vy * vy + vz * vz;
+
+        double invSpeed = Mth.invSqrt((float) speedSqr);
+        double velHoriz = Math.sqrt(vx * vx + vz * vz) * invSpeed;
+        double velVert = vy * invSpeed;
+        float pitch = -entity.getXRot() * Mth.DEG_TO_RAD;
+        float lookHoriz = Mth.cos(pitch);
+        float lookVert = Mth.sin(pitch);
+        float cosAoA = (float)(lookHoriz * velHoriz + lookVert * velVert);
+        cosAoA = Mth.clamp(cosAoA, -1.0f, 1.0f);
+
+        return (float)Math.acos(cosAoA);
+    }
+
+    public static float getSignedElytraAoACalculation(LivingEntity entity) {
         if (!entity.isFallFlying()) {
             return 1.0f;
         }

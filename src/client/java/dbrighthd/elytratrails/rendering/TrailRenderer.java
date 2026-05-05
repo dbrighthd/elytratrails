@@ -210,7 +210,7 @@ public class TrailRenderer {
     }
 
     private Trail.Point copyTrailPointNewPos(Trail.Point point, Vec3 newPos, boolean visible) {
-        return new Trail.Point(newPos, point.epoch(), visible);
+        return new Trail.Point(newPos, point.epoch(), point.speedData(), visible);
     }
 
 
@@ -254,6 +254,8 @@ public class TrailRenderer {
             renderSubdividedSegment(pose, consumer, point0, point1, point2, tStart, midT, p0, p1, p2, p3, startPos, midPos, trail, color, trailSettings);
             renderSubdividedSegment(pose, consumer, point0, point1, point2, midT, tEnd, p0, p1, p2, p3, midPos, endPos, trail, color, trailSettings);
         } else {
+            PlayerSpeedData point0SpeedData = point0.speedData();
+            PlayerSpeedData point1SpeedData = point1.speedData();
 
             float segmentLength = (float) startPos.distanceTo(endPos) * 2f;
             float v1 = this.accumDist / 2.0f;
@@ -307,12 +309,20 @@ public class TrailRenderer {
                 alphaEnd *= computeEndFade(v2 - correctedEnd, trailSettings);
             }
             if (trailSettings.speedBasedAlpha()) {
-                alphaStart *= inverseLerpTwoVals(point0.speedAtEmission(), trailSettings.minAlphaSpeed(), trailSettings.maxAlphaSpeed());
-                alphaEnd *= inverseLerpTwoVals(point1.speedAtEmission(), trailSettings.minAlphaSpeed(), trailSettings.maxAlphaSpeed());
+                alphaStart *= inverseLerpTwoVals(point0SpeedData.speed(), trailSettings.minAlphaSpeed(), trailSettings.maxAlphaSpeed());
+                alphaEnd *= inverseLerpTwoVals(point1SpeedData.speed(), trailSettings.minAlphaSpeed(), trailSettings.maxAlphaSpeed());
             }
             if (trailSettings.speedBasedWidth()) {
-                scaleStart *= inverseLerpTwoVals(point0.speedAtEmission(), trailSettings.minWidthSpeed(), trailSettings.maxWidthSpeed());
-                scaleEnd *= inverseLerpTwoVals(point1.speedAtEmission(), trailSettings.minWidthSpeed(), trailSettings.maxWidthSpeed());
+                scaleStart *= inverseLerpTwoVals(point0SpeedData.speed(), trailSettings.minWidthSpeed(), trailSettings.maxWidthSpeed());
+                scaleEnd *= inverseLerpTwoVals(point1SpeedData.speed(), trailSettings.minWidthSpeed(), trailSettings.maxWidthSpeed());
+            }
+            if (point0SpeedData.aoaProvided() && trailSettings.aoaBasedAlpha()) {
+                alphaStart *= inverseLerpTwoVals(point0SpeedData.aoa(), trailSettings.minAlphaAOA(), trailSettings.maxAlphaAOA());
+                alphaEnd *= inverseLerpTwoVals(point1SpeedData.aoa(), trailSettings.minAlphaAOA(), trailSettings.maxAlphaAOA());
+            }
+            if (point0SpeedData.aoaProvided() && trailSettings.aoaBasedWidth()) {
+                scaleStart *= inverseLerpTwoVals(point0SpeedData.aoa(), trailSettings.minWidthAOA(), trailSettings.maxWidthAOA());
+                scaleEnd *= inverseLerpTwoVals(point1SpeedData.aoa(), trailSettings.minWidthAOA(), trailSettings.maxWidthAOA());
             }
             if (modConfig.tryNearTrailFade) {
                 alphaStart *= cameraDistanceFade((float) startPos.distanceTo(cameraPosition));

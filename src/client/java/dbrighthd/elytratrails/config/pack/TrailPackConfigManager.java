@@ -696,7 +696,13 @@ public final class TrailPackConfigManager {
                 playerConfig.speedBasedWidth(),
                 playerConfig.minWidthSpeed(),
                 playerConfig.maxWidthSpeed(),
-                playerConfig.distanceTillTrailEnd()
+                playerConfig.distanceTillTrailEnd(),
+                playerConfig.aoaBasedAlpha(),
+                playerConfig.minAlphaAOA(),
+                playerConfig.maxAlphaAOA(),
+                playerConfig.aoaBasedWidth(),
+                playerConfig.minWidthAOA(),
+                playerConfig.maxWidthAOA()
         );
     }
 
@@ -732,7 +738,13 @@ public final class TrailPackConfigManager {
                 playerConfig.speedBasedWidth(),
                 playerConfig.minWidthSpeed(),
                 playerConfig.maxWidthSpeed(),
-                playerConfig.distanceTillTrailEnd()
+                playerConfig.distanceTillTrailEnd(),
+                playerConfig.aoaBasedAlpha(),
+                playerConfig.minAlphaAOA(),
+                playerConfig.maxAlphaAOA(),
+                playerConfig.aoaBasedWidth(),
+                playerConfig.minWidthAOA(),
+                playerConfig.maxWidthAOA()
         );
     }
 
