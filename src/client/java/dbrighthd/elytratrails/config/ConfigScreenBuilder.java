@@ -378,9 +378,7 @@ public class ConfigScreenBuilder {
                 })
                 .setDefaultValue(encodedParticle)
                 .setTooltip(Component.translatable("text.elytratrails.option.particle.@Tooltip"))
-                .setSaveConsumer(newValue -> {
-                    config.particle = decodeParticle(newValue);
-                })
+                .setSaveConsumer(newValue -> config.particle = decodeParticle(newValue))
                 .build());
 
         particles.addEntry(entryBuilder.startIntField(Component.translatable("text.elytratrails.option.particleSpawnsPerTick"), config.particleSpawnsPerTick)

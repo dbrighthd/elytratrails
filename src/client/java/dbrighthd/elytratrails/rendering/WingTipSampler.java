@@ -35,8 +35,6 @@ import net.minecraft.world.phys.Vec3;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.joml.Quaternionf;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import java.util.*;
 
@@ -54,8 +52,6 @@ public class WingTipSampler {
 
     private record EmfInfo(String name, int variant, List<SpawnerInfo> spawners) {
     }
-
-    private static final Logger LOGGER = LoggerFactory.getLogger(WingTipSampler.class);
 
     private record SpawnerInfo(EmfWingTipHooks.SpawnerPath spawner, String[] pathSegments, boolean isLeftWing) {
     }
@@ -112,8 +108,6 @@ public class WingTipSampler {
             int variant = getModelVariantFromModel(animatedElytraRoot);
 
             if (!emfCache.containsKey(eid) || !(emfCache.get(eid).variant() == variant)) {
-                if (config.logTrails) {
-                }
                 emfCache.put(eid, new EmfInfo("elytra", variant, getSpawnersInfo(EmfWingTipHooks.findAllSpawnerPaths(leftWing, rightWing, modConfig.hardCodedFreshAnimationsPlayerWingtips))));
                 return List.of();
             }

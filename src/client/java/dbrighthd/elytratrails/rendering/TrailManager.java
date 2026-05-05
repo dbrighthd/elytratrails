@@ -26,7 +26,6 @@ import java.util.Map;
 import static dbrighthd.elytratrails.ElytraTrailsClient.getConfig;
 import static dbrighthd.elytratrails.config.pack.TrailPackConfigManager.*;
 import static dbrighthd.elytratrails.controller.EntityTwirlManager.isRolling;
-import static dbrighthd.elytratrails.util.ModelTransformationUtil.getSignedElytraAoACalculation;
 import static dbrighthd.elytratrails.util.ModelTransformationUtil.getUnsignedAOA;
 
 public class TrailManager {
@@ -43,7 +42,7 @@ public class TrailManager {
     public TrailManager(WingTipSampler sampler) {
         this.sampler = sampler;
         ClientTickEvents.END_CLIENT_TICK.register(this::removeDeadPoints);
-        LevelRenderEvents.AFTER_TRANSLUCENT_FEATURES.register(cxt -> {
+        LevelRenderEvents.AFTER_TRANSLUCENT_FEATURES.register(_ -> {
             modConfig = getConfig();
             float now = TimeUtil.currentMillis();
             boolean recordEmitters = true;
