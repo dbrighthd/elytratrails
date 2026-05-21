@@ -3,6 +3,7 @@ package dbrighthd.elytratrails.controller;
 import dbrighthd.elytratrails.util.EasingUtil;
 import dbrighthd.elytratrails.util.TimeUtil;
 import net.minecraft.util.Mth;
+import dbrighthd.elytratrails.controller.EntityTwirlManager.Phase;
 
 import static dbrighthd.elytratrails.ElytraTrailsClient.getConfig;
 import static dbrighthd.elytratrails.util.EasingUtil.*;
@@ -21,14 +22,8 @@ public final class ContinuousTwirlController {
     private static final double BACK_EASE_OUT_PEAK_U = 0.54;
     private static final double BACK_EASE_IN_START_U = 0.481219;
 
-    private enum Phase {
-        EASE_IN_180,
-        CONSTANT_360,
-        EASE_OUT_180
-    }
-
-    private static long phaseStartNanos = 0L;
-    private static Phase phase = Phase.EASE_IN_180;
+    static long phaseStartNanos = 0L;
+    static Phase phase = Phase.EASE_IN_180;
 
     private static double baseAngleRad = 0.0;
 

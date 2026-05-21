@@ -9,6 +9,8 @@ import net.minecraft.world.phys.Vec3;
 import org.joml.Matrix4f;
 import org.joml.Vector4f;
 
+import static dbrighthd.elytratrails.controller.EntityTwirlManager.getTwirlProgress;
+
 
 public class ModelTransformationUtil {
 
@@ -34,6 +36,13 @@ public class ModelTransformationUtil {
     }
 
     public static float getUnsignedAOA(LivingEntity entity)
+    {
+        float AOARaw = getUnsignedAOARaw(entity);
+        return AOARaw + (float)getTwirlProgress(entity.getId());
+    }
+
+
+    public static float getUnsignedAOARaw(LivingEntity entity)
     {
         if (!entity.isFallFlying())
         {

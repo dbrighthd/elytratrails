@@ -9,6 +9,7 @@ import it.unimi.dsi.fastutil.ints.Int2ObjectOpenHashMap;
 import net.fabricmc.fabric.api.client.networking.v1.ClientPlayNetworking;
 import net.minecraft.client.Minecraft;
 import net.minecraft.util.Mth;
+import net.minecraft.world.entity.player.Player;
 
 import static dbrighthd.elytratrails.ElytraTrailsClient.getConfig;
 import static dbrighthd.elytratrails.util.EasingUtil.easeRandom;
@@ -31,9 +32,9 @@ public final class EntityTwirlManager {
 
     private enum Kind {NORMAL, CONTINUOUS}
 
-    private enum Phase {EASE_IN_180, CONSTANT_360, EASE_OUT_180}
+    public enum Phase {EASE_IN_180, CONSTANT_360, EASE_OUT_180}
 
-    private static final class TwirlData {
+    public static final class TwirlData {
         final int entityId;
 
         TwirlData(int entityId) {
@@ -201,14 +202,18 @@ public final class EntityTwirlManager {
     }
 
     public static float getExtraRollRadians(int entityId) {
+        Player player = Minecraft.getInstance().player;
+        if(player != null && entityId == player.getId())
+        {
+            return getClientExtraRollRadians();
+        }
         TwirlData data = BY_ENTITY.get(entityId);
         if (data == null || !data.active) return 0f;
 
         long now = TimeUtil.currentNanos();
         TwirlInfo info = getEntityTwirlConfigs(entityId);
-        return data.kind == Kind.NORMAL ? computeNormal(data, now, info) : computeContinuous(data, now, info);
+        return data.kind == Kind.NORMAL ? -computeNormal(data, now, info) : -computeContinuous(data, now, info);
     }
-
     private static float computeNormal(TwirlData data, long now, TwirlInfo info) {
         double t = (now - data.startNanos) / (info.duration() * 1_000_000_000.0);
 
@@ -522,10 +527,69 @@ public final class EntityTwirlManager {
             return false;
         }
         if (Minecraft.getInstance().player != null && entityId == Minecraft.getInstance().player.getId()) {
-            return TwirlRoll.isAnyActive();
+            return isAnyClientRollActive();
         }
         TwirlData data = BY_ENTITY.get(entityId);
         return data != null && data.active;
+    }
+    public static boolean isAnyClientRollActive() {
+        return TwirlController.isActive() || ContinuousTwirlController.isActive();
+    }
+
+    public static float getClientExtraRollRadians() {
+        if (ContinuousTwirlController.isActive()) {
+            return -ContinuousTwirlController.getExtraRollRadians();
+        }
+        return TwirlController.getExtraRollRadians();
+    }
+
+    //Returns 0 if not twirling, 0-1 inverse lerp if beginning twirl, 1 if continuous twirl, 1-0 inverse lerp when ending.
+    public static double getTwirlProgress(int entityId) {
+        Phase phase;
+        long phaseStartNanos;
+        Player player = Minecraft.getInstance().player;
+        if(player != null && entityId == player.getId())
+        {
+            if(ContinuousTwirlController.isActive())
+            {
+
+                phase = ContinuousTwirlController.phase;
+                phaseStartNanos = ContinuousTwirlController.phaseStartNanos;
+            }
+            else if(TwirlController.isActive())
+            {
+                return Math.sin(TwirlController.getExtraRollRadians());
+            }
+            else
+            {
+                return 0;
+            }
+        }
+        else
+        {
+            TwirlData data = BY_ENTITY.get(entityId);
+            if(data == null)
+            {
+                return 0;
+            }
+            phase = data.phase;
+            phaseStartNanos = data.phaseStartNanos;
+        }
+        TwirlInfo twirlInfo = getEntityTwirlConfigs(entityId);
+        double elapsedS = (TimeUtil.currentNanos() - phaseStartNanos) / 1_000_000_000.0;
+        switch(phase)
+        {
+            case EASE_IN_180 -> {
+                return Mth.clamp(elapsedS / twirlInfo.half_duration(), 0.0, 1.0);
+            }
+            case CONSTANT_360 -> {
+                return 1;
+            }
+            case EASE_OUT_180 -> {
+                return 1 - Mth.clamp(elapsedS / twirlInfo.half_duration(), 0.0, 1.0);
+            }
+            default -> {return 0;}
+        }
     }
 
     private EntityTwirlManager() {
