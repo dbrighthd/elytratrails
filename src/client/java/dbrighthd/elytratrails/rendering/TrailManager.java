@@ -202,9 +202,7 @@ public class TrailManager {
 
                     Trail trail = trailGroup.trails().get(i);
                     Emitter emitter = emitters.get(i);
-                    trail.points().add(new Trail.Point(emitter.position(), speedData,emitter.visible()));
-                    System.out.println(speedData.aoa());
-                }
+                    trail.points().add(new Trail.Point(emitter.position(), speedData,emitter.visible()));}
             } else {
                 removeTrail(eid);
             }
