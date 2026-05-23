@@ -8,44 +8,32 @@ public final class FakeVertexConsumer implements VertexConsumer {
     public FakeVertexConsumer() {}
 
     @Override
-    public VertexConsumer vertex(double x, double y, double z) {
-        return this;
+    public VertexConsumer addVertex(float x, float y, float z) {
+        return null;
     }
 
     @Override
-    public VertexConsumer color(int red, int green, int blue, int alpha) {
-        return this;
+    public VertexConsumer setColor(int red, int green, int blue, int alpha) {
+        return null;
     }
 
     @Override
-    public VertexConsumer uv(float u, float v) {
-        return this;
+    public VertexConsumer setUv(float u, float v) {
+        return null;
     }
 
     @Override
-    public VertexConsumer overlayCoords(int u, int v) {
-        return this;
+    public VertexConsumer setUv1(int u, int v) {
+        return null;
     }
 
     @Override
-    public VertexConsumer uv2(int u, int v) {
-        return this;
+    public VertexConsumer setUv2(int u, int v) {
+        return null;
     }
 
     @Override
-    public VertexConsumer normal(float x, float y, float z) {
-        return this;
-    }
-
-    @Override
-    public void endVertex() {
-    }
-
-    @Override
-    public void defaultColor(int red, int green, int blue, int alpha) {
-    }
-
-    @Override
-    public void unsetDefaultColor() {
+    public VertexConsumer setNormal(float normalX, float normalY, float normalZ) {
+        return null;
     }
 }

@@ -18,7 +18,7 @@ public class ElytraTimeUtil {
     }
 
     public static long currentMillis() {
-        return (long) (tickCounter * 1000 + (Minecraft.getInstance().getFrameTime() * 1000)) / 20;
+        return (long) (tickCounter * 1000 + (Minecraft.getInstance().getTimer().getGameTimeDeltaPartialTick(false) * 1000)) / 20;
     }
 
     public static long currentNanos() {

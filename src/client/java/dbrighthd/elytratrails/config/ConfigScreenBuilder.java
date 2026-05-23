@@ -9,7 +9,9 @@ import dbrighthd.elytratrails.controller.TwirlController;
 //import dbrighthd.elytratrails.network.GetAllRequestC2SPayload;
 //import dbrighthd.elytratrails.network.PlayerConfigC2SPayload;
 //import dbrighthd.elytratrails.network.RemoveFromStoreC2SPayload;
-import dbrighthd.elytratrails.network.ClientPackets;
+import dbrighthd.elytratrails.network.GetAllRequestC2SPayload;
+import dbrighthd.elytratrails.network.PlayerConfigC2SPayload;
+import dbrighthd.elytratrails.network.RemoveFromStoreC2SPayload;
 import dbrighthd.elytratrails.rendering.TrailSystem;
 import dbrighthd.elytratrails.util.EasingUtil;
 import me.shedaniel.clothconfig2.api.*;
@@ -469,15 +471,14 @@ public class ConfigScreenBuilder {
                 TrailSystem.getTrailManager().removeTrail(mc.player.getId());
 
                 if (getConfig().shareTrail || !getConfig().showTrailToOtherPlayers) {
-                    ClientPackets.sendPlayerConfig(getLocalPlayerConfigToSend().toTag());
+                    ClientPlayNetworking.send(new PlayerConfigC2SPayload(getLocalPlayerConfigToSend().toTag()));
                 } else {
-                    ClientPackets.sendRemoveFromStore();
+                    ClientPlayNetworking.send(new RemoveFromStoreC2SPayload());
                 }
-
                 if (!getConfig().syncWithServer) {
                     CLIENT_PLAYER_CONFIGS.clear();
                 } else if (CLIENT_PLAYER_CONFIGS.isEmpty()) {
-                    ClientPackets.sendGetAllRequest();
+                    ClientPlayNetworking.send(new GetAllRequestC2SPayload());
                 }
             }
         });

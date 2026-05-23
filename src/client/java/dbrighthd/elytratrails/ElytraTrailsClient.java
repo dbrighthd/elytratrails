@@ -3,11 +3,14 @@ package dbrighthd.elytratrails;
 import dbrighthd.elytratrails.compat.Compatibility;
 import dbrighthd.elytratrails.config.ConfigManager;
 import dbrighthd.elytratrails.config.ModConfig;
+//import dbrighthd.elytratrails.config.pack.TrailPackConfigManager;
 import dbrighthd.elytratrails.config.pack.TrailPackConfigManager;
 import dbrighthd.elytratrails.controller.ContinuousTwirlController;
 import dbrighthd.elytratrails.controller.TwirlController;
 import dbrighthd.elytratrails.handler.CommandHandler;
 import dbrighthd.elytratrails.handler.ParticleHandler;
+//import dbrighthd.elytratrails.network.RegisterPacketsClient;
+//import dbrighthd.elytratrails.rendering.TrailPipelines;
 import dbrighthd.elytratrails.network.RegisterPacketsClient;
 import dbrighthd.elytratrails.rendering.TrailSystem;
 import dbrighthd.elytratrails.rendering.TrailTextureRegistry;
@@ -18,12 +21,18 @@ import net.fabricmc.fabric.api.resource.SimpleSynchronousResourceReloadListener;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.packs.PackType;
 import net.minecraft.server.packs.resources.ResourceManager;
+import org.intellij.lang.annotations.Identifier;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.Objects;
 
 import static dbrighthd.elytratrails.network.ClientPlayerConfigStore.refreshLocalConfigs;
+//import net.minecraft.resources.Identifier;
 
+//import static dbrighthd.elytratrails.network.ClientPlayerConfigStore.refreshLocalConfigs;
+
+
+@SuppressWarnings("deprecation")
 public class ElytraTrailsClient implements ClientModInitializer {
     private static ModConfig modConfig;
 

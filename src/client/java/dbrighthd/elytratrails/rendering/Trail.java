@@ -33,7 +33,7 @@ public record Trail(ResourceLocation texture, List<Point> points, ResolvedTrailS
     }
 
     private static RenderType getRenderType(ResourceLocation texture, ResolvedTrailSettings trailSettings) {
-                if (trailSettings.glowingTrails()) {
+        if (trailSettings.glowingTrails()) {
             if (trailSettings.translucentTrails()) {
                 if (trailSettings.wireframeTrails()) {
                     return TrailPipelines.entityTranslucentEmissiveWireFrame(texture);

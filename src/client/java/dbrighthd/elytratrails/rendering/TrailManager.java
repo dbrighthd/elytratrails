@@ -142,7 +142,7 @@ public class TrailManager {
             boolean valid = TrailManager.isPlayerTrailValid(config, player);
 
             if (valid) {
-                List<Emitter> emitters = new ArrayList<>(sampler.getPlayerTrailEmitterPositions(player, ctx.getDeltaFrameTime(), modConfig));
+                List<Emitter> emitters = new ArrayList<>(sampler.getPlayerTrailEmitterPositions(player, ctx.getTimer().getGameTimeDeltaPartialTick(false), modConfig));
                 double speed = player.getDeltaMovement().length();
                 if (emitters.isEmpty()) {
                     if (modConfig.logTrails) {
@@ -191,7 +191,7 @@ public class TrailManager {
                     trail.points().add(new Trail.Point(emitter.position(), speed,emitter.visible()));
                 }
             } else {
-                activeTrails.remove(eid);
+                removeTrail(eid);
             }
         }
 

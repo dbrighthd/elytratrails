@@ -429,59 +429,57 @@ public class TrailRenderer {
         int colorEnd = multiplyAlpha(color, alphaEnd);
 
         float normalX = 0, normalY = 1, normalZ = 0;
+
         float widthStart = halfWidthStart <= 0 ? 0.5f : 1f;
         float widthEnd = halfWidthEnd <= 0 ? 0.5f : 1f;
-        consumer.vertex(
+
+        consumer.addVertex(
                         pose.pose(),
                         p1.x(),
                         p1.y(),
                         p1.z()
                 )
-                .color(colorStart)
-                .uv(v1, flipUv ? 1f - widthStart : -(1f - widthStart))
-                .overlayCoords(overlay)
-                .uv2(lightStart)
-                .normal(pose.normal(), normalX, normalY, normalZ)
-                .endVertex();
+                .setColor(colorStart)
+                .setUv(v1, flipUv ? 1f - widthStart : -(1f - widthStart))
+                .setOverlay(overlay)
+                .setLight(lightStart)
+                .setNormal(normalX, normalY, normalZ);
 
-        consumer.vertex(
+        consumer.addVertex(
                         pose.pose(),
                         p2.x(),
                         p2.y(),
                         p2.z()
                 )
-                .color(colorEnd)
-                .uv(v2, 0f)
-                .overlayCoords(overlay)
-                .uv2(lightEnd)
-                .normal(pose.normal(), normalX, normalY, normalZ)
-                .endVertex();
+                .setColor(colorEnd)
+                .setUv(v2, 0f)
+                .setOverlay(overlay)
+                .setLight(lightEnd)
+                .setNormal(normalX, normalY, normalZ);
 
-        consumer.vertex(
+        consumer.addVertex(
                         pose.pose(),
                         p3.x(),
                         p3.y(),
                         p3.z()
                 )
-                .color(colorEnd)
-                .uv(v2, flipUv ? widthEnd : -widthEnd)
-                .overlayCoords(overlay)
-                .uv2(lightEnd)
-                .normal(pose.normal(), normalX, normalY, normalZ)
-                .endVertex();
+                .setColor(colorEnd)
+                .setUv(v2, flipUv ? widthEnd : -widthEnd)
+                .setOverlay(overlay)
+                .setLight(lightEnd)
+                .setNormal(normalX, normalY, normalZ);
 
-        consumer.vertex(
+        consumer.addVertex(
                         pose.pose(),
                         p4.x(),
                         p4.y(),
                         p4.z()
                 )
-                .color(colorStart)
-                .uv(v1, flipUv ? widthStart : -widthStart)
-                .overlayCoords(overlay)
-                .uv2(lightStart)
-                .normal(pose.normal(), normalX, normalY, normalZ)
-                .endVertex();
+                .setColor(colorStart)
+                .setUv(v1, flipUv ? widthStart : -widthStart)
+                .setOverlay(overlay)
+                .setLight(lightStart)
+                .setNormal(normalX, normalY, normalZ);
     }
 
     private void calculateSubdivideLength(

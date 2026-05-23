@@ -7,14 +7,12 @@ import dbrighthd.elytratrails.rendering.TrailSystem;
 import dbrighthd.elytratrails.util.FrameCounterUtil;
 import dbrighthd.elytratrails.util.ShaderChecksUtil;
 import it.unimi.dsi.fastutil.ints.Int2IntOpenHashMap;
-import jdk.jfr.StackTrace;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.model.ElytraModel;
 import net.minecraft.client.model.geom.ModelPart;
 import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.util.Mth;
 import net.minecraft.world.phys.Vec3;
-import org.joml.Vector4f;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
@@ -34,9 +32,10 @@ public class ElytraLayerMixin {
             method = "render(Lcom/mojang/blaze3d/vertex/PoseStack;Lnet/minecraft/client/renderer/MultiBufferSource;ILnet/minecraft/world/entity/LivingEntity;FFFFFF)V",
             at = @At(
                     value = "INVOKE",
-                    target = "Lnet/minecraft/client/model/ElytraModel;renderToBuffer(Lcom/mojang/blaze3d/vertex/PoseStack;Lcom/mojang/blaze3d/vertex/VertexConsumer;IIFFFF)V"
+                    target = "Lnet/minecraft/client/renderer/entity/ItemRenderer;getArmorFoilBuffer(Lnet/minecraft/client/renderer/MultiBufferSource;Lnet/minecraft/client/renderer/RenderType;Z)Lcom/mojang/blaze3d/vertex/VertexConsumer;"
             )
-    )    private void elytratrails$captureElytraWingTips(PoseStack poseStack, MultiBufferSource buffer, int packedLight, net.minecraft.world.entity.LivingEntity entity, float limbSwing, float limbSwingAmount, float partialTicks, float ageInTicks, float netHeadYaw, float headPitch, CallbackInfo ci) {
+    )
+    private void elytratrails$captureElytraWingTips(PoseStack poseStack, MultiBufferSource buffer, int packedLight, net.minecraft.world.entity.LivingEntity entity, float limbSwing, float limbSwingAmount, float partialTicks, float ageInTicks, float netHeadYaw, float headPitch, CallbackInfo ci) {
         Minecraft minecraft = Minecraft.getInstance();
         if (minecraft.level == null) return;
 
@@ -68,29 +67,11 @@ public class ElytraLayerMixin {
         rightWingTipLocal = new Vec3(rightWingTipLocal.x * localTipXScale, rightWingTipLocal.y, rightWingTipLocal.z);
         Vec3 leftWingTipView = transformLocalPointThroughPart(poseStack, leftWingPart, leftWingTipLocal);
         Vec3 rightWingTipView = transformLocalPointThroughPart(poseStack, rightWingPart, rightWingTipLocal);
-
-        Vec3 leftWingTipWorld = elytratrails$viewSpaceToWorld(leftWingTipView);
-        Vec3 rightWingTipWorld = elytratrails$viewSpaceToWorld(rightWingTipView);
-
-        TrailSystem.getWingtipSampler().insertWingTips(entityId, leftWingTipWorld, rightWingTipWorld);
-    }
-
-    //need this to "correct" the posestack and give those points
-    @Unique
-    private static Vec3 elytratrails$viewSpaceToWorld(Vec3 viewSpacePoint) {
-        Minecraft minecraft = Minecraft.getInstance();
-
         Vec3 cameraPos = minecraft.gameRenderer.getMainCamera().getPosition();
 
-        float cameraYaw = minecraft.gameRenderer.getMainCamera().getYRot();
-        float cameraPitch = minecraft.gameRenderer.getMainCamera().getXRot();
+        Vec3 leftWingTipWorld = leftWingTipView.add(cameraPos); // I dont need the same pose-stack correction in 1.21.1
+        Vec3 rightWingTipWorld = rightWingTipView.add(cameraPos);
 
-        PoseStack inverseCameraStack = new PoseStack();
-        inverseCameraStack.mulPose(Axis.YP.rotationDegrees(-cameraYaw - 180.0F));
-        inverseCameraStack.mulPose(Axis.XP.rotationDegrees(-cameraPitch));
-
-        Vector4f vector = new Vector4f((float) viewSpacePoint.x, (float) viewSpacePoint.y, (float) viewSpacePoint.z, 1.0F);
-        vector.mul(inverseCameraStack.last().pose());
-        return new Vec3(vector.x() + cameraPos.x, vector.y() + cameraPos.y, vector.z() + cameraPos.z);
+        TrailSystem.getWingtipSampler().insertWingTips(entityId, leftWingTipWorld, rightWingTipWorld);
     }
 }

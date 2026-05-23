@@ -11,7 +11,7 @@ public class TrailSystem {
     private static final TrailRenderer renderer = new TrailRenderer(manager);
 
     public static void init() {
-        WorldRenderEvents.END.register(ctx -> {
+        WorldRenderEvents.AFTER_TRANSLUCENT.register(ctx -> {
             ModConfig config = ElytraTrailsClient.getConfig();
             if (!config.enableAllTrails) return;
             renderer.renderAllTrails(ctx, sampler.gatherdTrailsThisFrameSnapCache);

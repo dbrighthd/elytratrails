@@ -21,25 +21,25 @@ import static dbrighthd.elytratrails.ElytraTrailsClient.getConfig;
 public abstract class AvatarRendererMixin {
 
     @Inject(
-            method = "Lnet/minecraft/client/renderer/entity/player/PlayerRenderer;setupRotations(Lnet/minecraft/client/player/AbstractClientPlayer;Lcom/mojang/blaze3d/vertex/PoseStack;FFF)V",
+            method = "Lnet/minecraft/client/renderer/entity/player/PlayerRenderer;setupRotations(Lnet/minecraft/client/player/AbstractClientPlayer;Lcom/mojang/blaze3d/vertex/PoseStack;FFFF)V",
             at = @At("TAIL")
     )
-    private void elytratrails$addSpinRoll(AbstractClientPlayer entityLiving, PoseStack poseStack, float ageInTicks, float rotationYaw, float partialTicks, CallbackInfo ci) {
+    private void elytratrails$addSpinRoll(AbstractClientPlayer entity, PoseStack poseStack, float bob, float yBodyRot, float partialTick, float scale, CallbackInfo ci) {
         if (!getConfig().enableTwirls) {
             return;
         }
-        if (!entityLiving.isFallFlying()) return;
+        if (!entity.isFallFlying()) return;
 
         var mc = Minecraft.getInstance();
         int localId = (mc.player != null) ? mc.player.getId() : Integer.MIN_VALUE;
 
         float extra;
-        if (entityLiving.getId() == localId) {
+        if (entity.getId() == localId) {
             //Local player twirling uses its own system
             extra = TwirlRoll.getExtraRollRadians();
         } else {
             //twirling for other entities
-            extra = -EntityTwirlManager.getExtraRollRadians(entityLiving.getId());
+            extra = -EntityTwirlManager.getExtraRollRadians(entity.getId());
         }
 
         if (extra != 0f) {

@@ -113,11 +113,3 @@ publishing {
 		// retrieving dependencies.
 	}
 }
-configurations.configureEach {
-	resolutionStrategy.eachDependency { details ->
-		if (details.requested.group == "org.lwjgl") {
-			details.useVersion "3.3.1"
-			details.because "Minecraft 1.20.1 / Sodium expects LWJGL 3.3.1"
-		}
-	}
-}

@@ -1,4 +1,2 @@
 accessWidener v1 named
 accessible field net/minecraft/client/KeyMapping key Lcom/mojang/blaze3d/platform/InputConstants$Key;
-accessible class net/minecraft/client/renderer/RenderType$CompositeState
-accessible class net/minecraft/client/renderer/RenderType$OutlineProperty

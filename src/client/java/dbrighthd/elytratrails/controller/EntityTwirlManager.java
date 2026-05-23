@@ -2,15 +2,12 @@ package dbrighthd.elytratrails.controller;
 
 import dbrighthd.elytratrails.network.ClientPlayerConfigStore;
 import dbrighthd.elytratrails.network.PlayerConfig;
-//import dbrighthd.elytratrails.network.TwirlStateC2SPayload;
-import dbrighthd.elytratrails.network.RegisterPackets;
+import dbrighthd.elytratrails.network.TwirlStateC2SPayload;
 import dbrighthd.elytratrails.util.EasingUtil;
 import dbrighthd.elytratrails.util.ElytraTimeUtil;
 import it.unimi.dsi.fastutil.ints.Int2ObjectOpenHashMap;
 import net.fabricmc.fabric.api.client.networking.v1.ClientPlayNetworking;
-import net.fabricmc.fabric.api.networking.v1.PacketByteBufs;
 import net.minecraft.client.Minecraft;
-import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.util.Mth;
 
 import static dbrighthd.elytratrails.ElytraTrailsClient.getConfig;
@@ -514,12 +511,10 @@ public final class EntityTwirlManager {
         var mc = Minecraft.getInstance();
         if (mc.level == null || mc.player == null || mc.getConnection() == null) return;
 
-        if (!ClientPlayNetworking.canSend(RegisterPackets.TWIRL_STATE_C2S)) return;
+        TwirlStateC2SPayload payload = new TwirlStateC2SPayload(twirlState);
+        if (!ClientPlayNetworking.canSend(payload.type())) return;
 
-        FriendlyByteBuf buf = PacketByteBufs.create();
-        buf.writeInt(twirlState);
-
-        ClientPlayNetworking.send(RegisterPackets.TWIRL_STATE_C2S, buf);
+        ClientPlayNetworking.send(payload);
     }
 
     public static boolean isRolling(int entityId) {
