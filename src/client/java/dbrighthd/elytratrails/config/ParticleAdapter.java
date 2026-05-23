@@ -5,17 +5,18 @@ import com.google.gson.stream.JsonReader;
 import com.google.gson.stream.JsonToken;
 import com.google.gson.stream.JsonWriter;
 import net.minecraft.core.particles.ParticleOptions;
+import net.minecraft.core.particles.ParticleTypes;
 
 import java.io.IOException;
 
-import static dbrighthd.elytratrails.handler.ParticleHandler.decodeParticle;
-import static dbrighthd.elytratrails.handler.ParticleHandler.encodeParticle;
+//import static dbrighthd.elytratrails.handler.ParticleHandler.decodeParticle;
+//import static dbrighthd.elytratrails.handler.ParticleHandler.encodeParticle;
+
 
 public class ParticleAdapter extends TypeAdapter<ParticleOptions> {
     @Override
     public void write(JsonWriter jsonWriter, ParticleOptions particleOptions) throws IOException {
-        String out = encodeParticle(particleOptions);
-        jsonWriter.value(out);
+            jsonWriter.value("minecraft:poof");
     }
 
     @Override
@@ -25,6 +26,6 @@ public class ParticleAdapter extends TypeAdapter<ParticleOptions> {
             return null;
         }
         String particleString = jsonReader.nextString();
-        return decodeParticle(particleString);
+        return ParticleTypes.POOF;
     }
 }

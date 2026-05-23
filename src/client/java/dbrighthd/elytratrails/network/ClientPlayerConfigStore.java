@@ -3,19 +3,17 @@ package dbrighthd.elytratrails.network;
 //import dbrighthd.elytratrails.compat.flashback.FlashbackCompat;
 import dbrighthd.elytratrails.config.ModConfig;
 import dbrighthd.elytratrails.util.EasingUtil;
-import net.fabricmc.loader.api.FabricLoader;
 import net.minecraft.client.Minecraft;
 import net.minecraft.nbt.CompoundTag;
 
 import java.util.concurrent.ConcurrentHashMap;
 
 import static dbrighthd.elytratrails.ElytraTrailsClient.getConfig;
-import static java.lang.Math.clamp;
+import static dbrighthd.elytratrails.compat.ModStatuses.FLASHBACK_LOADED;
 
 
 public final class ClientPlayerConfigStore {
     public static final ConcurrentHashMap<Integer, PlayerConfig> CLIENT_PLAYER_CONFIGS = new ConcurrentHashMap<>();
-    public static final boolean FLASHBACK_LOADED = FabricLoader.getInstance().isModLoaded("flashback");
     public static PlayerConfig CLIENT_CONFIG;
 
     public static PlayerConfig CLIENT_OTHERS_CONFIG;
@@ -77,8 +75,8 @@ public final class ClientPlayerConfigStore {
         }
         PlayerConfig incomingConfig = fromTag(configTag, entityId);
 
-        double safeMaxWidth = clamp(incomingConfig.maxWidth(), 0, getConfig().maxOnlineWidth);
-        double safeLifetime = clamp(incomingConfig.trailLifetime(), 0, getConfig().maxOnlineLifetime);
+        double safeMaxWidth = Math.min(Math.max(incomingConfig.maxWidth(), 0), getConfig().maxOnlineWidth);
+        double safeLifetime = Math.min(Math.max(incomingConfig.trailLifetime(), 0), getConfig().maxOnlineLifetime);
 
         double safeMinSpeed = Math.max(0.0, incomingConfig.trailMinSpeed());
         double safeStartRamp = Math.max(0.0, incomingConfig.startRampDistance());
@@ -141,13 +139,7 @@ public final class ClientPlayerConfigStore {
                 incomingConfig.wingtipVerticalPosition(),
                 incomingConfig.wingtipHorizontalPosition(),
                 incomingConfig.wingtipDepthPosition(),
-                incomingConfig.distanceTillTrailEnd(),
-                incomingConfig.aoaBasedAlpha(),
-                incomingConfig.minAlphaAOA(),
-                incomingConfig.maxAlphaAOA(),
-                incomingConfig.aoaBasedWidth(),
-                incomingConfig.minWidthAOA(),
-                incomingConfig.maxWidthAOA()
+                incomingConfig.distanceTillTrailEnd()
         );
 
         CLIENT_PLAYER_CONFIGS.put(entityId, safe);
@@ -163,54 +155,48 @@ public final class ClientPlayerConfigStore {
             fallbackConfig = cfg.otherPlayerConfig.getPlayerConfig();
         }
 
-        boolean enableTrail = tag.getBooleanOr("enableTrail", fallbackConfig.enableTrail());
-        boolean enableRandomWidth = tag.getBooleanOr("enableRandomWidth", fallbackConfig.enableRandomWidth());
-        boolean speedDependentTrail = tag.getBooleanOr("speedDependentTrail", fallbackConfig.speedDependentTrail());
-        double trailMinSpeed = tag.getDoubleOr("trailMinSpeed", fallbackConfig.trailMinSpeed());
-        boolean trailMovesWithElytraAngle = tag.getBooleanOr("trailMovesWithElytraAngle", fallbackConfig.trailMovesWithElytraAngle());
-        double maxWidth = tag.getDoubleOr("maxWidth", fallbackConfig.maxWidth());
-        double trailLifetime = tag.getDoubleOr("trailLifetime", fallbackConfig.trailLifetime());
-        double startRampDistance = tag.getDoubleOr("startRampDistance", fallbackConfig.startRampDistance());
-        double endRampDistance = tag.getDoubleOr("endRampDistance", fallbackConfig.endRampDistance());
-        int color = tag.getIntOr("color", fallbackConfig.color());
-        double randomWidthVariation = tag.getDoubleOr("randomWidthVariation", fallbackConfig.randomWidthVariation());
-        String prideTrail = tag.getStringOr("prideTrail", fallbackConfig.prideTrail());
-        boolean fadeStart = tag.getBooleanOr("fadeStart", fallbackConfig.fadeStart());
-        double fadeStartDistance = tag.getDoubleOr("fadeStartDistance", fallbackConfig.fadeStartDistance());
-        boolean lifeTimeFade = tag.getBooleanOr("lifeTimeFade", fallbackConfig.lifeTimeFade());
-        boolean glowingTrails = tag.getBooleanOr("glowingTrails", fallbackConfig.glowingTrails());
-        boolean translucentTrails = tag.getBooleanOr("translucentTrails", fallbackConfig.translucentTrails());
-        boolean wireframeTrails = tag.getBooleanOr("wireframeTrails", fallbackConfig.wireframeTrails());
-        boolean alwaysShowTrailDuringTwirl = tag.getBooleanOr("alwaysShowTrailDuringTwirl", fallbackConfig.alwaysShowTrailDuringTwirl());
-        String prideTrailRight = tag.getStringOr("prideTrailRight", fallbackConfig.prideTrailRight());
-        double twirlTime = tag.getDoubleOr("twirlTime", fallbackConfig.twirlTime());
-        boolean increaseWidthOverTime = tag.getBooleanOr("increaseWidthOverTime", fallbackConfig.increaseWidthOverTime());
-        double startingWidthMultiplier = tag.getDoubleOr("startingWidthMultiplier", fallbackConfig.startingWidthMultiplier());
-        double endingWidthMultiplier = tag.getDoubleOr("endingWidthMultiplier", fallbackConfig.endingWidthMultiplier());
-        double distanceTillTrailStart = tag.getDoubleOr("distanceTillTrailStart", fallbackConfig.distanceTillTrailStart());
+        boolean enableTrail = CompoundTagOrDefaults.getBooleanOr(tag, "enableTrail", fallbackConfig.enableTrail());
+        boolean enableRandomWidth = CompoundTagOrDefaults.getBooleanOr(tag, "enableRandomWidth", fallbackConfig.enableRandomWidth());
+        boolean speedDependentTrail = CompoundTagOrDefaults.getBooleanOr(tag, "speedDependentTrail", fallbackConfig.speedDependentTrail());
+        double trailMinSpeed = CompoundTagOrDefaults.getDoubleOr(tag, "trailMinSpeed", fallbackConfig.trailMinSpeed());
+        boolean trailMovesWithElytraAngle = CompoundTagOrDefaults.getBooleanOr(tag, "trailMovesWithElytraAngle", fallbackConfig.trailMovesWithElytraAngle());
+        double maxWidth = CompoundTagOrDefaults.getDoubleOr(tag, "maxWidth", fallbackConfig.maxWidth());
+        double trailLifetime = CompoundTagOrDefaults.getDoubleOr(tag, "trailLifetime", fallbackConfig.trailLifetime());
+        double startRampDistance = CompoundTagOrDefaults.getDoubleOr(tag, "startRampDistance", fallbackConfig.startRampDistance());
+        double endRampDistance = CompoundTagOrDefaults.getDoubleOr(tag, "endRampDistance", fallbackConfig.endRampDistance());
+        int color = CompoundTagOrDefaults.getIntOr(tag, "color", fallbackConfig.color());
+        double randomWidthVariation = CompoundTagOrDefaults.getDoubleOr(tag, "randomWidthVariation", fallbackConfig.randomWidthVariation());
+        String prideTrail = CompoundTagOrDefaults.getStringOr(tag, "prideTrail", fallbackConfig.prideTrail());
+        boolean fadeStart = CompoundTagOrDefaults.getBooleanOr(tag, "fadeStart", fallbackConfig.fadeStart());
+        double fadeStartDistance = CompoundTagOrDefaults.getDoubleOr(tag, "fadeStartDistance", fallbackConfig.fadeStartDistance());
+        boolean lifeTimeFade = CompoundTagOrDefaults.getBooleanOr(tag, "lifeTimeFade", fallbackConfig.lifeTimeFade());
+        boolean glowingTrails = CompoundTagOrDefaults.getBooleanOr(tag, "glowingTrails", fallbackConfig.glowingTrails());
+        boolean translucentTrails = CompoundTagOrDefaults.getBooleanOr(tag, "translucentTrails", fallbackConfig.translucentTrails());
+        boolean wireframeTrails = CompoundTagOrDefaults.getBooleanOr(tag, "wireframeTrails", fallbackConfig.wireframeTrails());
+        boolean alwaysShowTrailDuringTwirl = CompoundTagOrDefaults.getBooleanOr(tag, "alwaysShowTrailDuringTwirl", fallbackConfig.alwaysShowTrailDuringTwirl());
+        String prideTrailRight = CompoundTagOrDefaults.getStringOr(tag, "prideTrailRight", fallbackConfig.prideTrailRight());
+        double twirlTime = CompoundTagOrDefaults.getDoubleOr(tag, "twirlTime", fallbackConfig.twirlTime());
+        boolean increaseWidthOverTime = CompoundTagOrDefaults.getBooleanOr(tag, "increaseWidthOverTime", fallbackConfig.increaseWidthOverTime());
+        double startingWidthMultiplier = CompoundTagOrDefaults.getDoubleOr(tag, "startingWidthMultiplier", fallbackConfig.startingWidthMultiplier());
+        double endingWidthMultiplier = CompoundTagOrDefaults.getDoubleOr(tag, "endingWidthMultiplier", fallbackConfig.endingWidthMultiplier());
+        double distanceTillTrailStart = CompoundTagOrDefaults.getDoubleOr(tag, "distanceTillTrailStart", fallbackConfig.distanceTillTrailStart());
         EasingUtil.EaseType easeType = readEnum(tag, "easeType", EasingUtil.EaseType.class, fallbackConfig.easeType());
-        boolean endDistanceFade = tag.getBooleanOr("endDistanceFade", fallbackConfig.endDistanceFade());
-        double endDistanceFadeAmount = tag.getDoubleOr("endDistanceFadeAmount", fallbackConfig.endDistanceFadeAmount());
-        String playerName = tag.getStringOr("playerName", fallbackConfig.playerName());
-        boolean speedBasedAlpha = tag.getBooleanOr("speedBasedAlpha", fallbackConfig.speedBasedAlpha());
-        double minAlphaSpeed = tag.getDoubleOr("minAlphaSpeed", fallbackConfig.minAlphaSpeed());
-        double maxAlphaSpeed = tag.getDoubleOr("maxAlphaSpeed", fallbackConfig.maxAlphaSpeed());
-        boolean speedBasedWidth = tag.getBooleanOr("speedBasedWidth", fallbackConfig.speedBasedWidth());
-        double minWidthSpeed = tag.getDoubleOr("minWidthSpeed", fallbackConfig.minWidthSpeed());
-        double maxWidthSpeed = tag.getDoubleOr("maxWidthSpeed", fallbackConfig.maxWidthSpeed());
-        boolean trailMovesWithAngleOfAttack = tag.getBooleanOr("trailMovesWithAngleOfAttack", fallbackConfig.trailMovesWithAngleOfAttack());
-        boolean useColorBoth = tag.getBooleanOr("useColorBoth", fallbackConfig.useColorBoth());
-        int colorRight = tag.getIntOr("colorRight", fallbackConfig.colorRight());
-        double wingtipVerticalPosition = tag.getDoubleOr("wingtipVerticalPosition", fallbackConfig.wingtipVerticalPosition());
-        double wingtipHorizontalPosition = tag.getDoubleOr("wingtipHorizontalPosition", fallbackConfig.wingtipHorizontalPosition());
-        double wingtipDepthPosition = tag.getDoubleOr("wingtipDepthPosition", fallbackConfig.wingtipDepthPosition());
-        double distanceTillTrailEnd = tag.getDoubleOr("distanceTillTrailEnd", fallbackConfig.distanceTillTrailEnd());
-        boolean aoaBasedAlpha = tag.getBooleanOr("aoaBasedAlpha", fallbackConfig.aoaBasedAlpha());
-        double minAlphaAOA = tag.getDoubleOr("minAlphaAOA",fallbackConfig.minAlphaAOA());
-        double maxAlphaAOA = tag.getDoubleOr("maxAlphaAOA",fallbackConfig.maxAlphaAOA());
-        boolean aoaBasedWidth = tag.getBooleanOr("aoaBasedWidth", fallbackConfig.aoaBasedWidth());
-        double minWidthAOA = tag.getDoubleOr("minWidthAOA",fallbackConfig.minWidthAOA());
-        double maxWidthAOA = tag.getDoubleOr("maxAlphaAOA",fallbackConfig.maxWidthAOA());
+        boolean endDistanceFade = CompoundTagOrDefaults.getBooleanOr(tag, "endDistanceFade", fallbackConfig.endDistanceFade());
+        double endDistanceFadeAmount = CompoundTagOrDefaults.getDoubleOr(tag, "endDistanceFadeAmount", fallbackConfig.endDistanceFadeAmount());
+        String playerName = CompoundTagOrDefaults.getStringOr(tag, "playerName", fallbackConfig.playerName());
+        boolean speedBasedAlpha = CompoundTagOrDefaults.getBooleanOr(tag, "speedBasedAlpha", fallbackConfig.speedBasedAlpha());
+        double minAlphaSpeed = CompoundTagOrDefaults.getDoubleOr(tag, "minAlphaSpeed", fallbackConfig.minAlphaSpeed());
+        double maxAlphaSpeed = CompoundTagOrDefaults.getDoubleOr(tag, "maxAlphaSpeed", fallbackConfig.maxAlphaSpeed());
+        boolean speedBasedWidth = CompoundTagOrDefaults.getBooleanOr(tag, "speedBasedWidth", fallbackConfig.speedBasedWidth());
+        double minWidthSpeed = CompoundTagOrDefaults.getDoubleOr(tag, "minWidthSpeed", fallbackConfig.minWidthSpeed());
+        double maxWidthSpeed = CompoundTagOrDefaults.getDoubleOr(tag, "maxWidthSpeed", fallbackConfig.maxWidthSpeed());
+        boolean trailMovesWithAngleOfAttack = CompoundTagOrDefaults.getBooleanOr(tag, "trailMovesWithAngleOfAttack", fallbackConfig.trailMovesWithAngleOfAttack());
+        boolean useColorBoth = CompoundTagOrDefaults.getBooleanOr(tag, "useColorBoth", fallbackConfig.useColorBoth());
+        int colorRight = CompoundTagOrDefaults.getIntOr(tag, "colorRight", fallbackConfig.colorRight());
+        double wingtipVerticalPosition = CompoundTagOrDefaults.getDoubleOr(tag, "wingtipVerticalPosition", fallbackConfig.wingtipVerticalPosition());
+        double wingtipHorizontalPosition = CompoundTagOrDefaults.getDoubleOr(tag, "wingtipHorizontalPosition", fallbackConfig.wingtipHorizontalPosition());
+        double wingtipDepthPosition = CompoundTagOrDefaults.getDoubleOr(tag, "wingtipDepthPosition", fallbackConfig.wingtipDepthPosition());
+        double distanceTillTrailEnd = CompoundTagOrDefaults.getDoubleOr(tag, "distanceTillTrailEnd", fallbackConfig.distanceTillTrailEnd());
         return new PlayerConfig(
                 enableTrail,
                 enableRandomWidth,
@@ -253,20 +239,14 @@ public final class ClientPlayerConfigStore {
                 wingtipVerticalPosition,
                 wingtipHorizontalPosition,
                 wingtipDepthPosition,
-                distanceTillTrailEnd,
-                aoaBasedAlpha,
-                minAlphaAOA,
-                maxAlphaAOA,
-                aoaBasedWidth,
-                minWidthAOA,
-                maxWidthAOA
+                distanceTillTrailEnd
         );
     }
 
     public static <E extends Enum<E>> E readEnum(CompoundTag tag, String key, Class<E> enumClass, E fallback) {
         if (!tag.contains(key)) return fallback;
 
-        String s = tag.getStringOr(key, "Sine");
+        String s = CompoundTagOrDefaults.getStringOr(tag, key, "Sine");
         try {
             return Enum.valueOf(enumClass, s);
         } catch (IllegalArgumentException ignored) {
@@ -276,12 +256,12 @@ public final class ClientPlayerConfigStore {
 
     public static PlayerConfig getOrDefault(int entityId) {
         if (Minecraft.getInstance().player != null && Minecraft.getInstance().player.getId() == entityId) {
-//            if (FLASHBACK_LOADED && FlashbackCompat.isInReplay()) //return the config that was set at the time if it exists
-//            {
-//                if (CLIENT_PLAYER_CONFIGS.containsKey(entityId)) {
-//                    return CLIENT_PLAYER_CONFIGS.get(entityId);
-//                }
-//            }
+            if (FLASHBACK_LOADED) //return the config that was set at the time if it exists
+            {
+                if (CLIENT_PLAYER_CONFIGS.containsKey(entityId)) {
+                    return CLIENT_PLAYER_CONFIGS.get(entityId);
+                }
+            }
             return getLocalPlayerConfig();
         } else if (CLIENT_PLAYER_CONFIGS.containsKey(entityId)) {
             return CLIENT_PLAYER_CONFIGS.get(entityId);

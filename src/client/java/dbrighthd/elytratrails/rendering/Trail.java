@@ -1,23 +1,24 @@
 package dbrighthd.elytratrails.rendering;
 
 import dbrighthd.elytratrails.config.pack.ResolvedTrailSettings;
+//import dbrighthd.elytratrails.config.pack.TrailPackConfigManager;
 import dbrighthd.elytratrails.config.pack.TrailPackConfigManager;
 import dbrighthd.elytratrails.network.ClientPlayerConfigStore;
 import dbrighthd.elytratrails.network.PlayerConfig;
-import dbrighthd.elytratrails.util.TimeUtil;
-import net.minecraft.client.renderer.rendertype.RenderType;
-import net.minecraft.resources.Identifier;
+import dbrighthd.elytratrails.util.ElytraTimeUtil;
+import net.minecraft.client.renderer.RenderType;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.phys.Vec3;
 
 import java.util.ArrayList;
 import java.util.List;
 
-public record Trail(Identifier texture, List<Point> points, ResolvedTrailSettings config, boolean isLeftWing, int entityId, int emitterIndex, Long trailId, RenderType renderType) {
+public record Trail(ResourceLocation texture, List<Point> points, ResolvedTrailSettings config, boolean isLeftWing, int entityId, int emitterIndex, Long trailId, RenderType renderType) {
 
     public static Trail fromPlayerConfig(int playerId, Emitter emitter, int index, long trailId) {
         PlayerConfig config = ClientPlayerConfigStore.getOrDefault(playerId);
         ResolvedTrailSettings resolvedTrailSettings = TrailPackConfigManager.resolve(emitter.modelName(), emitter.boneName(), config, emitter.isLeftWing());
-        Identifier texture = TrailTextureRegistry.resolveTextureOrNull(resolvedTrailSettings.prideTrail());
+        ResourceLocation texture = TrailTextureRegistry.resolveTextureOrNull(resolvedTrailSettings.prideTrail());
         if (texture == null) texture = TrailRenderer.DEFAULT_TEXTURE;
         return new Trail(texture, new ArrayList<>(), resolvedTrailSettings, emitter.isLeftWing(), playerId, index, trailId, getRenderType(texture,resolvedTrailSettings));
     }
@@ -25,14 +26,14 @@ public record Trail(Identifier texture, List<Point> points, ResolvedTrailSetting
      * @param pos   position of trail point
      * @param epoch time of creation, in milliseconds
      */
-    public record Point(Vec3 pos, long epoch, PlayerSpeedData speedData, boolean visible) {
-        public Point(Vec3 pos, PlayerSpeedData speed, boolean visible) {
-            this(pos, TimeUtil.currentMillis(), speed, visible);
+    public record Point(Vec3 pos, long epoch, double speedAtEmission, boolean visible) {
+        public Point(Vec3 pos, double speed, boolean visible) {
+            this(pos, ElytraTimeUtil.currentMillis(), speed, visible);
         }
     }
 
-    private static RenderType getRenderType(Identifier texture, ResolvedTrailSettings trailSettings) {
-        if (trailSettings.glowingTrails()) {
+    private static RenderType getRenderType(ResourceLocation texture, ResolvedTrailSettings trailSettings) {
+                if (trailSettings.glowingTrails()) {
             if (trailSettings.translucentTrails()) {
                 if (trailSettings.wireframeTrails()) {
                     return TrailPipelines.entityTranslucentEmissiveWireFrame(texture);
@@ -46,10 +47,7 @@ public record Trail(Identifier texture, List<Point> points, ResolvedTrailSetting
 
                 }
             }
-        } else {
-            if (trailSettings.wireframeTrails()) {
-                return TrailPipelines.entityTranslucentCullWireFrame(texture);
-            } else {
+        } else { // no wireframe trails in this version
                 if (trailSettings.translucentTrails()) {
                     return TrailPipelines.entityTranslucentCull(texture);
                 } else {
@@ -57,6 +55,5 @@ public record Trail(Identifier texture, List<Point> points, ResolvedTrailSetting
 
                 }
             }
-        }
     }
 }

@@ -1,8 +1,10 @@
 package dbrighthd.elytratrails.network;
 
+import net.fabricmc.fabric.api.networking.v1.PacketByteBufs;
 import net.fabricmc.fabric.api.networking.v1.ServerPlayConnectionEvents;
 import net.fabricmc.fabric.api.networking.v1.ServerPlayNetworking;
 import net.minecraft.nbt.CompoundTag;
+import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.server.level.ServerPlayer;
 
 import java.util.concurrent.ConcurrentHashMap;
@@ -15,12 +17,20 @@ public class ServerPlayerConfigStore {
     public static void registerDisconnectCleanup() {
         ServerPlayConnectionEvents.DISCONNECT.register((handler, server) -> {
             ServerPlayer player = handler.player;
-            playersReceivedWarnings.remove(player.getUUID());
-            RemoveFromStoreS2CPayload serverPayload = new RemoveFromStoreS2CPayload(player.getId());
-            for (ServerPlayer serverPlayer : server.getPlayerList().getPlayers()) {
-                ServerPlayNetworking.send(serverPlayer, serverPayload);
-            }
+
+            RegisterPackets.playersReceivedWarnings.remove(player.getUUID());
             SERVER_PLAYER_CONFIGS.remove(player.getId());
+
+            for (ServerPlayer serverPlayer : server.getPlayerList().getPlayers()) {
+                FriendlyByteBuf buf = PacketByteBufs.create();
+                buf.writeInt(player.getId());
+
+                ServerPlayNetworking.send(
+                        serverPlayer,
+                        RegisterPackets.REMOVE_FROM_STORE_S2C,
+                        buf
+                );
+            }
         });
     }
 }

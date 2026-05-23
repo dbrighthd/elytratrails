@@ -1,6 +1,6 @@
 package dbrighthd.elytratrails.rendering;
 
-import net.minecraft.resources.Identifier;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.packs.resources.ResourceManager;
 
 import java.util.Collections;
@@ -17,10 +17,10 @@ public final class TrailTextureRegistry {
 
 
     public static void reloadNow(ResourceManager manager) {
-        Map<Identifier, ?> found = manager.listResources("textures/trails", id -> id.getPath().endsWith(".png"));
+        Map<ResourceLocation, ?> found = manager.listResources("textures/trails", id -> id.getPath().endsWith(".png"));
 
         Set<String> out = new HashSet<>();
-        for (Identifier id : found.keySet()) {
+        for (ResourceLocation id : found.keySet()) {
             if (!"elytratrails".equals(id.getNamespace())) continue;
 
             String path = id.getPath(); // textures/trails/<name>.png
@@ -35,13 +35,13 @@ public final class TrailTextureRegistry {
     }
 
 
-    public static Identifier resolveTextureOrNull(String trailTextureName) {
+    public static ResourceLocation resolveTextureOrNull(String trailTextureName) {
         String name = normalizeFromUserString(trailTextureName);
         if (name == null) return null;
 
         if (!AVAILABLE.contains(name)) return null;
 
-        return Identifier.parse("elytratrails:textures/trails/" + name + ".png");
+        return ResourceLocation.tryParse("elytratrails:textures/trails/" + name + ".png");
     }
 
     private static String normalizeFromUserString(String in) {
@@ -50,7 +50,7 @@ public final class TrailTextureRegistry {
         if (s.isEmpty()) return null;
 
         if (s.contains(":")) {
-            Identifier id = Identifier.tryParse(s);
+            ResourceLocation id = ResourceLocation.tryParse(s);
             if (id == null) return null;
             s = id.getPath();
         }

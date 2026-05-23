@@ -8,7 +8,7 @@ import dbrighthd.elytratrails.config.ClientConfig;
 import dbrighthd.elytratrails.config.ModConfig;
 import dbrighthd.elytratrails.network.PlayerConfig;
 import net.fabricmc.loader.api.FabricLoader;
-import net.minecraft.resources.Identifier;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.packs.resources.Resource;
 import net.minecraft.server.packs.resources.ResourceManager;
 import net.minecraft.world.entity.Entity;
@@ -96,7 +96,7 @@ public final class TrailPackConfigManager {
         entitiesWithTrailOverrides.clear();
         if (resourceManager == null) return;
         try {
-            Map<Identifier, Resource> discoveredResources = resourceManager.listResources(CONFIG_FOLDER, id -> {
+            Map<ResourceLocation, Resource> discoveredResources = resourceManager.listResources(CONFIG_FOLDER, id -> {
                 if (!NAMESPACE.equals(id.getNamespace())) return false;
 
                 String normalizedPath = id.getPath().replace('\\', '/');
@@ -108,7 +108,7 @@ public final class TrailPackConfigManager {
             });
 
             for (var entry : discoveredResources.entrySet()) {
-                Identifier resourceId = entry.getKey();
+                ResourceLocation resourceId = entry.getKey();
                 Resource resource = entry.getValue();
 
                 String modelKey = modelKeyFromTrailConfigsPath(resourceId.getPath());
@@ -129,7 +129,7 @@ public final class TrailPackConfigManager {
         if (resourceManager == null) return;
 
         try {
-            Map<Identifier, Resource> discoveredResources = resourceManager.listResources(PRESETS_FOLDER, id -> {
+            Map<ResourceLocation, Resource> discoveredResources = resourceManager.listResources(PRESETS_FOLDER, id -> {
                 if (!NAMESPACE.equals(id.getNamespace())) return false;
 
                 String normalizedPath = id.getPath().replace('\\', '/');
@@ -141,7 +141,7 @@ public final class TrailPackConfigManager {
             });
 
             for (var entry : discoveredResources.entrySet()) {
-                Identifier resourceId = entry.getKey();
+                ResourceLocation resourceId = entry.getKey();
                 Resource resource = entry.getValue();
 
                 String presetKey = presetKeyFromPresetPath(resourceId.getPath());
@@ -153,7 +153,7 @@ public final class TrailPackConfigManager {
         } catch (Throwable ignored) {
         }
         try {
-            Map<Identifier, Resource> discoveredResources = resourceManager.listResources(HIDDEN_PRESETS_FOLDER, id -> {
+            Map<ResourceLocation, Resource> discoveredResources = resourceManager.listResources(HIDDEN_PRESETS_FOLDER, id -> {
                 if (!NAMESPACE.equals(id.getNamespace())) return false;
 
                 String normalizedPath = id.getPath().replace('\\', '/');
@@ -165,7 +165,7 @@ public final class TrailPackConfigManager {
             });
 
             for (var entry : discoveredResources.entrySet()) {
-                Identifier resourceId = entry.getKey();
+                ResourceLocation resourceId = entry.getKey();
                 Resource resource = entry.getValue();
 
                 String presetKey = hiddenPresetKeyFromPresetPath(resourceId.getPath());
@@ -284,8 +284,7 @@ public final class TrailPackConfigManager {
                 HIDDEN_CONFIG_PRESETS.put(presetKey, overrides);
 
             }
-        } catch (Throwable throwable) {
-            LOGGER.warn("Loading presets failed: {}", throwable.getMessage());
+        } catch (Throwable ignored) {
         }
     }
 
@@ -324,9 +323,7 @@ public final class TrailPackConfigManager {
                 gson.toJson(root, writer);
             }
 
-        } catch (IOException exception) {
-
-            LOGGER.warn("Exporting presets failed: {}", exception.getMessage());
+        } catch (IOException ignored) {
         }
     }
 
@@ -348,8 +345,7 @@ public final class TrailPackConfigManager {
 
         try {
             Files.createDirectories(presetDir); // okay if already exists
-        } catch (IOException exception) {
-            LOGGER.warn("Creating presets directory failed: {}", exception.getMessage());
+        } catch (IOException ignored) {
             return;
         }
 
@@ -357,9 +353,7 @@ public final class TrailPackConfigManager {
             paths.filter(Files::isRegularFile)
                     .filter(path -> path.getFileName().toString().toLowerCase(Locale.ROOT).endsWith(".json"))
                     .forEach(TrailPackConfigManager::loadAndCacheDiskPresetFile);
-        } catch (Throwable exception) {
-            LOGGER.warn("Loading presets failed: {}", exception.getMessage());
-
+        } catch (Throwable ignored) {
         }
     }
 
@@ -376,8 +370,7 @@ public final class TrailPackConfigManager {
             if (fallbackName.isEmpty()) return;
 
             CONFIG_PRESETS.put(fallbackName, overrides);
-        } catch (Throwable exception) {
-            LOGGER.warn("Failed to load presets from disk: {}", exception.getMessage());
+        } catch (Throwable ignored) {
         }
     }
 
@@ -484,8 +477,7 @@ public final class TrailPackConfigManager {
             if (parsed == null) return;
             MODEL_TRAIL_CONFIGS.put(modelKey, parsed);
             maxLifetimeOverrideSeconds = Math.max(maxLifetimeOverrideSeconds, parsed.maxLifetimeSeconds());
-        } catch (Throwable throwable) {
-            LOGGER.warn("Failed to load model config for {}, : {}", modelKey, throwable.getMessage());
+        } catch (Throwable ignored) {
         }
     }
 
@@ -696,13 +688,7 @@ public final class TrailPackConfigManager {
                 playerConfig.speedBasedWidth(),
                 playerConfig.minWidthSpeed(),
                 playerConfig.maxWidthSpeed(),
-                playerConfig.distanceTillTrailEnd(),
-                playerConfig.aoaBasedAlpha(),
-                playerConfig.minAlphaAOA(),
-                playerConfig.maxAlphaAOA(),
-                playerConfig.aoaBasedWidth(),
-                playerConfig.minWidthAOA(),
-                playerConfig.maxWidthAOA()
+                playerConfig.distanceTillTrailEnd()
         );
     }
 
@@ -738,13 +724,7 @@ public final class TrailPackConfigManager {
                 playerConfig.speedBasedWidth(),
                 playerConfig.minWidthSpeed(),
                 playerConfig.maxWidthSpeed(),
-                playerConfig.distanceTillTrailEnd(),
-                playerConfig.aoaBasedAlpha(),
-                playerConfig.minAlphaAOA(),
-                playerConfig.maxAlphaAOA(),
-                playerConfig.aoaBasedWidth(),
-                playerConfig.minWidthAOA(),
-                playerConfig.maxWidthAOA()
+                playerConfig.distanceTillTrailEnd()
         );
     }
 

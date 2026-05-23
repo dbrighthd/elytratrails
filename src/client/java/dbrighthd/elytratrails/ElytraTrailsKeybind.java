@@ -7,18 +7,15 @@ import dbrighthd.elytratrails.config.ModConfig;
 import dbrighthd.elytratrails.controller.ContinuousTwirlController;
 import dbrighthd.elytratrails.controller.TwirlController;
 import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents;
-import net.fabricmc.fabric.api.client.keymapping.v1.KeyMappingHelper;
+import net.fabricmc.fabric.api.client.keybinding.v1.KeyBindingHelper;
 import net.minecraft.client.KeyMapping;
-import net.minecraft.resources.Identifier;
 
 import static dbrighthd.elytratrails.ElytraTrailsClient.getConfig;
 import static dbrighthd.elytratrails.ElytraTrailsClient.setConfig;
 import static dbrighthd.elytratrails.compat.ModStatuses.CLOTH_LOADED;
 
 public final class ElytraTrailsKeybind {
-    public static final KeyMapping.Category CATEGORY =
-            KeyMapping.Category.register(Identifier.fromNamespaceAndPath("elytratrails", "skibidi"));
-
+    public static final String CATEGORY = "key.category.elytratrails.skibidi";
     public static KeyMapping DO_A_LIL_TWIRL_RANDOM;
     public static KeyMapping DO_A_LIL_TWIRL_L;
     public static KeyMapping DO_A_LIL_TWIRL_R;
@@ -49,48 +46,48 @@ public final class ElytraTrailsKeybind {
     private static int queuedContinuousMode = 1;
 
     public static void init() {
-        DO_A_LIL_TWIRL_RANDOM = KeyMappingHelper.registerKeyMapping(new KeyMapping(
+        DO_A_LIL_TWIRL_RANDOM = KeyBindingHelper.registerKeyBinding(new KeyMapping(
                 "key.elytratrails.twirl_random",
                 InputConstants.Type.KEYSYM,
                 InputConstants.UNKNOWN.getValue(),
                 CATEGORY
         ));
-        OPEN_SETTINGS = KeyMappingHelper.registerKeyMapping(new KeyMapping(
+        OPEN_SETTINGS = KeyBindingHelper.registerKeyBinding(new KeyMapping(
                 "key.elytratrails.open_settings",
                 InputConstants.Type.KEYSYM,
                 InputConstants.UNKNOWN.getValue(),
                 CATEGORY
         ));
 
-        DO_A_LIL_TWIRL_L = KeyMappingHelper.registerKeyMapping(new KeyMapping(
+        DO_A_LIL_TWIRL_L = KeyBindingHelper.registerKeyBinding(new KeyMapping(
                 "key.elytratrails.twirl_l",
                 InputConstants.Type.KEYSYM,
                 InputConstants.UNKNOWN.getValue(),
                 CATEGORY
         ));
 
-        DO_A_LIL_TWIRL_R = KeyMappingHelper.registerKeyMapping(new KeyMapping(
+        DO_A_LIL_TWIRL_R = KeyBindingHelper.registerKeyBinding(new KeyMapping(
                 "key.elytratrails.twirl_r",
                 InputConstants.Type.KEYSYM,
                 InputConstants.UNKNOWN.getValue(),
                 CATEGORY
         ));
 
-        DO_A_LIL_CONTINUOUS_TWIRL_L = KeyMappingHelper.registerKeyMapping(new KeyMapping(
+        DO_A_LIL_CONTINUOUS_TWIRL_L = KeyBindingHelper.registerKeyBinding(new KeyMapping(
                 "key.elytratrails.continuous_twirl_l",
                 InputConstants.Type.KEYSYM,
                 InputConstants.UNKNOWN.getValue(),
                 CATEGORY
         ));
 
-        DO_A_LIL_CONTINUOUS_TWIRL_R = KeyMappingHelper.registerKeyMapping(new KeyMapping(
+        DO_A_LIL_CONTINUOUS_TWIRL_R = KeyBindingHelper.registerKeyBinding(new KeyMapping(
                 "key.elytratrails.continuous_twirl_r",
                 InputConstants.Type.KEYSYM,
                 InputConstants.UNKNOWN.getValue(),
                 CATEGORY
         ));
 
-        TOGGLE_TRAILS = KeyMappingHelper.registerKeyMapping(new KeyMapping(
+        TOGGLE_TRAILS = KeyBindingHelper.registerKeyBinding(new KeyMapping(
                 "key.elytratrails.toggle",
                 InputConstants.Type.KEYSYM,
                 InputConstants.UNKNOWN.getValue(),
@@ -98,6 +95,7 @@ public final class ElytraTrailsKeybind {
         ));
 
         ClientTickEvents.END_CLIENT_TICK.register(client -> {
+
             if (client.player == null || client.isPaused()) return;
 
             ModConfig modConfig = getConfig();
@@ -108,9 +106,21 @@ public final class ElytraTrailsKeybind {
             boolean twirlRPhysicalDown = DO_A_LIL_TWIRL_R.isDown();
             boolean twirlRandomPhysicalDown = DO_A_LIL_TWIRL_RANDOM.isDown();
 
-            boolean continuousLPhysicalDown = DO_A_LIL_CONTINUOUS_TWIRL_R.isDown();
-            boolean continuousRPhysicalDown = DO_A_LIL_CONTINUOUS_TWIRL_L.isDown();
 
+            boolean continuousLPhysicalDown;
+            boolean continuousRPhysicalDown;
+
+            if(modConfig.useWalkingKeysForTwirl)
+            {
+                continuousLPhysicalDown = client.options.keyRight.isDown();
+                continuousRPhysicalDown = client.options.keyLeft.isDown();
+            }
+            else
+            {
+                continuousLPhysicalDown = DO_A_LIL_CONTINUOUS_TWIRL_R.isDown();
+                continuousRPhysicalDown = DO_A_LIL_CONTINUOUS_TWIRL_L.isDown();
+
+            }
             boolean twirlLPressed = twirlLPhysicalDown && !prevTwirlLDown;
             boolean twirlRPressed = twirlRPhysicalDown && !prevTwirlRDown;
             boolean twirlRandomPressed = twirlRandomPhysicalDown && !prevTwirlRandomDown;
@@ -122,7 +132,6 @@ public final class ElytraTrailsKeybind {
             prevTwirlRandomDown = twirlRandomPhysicalDown;
             prevContinuousLDown = continuousLPhysicalDown;
             prevContinuousRDown = continuousRPhysicalDown;
-
             boolean normalActive = TwirlController.isActive();
             boolean contActive = ContinuousTwirlController.isActive();
 
@@ -267,7 +276,6 @@ public final class ElytraTrailsKeybind {
         queuedContinuousRestart = true;
         queuedContinuousMode = mode;
     }
-
     private static void handleNormalPress(int mode, boolean normalActive) {
         if (mode != 0 && TwirlController.canBufferBackReverse(mode)) {
             if (TwirlController.canStillReverseFromBufferedBackInput(mode)) {

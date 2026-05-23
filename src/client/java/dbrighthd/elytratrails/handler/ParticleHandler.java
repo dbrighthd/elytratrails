@@ -9,7 +9,7 @@ import net.minecraft.commands.arguments.ParticleArgument;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Holder;
 import net.minecraft.core.HolderLookup;
-import net.minecraft.core.particles.ColorParticleOption;
+//import net.minecraft.core.particles.ColorParticleOption;
 import net.minecraft.core.particles.ParticleOptions;
 import net.minecraft.core.particles.ParticleType;
 import net.minecraft.core.particles.ParticleTypes;
@@ -17,9 +17,10 @@ import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.data.registries.VanillaRegistries;
 import net.minecraft.nbt.NbtOps;
 import net.minecraft.nbt.Tag;
-import net.minecraft.resources.Identifier;
+//import net.minecraft.resources.Identifier;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.world.phys.Vec3;
+import org.intellij.lang.annotations.Identifier;
 
 import static dbrighthd.elytratrails.ElytraTrailsClient.getConfig;
 
@@ -65,28 +66,29 @@ public class ParticleHandler {
             }
         });
     }
-    public static String encodeParticle(ParticleOptions particleOptions)
-    {
 
-        // it's better if you don't look too closely at this and just know that it works
-        @SuppressWarnings("rawtypes")
-        ParticleType type = particleOptions.getType();
-        var codec = type.codec().codec();
-        Identifier id = BuiltInRegistries.PARTICLE_TYPE.getResourceKey(type).map(ResourceKey::identifier).orElse(Identifier.withDefaultNamespace("poof"));
-
-
-        //noinspection unchecked
-        return id.toString() + codec.encodeStart(NbtOps.INSTANCE, particleOptions != null ? particleOptions : ParticleTypes.POOF).result().map(o -> ((Tag)o).toString()).orElse("");
-    }
-
-    public static ParticleOptions decodeParticle(String newValue)
-    {
-        HolderLookup.Provider lookup = VanillaRegistries.createLookup();
-
-        try {
-            return ParticleArgument.readParticle(new StringReader(newValue), lookup);
-        } catch (CommandSyntaxException e) {
-            return null;
-        }
-    }
+//    public static String encodeParticle(ParticleOptions particleOptions)
+//    {
+//
+//        // it's better if you don't look too closely at this and just know that it works
+//        @SuppressWarnings("rawtypes")
+//        ParticleType type = particleOptions.getType();
+//        var codec = type.codec().codec();
+//        Identifier id = BuiltInRegistries.PARTICLE_TYPE.getResourceKey(type).map(ResourceKey::identifier).orElse(Identifier.withDefaultNamespace("poof"));
+//
+//
+//        //noinspection unchecked
+//        return id.toString() + codec.encodeStart(NbtOps.INSTANCE, particleOptions != null ? particleOptions : ParticleTypes.POOF).result().map(o -> ((Tag)o).toString()).orElse("");
+//    }
+//
+//    public static ParticleOptions decodeParticle(String newValue)
+//    {
+//        HolderLookup.Provider lookup = VanillaRegistries.createLookup();
+//
+//        try {
+//            return ParticleArgument.readParticle(new StringReader(newValue), lookup);
+//        } catch (CommandSyntaxException e) {
+//            return null;
+//        }
+//    }
 }

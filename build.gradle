@@ -1,5 +1,5 @@
 plugins {
-	id 'net.fabricmc.fabric-loom' version "${loom_version}"
+	id 'net.fabricmc.fabric-loom-remap' version "${loom_version}"
 	id 'maven-publish'
 }
 
@@ -13,7 +13,15 @@ base {
 repositories {
 	maven { url "https://maven.shedaniel.me/" }
 	maven { url "https://maven.terraformersmc.com/releases/" }
-
+	maven { url = uri("https://maven.terraformersmc.com/releases/") }
+	maven {
+		name = 'ParchmentMC'
+		url = 'https://maven.parchmentmc.org'
+	}
+	maven {
+		name = "Gegy Maven"
+		url = uri("https://maven.gegy.dev")
+	}
 	exclusiveContent {
 		forRepository {
 			maven {
@@ -30,7 +38,7 @@ repositories {
 loom {
 	splitEnvironmentSourceSets()
 
-	accessWidenerPath = file("src/main/resources/elytratrails.classtweaker")
+	accessWidenerPath = file("src/main/resources/elytratrails.accesswidener")
 
 	mods {
 		"elytratrails" {
@@ -38,24 +46,24 @@ loom {
 			sourceSet sourceSets.client
 		}
 	}
+
 }
 
 dependencies {
 	minecraft "com.mojang:minecraft:${project.minecraft_version}"
+	mappings loom.layered {
+		officialMojangMappings()
+		parchment("org.parchmentmc.data:parchment-${project.minecraft_version}:${project.parchment_version}@zip")
+	}
+	modImplementation "net.fabricmc:fabric-loader:${project.loader_version}"
 
-	implementation "net.fabricmc:fabric-loader:${project.loader_version}"
-	implementation "net.fabricmc.fabric-api:fabric-api:${project.fabric_api_version}"
+	modImplementation "net.fabricmc.fabric-api:fabric-api:${project.fabric_api_version}"
+	modImplementation("com.terraformersmc:modmenu:${project.modmenu_version}")
+	modCompileOnly "maven.modrinth:iris:${project.iris_version}"
 
-	implementation "com.terraformersmc:modmenu:${project.modmenu_version}"
-	 api("me.shedaniel.cloth:cloth-config-fabric:${project.cloth_version}") {
-	 	exclude(group: "net.fabricmc.fabric-api")
-	 }
-
-	compileOnly "maven.modrinth:iris:${project.iris_version}"
-	compileOnly "maven.modrinth:entity-model-features:${project.emf_version}"
-	compileOnly "maven.modrinth:custom-player-models:${project.cpm_version}"
-
-	compileOnly "maven.modrinth:entitytexturefeatures:${project.etf_version}"
+	modApi(modApi "me.shedaniel.cloth:cloth-config-fabric:${project.cloth_version}") {
+		exclude(group: "net.fabricmc.fabric-api")
+	}
 }
 
 processResources {
@@ -67,25 +75,28 @@ processResources {
 }
 
 tasks.withType(JavaCompile).configureEach {
-	it.options.release = 25
+	it.options.release = 17
 }
 
 java {
+	// Loom will automatically attach sourcesJar to a RemapSourcesJar task and to the "build" task
+	// if it is present.
+	// If you remove this line, sources will not be generated.
 	withSourcesJar()
 
-	toolchain {
-		languageVersion = JavaLanguageVersion.of(25)
-	}
+	sourceCompatibility = JavaVersion.VERSION_17
+	targetCompatibility = JavaVersion.VERSION_17
 }
 
 jar {
 	inputs.property "archivesName", project.base.archivesName
 
 	from("LICENSE") {
-		rename { "${it}_${inputs.properties.archivesName}" }
+		rename { "${it}_${inputs.properties.archivesName}"}
 	}
 }
 
+// configure the maven publication
 publishing {
 	publications {
 		create("mavenJava", MavenPublication) {
@@ -94,6 +105,19 @@ publishing {
 		}
 	}
 
+	// See https://docs.gradle.org/current/userguide/publishing_maven.html for information on how to set up publishing.
 	repositories {
+		// Add repositories to publish to here.
+		// Notice: This block does NOT have the same function as the block in the top level.
+		// The repositories here will be used for publishing your artifact, not for
+		// retrieving dependencies.
+	}
+}
+configurations.configureEach {
+	resolutionStrategy.eachDependency { details ->
+		if (details.requested.group == "org.lwjgl") {
+			details.useVersion "3.3.1"
+			details.because "Minecraft 1.20.1 / Sodium expects LWJGL 3.3.1"
+		}
 	}
 }

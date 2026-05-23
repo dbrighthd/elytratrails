@@ -4,6 +4,8 @@ import dbrighthd.elytratrails.network.ClientPlayerConfigStore;
 
 import static dbrighthd.elytratrails.config.pack.TrailPackConfigManager.resolveTrailFromPlayerConfig;
 
+//import static dbrighthd.elytratrails.config.pack.TrailPackConfigManager.resolveTrailFromPlayerConfig;
+
 /**
  * ResolvedTrailSettings objects are the "final" state of a trail's settings, where nothing is ambiguous, and it's ready to render
  */
@@ -38,13 +40,7 @@ public record ResolvedTrailSettings(
         boolean speedBasedWidth,
         double minWidthSpeed,
         double maxWidthSpeed,
-        double distanceTillTrailEnd,
-        boolean aoaBasedAlpha,
-        double minAlphaAOA,
-        double maxAlphaAOA,
-        boolean aoaBasedWidth,
-        double minWidthAOA,
-        double maxWidthAOA
+        double distanceTillTrailEnd
 ) {
     public static ResolvedTrailSettings defaults(boolean isLeftWing) {
         return resolveTrailFromPlayerConfig(ClientPlayerConfigStore.getLocalPlayerConfig(), isLeftWing);

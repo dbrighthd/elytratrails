@@ -1,7 +1,8 @@
 package dbrighthd.elytratrails;
-
+//
+//import dbrighthd.elytratrails.network.RegisterPackets;
+//import dbrighthd.elytratrails.network.ServerPlayerConfigStore;
 import dbrighthd.elytratrails.network.RegisterPackets;
-import dbrighthd.elytratrails.network.ServerPlayerConfigStore;
 import net.fabricmc.api.ModInitializer;
 
 import org.slf4j.Logger;
@@ -19,6 +20,6 @@ public class ElytraTrails implements ModInitializer {
 	public void onInitialize() {
 		RegisterPackets.initCommon();
 		RegisterPackets.initServer();
-		ServerPlayerConfigStore.registerDisconnectCleanup();
+//		ServerPlayerConfigStore.registerDisconnectCleanup();
 	}
 }

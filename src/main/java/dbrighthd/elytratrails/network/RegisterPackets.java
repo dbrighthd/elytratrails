@@ -1,8 +1,13 @@
 package dbrighthd.elytratrails.network;
 
-import net.fabricmc.fabric.api.networking.v1.PayloadTypeRegistry;
+import dbrighthd.elytratrails.ElytraTrails;
+import net.fabricmc.fabric.api.networking.v1.PacketByteBufs;
+import net.fabricmc.fabric.api.networking.v1.ServerPlayConnectionEvents;
 import net.fabricmc.fabric.api.networking.v1.ServerPlayNetworking;
 import net.minecraft.nbt.CompoundTag;
+import net.minecraft.network.FriendlyByteBuf;
+import net.minecraft.network.chat.Component;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.Entity;
 
@@ -11,59 +16,127 @@ import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
 
-
+//I think I miss 1.21.11 networking code
 public class RegisterPackets {
+    public static final ResourceLocation TWIRL_STATE_C2S =
+            new ResourceLocation(ElytraTrails.MOD_ID, "twirl_state_c2s");
+
+    public static final ResourceLocation TWIRL_STATE_S2C =
+            new ResourceLocation(ElytraTrails.MOD_ID, "twirl_state_s2c");
+
+    public static final ResourceLocation PLAYER_CONFIG_C2S =
+            new ResourceLocation(ElytraTrails.MOD_ID, "player_config_c2s");
+
+    public static final ResourceLocation PLAYER_CONFIG_S2C =
+            new ResourceLocation(ElytraTrails.MOD_ID, "player_config_s2c");
+
+    public static final ResourceLocation GET_ALL_REQUEST_C2S =
+            new ResourceLocation(ElytraTrails.MOD_ID, "get_all_request_c2s");
+
+    public static final ResourceLocation REMOVE_FROM_STORE_C2S =
+            new ResourceLocation(ElytraTrails.MOD_ID, "remove_from_store_c2s");
+
+    public static final ResourceLocation REMOVE_FROM_STORE_S2C =
+            new ResourceLocation(ElytraTrails.MOD_ID, "remove_from_store_s2c");
+
+    public static final ResourceLocation LEGACY_PLAYER_CONFIG_C2S =
+            new ResourceLocation(ElytraTrails.MOD_ID, "legacy_player_config_c2s");
+
+    public static final ResourceLocation LEGACY_PLAYER_CONFIG_S2C =
+            new ResourceLocation(ElytraTrails.MOD_ID, "legacy_player_config_s2c");
+
     public static Set<UUID> playersReceivedWarnings = new HashSet<>();
+
     public static void initCommon() {
-        PayloadTypeRegistry.clientboundPlay().register(TwirlStateS2CPayload.ID,TwirlStateS2CPayload.CODEC);
-        PayloadTypeRegistry.serverboundPlay().register(TwirlStateC2SPayload.ID,TwirlStateC2SPayload.CODEC);
-        PayloadTypeRegistry.clientboundPlay().register(PlayerConfigS2CPayload.ID,PlayerConfigS2CPayload.CODEC);
-        PayloadTypeRegistry.serverboundPlay().register(PlayerConfigC2SPayload.ID,PlayerConfigC2SPayload.CODEC);
-        PayloadTypeRegistry.serverboundPlay().register(GetAllRequestC2SPayload.ID,GetAllRequestC2SPayload.CODEC);
-        PayloadTypeRegistry.clientboundPlay().register(RemoveFromStoreS2CPayload.ID,RemoveFromStoreS2CPayload.CODEC);
-        PayloadTypeRegistry.serverboundPlay().register(RemoveFromStoreC2SPayload.ID,RemoveFromStoreC2SPayload.CODEC);
-        PayloadTypeRegistry.clientboundPlay().register(LegacyPlayerConfigS2CPayload.ID,LegacyPlayerConfigS2CPayload.CODEC);
-        PayloadTypeRegistry.serverboundPlay().register(LegacyPlayerConfigC2SPayload.ID,LegacyPlayerConfigC2SPayload.CODEC);
     }
+
     public static void initServer() {
-        ServerPlayNetworking.registerGlobalReceiver(TwirlStateC2SPayload.ID, (payload, context) -> {
-            Entity entity = context.player();
-            TwirlStateS2CPayload serverPayload = new TwirlStateS2CPayload(entity.getId(), payload.twirlState());
-            for (ServerPlayer player : context.server().getPlayerList().getPlayers()) {
-                ServerPlayNetworking.send(player, serverPayload);
-            }
+        ServerPlayConnectionEvents.DISCONNECT.register((handler, server) -> {
+            ServerPlayer player = handler.player;
+            int playerId = player.getId();
+
+            server.execute(() -> {
+                ServerPlayerConfigStore.SERVER_PLAYER_CONFIGS.remove(playerId);
+                playersReceivedWarnings.remove(player.getUUID());
+
+                for (ServerPlayer target : server.getPlayerList().getPlayers()) {
+                    FriendlyByteBuf serverBuf = PacketByteBufs.create();
+                    serverBuf.writeInt(playerId);
+
+                    ServerPlayNetworking.send(target, REMOVE_FROM_STORE_S2C, serverBuf);
+                }
+            });
         });
-        ServerPlayNetworking.registerGlobalReceiver(PlayerConfigC2SPayload.ID, (payload, context) -> {
-            Entity entity = context.player();
-            ServerPlayerConfigStore.SERVER_PLAYER_CONFIGS.put(entity.getId(),payload.configTag());
-            PlayerConfigS2CPayload serverPayload = new PlayerConfigS2CPayload(entity.getId(), payload.configTag());
-            for (ServerPlayer player : context.server().getPlayerList().getPlayers()) {
-                ServerPlayNetworking.send(player, serverPayload);
-            }
+        ServerPlayNetworking.registerGlobalReceiver(TWIRL_STATE_C2S, (server, player, handler, buf, responseSender) -> {
+            int twirlState = buf.readInt();
+
+            server.execute(() -> {
+                Entity entity = player;
+
+                FriendlyByteBuf serverBuf = PacketByteBufs.create();
+                serverBuf.writeInt(entity.getId());
+                serverBuf.writeInt(twirlState);
+
+                for (ServerPlayer target : server.getPlayerList().getPlayers()) {
+                    ServerPlayNetworking.send(target, TWIRL_STATE_S2C, serverBuf);
+                }
+            });
         });
-        ServerPlayNetworking.registerGlobalReceiver(LegacyPlayerConfigC2SPayload.ID, (payload, context) -> {
-            if(!playersReceivedWarnings.contains(context.player().getUUID()))
-            {
-                context.player().sendSystemMessage(
-                        net.minecraft.network.chat.Component.literal("§cYou are using an outdated version of Elytra Contrails. To sync with this server, you must update to Elytra Contrails 1.4.0+")
-                );
-            }
-            playersReceivedWarnings.add(context.player().getUUID());
+
+        ServerPlayNetworking.registerGlobalReceiver(PLAYER_CONFIG_C2S, (server, player, handler, buf, responseSender) -> {
+            CompoundTag configTag = buf.readNbt();
+
+            server.execute(() -> {
+                Entity entity = player;
+
+                ServerPlayerConfigStore.SERVER_PLAYER_CONFIGS.put(entity.getId(), configTag);
+
+                for (ServerPlayer target : server.getPlayerList().getPlayers()) {
+                    FriendlyByteBuf serverBuf = PacketByteBufs.create();
+                    serverBuf.writeInt(entity.getId());
+                    serverBuf.writeNbt(configTag);
+
+                    ServerPlayNetworking.send(target, PLAYER_CONFIG_S2C, serverBuf);
+                }
+            });
         });
-        ServerPlayNetworking.registerGlobalReceiver(GetAllRequestC2SPayload.ID, (payload, context) -> {
-            for(Map.Entry<Integer, CompoundTag> configPair : ServerPlayerConfigStore.SERVER_PLAYER_CONFIGS.entrySet())
-            {
-                PlayerConfigS2CPayload serverPayload = new PlayerConfigS2CPayload(configPair.getKey(), configPair.getValue());
-                ServerPlayNetworking.send(context.player(), serverPayload);
-            }
+
+        ServerPlayNetworking.registerGlobalReceiver(LEGACY_PLAYER_CONFIG_C2S, (server, player, handler, buf, responseSender) -> {
+            server.execute(() -> {
+                if (!playersReceivedWarnings.contains(player.getUUID())) {
+                    player.displayClientMessage(
+                            Component.literal("§cYou are using an outdated version of Elytra Contrails. To sync with this server, you must update to Elytra Contrails 1.4.0+"),
+                            false
+                    );
+                }
+
+                playersReceivedWarnings.add(player.getUUID());
+            });
         });
-        ServerPlayNetworking.registerGlobalReceiver(RemoveFromStoreC2SPayload.ID, (payload, context) -> {
-            ServerPlayerConfigStore.SERVER_PLAYER_CONFIGS.remove(context.player().getId());
-            for (ServerPlayer player : context.server().getPlayerList().getPlayers())
-            {
-                RemoveFromStoreS2CPayload serverPayload = new RemoveFromStoreS2CPayload(context.player().getId());
-                ServerPlayNetworking.send(player, serverPayload);
-            }
+
+        ServerPlayNetworking.registerGlobalReceiver(GET_ALL_REQUEST_C2S, (server, player, handler, buf, responseSender) -> {
+            server.execute(() -> {
+                for (Map.Entry<Integer, CompoundTag> configPair : ServerPlayerConfigStore.SERVER_PLAYER_CONFIGS.entrySet()) {
+                    FriendlyByteBuf serverBuf = PacketByteBufs.create();
+                    serverBuf.writeInt(configPair.getKey());
+                    serverBuf.writeNbt(configPair.getValue());
+
+                    ServerPlayNetworking.send(player, PLAYER_CONFIG_S2C, serverBuf);
+                }
+            });
+        });
+
+        ServerPlayNetworking.registerGlobalReceiver(REMOVE_FROM_STORE_C2S, (server, player, handler, buf, responseSender) -> {
+            server.execute(() -> {
+                ServerPlayerConfigStore.SERVER_PLAYER_CONFIGS.remove(player.getId());
+
+                for (ServerPlayer target : server.getPlayerList().getPlayers()) {
+                    FriendlyByteBuf serverBuf = PacketByteBufs.create();
+                    serverBuf.writeInt(player.getId());
+
+                    ServerPlayNetworking.send(target, REMOVE_FROM_STORE_S2C, serverBuf);
+                }
+            });
         });
     }
 }

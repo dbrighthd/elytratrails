@@ -1,13 +1,12 @@
 package dbrighthd.elytratrails.config;
 
-import net.minecraft.client.gui.GuiGraphicsExtractor;
+import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.Button;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.network.chat.Component;
 import org.jetbrains.annotations.NotNull;
 
 public class FallbackConfigMessageScreen extends Screen {
-    private static final int PANEL_WIDTH = 220;
     private static final int PANEL_HEIGHT = 110;
     private static final int BUTTON_WIDTH = 160;
     private static final int BUTTON_HEIGHT = 20;
@@ -40,15 +39,15 @@ public class FallbackConfigMessageScreen extends Screen {
 
 
     @Override
-    public void extractRenderState(@NotNull GuiGraphicsExtractor guiGraphics, int mouseX, int mouseY, float partialTick) {
+    public void render(@NotNull GuiGraphics guiGraphics, int mouseX, int mouseY, float partialTick) {
 
         int centerX = this.width / 2;
         int centerY = this.height / 2;
 
         int top = centerY - PANEL_HEIGHT / 2;
 
-        super.extractRenderState(guiGraphics, mouseX, mouseY, partialTick);
-        guiGraphics.centeredText(this.font, "The Cloth Config mod is required to edit Elytra Contrails settings!", centerX, top+14, 0xFFFFFFFF);
+        super.render(guiGraphics, mouseX, mouseY, partialTick);
+        guiGraphics.drawCenteredString(this.font, "The Cloth Config mod is required to edit Elytra Contrails settings!", centerX, top+14, 0xFFFFFFFF);
 
     }
 

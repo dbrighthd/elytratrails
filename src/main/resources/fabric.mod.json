@@ -3,7 +3,7 @@
 	"id": "elytratrails",
 	"version": "${version}",
 	"name": "Elytra Contrails",
-	"accessWidener" : "elytratrails.classtweaker",
+	"accessWidener" : "elytratrails.accesswidener",
 	"description": "Pretty trails when you are flying!",
 	"authors": [
 		"dbrighthd"
@@ -33,8 +33,7 @@
 		}
 	],
 	"depends": {
-		"fabricloader": ">=0.18.4",
-		"java": ">=25",
+		"minecraft": "~1.20.1",
 		"fabric-api": "*"
 	},
 	"custom": {

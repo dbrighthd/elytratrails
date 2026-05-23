@@ -1,217 +1,152 @@
 package dbrighthd.elytratrails.rendering;
 
-import com.mojang.blaze3d.pipeline.BlendFunction;
-import com.mojang.blaze3d.pipeline.ColorTargetState;
-import com.mojang.blaze3d.pipeline.DepthStencilState;
-import com.mojang.blaze3d.pipeline.RenderPipeline;
-import com.mojang.blaze3d.platform.CompareOp;
-import com.mojang.blaze3d.platform.PolygonMode;
-import dbrighthd.elytratrails.ElytraTrails;
-import net.minecraft.client.renderer.RenderPipelines;
-import net.minecraft.client.renderer.rendertype.RenderSetup;
-import net.minecraft.client.renderer.rendertype.RenderType;
-import net.minecraft.resources.Identifier;
-import net.minecraft.util.Util;
+import com.mojang.blaze3d.vertex.DefaultVertexFormat;
+import com.mojang.blaze3d.vertex.VertexFormat;
+import net.minecraft.Util;
+import net.minecraft.client.renderer.RenderStateShard;
+import net.minecraft.client.renderer.RenderType;
+import net.minecraft.resources.ResourceLocation;
 
 import java.util.function.BiFunction;
 import java.util.function.Function;
 
-public class TrailPipelines {
-    public static final ColorTargetState TRANSLUCENT_COLOR_STATE = new ColorTargetState(BlendFunction.TRANSLUCENT);
-    public static final DepthStencilState DEFAULT_STENCIL_WITH_FALSE_DEPTHWRITE = new DepthStencilState(CompareOp.LESS_THAN_OR_EQUAL, true);
-    public static final RenderPipeline PIPELINE_ENTITY_TRANSLUCENT_CULL = RenderPipelines.register(RenderPipeline.builder(RenderPipelines.ENTITY_SNIPPET)
-            .withLocation(Identifier.fromNamespaceAndPath(ElytraTrails.MOD_ID, "pipeline/entity_translucent_cull"))
-            .withShaderDefine("ALPHA_CUTOUT", 0.1F)
-            .withShaderDefine("PER_FACE_LIGHTING")
-            .withSampler("Sampler1")
-            //.withBlend(BlendFunction.TRANSLUCENT)
-            .withColorTargetState(TRANSLUCENT_COLOR_STATE)
-            .withDepthStencilState(DEFAULT_STENCIL_WITH_FALSE_DEPTHWRITE)
-            .withCull(false)
-            .build());
+//yes yes i know FLAMGOP they aren't actually pipelines but I didnt want to refactor the code
+public class TrailPipelines extends RenderStateShard {
+    private static final int BUFFER_SIZE = 1024;
 
-    private static final Function<Identifier, RenderType> ENTITY_TRANSLUCENT_CULL = Util.memoize(
-            (identifier) -> {
-                RenderSetup renderSetup = RenderSetup.builder(PIPELINE_ENTITY_TRANSLUCENT_CULL)
-                        .withTexture("Sampler0", identifier)
-                        .useLightmap()
-                        .useOverlay()
-                        .affectsCrumbling()
-                        .sortOnUpload()
-                        .setOutline(RenderSetup.OutlineProperty.AFFECTS_OUTLINE)
-                        .createRenderSetup();
-                return RenderType.create("entity_translucent_cull", renderSetup);
-            }
-    );
+    private TrailPipelines(String name, Runnable setupState, Runnable clearState) {
+        super(name, setupState, clearState);
+    }
+    private static final Function<ResourceLocation, RenderType> ENTITY_TRANSLUCENT_CULL = Util.memoize(texture -> {
+        RenderType.CompositeState state = RenderType.CompositeState.builder()
+                .setShaderState(RENDERTYPE_ENTITY_TRANSLUCENT_SHADER)
+                .setTextureState(new TextureStateShard(texture, false, false))
+                .setTransparencyState(TRANSLUCENT_TRANSPARENCY)
+                .setDepthTestState(LEQUAL_DEPTH_TEST)
+                .setCullState(NO_CULL)
+                .setLightmapState(LIGHTMAP)
+                .setOverlayState(OVERLAY)                        .setWriteMaskState(RenderStateShard.COLOR_DEPTH_WRITE)
+                .createCompositeState(RenderType.OutlineProperty.AFFECTS_OUTLINE);
 
-    public static final RenderPipeline PIPELINE_ENTITY_TRANSLUCENT_CULL_WIREFRAME = RenderPipelines.register(RenderPipeline.builder(RenderPipelines.ENTITY_SNIPPET)
-            .withLocation(Identifier.fromNamespaceAndPath(ElytraTrails.MOD_ID, "pipeline/entity_translucent_cull"))
-            .withShaderDefine("ALPHA_CUTOUT", 0.1F)
-            .withShaderDefine("PER_FACE_LIGHTING")
-            .withPolygonMode(PolygonMode.WIREFRAME)
-            .withSampler("Sampler1")
-            .withColorTargetState(TRANSLUCENT_COLOR_STATE)
-            .withDepthStencilState(DEFAULT_STENCIL_WITH_FALSE_DEPTHWRITE)
-            .withCull(false)
-            .build());
+        return RenderType.create(
+                "entity_translucent_cull",
+                DefaultVertexFormat.NEW_ENTITY,
+                VertexFormat.Mode.QUADS,
+                BUFFER_SIZE,
+                true,
+                true,
+                state
+        );
+    });
 
-    private static final Function<Identifier, RenderType> ENTITY_TRANSLUCENT_CULL_WIREFRAME = Util.memoize(
-            (identifier) -> {
-                RenderSetup renderSetup = RenderSetup.builder(PIPELINE_ENTITY_TRANSLUCENT_CULL_WIREFRAME)
-                        .withTexture("Sampler0", identifier)
-                        .useLightmap()
-                        .useOverlay()
-                        .affectsCrumbling()
-                        .sortOnUpload()
-                        .setOutline(RenderSetup.OutlineProperty.AFFECTS_OUTLINE)
-                        .createRenderSetup();
-                return RenderType.create("entity_translucent_cull", renderSetup);
-            }
-    );
-
-
-    public static final RenderPipeline PIPELINE_ENTITY_TRANSLUCENT_EMISSIVE_UNLIT =
-            RenderPipelines.register(RenderPipeline.builder(RenderPipelines.ENTITY_EMISSIVE_SNIPPET)
-                    .withLocation(Identifier.parse("elytratrails:pipeline/entity_translucent_emissive_unlit"))
-                    .withShaderDefine("ALPHA_CUTOUT", 0.1F)
-                    .withShaderDefine("NO_CARDINAL_LIGHTING")
-                    .withSampler("Sampler1")
-                    .withColorTargetState(TRANSLUCENT_COLOR_STATE)
-                    .withCull(false)
-                    .withDepthStencilState(DEFAULT_STENCIL_WITH_FALSE_DEPTHWRITE)
-                    .build());
-
-    public static final RenderPipeline PIPELINE_ENTITY_TRANSLUCENT_EMISSIVE_UNLIT_WIREFRAME =
-            RenderPipelines.register(RenderPipeline.builder(RenderPipelines.ENTITY_EMISSIVE_SNIPPET)
-                    .withLocation(Identifier.parse("elytratrails:pipeline/entity_translucent_emissive_unlit"))
-                    .withShaderDefine("ALPHA_CUTOUT", 0.1F)
-                    .withShaderDefine("NO_CARDINAL_LIGHTING")
-                    .withSampler("Sampler1")
-                    .withPolygonMode(PolygonMode.WIREFRAME)
-                    .withColorTargetState(TRANSLUCENT_COLOR_STATE)
-                    .withCull(false)
-                    .withDepthStencilState(DEFAULT_STENCIL_WITH_FALSE_DEPTHWRITE)
-                    .build());
-
-    public static final RenderPipeline PIPELINE_ENTITY_CUTOUT_EMISSIVE_UNLIT =
-            RenderPipelines.register(RenderPipeline.builder(RenderPipelines.ENTITY_EMISSIVE_SNIPPET)
-                    .withLocation(Identifier.parse("elytratrails:pipeline/entity_cutout_emissive_unlit"))
-                    .withShaderDefine("ALPHA_CUTOUT", 0.1F)
-                    .withShaderDefine("NO_CARDINAL_LIGHTING")
-                    .withSampler("Sampler1")
-                    .withCull(false)
-                    .build());
-
-    public static final RenderPipeline PIPELINE_ENTITY_CUTOUT_EMISSIVE_UNLIT_WIREFRAME =
-            RenderPipelines.register(RenderPipeline.builder(RenderPipelines.ENTITY_EMISSIVE_SNIPPET)
-                    .withLocation(Identifier.parse("elytratrails:pipeline/entity_cutout_emissive_unlit"))
-                    .withShaderDefine("ALPHA_CUTOUT", 0.1F)
-                    .withShaderDefine("NO_CARDINAL_LIGHTING")
-                    .withPolygonMode(PolygonMode.WIREFRAME)
-                    .withSampler("Sampler1")
-                    .withCull(false)
-                    .build());
-
-
-    public static final RenderPipeline PIPELINE_ENTITY_CUTOUT_LIT =
-            RenderPipelines.register(RenderPipeline.builder(RenderPipelines.ENTITY_SNIPPET)
-                    .withLocation(Identifier.parse("elytratrails:pipeline/entity_cutout_lit"))
-                    .withShaderDefine("ALPHA_CUTOUT", 0.1F)
-                    .withSampler("Sampler1")
-                    .withShaderDefine("PER_FACE_LIGHTING")
-                    .withCull(false)
-                    // Intentionally no blend (cutout)
-                    .build());
-    private static final BiFunction<Identifier, Boolean, RenderType> RENDER_TYPE_ENTITY_TRANSLUCENT_EMISSIVE_UNLIT =
-            Util.memoize((identifier, outline) -> {
-                RenderSetup renderSetup = RenderSetup.builder(PIPELINE_ENTITY_TRANSLUCENT_EMISSIVE_UNLIT)
-                        .withTexture("Sampler0", identifier)
-                        .useOverlay()
-                        .affectsCrumbling()
-                        .sortOnUpload()
-                        .setOutline(outline ? RenderSetup.OutlineProperty.AFFECTS_OUTLINE : RenderSetup.OutlineProperty.NONE)
-                        .createRenderSetup();
-                return RenderType.create("elytratrails_entity_translucent_emissive_unlit", renderSetup);
+    //idk how to do wireframe
+    private static final Function<ResourceLocation, RenderType> ENTITY_TRANSLUCENT_CULL_WIREFRAME = Util.memoize(ENTITY_TRANSLUCENT_CULL);
+    private static final BiFunction<ResourceLocation, Boolean, RenderType> ENTITY_TRANSLUCENT_EMISSIVE_UNLIT =
+            Util.memoize((texture, outline) -> {
+                RenderType.CompositeState state = RenderType.CompositeState.builder()
+                        .setShaderState(RENDERTYPE_ENTITY_TRANSLUCENT_EMISSIVE_SHADER)
+                        .setTextureState(new TextureStateShard(texture, false, false))
+                        .setTransparencyState(TRANSLUCENT_TRANSPARENCY)
+                        .setCullState(NO_CULL)
+                        .setOverlayState(OVERLAY)
+                        .setDepthTestState(LEQUAL_DEPTH_TEST)
+                        .setWriteMaskState(RenderStateShard.COLOR_DEPTH_WRITE)
+                        .createCompositeState(outline ? RenderType.OutlineProperty.AFFECTS_OUTLINE : RenderType.OutlineProperty.NONE);
+                return RenderType.create(
+                        "entity_translucent_emissive_unlit",
+                        DefaultVertexFormat.NEW_ENTITY,
+                        VertexFormat.Mode.QUADS,
+                        BUFFER_SIZE,
+                        true,
+                        true,
+                        state
+                );
             });
 
-    private static final BiFunction<Identifier, Boolean, RenderType> RENDER_TYPE_ENTITY_TRANSLUCENT_EMISSIVE_UNLIT_WIREFRAME =
-            Util.memoize((identifier, outline) -> {
-                RenderSetup renderSetup = RenderSetup.builder(PIPELINE_ENTITY_TRANSLUCENT_EMISSIVE_UNLIT_WIREFRAME)
-                        .withTexture("Sampler0", identifier)
-                        .useOverlay()
-                        .affectsCrumbling()
-                        .sortOnUpload()
-                        .setOutline(outline ? RenderSetup.OutlineProperty.AFFECTS_OUTLINE : RenderSetup.OutlineProperty.NONE)
-                        .createRenderSetup();
-                return RenderType.create("elytratrails_entity_translucent_emissive_unlit", renderSetup);
+    private static final BiFunction<ResourceLocation, Boolean, RenderType> ENTITY_TRANSLUCENT_EMISSIVE_UNLIT_WIREFRAME =
+            Util.memoize(ENTITY_TRANSLUCENT_EMISSIVE_UNLIT
+            );
+    private static final BiFunction<ResourceLocation, Boolean, RenderType> ENTITY_CUTOUT_EMISSIVE_UNLIT =
+            Util.memoize((texture, outline) -> {
+                RenderType.CompositeState state = RenderType.CompositeState.builder()
+                        .setShaderState(RENDERTYPE_ENTITY_TRANSLUCENT_EMISSIVE_SHADER)
+                        .setTextureState(new TextureStateShard(texture, false, false))
+                        .setCullState(NO_CULL)
+                        .setOverlayState(OVERLAY)
+                        .setDepthTestState(LEQUAL_DEPTH_TEST)
+
+                        .setWriteMaskState(RenderStateShard.COLOR_DEPTH_WRITE)
+                        .createCompositeState(outline
+                                ? RenderType.OutlineProperty.AFFECTS_OUTLINE
+                                : RenderType.OutlineProperty.NONE);
+
+                return RenderType.create(
+                        "entity_cutout_emissive_unlit",
+                        DefaultVertexFormat.NEW_ENTITY,
+                        VertexFormat.Mode.QUADS,
+                        BUFFER_SIZE,
+                        true,
+                        false,
+                        state
+                );
             });
 
-    private static final BiFunction<Identifier, Boolean, RenderType> RENDER_TYPE_ENTITY_CUTOUT_EMISSIVE_UNLIT =
-            Util.memoize((identifier, outline) -> {
-                RenderSetup renderSetup = RenderSetup.builder(PIPELINE_ENTITY_CUTOUT_EMISSIVE_UNLIT)
-                        .withTexture("Sampler0", identifier)
-                        .useOverlay()
-                        .affectsCrumbling()
-                        .sortOnUpload()
-                        .setOutline(outline ? RenderSetup.OutlineProperty.AFFECTS_OUTLINE : RenderSetup.OutlineProperty.NONE)
-                        .createRenderSetup();
-                return RenderType.create("elytratrails_entity_cutout_emissive_unlit", renderSetup);
+    private static final BiFunction<ResourceLocation, Boolean, RenderType> ENTITY_CUTOUT_EMISSIVE_UNLIT_WIREFRAME =
+            Util.memoize(ENTITY_CUTOUT_EMISSIVE_UNLIT
+            );
+    private static final BiFunction<ResourceLocation, Boolean, RenderType> ENTITY_CUTOUT_LIT =
+            Util.memoize((texture, outline) -> {
+                RenderType.CompositeState state = RenderType.CompositeState.builder()
+                        .setShaderState(RENDERTYPE_ENTITY_CUTOUT_NO_CULL_SHADER)
+                        .setTextureState(new TextureStateShard(texture, false, false))
+                        .setCullState(NO_CULL)
+                        .setLightmapState(LIGHTMAP)
+                        .setOverlayState(OVERLAY)
+                        .setDepthTestState(LEQUAL_DEPTH_TEST)
+                        .setWriteMaskState(COLOR_DEPTH_WRITE)
+                        .createCompositeState(outline
+                                ? RenderType.OutlineProperty.AFFECTS_OUTLINE
+                                : RenderType.OutlineProperty.NONE);
+
+                return RenderType.create(
+                        "entity_cutout_lit",
+                        DefaultVertexFormat.NEW_ENTITY,
+                        VertexFormat.Mode.QUADS,
+                        BUFFER_SIZE,
+                        true,
+                        false,
+                        state
+                );
             });
 
-    private static final BiFunction<Identifier, Boolean, RenderType> RENDER_TYPE_ENTITY_CUTOUT_EMISSIVE_UNLIT_WIREFRAME =
-            Util.memoize((identifier, outline) -> {
-                RenderSetup renderSetup = RenderSetup.builder(PIPELINE_ENTITY_CUTOUT_EMISSIVE_UNLIT_WIREFRAME)
-                        .withTexture("Sampler0", identifier)
-                        .useOverlay()
-                        .affectsCrumbling()
-                        .sortOnUpload()
-                        .setOutline(outline ? RenderSetup.OutlineProperty.AFFECTS_OUTLINE : RenderSetup.OutlineProperty.NONE)
-                        .createRenderSetup();
-                return RenderType.create("elytratrails_entity_cutout_emissive_unlit", renderSetup);
-            });
-
-    private static final BiFunction<Identifier, Boolean, RenderType> RENDER_TYPE_ENTITY_CUTOUT_LIT =
-            Util.memoize((identifier, outline) -> {
-                RenderSetup renderSetup = RenderSetup.builder(PIPELINE_ENTITY_CUTOUT_LIT)
-                        .withTexture("Sampler0", identifier)
-                        .useOverlay()
-                        .useLightmap()
-                        .affectsCrumbling()
-                        .sortOnUpload()
-                        .setOutline(outline ? RenderSetup.OutlineProperty.AFFECTS_OUTLINE : RenderSetup.OutlineProperty.NONE)
-                        .createRenderSetup();
-                return RenderType.create("elytratrails_entity_cutout_lit", renderSetup);
-            });
-
-    public static RenderType entityTranslucentEmissiveUnlit(Identifier texture) {
-        return RENDER_TYPE_ENTITY_TRANSLUCENT_EMISSIVE_UNLIT.apply(texture, false);
-    }
-
-    public static RenderType entityTranslucentEmissiveWireFrame(Identifier texture) {
-        return RENDER_TYPE_ENTITY_TRANSLUCENT_EMISSIVE_UNLIT_WIREFRAME.apply(texture, false);
-    }
-
-    public static RenderType entityCutoutEmissiveUnlit(Identifier texture) {
-        return RENDER_TYPE_ENTITY_CUTOUT_EMISSIVE_UNLIT.apply(texture, false);
-    }
-
-    public static RenderType entityCutoutEmissiveUnlitWireframe(Identifier texture) {
-        return RENDER_TYPE_ENTITY_CUTOUT_EMISSIVE_UNLIT_WIREFRAME.apply(texture, false);
-    }
-
-    @SuppressWarnings("unused")
-    public static RenderType entityCutoutLit(Identifier texture) {
-        return RENDER_TYPE_ENTITY_CUTOUT_LIT.apply(texture, false);
-    }
-
-    public static void init() {
-    }
-
-    public static RenderType entityTranslucentCull(Identifier texture) {
+    public static RenderType entityTranslucentCull(ResourceLocation texture) {
         return ENTITY_TRANSLUCENT_CULL.apply(texture);
     }
 
-    public static RenderType entityTranslucentCullWireFrame(Identifier texture) {
+    public static RenderType entityTranslucentCullWireFrame(ResourceLocation texture) {
         return ENTITY_TRANSLUCENT_CULL_WIREFRAME.apply(texture);
+    }
+
+    public static RenderType entityTranslucentEmissiveUnlit(ResourceLocation texture) {
+        return ENTITY_TRANSLUCENT_EMISSIVE_UNLIT.apply(texture, false);
+    }
+
+    public static RenderType entityTranslucentEmissiveWireFrame(ResourceLocation texture) {
+        return ENTITY_TRANSLUCENT_EMISSIVE_UNLIT_WIREFRAME.apply(texture, false);
+    }
+
+    public static RenderType entityCutoutEmissiveUnlit(ResourceLocation texture) {
+        return ENTITY_CUTOUT_EMISSIVE_UNLIT.apply(texture, false);
+    }
+
+    public static RenderType entityCutoutEmissiveUnlitWireframe(ResourceLocation texture) {
+        return ENTITY_CUTOUT_EMISSIVE_UNLIT_WIREFRAME.apply(texture, false);
+    }
+
+    public static RenderType entityCutoutLit(ResourceLocation texture) {
+        return ENTITY_CUTOUT_LIT.apply(texture, false);
+    }
+
+    public static void init() {
     }
 }

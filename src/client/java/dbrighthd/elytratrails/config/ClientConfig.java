@@ -51,13 +51,6 @@ public class ClientConfig {
     public double wingtipHorizontalPosition;
     public double wingtipDepthPosition;
     public double distanceTillTrailEnd;
-    public boolean aoaBasedAlpha;
-    public double minAlphaAOA;
-    public double maxAlphaAOA;
-    public boolean aoaBasedWidth;
-    public double minWidthAOA;
-    public double maxWidthAOA;
-
     public transient int justColor;
     public transient int justAlpha;
     public transient int justColorRight;
@@ -104,15 +97,8 @@ public class ClientConfig {
             double wingtipVerticalPosition,
             double wingtipHorizontalPosition,
             double wingtipDepthPosition,
-            double distanceTillTrailEnd,
-            boolean aoaBasedAlpha,
-            double minAlphaAOA,
-            double maxAlphaAOA,
-            boolean aoaBasedWidth,
-            double minWidthAOA,
-            double maxWidthAOA
-            )
-    {
+            double distanceTillTrailEnd
+    ) {
         this.enableTrail = enableTrail;
         this.enableRandomWidth = enableRandomWidth;
         this.speedDependentTrail = speedDependentTrail;
@@ -154,12 +140,6 @@ public class ClientConfig {
         this.wingtipHorizontalPosition = wingtipHorizontalPosition;
         this.wingtipDepthPosition = wingtipDepthPosition;
         this.distanceTillTrailEnd = distanceTillTrailEnd;
-        this.aoaBasedAlpha = aoaBasedAlpha;
-        this.minAlphaAOA = minAlphaAOA;
-        this.maxAlphaAOA = maxAlphaAOA;
-        this.aoaBasedWidth = aoaBasedWidth;
-        this.minWidthAOA = minWidthAOA;
-        this.maxWidthAOA = maxWidthAOA;
     }
 
     public ClientConfig() {
@@ -204,13 +184,7 @@ public class ClientConfig {
                 0.5,
                 1.0,
                 1,
-                0.0,
-                false,
-                5,
-                45,
-                false,
-                5,
-                45
+                0.0
         );
     }
 
@@ -260,13 +234,7 @@ public class ClientConfig {
                 colorRight, wingtipVerticalPosition,
                 wingtipHorizontalPosition,
                 wingtipDepthPosition,
-                distanceTillTrailEnd,
-                aoaBasedAlpha,
-                minAlphaAOA,
-                maxAlphaAOA,
-                aoaBasedWidth,
-                minWidthAOA,
-                maxWidthAOA);
+                distanceTillTrailEnd);
     }
 
     public PlayerConfig getHiddenPlayerConfig() {
@@ -312,13 +280,7 @@ public class ClientConfig {
                 wingtipVerticalPosition,
                 wingtipHorizontalPosition,
                 wingtipDepthPosition,
-                distanceTillTrailEnd,
-                aoaBasedAlpha,
-                minAlphaAOA,
-                maxAlphaAOA,
-                aoaBasedWidth,
-                minWidthAOA,
-                maxWidthAOA);
+                distanceTillTrailEnd);
     }
     public void validate() {
         if (prideTrail == null) {

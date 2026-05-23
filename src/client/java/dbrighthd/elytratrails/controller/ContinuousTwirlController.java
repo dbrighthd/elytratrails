@@ -1,9 +1,8 @@
 package dbrighthd.elytratrails.controller;
 
 import dbrighthd.elytratrails.util.EasingUtil;
-import dbrighthd.elytratrails.util.TimeUtil;
+import dbrighthd.elytratrails.util.ElytraTimeUtil;
 import net.minecraft.util.Mth;
-import dbrighthd.elytratrails.controller.EntityTwirlManager.Phase;
 
 import static dbrighthd.elytratrails.ElytraTrailsClient.getConfig;
 import static dbrighthd.elytratrails.util.EasingUtil.*;
@@ -22,8 +21,14 @@ public final class ContinuousTwirlController {
     private static final double BACK_EASE_OUT_PEAK_U = 0.54;
     private static final double BACK_EASE_IN_START_U = 0.481219;
 
-    static long phaseStartNanos = 0L;
-    static Phase phase = Phase.EASE_IN_180;
+    private enum Phase {
+        EASE_IN_180,
+        CONSTANT_360,
+        EASE_OUT_180
+    }
+
+    private static long phaseStartNanos = 0L;
+    private static Phase phase = Phase.EASE_IN_180;
 
     private static double baseAngleRad = 0.0;
 
@@ -50,7 +55,7 @@ public final class ContinuousTwirlController {
         double DURATION_S = Math.max(getConfig().clientPlayerConfig.twirlTime, 0.0001);
         HALF_DURATION_S = DURATION_S * 0.5;
         OMEGA_RAD_S = (Math.PI * Math.PI) / DURATION_S;
-        TURN360_DURATION_S = Math.TAU / OMEGA_RAD_S;
+        TURN360_DURATION_S = Math.PI * 2 / OMEGA_RAD_S;
         HALF_DURATION_S *= getEaseMult(getConfig().clientPlayerConfig.easeType);
         easeType = getConfig().clientPlayerConfig.easeType;
     }
@@ -88,7 +93,7 @@ public final class ContinuousTwirlController {
                 && effectiveOppositeRequest != 0
                 && easeType == EasingUtil.EaseType.Back) {
 
-            long now = TimeUtil.currentNanos();
+            long now = ElytraTimeUtil.currentNanos();
             double elapsedS = (now - phaseStartNanos) / 1_000_000_000.0;
             double u = Mth.clamp(elapsedS / HALF_DURATION_S, 0.0, 1.0);
 
@@ -136,7 +141,7 @@ public final class ContinuousTwirlController {
             return true;
         }
 
-        long now = TimeUtil.currentNanos();
+        long now = ElytraTimeUtil.currentNanos();
         double elapsedS = (now - phaseStartNanos) / 1_000_000_000.0;
         double u = Mth.clamp(elapsedS / HALF_DURATION_S, 0.0, 1.0);
         return u < BACK_EASE_OUT_PEAK_U;
@@ -145,7 +150,7 @@ public final class ContinuousTwirlController {
     private static void startSpin() {
         active = true;
         phase = Phase.EASE_IN_180;
-        phaseStartNanos = TimeUtil.currentNanos();
+        phaseStartNanos = ElytraTimeUtil.currentNanos();
         baseAngleRad = 0.0;
 
         holdMode = pendingMode;
@@ -178,7 +183,7 @@ public final class ContinuousTwirlController {
         currentDir = newDir;
         phase = Phase.EASE_IN_180;
 
-        long now = TimeUtil.currentNanos();
+        long now = ElytraTimeUtil.currentNanos();
         long peakOffset = (long) (BACK_EASE_IN_START_U * HALF_DURATION_S * 1_000_000_000.0);
         phaseStartNanos = now - peakOffset;
 
@@ -205,9 +210,9 @@ public final class ContinuousTwirlController {
     private static double rollConstant360(double elapsedS) {
         double a = OMEGA_RAD_S * elapsedS;
         if (easeType == EaseType.Random) {
-            return EasingUtil.easeRandom() * Math.TAU;
+            return EasingUtil.easeRandom() * Math.PI * 2;
         }
-        return Mth.clamp(a, 0.0, Math.TAU);
+        return Mth.clamp(a, 0.0, Math.PI * 2);
     }
 
     private static double rollLast180(double elapsedS) {
@@ -225,7 +230,7 @@ public final class ContinuousTwirlController {
     public static float getExtraRollRadians() {
         if (!active) return 0f;
 
-        long now = TimeUtil.currentNanos();
+        long now = ElytraTimeUtil.currentNanos();
 
         for (int guard = 0; guard < 6; guard++) {
             double elapsedS = (now - phaseStartNanos) / 1_000_000_000.0;
@@ -250,7 +255,7 @@ public final class ContinuousTwirlController {
 
                 case CONSTANT_360: {
                     while (elapsedS >= TURN360_DURATION_S) {
-                        baseAngleRad += currentDir * Math.TAU;
+                        baseAngleRad += currentDir * Math.PI * 2;
                         phaseStartNanos += (long) (TURN360_DURATION_S * 1_000_000_000.0);
 
                         if (shouldContinueConstant()) {

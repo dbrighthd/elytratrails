@@ -2,7 +2,8 @@ package dbrighthd.elytratrails.rendering;
 
 import dbrighthd.elytratrails.ElytraTrailsClient;
 import dbrighthd.elytratrails.config.ModConfig;
-import net.fabricmc.fabric.api.client.rendering.v1.level.LevelRenderEvents;
+import net.fabricmc.fabric.api.client.rendering.v1.WorldRenderEvents;
+
 public class TrailSystem {
 
     private static final WingTipSampler sampler = new WingTipSampler();
@@ -10,10 +11,13 @@ public class TrailSystem {
     private static final TrailRenderer renderer = new TrailRenderer(manager);
 
     public static void init() {
-        LevelRenderEvents.AFTER_TRANSLUCENT_TERRAIN.register(ctx -> {
+        WorldRenderEvents.END.register(ctx -> {
             ModConfig config = ElytraTrailsClient.getConfig();
             if (!config.enableAllTrails) return;
-            renderer.renderAllTrails(ctx, sampler.gatheredTrailsThisFrame);
+            renderer.renderAllTrails(ctx, sampler.gatherdTrailsThisFrameSnapCache);
+            if (ctx.consumers() instanceof net.minecraft.client.renderer.MultiBufferSource.BufferSource bufferSource) {
+                bufferSource.endLastBatch();
+            }
         });
     }
 

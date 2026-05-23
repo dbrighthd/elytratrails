@@ -45,13 +45,7 @@ public record PlayerConfig(
         double wingtipVerticalPosition,
         double wingtipHorizontalPosition,
         double wingtipDepthPosition,
-        double distanceTillTrailEnd,
-        boolean aoaBasedAlpha,
-        double minAlphaAOA,
-        double maxAlphaAOA,
-        boolean aoaBasedWidth,
-        double minWidthAOA,
-        double maxWidthAOA
+        double distanceTillTrailEnd
 ) {
     public static final int CONFIG_VERSION = 1;
 
@@ -101,12 +95,7 @@ public record PlayerConfig(
         tag.putDouble("wingtipHorizontalPosition", wingtipHorizontalPosition);
         tag.putDouble("wingtipDepthPosition", wingtipDepthPosition);
         tag.putDouble("distanceTillTrailEnd", distanceTillTrailEnd);
-        tag.putBoolean("aoaBasedAlpha", aoaBasedAlpha);
-        tag.putDouble("minAlphaAOA", minAlphaAOA);
-        tag.putDouble("maxAlphaAOA",maxAlphaAOA);
-        tag.putBoolean("aoaBasedWidth",aoaBasedWidth);
-        tag.putDouble("minWidthAOA",minWidthAOA);
-        tag.putDouble("maxWidthAOA",maxWidthAOA);
+
         return tag;
     }
 

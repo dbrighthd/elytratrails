@@ -6,9 +6,10 @@ import dbrighthd.elytratrails.ElytraTrailsKeybind;
 import dbrighthd.elytratrails.config.pack.TrailPackConfigManager;
 import dbrighthd.elytratrails.controller.ContinuousTwirlController;
 import dbrighthd.elytratrails.controller.TwirlController;
-import dbrighthd.elytratrails.network.GetAllRequestC2SPayload;
-import dbrighthd.elytratrails.network.PlayerConfigC2SPayload;
-import dbrighthd.elytratrails.network.RemoveFromStoreC2SPayload;
+//import dbrighthd.elytratrails.network.GetAllRequestC2SPayload;
+//import dbrighthd.elytratrails.network.PlayerConfigC2SPayload;
+//import dbrighthd.elytratrails.network.RemoveFromStoreC2SPayload;
+import dbrighthd.elytratrails.network.ClientPackets;
 import dbrighthd.elytratrails.rendering.TrailSystem;
 import dbrighthd.elytratrails.util.EasingUtil;
 import me.shedaniel.clothconfig2.api.*;
@@ -20,8 +21,15 @@ import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.commands.arguments.ParticleArgument;
 import net.minecraft.core.HolderLookup;
 import net.minecraft.core.particles.ParticleOptions;
+import net.minecraft.core.particles.ParticleType;
+import net.minecraft.core.particles.ParticleTypes;
+import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.data.registries.VanillaRegistries;
+import net.minecraft.nbt.NbtOps;
+import net.minecraft.nbt.Tag;
 import net.minecraft.network.chat.Component;
+
+import net.minecraft.resources.ResourceKey;
 
 import java.util.*;
 
@@ -29,8 +37,8 @@ import static dbrighthd.elytratrails.ElytraTrailsClient.getConfig;
 import static dbrighthd.elytratrails.ElytraTrailsClient.refreshConfig;
 import static dbrighthd.elytratrails.config.pack.TrailPackConfigManager.exportTrailPresetToDisk;
 import static dbrighthd.elytratrails.config.pack.TrailPackConfigManager.withAlphaAndColor;
-import static dbrighthd.elytratrails.handler.ParticleHandler.decodeParticle;
-import static dbrighthd.elytratrails.handler.ParticleHandler.encodeParticle;
+//import static dbrighthd.elytratrails.handler.ParticleHandler.decodeParticle;
+//import static dbrighthd.elytratrails.handler.ParticleHandler.encodeParticle;
 import static dbrighthd.elytratrails.network.ClientPlayerConfigStore.*;
 
 /**
@@ -52,7 +60,7 @@ public class ConfigScreenBuilder {
         config.PresetOthers = presetDefault;
         List<String> presetNames = new ArrayList<>(TrailPackConfigManager.getPresets().keySet());
         Collections.sort(presetNames);
-        presetNames.addFirst(presetDefault);
+        presetNames.add(0,presetDefault);
         ConfigBuilder builder = ConfigBuilder.create()
                 .setParentScreen(parent)
                 .setTitle(Component.translatable("text.elytratrails.title"));
@@ -85,8 +93,9 @@ public class ConfigScreenBuilder {
                 .build());
         general.addEntry(entryBuilder.startBooleanToggle(Component.translatable("text.elytratrails.option.hardCodedFreshAnimationsPlayerWingtips"), config.hardCodedFreshAnimationsPlayerWingtips)
                 .setDefaultValue(defaultModConfig.hardCodedFreshAnimationsPlayerWingtips)
-                .setTooltip(Component.translatable("text.elytratrails.option.hardCodedFreshAnimationsPlayerWingtips.@Tooltip"))
+                .setTooltip(Component.translatable("text.elytratrails.option.noWorkingInVersion.@Tooltip"))
                 .setSaveConsumer(newValue -> config.hardCodedFreshAnimationsPlayerWingtips = newValue)
+                .setRequirement(() -> false)
                 .build());
         general.addEntry(entryBuilder.startBooleanToggle(Component.translatable("text.elytratrails.option.cameraDistanceFade"), config.tryNearTrailFade)
                 .setDefaultValue(defaultModConfig.tryNearTrailFade)
@@ -105,44 +114,47 @@ public class ConfigScreenBuilder {
                 .build());
         general.addEntry(entryBuilder.startBooleanToggle(Component.translatable("text.elytratrails.option.fadeFirstPersonTrail"), config.fadeFirstPersonTrail)
                 .setDefaultValue(defaultModConfig.fadeFirstPersonTrail)
-                .setTooltip(Component.translatable("text.elytratrails.option.fadeFirstPersonTrail.@Tooltip"))
-                .setSaveConsumer(newValue -> config.fadeFirstPersonTrail = newValue)
-                .build());
+                .setTooltip(Component.translatable( "text.elytratrails.option.fadeFirstPersonTrail.@Tooltip"))
+                .setSaveConsumer(newValue -> config.fadeFirstPersonTrail = newValue).build());
         general.addEntry(entryBuilder.startDoubleField(Component.translatable("text.elytratrails.option.firstPersonFadeTime"), config.firstPersonFadeTime)
                 .setDefaultValue(defaultModConfig.firstPersonFadeTime)
-                .setTooltip(Component.translatable("text.elytratrails.option.firstPersonFadeTime.@Tooltip"))
-                .setSaveConsumer(newValue -> config.firstPersonFadeTime = newValue)
-                .build());
-        general.addEntry(entryBuilder.startBooleanToggle(Component.translatable("text.elytratrails.option.resourcePackOverride"), config.resourcePackOverride)
+                .setTooltip(Component.translatable( "text.elytratrails.option.firstPersonFadeTime.@Tooltip"))
+                .setSaveConsumer(newValue -> config.firstPersonFadeTime = newValue).build());
+        general.addEntry(entryBuilder.startBooleanToggle(Component.translatable("text.elytratrails.option.resourcePackOverride"), false)
                 .setDefaultValue(defaultModConfig.resourcePackOverride)
                 .setTooltip(Component.translatable("text.elytratrails.option.resourcePackOverride.@Tooltip"))
                 .setSaveConsumer(newValue -> config.resourcePackOverride = newValue)
+                .setRequirement(() -> false)
                 .build());
-        general.addEntry(entryBuilder.startBooleanToggle(Component.translatable("text.elytratrails.option.emfSupport"), config.emfSupport)
+        general.addEntry(entryBuilder.startBooleanToggle(Component.translatable("text.elytratrails.option.emfSupport"), false)
                 .setDefaultValue(defaultModConfig.emfSupport)
-                .setTooltip(Component.translatable("text.elytratrails.option.emfSupport.@Tooltip"))
+                .setTooltip(Component.translatable("text.elytratrails.option.noWorkingInVersion.@Tooltip"))
                 .setSaveConsumer(newValue -> config.emfSupport = newValue)
+                .setRequirement(() -> false)
                 .build());
-        general.addEntry(entryBuilder.startBooleanToggle(Component.translatable("text.elytratrails.option.extendedEmfSupport"), config.extendedEmfSupport)
+        general.addEntry(entryBuilder.startBooleanToggle(Component.translatable("text.elytratrails.option.extendedEmfSupport"), false)
                 .setDefaultValue(defaultModConfig.extendedEmfSupport)
-                .setTooltip(Component.translatable("text.elytratrails.option.extendedEmfSupport.@Tooltip"))
+                .setTooltip(Component.translatable("text.elytratrails.option.noWorkingInVersion.@Tooltip"))
                 .setSaveConsumer(newValue -> config.extendedEmfSupport = newValue)
+                .setRequirement(() -> false)
                 .build());
-        general.addEntry(entryBuilder.startBooleanToggle(Component.translatable("text.elytratrails.option.tryWithoutEmf"), config.tryWithoutEmf)
+        general.addEntry(entryBuilder.startBooleanToggle(Component.translatable("text.elytratrails.option.tryWithoutEmf"), false)
                 .setDefaultValue(defaultModConfig.tryWithoutEmf)
-                .setTooltip(Component.translatable("text.elytratrails.option.tryWithoutEmf.@Tooltip"))
+                .setTooltip(Component.translatable("text.elytratrails.option.noWorkingInVersion.@Tooltip"))
                 .setSaveConsumer(newValue -> config.tryWithoutEmf = newValue)
+                .setRequirement(() -> false)
                 .build());
         general.addEntry(entryBuilder.startBooleanToggle(Component.translatable("text.elytratrails.option.logTrails"), config.logTrails)
                 .setDefaultValue(defaultModConfig.logTrails)
                 .setTooltip(Component.translatable("text.elytratrails.option.logTrails.@Tooltip"))
                 .setSaveConsumer(newValue -> config.logTrails = newValue)
                 .build());
-        general.addEntry(entryBuilder.startBooleanToggle(Component.translatable("text.elytratrails.option.shaderOverride"), config.alwaysGlowWhenShaderTranslucent)
+        general.addEntry(entryBuilder.startBooleanToggle(Component.translatable("text.elytratrails.option.shaderOverride"), false)
                 .setDefaultValue(defaultModConfig.alwaysGlowWhenShaderTranslucent)
-                .setTooltip(Component.translatable("text.elytratrails.option.shaderOverride.@Tooltip"))
+                .setTooltip(Component.translatable( "text.elytratrails.option.noWorkingInVersion.@Tooltip"))
                 .setSaveConsumer(newValue -> config.alwaysGlowWhenShaderTranslucent = newValue)
                 .requireRestart()
+                .setRequirement(() -> false)
                 .build());
         general.addEntry(entryBuilder.startEnumSelector(
                         Component.translatable("text.elytratrails.option.clearTrails"),
@@ -200,6 +212,11 @@ public class ConfigScreenBuilder {
 
         keybinds.addEntry(entryBuilder.startTextDescription(
                         Component.translatable("text.elytratrails.category.keybinds.desc"))
+                .build());
+        keybinds.addEntry(entryBuilder.startBooleanToggle(Component.translatable("text.elytratrails.option.walkForTwirl"), config.useWalkingKeysForTwirl)
+                .setDefaultValue(defaultModConfig.useWalkingKeysForTwirl)
+                .setTooltip(Component.translatable("text.elytratrails.option.walkForTwirl.@Tooltip"))
+                .setSaveConsumer(newValue -> config.useWalkingKeysForTwirl = newValue)
                 .build());
         keybinds.addEntry(entryBuilder.startKeyCodeField(
                         Component.translatable("text.elytratrails.option.twirl_r_continuous_key"),
@@ -357,7 +374,7 @@ public class ConfigScreenBuilder {
                 "OthersDefault"
         );
 
-        String encodedParticle = encodeParticle(config.particle);
+//        String encodedParticle = encodeParticle(config.particle);
         HolderLookup.Provider lookup = VanillaRegistries.createLookup();
         particles.addEntry(entryBuilder.startTextDescription(
                         Component.translatable("text.elytratrails.category.particles.desc"))
@@ -367,19 +384,21 @@ public class ConfigScreenBuilder {
                 .setTooltip(Component.translatable("text.elytratrails.option.enableParticles.@Tooltip"))
                 .setSaveConsumer(newValue -> config.enableParticles = newValue)
                 .build());
-        particles.addEntry(entryBuilder.startStrField(Component.translatable("text.elytratrails.option.particle"), encodedParticle)
-                .setErrorSupplier(s -> {
-                    try {
-                        ParticleOptions ignored = ParticleArgument.readParticle(new StringReader(s), lookup);
-                        return Optional.empty();
-                    } catch (CommandSyntaxException exception) {
-                        return Optional.of(Component.translatable(exception.getLocalizedMessage()));
-                    }
-                })
-                .setDefaultValue(encodedParticle)
-                .setTooltip(Component.translatable("text.elytratrails.option.particle.@Tooltip"))
-                .setSaveConsumer(newValue -> config.particle = decodeParticle(newValue))
-                .build());
+//        particles.addEntry(entryBuilder.startStrField(Component.translatable("text.elytratrails.option.particle"), encodedParticle)
+//                .setErrorSupplier(s -> {
+//                    try {
+//                        ParticleOptions ignored = ParticleArgument.readParticle(new StringReader(s), lookup);
+//                        return Optional.empty();
+//                    } catch (CommandSyntaxException exception) {
+//                        return Optional.of(Component.translatable(exception.getLocalizedMessage()));
+//                    }
+//                })
+//                .setDefaultValue(encodedParticle)
+//                .setTooltip(Component.translatable("text.elytratrails.option.particle.@Tooltip"))
+//                .setSaveConsumer(newValue -> {
+//                    config.particle = decodeParticle(newValue);
+//                })
+//                .build());
 
         particles.addEntry(entryBuilder.startIntField(Component.translatable("text.elytratrails.option.particleSpawnsPerTick"), config.particleSpawnsPerTick)
                 .setDefaultValue(defaultModConfig.particleSpawnsPerTick)
@@ -448,17 +467,17 @@ public class ConfigScreenBuilder {
             refreshLocalConfigs();
             if (mc.getConnection() != null && mc.player != null && mc.level != null) {
                 TrailSystem.getTrailManager().removeTrail(mc.player.getId());
-                TrailSystem.getWingtipSampler().removeAllEmfCache();
 
                 if (getConfig().shareTrail || !getConfig().showTrailToOtherPlayers) {
-                    ClientPlayNetworking.send(new PlayerConfigC2SPayload(getLocalPlayerConfigToSend().toTag()));
+                    ClientPackets.sendPlayerConfig(getLocalPlayerConfigToSend().toTag());
                 } else {
-                    ClientPlayNetworking.send(new RemoveFromStoreC2SPayload());
+                    ClientPackets.sendRemoveFromStore();
                 }
+
                 if (!getConfig().syncWithServer) {
                     CLIENT_PLAYER_CONFIGS.clear();
                 } else if (CLIENT_PLAYER_CONFIGS.isEmpty()) {
-                    ClientPlayNetworking.send(new GetAllRequestC2SPayload());
+                    ClientPackets.sendGetAllRequest();
                 }
             }
         });
@@ -537,10 +556,12 @@ public class ConfigScreenBuilder {
                 .setSaveConsumer(newValue -> targetConfig.glowingTrails = newValue)
                 .build());
 
-        advancedOptions.add(entryBuilder.startBooleanToggle(option("wireframeTrails", suffix), targetConfig.wireframeTrails)
+        advancedOptions.add(entryBuilder.startBooleanToggle(option("wireframeTrails", suffix), false)
                 .setDefaultValue(ConfigScreenBuilder.defaultConfig.wireframeTrails)
-                .setTooltip(tooltip("wireframeTrails", suffix))
+                .setTooltip(Component.translatable("text.elytratrails.option.noWorkingInVersion.@Tooltip"))
                 .setSaveConsumer(newValue -> targetConfig.wireframeTrails = newValue)
+                .setRequirement(() -> false)
+
                 .build());
 
         advancedOptions.add(entryBuilder.startBooleanToggle(option("trailMovesWithElytraAngle", suffix), targetConfig.trailMovesWithElytraAngle)
@@ -549,25 +570,32 @@ public class ConfigScreenBuilder {
                 .setSaveConsumer(newValue -> targetConfig.trailMovesWithElytraAngle = newValue)
                 .build());
 
-        advancedOptions.add(entryBuilder.startBooleanToggle(option("trailMovesWithAngleOfAttack", suffix), targetConfig.trailMovesWithAngleOfAttack)
+        advancedOptions.add(entryBuilder.startBooleanToggle(option("trailMovesWithAngleOfAttack", suffix), false)
                 .setDefaultValue(ConfigScreenBuilder.defaultConfig.trailMovesWithAngleOfAttack)
-                .setTooltip(tooltip("trailMovesWithAngleOfAttack", suffix))
+                .setTooltip(Component.translatable("text.elytratrails.option.noWorkingInVersion.@Tooltip"))
+                .setRequirement(() -> false)
+
                 .setSaveConsumer(newValue -> targetConfig.trailMovesWithAngleOfAttack = newValue)
                 .build());
         advancedOptions.add(entryBuilder.startDoubleField(option("wingtipVerticalPosition", suffix), targetConfig.wingtipVerticalPosition)
                 .setDefaultValue(ConfigScreenBuilder.defaultConfig.wingtipVerticalPosition)
-                .setTooltip(tooltip("wingtipVerticalPosition", suffix))
+                .setTooltip(Component.translatable("text.elytratrails.option.noWorkingInVersion.@Tooltip"))
+                .setRequirement(() -> false)
+
                 .setSaveConsumer(newValue -> targetConfig.wingtipVerticalPosition = newValue)
                 .build());
         advancedOptions.add(entryBuilder.startDoubleField(option("wingtipHorizontalPosition", suffix), targetConfig.wingtipHorizontalPosition)
                 .setDefaultValue(ConfigScreenBuilder.defaultConfig.wingtipHorizontalPosition)
-                .setTooltip(tooltip("wingtipHorizontalPosition", suffix))
+                .setTooltip(Component.translatable("text.elytratrails.option.noWorkingInVersion.@Tooltip"))
+                .setRequirement(() -> false)
+
                 .setSaveConsumer(newValue -> targetConfig.wingtipHorizontalPosition = newValue)
                 .build());
         advancedOptions.add(entryBuilder.startDoubleField(option("wingtipDepthPosition", suffix), targetConfig.wingtipDepthPosition)
                 .setDefaultValue(ConfigScreenBuilder.defaultConfig.wingtipDepthPosition)
-                .setTooltip(tooltip("wingtipDepthPosition", suffix))
+                .setTooltip(Component.translatable("text.elytratrails.option.noWorkingInVersion.@Tooltip"))
                 .setSaveConsumer(newValue -> targetConfig.wingtipDepthPosition = newValue)
+                .setRequirement(() -> false)
                 .build());
         category.addEntry(entryBuilder.startDoubleField(option("width", suffix), targetConfig.maxWidth)
                 .setDefaultValue(ConfigScreenBuilder.defaultConfig.maxWidth)
@@ -753,43 +781,6 @@ public class ConfigScreenBuilder {
                 .setTooltip(tooltip("maxWidthSpeed", suffix))
                 .setSaveConsumer(newValue -> targetConfig.maxWidthSpeed = newValue)
                 .build());
-
-        advancedOptions.add(entryBuilder.startBooleanToggle(option("aoaBasedAlpha", suffix), targetConfig.aoaBasedAlpha)
-                .setDefaultValue(ConfigScreenBuilder.defaultConfig.aoaBasedAlpha)
-                .setTooltip(tooltip("aoaBasedAlpha", suffix))
-                .setSaveConsumer(newValue -> targetConfig.aoaBasedAlpha = newValue)
-                .build());
-
-        advancedOptions.add(entryBuilder.startDoubleField(option("minAlphaAOA", suffix), targetConfig.minAlphaAOA)
-                .setDefaultValue(ConfigScreenBuilder.defaultConfig.minAlphaAOA)
-                .setTooltip(tooltip("minAlphaAOA", suffix))
-                .setSaveConsumer(newValue -> targetConfig.minAlphaAOA = newValue)
-                .build());
-
-        advancedOptions.add(entryBuilder.startDoubleField(option("maxAlphaAOA", suffix), targetConfig.maxAlphaAOA)
-                .setDefaultValue(ConfigScreenBuilder.defaultConfig.maxAlphaAOA)
-                .setTooltip(tooltip("maxAlphaAOA", suffix))
-                .setSaveConsumer(newValue -> targetConfig.maxAlphaAOA = newValue)
-                .build());
-
-        advancedOptions.add(entryBuilder.startBooleanToggle(option("aoaBasedWidth", suffix), targetConfig.aoaBasedWidth)
-                .setDefaultValue(ConfigScreenBuilder.defaultConfig.aoaBasedWidth)
-                .setTooltip(tooltip("aoaBasedWidth", suffix))
-                .setSaveConsumer(newValue -> targetConfig.aoaBasedWidth = newValue)
-                .build());
-
-        advancedOptions.add(entryBuilder.startDoubleField(option("minWidthAOA", suffix), targetConfig.minWidthAOA)
-                .setDefaultValue(ConfigScreenBuilder.defaultConfig.minWidthAOA)
-                .setTooltip(tooltip("minWidthAOA", suffix))
-                .setSaveConsumer(newValue -> targetConfig.minWidthAOA = newValue)
-                .build());
-
-        advancedOptions.add(entryBuilder.startDoubleField(option("maxWidthAOA", suffix), targetConfig.maxWidthAOA)
-                .setDefaultValue(ConfigScreenBuilder.defaultConfig.maxWidthAOA)
-                .setTooltip(tooltip("maxWidthAOA", suffix))
-                .setSaveConsumer(newValue -> targetConfig.maxWidthAOA = newValue)
-                .build());
-
         category.addEntry(entryBuilder.startTextDescription(
                         Component.translatable("text.elytratrails.category.advanced"))
                 .build());

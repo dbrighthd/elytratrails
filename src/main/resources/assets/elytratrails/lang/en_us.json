@@ -25,7 +25,11 @@
   "text.elytratrails.option.PresetOthers": "Other's Selected Preset",
   "text.elytratrails.option.PresetOthers.@Tooltip": "Preset that is selected will override \"Other's Trails\" settings upon saving config",
 
+  "text.elytratrails.option.walkForTwirl" : "Use Strafe Keys for Twirl",
+  "text.elytratrails.option.walkForTwirl.@Tooltip" : "Use strafing keys for continuous twirl instead of the set keybinds (Normally you would just set them yourself, but keybind conflicts happen on 1.20.1)",
+  "text.elytratrails.option.noFirstPersonInVersion.@Tooltip" : "First Person Trails do not work in 1.20.1.",
 
+  "text.elytratrails.option.noWorkingInVersion.@Tooltip" : "Option unavailable in 1.20.1",
 
   "text.elytratrails.option.export": "Export as Preset",
   "text.elytratrails.option.export.@Tooltip": "Exports above setting as a preset (located in config/elytratrails_presets) upon config saving. PRESET NAME IS REQUIRED FOR SAVING",

@@ -2,19 +2,21 @@
   "required": true,
   "package": "dbrighthd.elytratrails.mixin.client",
   "plugin": "dbrighthd.elytratrails.compat.CompatMixinPlugin",
-  "compatibilityLevel": "JAVA_21",
+  "compatibilityLevel": "JAVA_17",
   "client": [
     "AvatarRendererMixin",
     "CameraTwirlMixin",
     "ClientLevelEntityRemovalMixin",
     "ClientPacketListenerRemoveEntitiesMixin",
-    "ModelFeatureStorageAccessor"
+    "ElytraLayerAccessorMixin",
+    "ElytraLayerMixin",
+    "EquipmentElytraModelAccessor",
+    "GameRendererMixin",
+    "LevelRendererMixin"
   ],
   "injectors": {
     "defaultRequire": 1
   },
   "mixins": [
-    "compat.EmfModelPartRootRegisterMixin",
-    "compat.cpm.CPMOrderedSubmitNodeCollectorMixin"
   ]
 }

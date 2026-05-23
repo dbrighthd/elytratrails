@@ -27,7 +27,7 @@ public class ModConfig {
     public boolean alwaysSnapTrail = true;
     public boolean logTrails = false;
     public boolean inputBuffer = true;
-
+    public boolean forceHiddenEntityRenderPass = true;
     //fresh took too long to update and people are complaining to me
     public boolean hardCodedFreshAnimationsPlayerWingtips = false;
     public ClearTrails clearTrailsOption = ClearTrails.NO;
@@ -38,6 +38,8 @@ public class ModConfig {
     }
 
     public boolean alwaysGlowWhenShaderTranslucent = true;
+
+    public boolean useWalkingKeysForTwirl = false;
 
     //server stuff
     public boolean syncWithServer = true;
@@ -92,6 +94,7 @@ public class ModConfig {
         if (particle == null) {
             particle = ParticleTypes.POOF;
         }
+
 
         clientPlayerConfig.validate();
         otherPlayerConfig.validate();

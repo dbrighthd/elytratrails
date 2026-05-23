@@ -4,7 +4,7 @@ import com.google.gson.JsonObject;
 import dbrighthd.elytratrails.network.PlayerConfig;
 import org.jetbrains.annotations.Nullable;
 
-import static dbrighthd.elytratrails.config.pack.TrailPackConfigManager.parseHexColor;
+//import static dbrighthd.elytratrails.config.pack.TrailPackConfigManager.parseHexColor;
 
 /**
  * TrailOverrides store a json object that can have any or none of the properties in ResolvedTrailSettings. exists to have stuff override eachotheer,
@@ -25,14 +25,17 @@ public record TrailOverrides(JsonObject values) {
             for (java.lang.reflect.RecordComponent component : PlayerConfig.class.getRecordComponents()) {
                 String name = component.getName();
                 Object value = component.getAccessor().invoke(baseConfig);
-                switch (value) {
-                    case Boolean b -> json.addProperty(name, b);
-                    case Number n -> json.addProperty(name, n);
-                    case Character c -> json.addProperty(name, c);
-                    case String s -> json.addProperty(name, s);
-                    case Enum<?> e -> json.addProperty(name, e.name());
-                    case null, default -> {
-                    }
+
+                if (value instanceof Boolean b) {
+                    json.addProperty(name, b);
+                } else if (value instanceof Number n) {
+                    json.addProperty(name, n);
+                } else if (value instanceof Character c) {
+                    json.addProperty(name, c);
+                } else if (value instanceof String s) {
+                    json.addProperty(name, s);
+                } else if (value instanceof Enum<?> e) {
+                    json.addProperty(name, e.name());
                 }
 
             }
@@ -126,13 +129,7 @@ public record TrailOverrides(JsonObject values) {
                 getBoolean("speedBasedWidth"),
                 getDouble("minWidthSpeed"),
                 getDouble("maxWidthSpeed"),
-                getDouble("distanceTillTrailEnd"),
-                getBoolean("aoaBasedAlpha"),
-                getDouble("minAlphaAOA"),
-                getDouble("maxAlphaAOA"),
-                getBoolean("aoaBasedWidth"),
-                getDouble("minWidthAOA"),
-                getDouble("maxWidthAOA")
+                getDouble("distanceTillTrailEnd")
         );
     }
 
@@ -156,7 +153,7 @@ public record TrailOverrides(JsonObject values) {
         }
 
         if (values.get(key).getAsJsonPrimitive().isString()) {
-            return parseHexColor(values.get(key).getAsString());
+            return -1;
         }
 
         return -1; //white

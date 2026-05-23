@@ -2,14 +2,16 @@ package dbrighthd.elytratrails.controller;
 
 import dbrighthd.elytratrails.network.ClientPlayerConfigStore;
 import dbrighthd.elytratrails.network.PlayerConfig;
-import dbrighthd.elytratrails.network.TwirlStateC2SPayload;
+//import dbrighthd.elytratrails.network.TwirlStateC2SPayload;
+import dbrighthd.elytratrails.network.RegisterPackets;
 import dbrighthd.elytratrails.util.EasingUtil;
-import dbrighthd.elytratrails.util.TimeUtil;
+import dbrighthd.elytratrails.util.ElytraTimeUtil;
 import it.unimi.dsi.fastutil.ints.Int2ObjectOpenHashMap;
 import net.fabricmc.fabric.api.client.networking.v1.ClientPlayNetworking;
+import net.fabricmc.fabric.api.networking.v1.PacketByteBufs;
 import net.minecraft.client.Minecraft;
+import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.util.Mth;
-import net.minecraft.world.entity.player.Player;
 
 import static dbrighthd.elytratrails.ElytraTrailsClient.getConfig;
 import static dbrighthd.elytratrails.util.EasingUtil.easeRandom;
@@ -32,9 +34,9 @@ public final class EntityTwirlManager {
 
     private enum Kind {NORMAL, CONTINUOUS}
 
-    public enum Phase {EASE_IN_180, CONSTANT_360, EASE_OUT_180}
+    private enum Phase {EASE_IN_180, CONSTANT_360, EASE_OUT_180}
 
-    public static final class TwirlData {
+    private static final class TwirlData {
         final int entityId;
 
         TwirlData(int entityId) {
@@ -82,7 +84,7 @@ public final class EntityTwirlManager {
             BY_ENTITY.put(entityId, data);
         }
 
-        long now = TimeUtil.currentNanos();
+        long now = ElytraTimeUtil.currentNanos();
         TwirlInfo info = getEntityTwirlConfigs(entityId);
 
         switch (state) {
@@ -192,7 +194,7 @@ public final class EntityTwirlManager {
         double DURATION_S = Math.max(playerConfig.twirlTime(), 0.0001);
         double HALF_DURATION_S = DURATION_S * 0.5;
         double OMEGA_RAD_S = (Math.PI * Math.PI) / DURATION_S;
-        double TURN360_DURATION_S = Math.TAU / OMEGA_RAD_S;
+        double TURN360_DURATION_S = Math.PI * 2 / OMEGA_RAD_S;
         EasingUtil.EaseType easeType = playerConfig.easeType();
 
         DURATION_S *= getEaseMult(easeType);
@@ -202,18 +204,14 @@ public final class EntityTwirlManager {
     }
 
     public static float getExtraRollRadians(int entityId) {
-        Player player = Minecraft.getInstance().player;
-        if(player != null && entityId == player.getId())
-        {
-            return getClientExtraRollRadians();
-        }
         TwirlData data = BY_ENTITY.get(entityId);
         if (data == null || !data.active) return 0f;
 
-        long now = TimeUtil.currentNanos();
+        long now = ElytraTimeUtil.currentNanos();
         TwirlInfo info = getEntityTwirlConfigs(entityId);
-        return data.kind == Kind.NORMAL ? -computeNormal(data, now, info) : -computeContinuous(data, now, info);
+        return data.kind == Kind.NORMAL ? computeNormal(data, now, info) : computeContinuous(data, now, info);
     }
+
     private static float computeNormal(TwirlData data, long now, TwirlInfo info) {
         double t = (now - data.startNanos) / (info.duration() * 1_000_000_000.0);
 
@@ -251,7 +249,7 @@ public final class EntityTwirlManager {
 
         t = Mth.clamp(t, 0.0, 1.0);
         double eased = EasingUtil.easeBoth(t, info.easeType());
-        return (float) -(data.baseAngleRad + data.dir * eased * Math.TAU);
+        return (float) -(data.baseAngleRad + data.dir * eased * Math.PI * 2);
     }
 
     private static float computeContinuous(TwirlData data, long now, TwirlInfo info) {
@@ -282,7 +280,7 @@ public final class EntityTwirlManager {
 
                 case CONSTANT_360 -> {
                     while (elapsedS >= info.turn360_duration()) {
-                        data.baseAngleRad += data.dir * Math.TAU;
+                        data.baseAngleRad += data.dir * Math.PI * 2;
                         data.phaseStartNanos += (long) (info.turn360_duration() * 1_000_000_000.0);
                         elapsedS = (now - data.phaseStartNanos) / 1_000_000_000.0;
 
@@ -300,10 +298,10 @@ public final class EntityTwirlManager {
                         }
                     }
                     if (info.easeType == EasingUtil.EaseType.Random) {
-                        double a = easeRandom() * Math.TAU;
+                        double a = easeRandom() * Math.PI * 2;
                         return (float) (data.baseAngleRad + data.dir * a);
                     }
-                    double a = Mth.clamp(info.omega_rad_s() * elapsedS, 0.0, Math.TAU);
+                    double a = Mth.clamp(info.omega_rad_s() * elapsedS, 0.0, Math.PI * 2);
                     return (float) (data.baseAngleRad + data.dir * a);
                 }
 
@@ -411,7 +409,7 @@ public final class EntityTwirlManager {
         data.kind = Kind.NORMAL;
         data.active = true;
         data.dir = dir;
-        data.baseAngleRad = angle - dir * EasingUtil.easeBoth(BACK_NORMAL_START_T, info.easeType()) * Math.TAU;
+        data.baseAngleRad = angle - dir * EasingUtil.easeBoth(BACK_NORMAL_START_T, info.easeType()) * Math.PI * 2;
         data.startNanos = now - (long) (BACK_NORMAL_START_T * info.duration() * 1_000_000_000.0);
         data.endRequested = false;
 
@@ -453,7 +451,7 @@ public final class EntityTwirlManager {
         t = Mth.clamp(t, 0.0, 1.0);
 
         double eased = EasingUtil.easeBoth(t, info.easeType());
-        return data.baseAngleRad + data.dir * eased * Math.TAU;
+        return data.baseAngleRad + data.dir * eased * Math.PI * 2;
     }
 
     private static double currentContinuousAngle(TwirlData data, long now, TwirlInfo info) {
@@ -469,9 +467,9 @@ public final class EntityTwirlManager {
             }
             case CONSTANT_360 -> {
                 if (info.easeType == EasingUtil.EaseType.Random) {
-                    yield EasingUtil.easeRandom() * Math.TAU;
+                    yield EasingUtil.easeRandom() * Math.PI * 2;
                 }
-                double a = Mth.clamp(info.omega_rad_s() * elapsedS, 0.0, Math.TAU);
+                double a = Mth.clamp(info.omega_rad_s() * elapsedS, 0.0, Math.PI * 2);
                 yield data.baseAngleRad + data.dir * a;
             }
             case EASE_OUT_180 -> {
@@ -516,10 +514,12 @@ public final class EntityTwirlManager {
         var mc = Minecraft.getInstance();
         if (mc.level == null || mc.player == null || mc.getConnection() == null) return;
 
-        TwirlStateC2SPayload payload = new TwirlStateC2SPayload(twirlState);
-        if (!ClientPlayNetworking.canSend(payload.type())) return;
+        if (!ClientPlayNetworking.canSend(RegisterPackets.TWIRL_STATE_C2S)) return;
 
-        ClientPlayNetworking.send(payload);
+        FriendlyByteBuf buf = PacketByteBufs.create();
+        buf.writeInt(twirlState);
+
+        ClientPlayNetworking.send(RegisterPackets.TWIRL_STATE_C2S, buf);
     }
 
     public static boolean isRolling(int entityId) {
@@ -527,69 +527,10 @@ public final class EntityTwirlManager {
             return false;
         }
         if (Minecraft.getInstance().player != null && entityId == Minecraft.getInstance().player.getId()) {
-            return isAnyClientRollActive();
+            return TwirlRoll.isAnyActive();
         }
         TwirlData data = BY_ENTITY.get(entityId);
         return data != null && data.active;
-    }
-    public static boolean isAnyClientRollActive() {
-        return TwirlController.isActive() || ContinuousTwirlController.isActive();
-    }
-
-    public static float getClientExtraRollRadians() {
-        if (ContinuousTwirlController.isActive()) {
-            return -ContinuousTwirlController.getExtraRollRadians();
-        }
-        return TwirlController.getExtraRollRadians();
-    }
-
-    //Returns 0 if not twirling, 0-1 inverse lerp if beginning twirl, 1 if continuous twirl, 1-0 inverse lerp when ending.
-    public static double getTwirlProgress(int entityId) {
-        Phase phase;
-        long phaseStartNanos;
-        Player player = Minecraft.getInstance().player;
-        if(player != null && entityId == player.getId())
-        {
-            if(ContinuousTwirlController.isActive())
-            {
-
-                phase = ContinuousTwirlController.phase;
-                phaseStartNanos = ContinuousTwirlController.phaseStartNanos;
-            }
-            else if(TwirlController.isActive())
-            {
-                return Math.sin(TwirlController.getExtraRollRadians());
-            }
-            else
-            {
-                return 0;
-            }
-        }
-        else
-        {
-            TwirlData data = BY_ENTITY.get(entityId);
-            if(data == null)
-            {
-                return 0;
-            }
-            phase = data.phase;
-            phaseStartNanos = data.phaseStartNanos;
-        }
-        TwirlInfo twirlInfo = getEntityTwirlConfigs(entityId);
-        double elapsedS = (TimeUtil.currentNanos() - phaseStartNanos) / 1_000_000_000.0;
-        switch(phase)
-        {
-            case EASE_IN_180 -> {
-                return Mth.clamp(elapsedS / twirlInfo.half_duration(), 0.0, 1.0);
-            }
-            case CONSTANT_360 -> {
-                return 1;
-            }
-            case EASE_OUT_180 -> {
-                return 1 - Mth.clamp(elapsedS / twirlInfo.half_duration(), 0.0, 1.0);
-            }
-            default -> {return 0;}
-        }
     }
 
     private EntityTwirlManager() {
