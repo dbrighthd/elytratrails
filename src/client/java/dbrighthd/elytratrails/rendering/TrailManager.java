@@ -5,7 +5,7 @@ import dbrighthd.elytratrails.config.pack.ResolvedSampleSettings;
 import dbrighthd.elytratrails.config.pack.ResolvedTrailSettings;
 import dbrighthd.elytratrails.config.pack.TrailPackConfigManager;
 import dbrighthd.elytratrails.network.ClientPlayerConfigStore;
-import dbrighthd.elytratrails.util.TimeUtil;
+import dbrighthd.elytratrails.util.ElytraTimeUtil;
 import it.unimi.dsi.fastutil.ints.Int2ObjectMap;
 import it.unimi.dsi.fastutil.ints.Int2ObjectOpenHashMap;
 import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents;
@@ -32,6 +32,7 @@ public class TrailManager {
     private static final Logger LOGGER = LoggerFactory.getLogger(TrailManager.class);
 
     private final Int2ObjectMap<EntityTrailGroup> activeTrails = new Int2ObjectOpenHashMap<>();
+
     public final Map<Long, Float> deadPointDistance = new HashMap<>();
     long trailId = 0;
     private final List<Trail> trails = new ArrayList<>();
@@ -44,7 +45,7 @@ public class TrailManager {
         ClientTickEvents.END_CLIENT_TICK.register(this::removeDeadPoints);
         LevelRenderEvents.AFTER_TRANSLUCENT_FEATURES.register(_ -> {
             modConfig = getConfig();
-            float now = TimeUtil.currentMillis();
+            float now = ElytraTimeUtil.currentMillis();
             boolean recordEmitters = true;
             if ((now - lastSample) < (1000f / modConfig.maxSamplePerSecond)) {
                 if (modConfig.alwaysSnapTrail) {
@@ -53,7 +54,7 @@ public class TrailManager {
                     return;
                 }
             } else {
-                lastSample = TimeUtil.currentMillis();
+                lastSample = ElytraTimeUtil.currentMillis();
             }
             if (!modConfig.enableAllTrails) {
                 removeAllTrails();
@@ -92,7 +93,7 @@ public class TrailManager {
     }
 
     private void removeDeadPoints(Minecraft ctx) {
-        long currentTime = TimeUtil.currentMillis();
+        long currentTime = ElytraTimeUtil.currentMillis();
         if (getConfig().logTrails) {
             for (Trail trail : trails) {
                 if (trail.points().isEmpty()) {

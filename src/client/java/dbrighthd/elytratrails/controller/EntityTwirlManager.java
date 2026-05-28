@@ -4,7 +4,7 @@ import dbrighthd.elytratrails.network.ClientPlayerConfigStore;
 import dbrighthd.elytratrails.network.PlayerConfig;
 import dbrighthd.elytratrails.network.TwirlStateC2SPayload;
 import dbrighthd.elytratrails.util.EasingUtil;
-import dbrighthd.elytratrails.util.TimeUtil;
+import dbrighthd.elytratrails.util.ElytraTimeUtil;
 import it.unimi.dsi.fastutil.ints.Int2ObjectOpenHashMap;
 import net.fabricmc.fabric.api.client.networking.v1.ClientPlayNetworking;
 import net.minecraft.client.Minecraft;
@@ -82,7 +82,7 @@ public final class EntityTwirlManager {
             BY_ENTITY.put(entityId, data);
         }
 
-        long now = TimeUtil.currentNanos();
+        long now = ElytraTimeUtil.currentNanos();
         TwirlInfo info = getEntityTwirlConfigs(entityId);
 
         switch (state) {
@@ -210,7 +210,7 @@ public final class EntityTwirlManager {
         TwirlData data = BY_ENTITY.get(entityId);
         if (data == null || !data.active) return 0f;
 
-        long now = TimeUtil.currentNanos();
+        long now = ElytraTimeUtil.currentNanos();
         TwirlInfo info = getEntityTwirlConfigs(entityId);
         return data.kind == Kind.NORMAL ? -computeNormal(data, now, info) : -computeContinuous(data, now, info);
     }
@@ -576,7 +576,7 @@ public final class EntityTwirlManager {
             phaseStartNanos = data.phaseStartNanos;
         }
         TwirlInfo twirlInfo = getEntityTwirlConfigs(entityId);
-        double elapsedS = (TimeUtil.currentNanos() - phaseStartNanos) / 1_000_000_000.0;
+        double elapsedS = (ElytraTimeUtil.currentNanos() - phaseStartNanos) / 1_000_000_000.0;
         switch(phase)
         {
             case EASE_IN_180 -> {

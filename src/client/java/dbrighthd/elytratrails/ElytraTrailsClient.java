@@ -13,7 +13,7 @@ import dbrighthd.elytratrails.network.RegisterPacketsClient;
 import dbrighthd.elytratrails.rendering.TrailPipelines;
 import dbrighthd.elytratrails.rendering.TrailSystem;
 import dbrighthd.elytratrails.rendering.TrailTextureRegistry;
-import dbrighthd.elytratrails.util.TimeUtil;
+import dbrighthd.elytratrails.util.ElytraTimeUtil;
 import net.fabricmc.api.ClientModInitializer;
 import net.fabricmc.fabric.api.resource.ResourceManagerHelper;
 import net.fabricmc.fabric.api.resource.ResourcePackActivationType;
@@ -39,7 +39,7 @@ public class ElytraTrailsClient implements ClientModInitializer {
     public void onInitializeClient() {
         ConfigManager.load();
         refreshConfig();
-        TimeUtil.init();
+        ElytraTimeUtil.init();
         Compatibility.init();
         ElytraTrailsKeybind.init();
         TrailPipelines.init();

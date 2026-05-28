@@ -1,7 +1,7 @@
 package dbrighthd.elytratrails.controller;
 
 import dbrighthd.elytratrails.util.EasingUtil;
-import dbrighthd.elytratrails.util.TimeUtil;
+import dbrighthd.elytratrails.util.ElytraTimeUtil;
 import net.minecraft.util.Mth;
 
 import static dbrighthd.elytratrails.ElytraTrailsClient.getConfig;
@@ -67,7 +67,7 @@ public final class TwirlController {
                 && effectiveQueuedDir != 0
                 && effectiveQueuedDir == -currentDir) {
 
-            long now = TimeUtil.currentNanos();
+            long now = ElytraTimeUtil.currentNanos();
             double t = (now - startNanos) / (DURATION_S * 1_000_000_000.0);
             t = Mth.clamp(t, 0.0, 1.0);
 
@@ -124,7 +124,7 @@ public final class TwirlController {
             return false;
         }
 
-        long now = TimeUtil.currentNanos();
+        long now = ElytraTimeUtil.currentNanos();
         double t = (now - startNanos) / (DURATION_S * 1_000_000_000.0);
         t = Mth.clamp(t, 0.0, 1.0);
         return t < BACK_TWIRL_PEAK_T;
@@ -132,7 +132,7 @@ public final class TwirlController {
 
     private static void startSpin() {
         active = true;
-        startNanos = TimeUtil.currentNanos();
+        startNanos = ElytraTimeUtil.currentNanos();
         baseAngleRad = 0.0;
 
         reverseQueued = false;
@@ -163,7 +163,7 @@ public final class TwirlController {
             nextAltDir = -currentDir;
         }
 
-        long now = TimeUtil.currentNanos();
+        long now = ElytraTimeUtil.currentNanos();
         long offset = (long) (BACK_TWIRL_START_T * DURATION_S * 1_000_000_000.0);
         startNanos = now - offset;
 
@@ -178,7 +178,7 @@ public final class TwirlController {
     public static float getExtraRollRadians() {
         if (!active) return 0f;
 
-        long now = TimeUtil.currentNanos();
+        long now = ElytraTimeUtil.currentNanos();
         double t = (now - startNanos) / (DURATION_S * 1_000_000_000.0);
 
         if (easeType == EasingUtil.EaseType.Back

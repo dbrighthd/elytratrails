@@ -4,7 +4,7 @@ import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents;
 import net.minecraft.client.Minecraft;
 import net.minecraft.util.Util;
 
-public class TimeUtil {
+public class ElytraTimeUtil {
 
     private static long tickCounter = 0;
 

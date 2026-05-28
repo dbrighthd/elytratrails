@@ -4,7 +4,7 @@ import dbrighthd.elytratrails.config.pack.ResolvedTrailSettings;
 import dbrighthd.elytratrails.config.pack.TrailPackConfigManager;
 import dbrighthd.elytratrails.network.ClientPlayerConfigStore;
 import dbrighthd.elytratrails.network.PlayerConfig;
-import dbrighthd.elytratrails.util.TimeUtil;
+import dbrighthd.elytratrails.util.ElytraTimeUtil;
 import net.minecraft.client.renderer.rendertype.RenderType;
 import net.minecraft.resources.Identifier;
 import net.minecraft.world.phys.Vec3;
@@ -27,7 +27,7 @@ public record Trail(Identifier texture, List<Point> points, ResolvedTrailSetting
      */
     public record Point(Vec3 pos, long epoch, PlayerSpeedData speedData, boolean visible) {
         public Point(Vec3 pos, PlayerSpeedData speed, boolean visible) {
-            this(pos, TimeUtil.currentMillis(), speed, visible);
+            this(pos, ElytraTimeUtil.currentMillis(), speed, visible);
         }
     }
 

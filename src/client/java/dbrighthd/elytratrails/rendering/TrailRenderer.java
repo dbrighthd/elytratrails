@@ -5,7 +5,7 @@ import com.mojang.blaze3d.vertex.VertexConsumer;
 import dbrighthd.elytratrails.config.ModConfig;
 import dbrighthd.elytratrails.config.pack.ResolvedTrailSettings;
 import dbrighthd.elytratrails.rendering.math.SplineInterpolation;
-import dbrighthd.elytratrails.util.TimeUtil;
+import dbrighthd.elytratrails.util.ElytraTimeUtil;
 import net.fabricmc.fabric.api.client.rendering.v1.level.LevelRenderContext;
 import net.minecraft.client.Camera;
 import net.minecraft.client.Minecraft;
@@ -153,7 +153,7 @@ public class TrailRenderer {
 //            });
                 useLightMap = renderType == TrailPipelines.entityTranslucentCull(trail.texture()) || renderType == TrailPipelines.entityTranslucentCullWireFrame(trail.texture()) || renderType == TrailPipelines.entityCutoutLit(trail.texture());
                 totalTrailLength = 0f;
-                currentTime = TimeUtil.currentMillis();
+                currentTime = ElytraTimeUtil.currentMillis();
                 for (int i = 0; i < last; i++) {
                     int i0 = (i > 0) ? i - 1 : 0;
                     int i2 = i + 1;

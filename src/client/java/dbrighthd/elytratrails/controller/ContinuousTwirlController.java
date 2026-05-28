@@ -1,7 +1,7 @@
 package dbrighthd.elytratrails.controller;
 
 import dbrighthd.elytratrails.util.EasingUtil;
-import dbrighthd.elytratrails.util.TimeUtil;
+import dbrighthd.elytratrails.util.ElytraTimeUtil;
 import net.minecraft.util.Mth;
 import dbrighthd.elytratrails.controller.EntityTwirlManager.Phase;
 
@@ -88,7 +88,7 @@ public final class ContinuousTwirlController {
                 && effectiveOppositeRequest != 0
                 && easeType == EasingUtil.EaseType.Back) {
 
-            long now = TimeUtil.currentNanos();
+            long now = ElytraTimeUtil.currentNanos();
             double elapsedS = (now - phaseStartNanos) / 1_000_000_000.0;
             double u = Mth.clamp(elapsedS / HALF_DURATION_S, 0.0, 1.0);
 
@@ -136,7 +136,7 @@ public final class ContinuousTwirlController {
             return true;
         }
 
-        long now = TimeUtil.currentNanos();
+        long now = ElytraTimeUtil.currentNanos();
         double elapsedS = (now - phaseStartNanos) / 1_000_000_000.0;
         double u = Mth.clamp(elapsedS / HALF_DURATION_S, 0.0, 1.0);
         return u < BACK_EASE_OUT_PEAK_U;
@@ -145,7 +145,7 @@ public final class ContinuousTwirlController {
     private static void startSpin() {
         active = true;
         phase = Phase.EASE_IN_180;
-        phaseStartNanos = TimeUtil.currentNanos();
+        phaseStartNanos = ElytraTimeUtil.currentNanos();
         baseAngleRad = 0.0;
 
         holdMode = pendingMode;
@@ -178,7 +178,7 @@ public final class ContinuousTwirlController {
         currentDir = newDir;
         phase = Phase.EASE_IN_180;
 
-        long now = TimeUtil.currentNanos();
+        long now = ElytraTimeUtil.currentNanos();
         long peakOffset = (long) (BACK_EASE_IN_START_U * HALF_DURATION_S * 1_000_000_000.0);
         phaseStartNanos = now - peakOffset;
 
@@ -225,7 +225,7 @@ public final class ContinuousTwirlController {
     public static float getExtraRollRadians() {
         if (!active) return 0f;
 
-        long now = TimeUtil.currentNanos();
+        long now = ElytraTimeUtil.currentNanos();
 
         for (int guard = 0; guard < 6; guard++) {
             double elapsedS = (now - phaseStartNanos) / 1_000_000_000.0;
