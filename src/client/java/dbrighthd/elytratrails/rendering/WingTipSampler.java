@@ -220,7 +220,7 @@ public class WingTipSampler {
             ResolvedEmitterPoint cameraRelative = transformLocalPointThroughPath(stack, elytraRoot, wingRoot, spawner.pathSegments(), getEmitterLocalOffset(spawner));
             if (cameraRelative == null) continue;
 
-            emitters.add(new Emitter(cameraPos.add(cameraRelative.position()).add(entityWorldOffset), spawner.isLeftWing, "elytra" + (emfInfo.variant > 1 ? emfInfo.variant : ""), spawner.spawner.path(), cameraRelative.visible));
+            emitters.add(new Emitter(cameraRelative.position().add(entityWorldOffset.subtract(cameraPos)), spawner.isLeftWing, "elytra" + (emfInfo.variant > 1 ? emfInfo.variant : ""), spawner.spawner.path(), cameraRelative.visible));
         }
         return emitters;
     }
@@ -236,7 +236,7 @@ public class WingTipSampler {
             );
             if (cameraRelative == null) continue;
 
-            emitters.add(new Emitter(cameraPos.add(cameraRelative.position()).add(entityWorldOffset), spawner.isLeftWing, emfInfo.name + (emfInfo.variant > 1 ? emfInfo.variant : ""), spawner.spawner.path(), cameraRelative.visible));
+            emitters.add(new Emitter(cameraRelative.position().add(entityWorldOffset.subtract(cameraPos)), spawner.isLeftWing, emfInfo.name + (emfInfo.variant > 1 ? emfInfo.variant : ""), spawner.spawner.path(), cameraRelative.visible));
         }
         return emitters;
     }
