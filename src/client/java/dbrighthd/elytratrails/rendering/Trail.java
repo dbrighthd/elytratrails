@@ -29,6 +29,10 @@ public record Trail(Identifier texture, List<Point> points, ResolvedTrailSetting
         public Point(Vec3 pos, PlayerSpeedData speed, boolean visible) {
             this(pos, ElytraTimeUtil.currentMillis(), speed, visible);
         }
+        public Point addPositionOffset(Vec3 cameraDelta)
+        {
+            return new Point(pos.add(cameraDelta), epoch, speedData, visible);
+        }
     }
 
     private static RenderType getRenderType(Identifier texture, ResolvedTrailSettings trailSettings) {

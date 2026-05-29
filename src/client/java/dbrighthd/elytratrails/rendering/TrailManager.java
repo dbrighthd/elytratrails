@@ -15,6 +15,7 @@ import net.minecraft.world.entity.Avatar;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.phys.Vec3;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -32,7 +33,8 @@ public class TrailManager {
     private static final Logger LOGGER = LoggerFactory.getLogger(TrailManager.class);
 
     private final Int2ObjectMap<EntityTrailGroup> activeTrails = new Int2ObjectOpenHashMap<>();
-
+    public Vec3 prevCameraSpace;
+    public Vec3 deltaCameraSpace;
     public final Map<Long, Float> deadPointDistance = new HashMap<>();
     long trailId = 0;
     private final List<Trail> trails = new ArrayList<>();
@@ -40,11 +42,14 @@ public class TrailManager {
     private final WingTipSampler sampler;
     private ModConfig modConfig;
 
+
+
     public TrailManager(WingTipSampler sampler) {
         this.sampler = sampler;
         ClientTickEvents.END_CLIENT_TICK.register(this::removeDeadPoints);
         LevelRenderEvents.AFTER_TRANSLUCENT_FEATURES.register(_ -> {
             modConfig = getConfig();
+            doCameraOffset();
             float now = ElytraTimeUtil.currentMillis();
             boolean recordEmitters = true;
             if ((now - lastSample) < (1000f / modConfig.maxSamplePerSecond)) {
@@ -67,6 +72,22 @@ public class TrailManager {
         });
     }
 
+    public void doCameraOffset()
+    {
+        Vec3 cameraPos = Minecraft.getInstance().gameRenderer.getMainCamera().position();
+        if(prevCameraSpace == null)
+        {
+            prevCameraSpace = cameraPos;
+        }
+        deltaCameraSpace = prevCameraSpace.subtract(cameraPos);
+        for (Trail trail : trails) {
+            List<Trail.Point> points = trail.points();
+
+            points.replaceAll(point -> point.addPositionOffset(deltaCameraSpace));
+
+        }
+        prevCameraSpace = Minecraft.getInstance().gameRenderer.getMainCamera().position();
+    }
     public long newTrailId() {
         return trailId++;
     }

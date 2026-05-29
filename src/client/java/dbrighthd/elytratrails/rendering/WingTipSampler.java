@@ -259,8 +259,8 @@ public class WingTipSampler {
         Vec3 rightTip = computeTransformedWingTip(stack, elytraRoot, rightWing, ModelTransformationUtil.VANILLA_RIGHT_WING_TIP, player);
 
         return List.of(
-                new Emitter(cameraPos.add(leftTip).add(entityWorldOffset), true, "elytra", "/leftWingTip", true),
-                new Emitter(cameraPos.add(rightTip).add(entityWorldOffset), false, "elytra", "/rightWingTip", true)
+                new Emitter(leftTip.add(entityWorldOffset.subtract(cameraPos)), true, "elytra", "/leftWingTip", true),
+                new Emitter(rightTip.add(entityWorldOffset.subtract(cameraPos)), false, "elytra", "/rightWingTip", true)
         );
     }
 
@@ -269,7 +269,7 @@ public class WingTipSampler {
         ModelPart modelPart = animatedRoot != null ? animatedRoot : model.root();
         Vec3 tip = computeTransformedPoint(stack, modelPart, modelPart, offsets);
         return List.of(
-                new Emitter(cameraPos.add(tip).add(entityWorldOffset), true, entity.getType().toShortString(), "/trailspawner", true)
+                new Emitter(tip.add(entityWorldOffset.subtract(cameraPos)), true, entity.getType().toShortString(), "/trailspawner", true)
         );
     }
 
@@ -427,7 +427,7 @@ public class WingTipSampler {
         renderer.extractRenderState(player, state, partialTick);
 
         submitStorage.clear();
-        dispatcher.submit(state, cameraRenderState, -cameraRenderState.pos.x, -cameraRenderState.pos.y, -cameraRenderState.pos.z, new PoseStack(), submitStorage);
+        dispatcher.submit(state, cameraRenderState, 0, 0, 0, new PoseStack(), submitStorage);
         return findElytraModelSubmit();
     }
 
@@ -436,7 +436,7 @@ public class WingTipSampler {
 
         EntityRenderState state = dispatcher.extractEntity(entity, partialTick);
         submitStorage.clear();
-        dispatcher.submit(state, cameraRenderState, -cameraRenderState.pos.x, -cameraRenderState.pos.y, -cameraRenderState.pos.z, new PoseStack(), submitStorage);
+        dispatcher.submit(state, cameraRenderState, 0, 0, 0, new PoseStack(), submitStorage);
 
         List<SubmitNodeStorage.ModelSubmit<?>> submits = getAllModelSubmits();
         SubmitNodeStorage.ModelSubmit<?> fallback = null;

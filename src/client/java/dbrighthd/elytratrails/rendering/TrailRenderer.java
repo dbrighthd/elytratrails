@@ -70,7 +70,6 @@ public class TrailRenderer {
 
         modConfig = getConfig();
         cameraPosition = camera.position();
-        stack.translate(cameraPosition.scale(-1f));
         for (Trail trail : manager.trails()) {
             List<Trail.Point> points = trail.points();
             int size = points.size();
@@ -348,8 +347,8 @@ public class TrailRenderer {
                 Vec3 startTan = SplineInterpolation.catmullRomTangent(p0, p1, p2, p3, tStart).normalize();
                 Vec3 endTan = SplineInterpolation.catmullRomTangent(p0, p1, p2, p3, tEnd).normalize();
 
-                Vec3 sideA = startTan.cross(startPos.subtract(cameraPosition).normalize()).normalize();
-                Vec3 sideB = endTan.cross(endPos.subtract(cameraPosition).normalize()).normalize();
+                Vec3 sideA = startTan.cross(startPos.normalize()).normalize();
+                Vec3 sideB = endTan.cross(endPos.normalize()).normalize();
 
                 float removeDist = manager.deadPointDistance.getOrDefault(trail.trailId(), 0f);
                 v1 += removeDist;
@@ -467,7 +466,7 @@ public class TrailRenderer {
     private int computeLightTexture(Vec3 pos) {
         if (minecraft.level == null) return LightCoordsUtil.FULL_BRIGHT;
 
-        BlockPos blockPos = BlockPos.containing(pos);
+        BlockPos blockPos = BlockPos.containing(pos.add(cameraPosition));
         return LevelRenderer.getLightCoords(minecraft.level, blockPos);
     }
 
