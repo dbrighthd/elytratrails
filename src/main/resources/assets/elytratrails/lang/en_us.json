@@ -369,6 +369,43 @@
   "text.elytratrails.option.maxWidthSpeed" : "Full Width Speed",
   "text.elytratrails.option.maxWidthSpeed.@Tooltip" : "Speed at which width is set to max",
 
+  "text.elytratrails.option.aoaBasedAlpha" : "AOA Dependent Transparency",
+  "text.elytratrails.option.aoaBasedAlpha.@Tooltip" : "Change trail opacity/alpha based on AOA angle",
+
+  "text.elytratrails.option.minAlphaAOA" : "0 Alpha AOA Angle",
+  "text.elytratrails.option.minAlphaAOA.@Tooltip" : "AOA Angle (Degrees) at which alpha is set to 0",
+
+  "text.elytratrails.option.maxAlphaAOA" : "Full Alpha AOA Angle",
+  "text.elytratrails.option.maxAlphaAOA.@Tooltip" : "AOA Angle (Degrees) at which alpha is set to max",
+
+  "text.elytratrails.option.aoaBasedWidth" : "AOA Dependent Width",
+  "text.elytratrails.option.aoaBasedWidth.@Tooltip" : "Change trail width based on AOA angle",
+
+  "text.elytratrails.option.minWidthAOA" : "0 Width AOA Angle",
+  "text.elytratrails.option.minWidthAOA.@Tooltip" : "AOA Angle (Degrees) at which width is set to 0",
+
+  "text.elytratrails.option.maxWidthAOA" : "Full Width AOA Angle",
+  "text.elytratrails.option.maxWidthAOA.@Tooltip" : "AOA Angle (Degrees) at which width is set to max",
+
+
+  "text.elytratrails.option.aoaBasedAlphaOthersDefault" : "AOA Dependent Transparency",
+  "text.elytratrails.option.aoaBasedAlphaOthersDefault.@Tooltip" : "Change trail opacity/alpha based on AOA angle",
+
+  "text.elytratrails.option.minAlphaAOAOthersDefault" : "0 Alpha AOA Angle",
+  "text.elytratrails.option.minAlphaAOAOthersDefault.@Tooltip" : "AOA Angle (Degrees) at which alpha is set to 0",
+
+  "text.elytratrails.option.maxAlphaAOAOthersDefault" : "Full Alpha AOA Angle",
+  "text.elytratrails.option.maxAlphaAOAOthersDefault.@Tooltip" : "AOA Angle (Degrees) at which alpha is set to max",
+
+  "text.elytratrails.option.aoaBasedWidthOthersDefault" : "AOA Dependent Width",
+  "text.elytratrails.option.aoaBasedWidthOthersDefault.@Tooltip" : "Change trail width based on AOA angle",
+
+  "text.elytratrails.option.minWidthAOAOthersDefault" : "0 Width AOA Angle",
+  "text.elytratrails.option.minWidthAOAOthersDefault.@Tooltip" : "AOA Angle (Degrees) at which width is set to 0",
+
+  "text.elytratrails.option.maxWidthAOAOthersDefault" : "Full Width AOA Angle",
+  "text.elytratrails.option.maxWidthAOAOthersDefault.@Tooltip" : "AOA Angle (Degrees) at which width is set to max",
+
 
   "text.elytratrails.option.useSplines": "Trail Spline Smoothing",
   "text.elytratrails.option.useSplines.@Tooltip": "Should the trail interpolate between points to make it smoother?",
