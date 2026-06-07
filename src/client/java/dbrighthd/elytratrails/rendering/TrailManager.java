@@ -16,10 +16,7 @@ import net.minecraft.world.entity.player.Player;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 import static dbrighthd.elytratrails.ElytraTrailsClient.getConfig;
 import static dbrighthd.elytratrails.config.pack.TrailPackConfigManager.*;
@@ -33,6 +30,7 @@ public class TrailManager {
     long trailId = 0;
     private final List<Trail> trails = new ArrayList<>();
     private float lastSample;
+    private final Set<Long> trailsToRemove = new HashSet<>();
     private final WingTipSampler sampler;
     private ModConfig modConfig;
 
@@ -76,6 +74,11 @@ public class TrailManager {
         return (activeTrails.containsKey(eid));
     }
 
+    public void queueTrailDeletion(long trailId)
+    {
+        trailsToRemove.add(trailId);
+    }
+
     private void removeDeadPoints(Minecraft ctx) {
         long currentTime = ElytraTimeUtil.currentMillis();
         if (getConfig().logTrails) {
@@ -90,6 +93,8 @@ public class TrailManager {
 
             }
         }
+        trails.removeIf(trail -> trailsToRemove.contains(trail.trailId()));
+        trailsToRemove.clear();
         trails.removeIf(t -> (t.points().isEmpty() || t.points().stream().allMatch(p -> currentTime - p.epoch() > t.config().trailLifetime() * 1000)) && removeTrailFromMap(t));
         for (Trail trail : trails) {
             List<Trail.Point> points = trail.points();

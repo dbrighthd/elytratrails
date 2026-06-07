@@ -183,7 +183,9 @@ public class TrailRenderer {
             if (modConfig.logTrails) {
                 LOGGER.info("Trail removed for entity {}, trail segment was too long and discarded as invalid.", trail.entityId());
             }
+
             manager.removeTrail(trail.entityId());
+            manager.queueTrailDeletion(trail.trailId());
             return;
         }
         boolean needsSplit = false;
