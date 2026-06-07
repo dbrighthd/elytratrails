@@ -87,7 +87,7 @@ public class TrailRenderer {
                 if (emitters != null && manager.isActiveTrail(trail)) {
                     if(emitters.size() <= trail.emitterIndex())
                     {
-                        manager.removeTrail(trail.entityId());
+                            manager.removeTrail(trail.entityId());
                     }
                     Emitter emitter = emitters.get(trail.emitterIndex());
                     snappedLastPoint = copyTrailPointNewPos(points.get(last), emitter.position(), emitter.visible());
@@ -183,7 +183,9 @@ public class TrailRenderer {
             if (modConfig.logTrails) {
                 LOGGER.info("Trail removed for entity {}, trail segment was too long and discarded as invalid.", trail.entityId());
             }
+
             manager.removeTrail(trail.entityId());
+            manager.queueTrailDeletion(trail.trailId());
             return;
         }
         boolean needsSplit = false;
