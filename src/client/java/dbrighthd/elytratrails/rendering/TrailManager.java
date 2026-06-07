@@ -10,24 +10,26 @@ import it.unimi.dsi.fastutil.ints.Int2ObjectMap;
 import it.unimi.dsi.fastutil.ints.Int2ObjectOpenHashMap;
 import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents;
 import net.fabricmc.fabric.api.client.rendering.v1.level.LevelRenderEvents;
+import net.fabricmc.loader.impl.lib.sat4j.core.Vec;
 import net.minecraft.client.Minecraft;
+import net.minecraft.util.RandomSource;
 import net.minecraft.world.entity.Avatar;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.level.levelgen.synth.PerlinNoise;
 import net.minecraft.world.phys.Vec3;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 import static dbrighthd.elytratrails.ElytraTrailsClient.getConfig;
 import static dbrighthd.elytratrails.config.pack.TrailPackConfigManager.*;
 import static dbrighthd.elytratrails.controller.EntityTwirlManager.isRolling;
 import static dbrighthd.elytratrails.util.ModelTransformationUtil.getUnsignedAOA;
+import static java.lang.Math.cos;
+import static java.lang.Math.sin;
 
 public class TrailManager {
     private static final Logger LOGGER = LoggerFactory.getLogger(TrailManager.class);
@@ -37,8 +39,13 @@ public class TrailManager {
     public Vec3 deltaCameraSpace;
     public final Map<Long, Float> deadPointDistance = new HashMap<>();
     long trailId = 0;
+    private final PerlinNoise perlinNoise = PerlinNoise.create(RandomSource.create(), List.of(1));
     private final List<Trail> trails = new ArrayList<>();
     private float lastSample;
+    private Set<Long> trailsToRemove = new HashSet<>();
+    private float now = ElytraTimeUtil.currentMillis();
+    private float past = ElytraTimeUtil.currentMillis();
+    private float deltaT;
     private final WingTipSampler sampler;
     private ModConfig modConfig;
 
@@ -46,11 +53,13 @@ public class TrailManager {
 
     public TrailManager(WingTipSampler sampler) {
         this.sampler = sampler;
+
         ClientTickEvents.END_CLIENT_TICK.register(this::removeDeadPoints);
         LevelRenderEvents.AFTER_TRANSLUCENT_FEATURES.register(_ -> {
             modConfig = getConfig();
+            now = ElytraTimeUtil.currentMillis();
+            deltaT = now - past;
             doCameraOffset();
-            float now = ElytraTimeUtil.currentMillis();
             boolean recordEmitters = true;
             if ((now - lastSample) < (1000f / modConfig.maxSamplePerSecond)) {
                 if (modConfig.alwaysSnapTrail) {
@@ -69,6 +78,7 @@ public class TrailManager {
             if (modConfig.extendedEmfSupport && (!entitiesWithTrails.isEmpty() || !entitiesWithTrailOverrides.isEmpty())) {
                 gatherEntityTrails(Minecraft.getInstance(), recordEmitters);
             }
+            past = ElytraTimeUtil.currentMillis();
         });
     }
 
@@ -86,7 +96,21 @@ public class TrailManager {
             points.replaceAll(point -> point.addPositionOffset(deltaCameraSpace));
 
         }
+//        for (Trail trail : trails) {
+//            List<Trail.Point> points = trail.points();
+//
+//            points.replaceAll(point -> point.addPositionOffset(positionToWindVector(point,cameraPos)));
+//
+//        }
         prevCameraSpace = Minecraft.getInstance().gameRenderer.getMainCamera().position();
+    }
+
+    Vec3 positionToWindVector(Trail.Point point, Vec3 cameraPos)
+    {
+        Vec3 combined = point.pos().add(cameraPos).scale(0.01);
+        double outPerlin = perlinNoise.getValue(combined.x, combined.y, combined.z);
+        double angleRad = outPerlin * 2 * Math.PI;
+        return (new Vec3(cos(angleRad), 0, sin(angleRad))).scale(0.001).scale(deltaT);
     }
     public long newTrailId() {
         return trailId++;
@@ -127,6 +151,8 @@ public class TrailManager {
 
             }
         }
+        trails.removeIf(trail -> trailsToRemove.contains(trail.trailId()));
+        trailsToRemove.clear();
         trails.removeIf(t -> (t.points().isEmpty() || t.points().stream().allMatch(p -> currentTime - p.epoch() > t.config().trailLifetime() * 1000)) && removeTrailFromMap(t));
         for (Trail trail : trails) {
             List<Trail.Point> points = trail.points();
@@ -157,6 +183,12 @@ public class TrailManager {
         return true;
 
     }
+
+    public void queueTrailDeletion(long trailId)
+    {
+        trailsToRemove.add(trailId);
+    }
+
 
     public void removeTrail(int entityId) {
         if (getConfig().logTrails && activeTrails.containsKey(entityId)) {

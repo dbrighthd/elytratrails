@@ -230,9 +230,10 @@ public class TrailRenderer {
         double chordLenSq = chord.lengthSqr();
         if (chordLenSq > 400) {
             if (modConfig.logTrails) {
-                LOGGER.info("Trail removed for entity {}, trail segment was too long and discarded as invalid.", trail.entityId());
+                LOGGER.info("Trail removed for entity {}, trail segment was too long and discarded as invalid", trail.entityId());
             }
             manager.removeTrail(trail.entityId());
+            manager.queueTrailDeletion(trail.trailId());
             return;
         }
         boolean needsSplit = false;
@@ -291,8 +292,8 @@ public class TrailRenderer {
             }
 
             if (trailSettings.enableRandomWidth()) {
-                scaleStart = scaleStart * (float) trailSettings.randomWidthVariation() * ((float) (perlinNoise.getValue(startPos.x, startPos.y, startPos.z)) + 1);
-                scaleEnd = scaleEnd * (float) trailSettings.randomWidthVariation() * ((float) (perlinNoise.getValue(endPos.x, endPos.y, endPos.z)) + 1);
+                scaleStart = scaleStart * (float) trailSettings.randomWidthVariation() * ((float) (perlinNoise.getValue(startPos.x + cameraPosition.x, startPos.y + cameraPosition.y, startPos.z + cameraPosition.z)) + 1);
+                scaleEnd = scaleEnd * (float) trailSettings.randomWidthVariation() * ((float) (perlinNoise.getValue(endPos.x + cameraPosition.x, endPos.y + cameraPosition.y, endPos.z + cameraPosition.z)) + 1);
 
             }
             if (trailSettings.increaseWidthOverTime()) {
