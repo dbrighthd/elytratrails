@@ -18,10 +18,7 @@ import net.minecraft.world.phys.Vec3;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 import static dbrighthd.elytratrails.ElytraTrailsClient.getConfig;
 import static dbrighthd.elytratrails.config.pack.TrailPackConfigManager.*;
@@ -36,6 +33,7 @@ public class TrailManager {
     public Vec3 prevCameraSpace;
     public Vec3 deltaCameraSpace;
     private final List<Trail> trails = new ArrayList<>();
+    private final Set<Long> trailsToRemove = new HashSet<>();
     private float lastSample;
     private final WingTipSampler sampler;
     private ModConfig modConfig;
@@ -90,7 +88,10 @@ public class TrailManager {
     public boolean isActiveTrail(Trail trail) {
         return (activeTrails.containsKey(trail.entityId()) && activeTrails.get(trail.entityId()).trails().contains(trail));
     }
-
+    public void queueTrailDeletion(long trailId)
+    {
+        trailsToRemove.add(trailId);
+    }
     @SuppressWarnings("unused")
     public boolean entityHasActiveTrails(int eid) {
         return (activeTrails.containsKey(eid));
@@ -110,6 +111,8 @@ public class TrailManager {
 
             }
         }
+        trails.removeIf(trail -> trailsToRemove.contains(trail.trailId()));
+        trailsToRemove.clear();
         trails.removeIf(t -> (t.points().isEmpty() || t.points().stream().allMatch(p -> currentTime - p.epoch() > t.config().trailLifetime() * 1000)) && removeTrailFromMap(t));
         for (Trail trail : trails) {
             List<Trail.Point> points = trail.points();
