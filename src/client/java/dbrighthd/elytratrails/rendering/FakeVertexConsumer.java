@@ -9,31 +9,31 @@ public final class FakeVertexConsumer implements VertexConsumer {
 
     @Override
     public VertexConsumer addVertex(float x, float y, float z) {
-        return null;
+        return this;
     }
 
     @Override
     public VertexConsumer setColor(int red, int green, int blue, int alpha) {
-        return null;
+        return this;
     }
 
     @Override
     public VertexConsumer setUv(float u, float v) {
-        return null;
+        return this;
     }
 
     @Override
     public VertexConsumer setUv1(int u, int v) {
-        return null;
+        return this;
     }
 
     @Override
     public VertexConsumer setUv2(int u, int v) {
-        return null;
+        return this;
     }
 
     @Override
     public VertexConsumer setNormal(float normalX, float normalY, float normalZ) {
-        return null;
+        return this;
     }
 }
