@@ -757,42 +757,42 @@ public class ConfigScreenBuilder {
                 .setTooltip(tooltip("maxWidthSpeed", suffix))
                 .setSaveConsumer(newValue -> targetConfig.maxWidthSpeed = newValue)
                 .build());
-//
-//        advancedOptions.add(entryBuilder.startBooleanToggle(option("aoaBasedAlpha", suffix), targetConfig.aoaBasedAlpha)
-//                .setDefaultValue(ConfigScreenBuilder.defaultConfig.aoaBasedAlpha)
-//                .setTooltip(tooltip("aoaBasedAlpha", suffix))
-//                .setSaveConsumer(newValue -> targetConfig.aoaBasedAlpha = newValue)
-//                .build());
-//
-//        advancedOptions.add(entryBuilder.startDoubleField(option("minAlphaAOA", suffix), targetConfig.minAlphaAOA)
-//                .setDefaultValue(ConfigScreenBuilder.defaultConfig.minAlphaAOA)
-//                .setTooltip(tooltip("minAlphaAOA", suffix))
-//                .setSaveConsumer(newValue -> targetConfig.minAlphaAOA = newValue)
-//                .build());
-//
-//        advancedOptions.add(entryBuilder.startDoubleField(option("maxAlphaAOA", suffix), targetConfig.maxAlphaAOA)
-//                .setDefaultValue(ConfigScreenBuilder.defaultConfig.maxAlphaAOA)
-//                .setTooltip(tooltip("maxAlphaAOA", suffix))
-//                .setSaveConsumer(newValue -> targetConfig.maxAlphaAOA = newValue)
-//                .build());
-//
-//        advancedOptions.add(entryBuilder.startBooleanToggle(option("aoaBasedWidth", suffix), targetConfig.aoaBasedWidth)
-//                .setDefaultValue(ConfigScreenBuilder.defaultConfig.aoaBasedWidth)
-//                .setTooltip(tooltip("aoaBasedWidth", suffix))
-//                .setSaveConsumer(newValue -> targetConfig.aoaBasedWidth = newValue)
-//                .build());
-//
-//        advancedOptions.add(entryBuilder.startDoubleField(option("minWidthAOA", suffix), targetConfig.minWidthAOA)
-//                .setDefaultValue(ConfigScreenBuilder.defaultConfig.minWidthAOA)
-//                .setTooltip(tooltip("minWidthAOA", suffix))
-//                .setSaveConsumer(newValue -> targetConfig.minWidthAOA = newValue)
-//                .build());
-//
-//        advancedOptions.add(entryBuilder.startDoubleField(option("maxWidthAOA", suffix), targetConfig.maxWidthAOA)
-//                .setDefaultValue(ConfigScreenBuilder.defaultConfig.maxWidthAOA)
-//                .setTooltip(tooltip("maxWidthAOA", suffix))
-//                .setSaveConsumer(newValue -> targetConfig.maxWidthAOA = newValue)
-//                .build());
+
+        advancedOptions.add(entryBuilder.startBooleanToggle(option("aoaBasedAlpha", suffix), targetConfig.aoaBasedAlpha)
+                .setDefaultValue(ConfigScreenBuilder.defaultConfig.aoaBasedAlpha)
+                .setTooltip(tooltip("aoaBasedAlpha", suffix))
+                .setSaveConsumer(newValue -> targetConfig.aoaBasedAlpha = newValue)
+                .build());
+
+        advancedOptions.add(entryBuilder.startDoubleField(option("minAlphaAOA", suffix), targetConfig.minAlphaAOA)
+                .setDefaultValue(ConfigScreenBuilder.defaultConfig.minAlphaAOA)
+                .setTooltip(tooltip("minAlphaAOA", suffix))
+                .setSaveConsumer(newValue -> targetConfig.minAlphaAOA = newValue)
+                .build());
+
+        advancedOptions.add(entryBuilder.startDoubleField(option("maxAlphaAOA", suffix), targetConfig.maxAlphaAOA)
+                .setDefaultValue(ConfigScreenBuilder.defaultConfig.maxAlphaAOA)
+                .setTooltip(tooltip("maxAlphaAOA", suffix))
+                .setSaveConsumer(newValue -> targetConfig.maxAlphaAOA = newValue)
+                .build());
+
+        advancedOptions.add(entryBuilder.startBooleanToggle(option("aoaBasedWidth", suffix), targetConfig.aoaBasedWidth)
+                .setDefaultValue(ConfigScreenBuilder.defaultConfig.aoaBasedWidth)
+                .setTooltip(tooltip("aoaBasedWidth", suffix))
+                .setSaveConsumer(newValue -> targetConfig.aoaBasedWidth = newValue)
+                .build());
+
+        advancedOptions.add(entryBuilder.startDoubleField(option("minWidthAOA", suffix), targetConfig.minWidthAOA)
+                .setDefaultValue(ConfigScreenBuilder.defaultConfig.minWidthAOA)
+                .setTooltip(tooltip("minWidthAOA", suffix))
+                .setSaveConsumer(newValue -> targetConfig.minWidthAOA = newValue)
+                .build());
+
+        advancedOptions.add(entryBuilder.startDoubleField(option("maxWidthAOA", suffix), targetConfig.maxWidthAOA)
+                .setDefaultValue(ConfigScreenBuilder.defaultConfig.maxWidthAOA)
+                .setTooltip(tooltip("maxWidthAOA", suffix))
+                .setSaveConsumer(newValue -> targetConfig.maxWidthAOA = newValue)
+                .build());
 
         category.addEntry(entryBuilder.startTextDescription(
                         Component.translatable("text.elytratrails.category.advanced"))
