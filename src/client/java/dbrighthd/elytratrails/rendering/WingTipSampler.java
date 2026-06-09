@@ -62,7 +62,6 @@ public class WingTipSampler {
 
     public Map<Integer, List<Emitter>> gatheredTrailsThisFrame = new HashMap<>();
 
-
     public void clearFrameCache() {
         gatheredTrailsThisFrame.clear();
         if(CPM_LOADED)

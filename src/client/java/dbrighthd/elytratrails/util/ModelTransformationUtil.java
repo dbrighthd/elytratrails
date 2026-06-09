@@ -4,9 +4,12 @@ import net.minecraft.client.model.EntityModel;
 import net.minecraft.client.model.geom.ModelPart;
 import net.minecraft.client.renderer.entity.state.EntityRenderState;
 import net.minecraft.util.Mth;
+import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.phys.Vec3;
 import org.joml.Matrix4f;
+import org.joml.Vector3f;
 import org.joml.Vector4f;
 
 import static dbrighthd.elytratrails.controller.EntityTwirlManager.getTwirlProgress;
@@ -48,24 +51,10 @@ public class ModelTransformationUtil {
         {
             return 0.0f;
         }
+        Vec3 lookVector = entity.getLookAngle();
+        Vec3 motion = entity.getDeltaMovement();
 
-        Vec3 vel = entity.getDeltaMovement();
-        double vx = vel.x;
-        double vy = vel.y;
-        double vz = vel.z;
-
-        double speedSqr = vx * vx + vy * vy + vz * vz;
-
-        double invSpeed = Mth.invSqrt((float) speedSqr);
-        double velHoriz = Math.sqrt(vx * vx + vz * vz) * invSpeed;
-        double velVert = vy * invSpeed;
-        float pitch = -entity.getXRot() * Mth.DEG_TO_RAD;
-        float lookHoriz = Mth.cos(pitch);
-        float lookVert = Mth.sin(pitch);
-        float cosAoA = (float)(lookHoriz * velHoriz + lookVert * velVert);
-        cosAoA = Mth.clamp(cosAoA, -1.0f, 1.0f);
-
-        return (float)Math.acos(cosAoA);
+        return (float) Math.acos(lookVector.dot(motion)/((lookVector.length() * motion.length())));
     }
 
     public static float getSignedElytraAoACalculation(LivingEntity entity) {
@@ -78,7 +67,7 @@ public class ModelTransformationUtil {
         double vy = vel.y;
         double vz = vel.z;
 
-        double speedSqr = vx * vx + vy * vy + vz * vz;
+        double speedSqr = vel.lengthSqr();
         if (speedSqr < 1.0e-12) {
             return 1.0f;
         }
