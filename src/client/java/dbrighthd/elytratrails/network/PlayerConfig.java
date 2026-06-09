@@ -51,7 +51,8 @@ public record PlayerConfig(
         double maxAlphaAOA,
         boolean aoaBasedWidth,
         double minWidthAOA,
-        double maxWidthAOA
+        double maxWidthAOA,
+        boolean edgeFade
 ) {
     public static final int CONFIG_VERSION = 1;
 
@@ -107,6 +108,7 @@ public record PlayerConfig(
         tag.putBoolean("aoaBasedWidth",aoaBasedWidth);
         tag.putDouble("minWidthAOA",minWidthAOA);
         tag.putDouble("maxWidthAOA",maxWidthAOA);
+        tag.putBoolean("edgeFade",edgeFade);
         return tag;
     }
 

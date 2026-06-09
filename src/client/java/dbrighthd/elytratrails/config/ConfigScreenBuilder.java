@@ -649,7 +649,11 @@ public class ConfigScreenBuilder {
                 .setTooltip(tooltip("alphaRight", suffix))
                 .setSaveConsumer(newValue -> targetConfig.justAlphaRight = newValue)
                 .build());
-
+        category.addEntry(entryBuilder.startBooleanToggle(option("edgeFade", suffix), targetConfig.edgeFade)
+                .setDefaultValue(ConfigScreenBuilder.defaultConfig.edgeFade)
+                .setTooltip(tooltip("edgeFade", suffix))
+                .setSaveConsumer(newValue -> targetConfig.edgeFade = newValue)
+                .build());
 
         advancedOptions.add(entryBuilder.startDoubleField(option("randomWidthVariation", suffix), targetConfig.randomWidthVariation)
                 .setDefaultValue(ConfigScreenBuilder.defaultConfig.randomWidthVariation)

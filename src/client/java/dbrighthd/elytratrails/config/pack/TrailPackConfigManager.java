@@ -702,7 +702,8 @@ public final class TrailPackConfigManager {
                 playerConfig.maxAlphaAOA(),
                 playerConfig.aoaBasedWidth(),
                 playerConfig.minWidthAOA(),
-                playerConfig.maxWidthAOA()
+                playerConfig.maxWidthAOA(),
+                playerConfig.edgeFade()
         );
     }
 
@@ -744,7 +745,8 @@ public final class TrailPackConfigManager {
                 playerConfig.maxAlphaAOA(),
                 playerConfig.aoaBasedWidth(),
                 playerConfig.minWidthAOA(),
-                playerConfig.maxWidthAOA()
+                playerConfig.maxWidthAOA(),
+                playerConfig.edgeFade()
         );
     }
 

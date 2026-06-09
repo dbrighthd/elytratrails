@@ -57,6 +57,7 @@ public class ClientConfig {
     public boolean aoaBasedWidth;
     public double minWidthAOA;
     public double maxWidthAOA;
+    public boolean edgeFade;
 
     public transient int justColor;
     public transient int justAlpha;
@@ -110,7 +111,8 @@ public class ClientConfig {
             double maxAlphaAOA,
             boolean aoaBasedWidth,
             double minWidthAOA,
-            double maxWidthAOA
+            double maxWidthAOA,
+            boolean edgeFade
             )
     {
         this.enableTrail = enableTrail;
@@ -160,6 +162,7 @@ public class ClientConfig {
         this.aoaBasedWidth = aoaBasedWidth;
         this.minWidthAOA = minWidthAOA;
         this.maxWidthAOA = maxWidthAOA;
+        this.edgeFade = edgeFade;
     }
 
     public ClientConfig() {
@@ -210,7 +213,8 @@ public class ClientConfig {
                 45,
                 false,
                 5,
-                45
+                45,
+                false
         );
     }
 
@@ -266,7 +270,8 @@ public class ClientConfig {
                 maxAlphaAOA,
                 aoaBasedWidth,
                 minWidthAOA,
-                maxWidthAOA);
+                maxWidthAOA,
+                edgeFade);
     }
 
     public PlayerConfig getHiddenPlayerConfig() {
@@ -318,7 +323,8 @@ public class ClientConfig {
                 maxAlphaAOA,
                 aoaBasedWidth,
                 minWidthAOA,
-                maxWidthAOA);
+                maxWidthAOA,
+                edgeFade);
     }
     public void validate() {
         if (prideTrail == null) {

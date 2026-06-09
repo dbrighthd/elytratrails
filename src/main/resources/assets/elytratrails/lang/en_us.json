@@ -387,6 +387,11 @@
   "text.elytratrails.option.maxWidthAOA" : "Full Width AOA Angle",
   "text.elytratrails.option.maxWidthAOA.@Tooltip" : "AOA Angle (Degrees) at which width is set to max",
 
+  "text.elytratrails.option.edgeFade" : "Fade Trail Edges",
+  "text.elytratrails.option.edgeFade.@Tooltip" : "Makes the trail fade in and out on the edges",
+
+  "text.elytratrails.option.edgeFadeOtherDefaults" : "Other's Fade Trail Edges",
+  "text.elytratrails.option.edgeFadeOtherDefaults.@Tooltip" : "Default: Makes the trail fade in and out on the edges",
 
   "text.elytratrails.option.aoaBasedAlphaOthersDefault" : "AOA Dependent Transparency",
   "text.elytratrails.option.aoaBasedAlphaOthersDefault.@Tooltip" : "Change trail opacity/alpha based on AOA angle",

@@ -30,8 +30,7 @@ import java.util.Map;
 import static dbrighthd.elytratrails.ElytraTrailsClient.getConfig;
 import static java.lang.Math.max;
 import static java.lang.Math.min;
-import static net.minecraft.util.ARGB.alphaFloat;
-import static net.minecraft.util.ARGB.color;
+import static net.minecraft.util.ARGB.*;
 
 /**
  * Handles trail rendering
@@ -356,7 +355,7 @@ public class TrailRenderer {
                 v2 += removeDist;
                 v1 /= (float) trailSettings.maxWidth();
                 v2 /= (float) trailSettings.maxWidth();
-                quadBetweenPoints(pose, consumer, startPos, endPos, sideA, sideB, halfWidthStart, halfWidthEnd, v1, v2, alphaStart, alphaEnd, trail.isLeftWing(), color);
+                quadBetweenPoints(pose, consumer, startPos, endPos, sideA, sideB, halfWidthStart, halfWidthEnd, v1, v2, alphaStart, alphaEnd, trail.isLeftWing(), color, trailSettings.edgeFade());
             }
             this.accumDist += segmentLength;
         }
@@ -474,12 +473,16 @@ public class TrailRenderer {
     private void quadBetweenPoints(
             PoseStack.Pose pose, VertexConsumer consumer,
             Vec3 a, Vec3 b, Vec3 sideA, Vec3 sideB,
-            float halfWidthStart, float halfWidthEnd, float v1, float v2, float alphaStart, float alphaEnd, boolean flipUv, int color
+            float halfWidthStart, float halfWidthEnd, float v1, float v2, float alphaStart, float alphaEnd, boolean flipUv, int color, boolean edgeFade
     ) {
         Vector3f p1 = a.add(sideA.scale(halfWidthStart)).toVector3f();
         Vector3f p2 = b.add(sideB.scale(halfWidthEnd)).toVector3f();
         Vector3f p3 = b.subtract(sideB.scale(halfWidthEnd)).toVector3f();
         Vector3f p4 = a.subtract(sideA.scale(halfWidthStart)).toVector3f();
+
+        //in the middle, basically the raw points w/o the haldWidth
+        Vector3f p5 = a.toVector3f();
+        Vector3f p6 = b.toVector3f();
 
         int overlay = OverlayTexture.NO_OVERLAY;
         int lightStart = useLightMap ? computeLightTexture(a) : LightCoordsUtil.FULL_BRIGHT;
@@ -488,35 +491,99 @@ public class TrailRenderer {
         int colorStart = multiplyAlpha(color, alphaStart);
         int colorEnd = multiplyAlpha(color, alphaEnd);
 
+
+        int colorStartZero = multiplyAlpha(colorStart,0);
+        int colorEndZero = multiplyAlpha(colorEnd,0);
+
         float normalX = 0, normalY = -1, normalZ = 0;
 
         float widthStart = halfWidthStart <= 0 ? 0.5f : 1f;
         float widthEnd = halfWidthEnd <= 0 ? 0.5f : 1f;
 
-        consumer.addVertex(pose, p1)
-                .setNormal(normalX, normalY, normalZ)
-                .setOverlay(overlay)
-                .setLight(lightStart)
-                .setColor(colorStart)
-                .setUv(v1, flipUv ? 1f - widthStart : -(1f - widthStart));
-        consumer.addVertex(pose, p2)
-                .setNormal(normalX, normalY, normalZ)
-                .setOverlay(overlay)
-                .setLight(lightEnd)
-                .setColor(colorEnd)
-                .setUv(v2, 0f);
-        consumer.addVertex(pose, p3)
-                .setNormal(normalX, normalY, normalZ)
-                .setOverlay(overlay)
-                .setLight(lightEnd)
-                .setColor(colorEnd)
-                .setUv(v2, flipUv ? widthEnd : -widthEnd);
-        consumer.addVertex(pose, p4)
-                .setNormal(normalX, normalY, normalZ)
-                .setOverlay(overlay)
-                .setLight(lightStart)
-                .setColor(colorStart)
-                .setUv(v1, flipUv ? widthStart : -widthStart);
+        if(edgeFade)
+        {
+            float edgeA = flipUv ? 1f : 0f;
+            float edgeB = flipUv ? 0f : 1f;
+            float center = 0.5f;
+            //im splitting into two quads
+            consumer.addVertex(pose, p1)
+                    .setNormal(normalX, normalY, normalZ)
+                    .setOverlay(overlay)
+                    .setLight(lightStart)
+                    .setColor(colorStartZero)
+                    .setUv(v1, edgeA);
+            consumer.addVertex(pose, p2)
+                    .setNormal(normalX, normalY, normalZ)
+                    .setOverlay(overlay)
+                    .setLight(lightEnd)
+                    .setColor(colorEndZero)
+                    .setUv(v2, edgeA);
+            consumer.addVertex(pose, p6)
+                    .setNormal(normalX, normalY, normalZ)
+                    .setOverlay(overlay)
+                    .setLight(lightEnd)
+                    .setColor(colorEnd)
+                    .setUv(v2, center);
+            consumer.addVertex(pose, p5)
+                    .setNormal(normalX, normalY, normalZ)
+                    .setOverlay(overlay)
+                    .setLight(lightStart)
+                    .setColor(colorStart)
+                    .setUv(v1, center);
+
+            //second quad
+            consumer.addVertex(pose, p5)
+                    .setNormal(normalX, normalY, normalZ)
+                    .setOverlay(overlay)
+                    .setLight(lightStart)
+                    .setColor(colorStart)
+                    .setUv(v1, center);
+            consumer.addVertex(pose, p6)
+                    .setNormal(normalX, normalY, normalZ)
+                    .setOverlay(overlay)
+                    .setLight(lightEnd)
+                    .setColor(colorEnd)
+                    .setUv(v2, center);
+            consumer.addVertex(pose, p3)
+                    .setNormal(normalX, normalY, normalZ)
+                    .setOverlay(overlay)
+                    .setLight(lightEnd)
+                    .setColor(colorEndZero)
+                    .setUv(v2, edgeB);
+            consumer.addVertex(pose, p4)
+                    .setNormal(normalX, normalY, normalZ)
+                    .setOverlay(overlay)
+                    .setLight(lightStart)
+                    .setColor(colorStartZero)
+                    .setUv(v1, edgeB);
+        }
+        else
+        {
+            consumer.addVertex(pose, p1)
+                    .setNormal(normalX, normalY, normalZ)
+                    .setOverlay(overlay)
+                    .setLight(lightStart)
+                    .setColor(colorStart)
+                    .setUv(v1, flipUv ? 1f - widthStart : -(1f - widthStart));
+            consumer.addVertex(pose, p2)
+                    .setNormal(normalX, normalY, normalZ)
+                    .setOverlay(overlay)
+                    .setLight(lightEnd)
+                    .setColor(colorEnd)
+                    .setUv(v2, 0f);
+            consumer.addVertex(pose, p3)
+                    .setNormal(normalX, normalY, normalZ)
+                    .setOverlay(overlay)
+                    .setLight(lightEnd)
+                    .setColor(colorEnd)
+                    .setUv(v2, flipUv ? widthEnd : -widthEnd);
+            consumer.addVertex(pose, p4)
+                    .setNormal(normalX, normalY, normalZ)
+                    .setOverlay(overlay)
+                    .setLight(lightStart)
+                    .setColor(colorStart)
+                    .setUv(v1, flipUv ? widthStart : -widthStart);
+        }
     }
 
     private void calculateSubdivideLength(
