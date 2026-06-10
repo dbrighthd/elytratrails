@@ -263,8 +263,8 @@ public class TrailRenderer {
                 scaleEnd *= inverseLerpTwoVals(point1.speedAtEmission(), trailSettings.minWidthSpeed(), trailSettings.maxWidthSpeed());
             }
             if (modConfig.tryNearTrailFade) {
-                alphaStart *= cameraDistanceFade((float) startPos.distanceTo(cameraPosition));
-                alphaEnd *= cameraDistanceFade((float) endPos.distanceTo(cameraPosition));
+                alphaStart *= cameraDistanceFade((float) startPos.length());
+                alphaEnd *= cameraDistanceFade((float) endPos.length());
             }
             float halfWidthStart = (float) (trailSettings.maxWidth() / 2f) * scaleStart;
             float halfWidthEnd = (float) (trailSettings.maxWidth() / 2f) * scaleEnd;
