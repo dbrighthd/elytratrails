@@ -237,6 +237,16 @@
   "text.elytratrails.option.clearTrails" : "Clear All Trails",
   "text.elytratrails.option.clearTrails.@Tooltip" : "Clears all trails on config saving",
 
+  "text.elytratrails.option.applyWind" : "Wind Dispersion",
+  "text.elytratrails.option.applyWind.@Tooltip" : "Moves trails with simulated wind",
+
+  "text.elytratrails.option.windScale" : "Wind Noise Scale",
+  "text.elytratrails.option.windScale.@Tooltip" : "scale of noise applied to wind (larger = more)",
+
+  "text.elytratrails.option.windSpeed" : "Wind Speed",
+  "text.elytratrails.option.windSpeed.@Tooltip" : "Speed of wind applied to trails",
+
+
   "text.elytratrails.option.logTrails" : "Log Trails",
   "text.elytratrails.option.logTrails.@Tooltip" : "Logs trail creation/deletion",
 
@@ -440,8 +450,10 @@
   "text.elytratrails.category.particles": "Particles",
   "text.elytratrails.category.presets": "Presets",
   "text.elytratrails.category.keybinds": "Keybinds",
+  "text.elytratrails.category.debug": "Debug",
 
   "text.elytratrails.category.keybinds.desc": "Elytra Contrails Keybinds",
+  "text.elytratrails.category.debug.desc": "Elytra Contrails Debug Options",
 
   "text.elytratrails.category.general.desc": "General Settings",
   "text.elytratrails.category.elytra.desc": "Applies to your own trails (elytra + first-person behavior).",

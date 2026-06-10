@@ -96,21 +96,26 @@ public class TrailManager {
             points.replaceAll(point -> point.addPositionOffset(deltaCameraSpace));
 
         }
-//        for (Trail trail : trails) {
-//            List<Trail.Point> points = trail.points();
-//
-//            points.replaceAll(point -> point.addPositionOffset(positionToWindVector(point,cameraPos)));
-//
-//        }
+        if(modConfig.applyWind)
+        {
+            for (Trail trail : trails) {
+                List<Trail.Point> points = trail.points();
+
+                points.replaceAll(point -> point.addPositionOffset(positionToWindVector(point,cameraPos)));
+
+            }
+        }
         prevCameraSpace = Minecraft.getInstance().gameRenderer.getMainCamera().position();
     }
 
     Vec3 positionToWindVector(Trail.Point point, Vec3 cameraPos)
     {
-        Vec3 combined = point.pos().add(cameraPos).scale(0.01);
-        double outPerlin = perlinNoise.getValue(combined.x, combined.y, combined.z);
-        double angleRad = outPerlin * 2 * Math.PI;
-        return (new Vec3(cos(angleRad), 0, sin(angleRad))).scale(0.001).scale(deltaT);
+        Vec3 combined = point.pos().add(cameraPos).scale(0.02 * modConfig.windScale);
+        double outPerlin1 = perlinNoise.getValue(combined.x, combined.y, combined.z);
+        double outPerlin2 = perlinNoise.getValue(combined.x + 100, combined.y + 50, combined.z -100);
+        double angleRad1 = outPerlin1 * 2 * Math.PI;
+        double angleRad2 = outPerlin1 * 2 * Math.PI;
+        return (new Vec3(sin(angleRad1) * cos(angleRad2), cos(angleRad1), sin(angleRad1) * sin(angleRad2))).scale(0.0005).scale(deltaT * modConfig.windSpeed);
     }
     public long newTrailId() {
         return trailId++;

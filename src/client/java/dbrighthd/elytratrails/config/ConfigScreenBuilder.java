@@ -65,7 +65,10 @@ public class ConfigScreenBuilder {
         ConfigCategory particles = builder.getOrCreateCategory(Component.translatable("text.elytratrails.category.particles"));
         ConfigCategory presets = builder.getOrCreateCategory(Component.translatable("text.elytratrails.category.presets"));
         ConfigCategory keybinds = builder.getOrCreateCategory(Component.translatable("text.elytratrails.category.keybinds"));
+        ConfigCategory debug = builder.getOrCreateCategory(Component.translatable("text.elytratrails.category.debug"));
+
         SubCategoryBuilder advanced = entryBuilder.startSubCategory(Component.translatable("text.elytratrails.category.elytra.advanced"));
+
 
         SubCategoryBuilder advancedOthers = entryBuilder.startSubCategory(Component.translatable("text.elytratrails.category.elytra.advancedOthers"));
 
@@ -113,37 +116,25 @@ public class ConfigScreenBuilder {
                 .setTooltip(Component.translatable("text.elytratrails.option.firstPersonFadeTime.@Tooltip"))
                 .setSaveConsumer(newValue -> config.firstPersonFadeTime = newValue)
                 .build());
-        general.addEntry(entryBuilder.startBooleanToggle(Component.translatable("text.elytratrails.option.resourcePackOverride"), config.resourcePackOverride)
-                .setDefaultValue(defaultModConfig.resourcePackOverride)
-                .setTooltip(Component.translatable("text.elytratrails.option.resourcePackOverride.@Tooltip"))
-                .setSaveConsumer(newValue -> config.resourcePackOverride = newValue)
+
+        general.addEntry(entryBuilder.startBooleanToggle(Component.translatable("text.elytratrails.option.applyWind"), config.applyWind)
+                .setDefaultValue(defaultModConfig.applyWind)
+                .setTooltip(Component.translatable("text.elytratrails.option.applyWind.@Tooltip"))
+                .setSaveConsumer(newValue -> config.applyWind = newValue)
                 .build());
-        general.addEntry(entryBuilder.startBooleanToggle(Component.translatable("text.elytratrails.option.emfSupport"), config.emfSupport)
-                .setDefaultValue(defaultModConfig.emfSupport)
-                .setTooltip(Component.translatable("text.elytratrails.option.emfSupport.@Tooltip"))
-                .setSaveConsumer(newValue -> config.emfSupport = newValue)
+        general.addEntry(entryBuilder.startDoubleField(Component.translatable("text.elytratrails.option.windScale"), config.windScale)
+                .setDefaultValue(defaultModConfig.windScale)
+                .setTooltip(Component.translatable("text.elytratrails.option.windScale.@Tooltip"))
+                .setSaveConsumer(newValue -> config.windScale = newValue)
                 .build());
-        general.addEntry(entryBuilder.startBooleanToggle(Component.translatable("text.elytratrails.option.extendedEmfSupport"), config.extendedEmfSupport)
-                .setDefaultValue(defaultModConfig.extendedEmfSupport)
-                .setTooltip(Component.translatable("text.elytratrails.option.extendedEmfSupport.@Tooltip"))
-                .setSaveConsumer(newValue -> config.extendedEmfSupport = newValue)
+
+        general.addEntry(entryBuilder.startDoubleField(Component.translatable("text.elytratrails.option.windSpeed"), config.windSpeed)
+                .setDefaultValue(defaultModConfig.windSpeed)
+                .setTooltip(Component.translatable("text.elytratrails.option.windSpeed.@Tooltip"))
+                .setSaveConsumer(newValue -> config.windSpeed = newValue)
                 .build());
-        general.addEntry(entryBuilder.startBooleanToggle(Component.translatable("text.elytratrails.option.tryWithoutEmf"), config.tryWithoutEmf)
-                .setDefaultValue(defaultModConfig.tryWithoutEmf)
-                .setTooltip(Component.translatable("text.elytratrails.option.tryWithoutEmf.@Tooltip"))
-                .setSaveConsumer(newValue -> config.tryWithoutEmf = newValue)
-                .build());
-        general.addEntry(entryBuilder.startBooleanToggle(Component.translatable("text.elytratrails.option.logTrails"), config.logTrails)
-                .setDefaultValue(defaultModConfig.logTrails)
-                .setTooltip(Component.translatable("text.elytratrails.option.logTrails.@Tooltip"))
-                .setSaveConsumer(newValue -> config.logTrails = newValue)
-                .build());
-        general.addEntry(entryBuilder.startBooleanToggle(Component.translatable("text.elytratrails.option.shaderOverride"), config.alwaysGlowWhenShaderTranslucent)
-                .setDefaultValue(defaultModConfig.alwaysGlowWhenShaderTranslucent)
-                .setTooltip(Component.translatable("text.elytratrails.option.shaderOverride.@Tooltip"))
-                .setSaveConsumer(newValue -> config.alwaysGlowWhenShaderTranslucent = newValue)
-                .requireRestart()
-                .build());
+
+
         general.addEntry(entryBuilder.startEnumSelector(
                         Component.translatable("text.elytratrails.option.clearTrails"),
                         ModConfig.ClearTrails.class,
@@ -357,6 +348,8 @@ public class ConfigScreenBuilder {
                 "OthersDefault"
         );
 
+
+
         String encodedParticle = encodeParticle(config.particle);
         HolderLookup.Provider lookup = VanillaRegistries.createLookup();
         particles.addEntry(entryBuilder.startTextDescription(
@@ -434,6 +427,41 @@ public class ConfigScreenBuilder {
                         .setSaveConsumer(newValue -> config.PresetOthers = newValue)
                         .build()
         );
+
+        debug.addEntry(entryBuilder.startTextDescription(
+                        Component.translatable("text.elytratrails.category.debug.desc"))
+                .build());
+        debug.addEntry(entryBuilder.startBooleanToggle(Component.translatable("text.elytratrails.option.resourcePackOverride"), config.resourcePackOverride)
+                .setDefaultValue(defaultModConfig.resourcePackOverride)
+                .setTooltip(Component.translatable("text.elytratrails.option.resourcePackOverride.@Tooltip"))
+                .setSaveConsumer(newValue -> config.resourcePackOverride = newValue)
+                .build());
+        debug.addEntry(entryBuilder.startBooleanToggle(Component.translatable("text.elytratrails.option.emfSupport"), config.emfSupport)
+                .setDefaultValue(defaultModConfig.emfSupport)
+                .setTooltip(Component.translatable("text.elytratrails.option.emfSupport.@Tooltip"))
+                .setSaveConsumer(newValue -> config.emfSupport = newValue)
+                .build());
+        debug.addEntry(entryBuilder.startBooleanToggle(Component.translatable("text.elytratrails.option.extendedEmfSupport"), config.extendedEmfSupport)
+                .setDefaultValue(defaultModConfig.extendedEmfSupport)
+                .setTooltip(Component.translatable("text.elytratrails.option.extendedEmfSupport.@Tooltip"))
+                .setSaveConsumer(newValue -> config.extendedEmfSupport = newValue)
+                .build());
+        debug.addEntry(entryBuilder.startBooleanToggle(Component.translatable("text.elytratrails.option.tryWithoutEmf"), config.tryWithoutEmf)
+                .setDefaultValue(defaultModConfig.tryWithoutEmf)
+                .setTooltip(Component.translatable("text.elytratrails.option.tryWithoutEmf.@Tooltip"))
+                .setSaveConsumer(newValue -> config.tryWithoutEmf = newValue)
+                .build());
+        debug.addEntry(entryBuilder.startBooleanToggle(Component.translatable("text.elytratrails.option.logTrails"), config.logTrails)
+                .setDefaultValue(defaultModConfig.logTrails)
+                .setTooltip(Component.translatable("text.elytratrails.option.logTrails.@Tooltip"))
+                .setSaveConsumer(newValue -> config.logTrails = newValue)
+                .build());
+        debug.addEntry(entryBuilder.startBooleanToggle(Component.translatable("text.elytratrails.option.shaderOverride"), config.alwaysGlowWhenShaderTranslucent)
+                .setDefaultValue(defaultModConfig.alwaysGlowWhenShaderTranslucent)
+                .setTooltip(Component.translatable("text.elytratrails.option.shaderOverride.@Tooltip"))
+                .setSaveConsumer(newValue -> config.alwaysGlowWhenShaderTranslucent = newValue)
+                .requireRestart()
+                .build());
 
         builder.setSavingRunnable(() -> {
             encodeConfigColors(config.clientPlayerConfig);
