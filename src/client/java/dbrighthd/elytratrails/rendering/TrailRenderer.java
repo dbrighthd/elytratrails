@@ -208,7 +208,7 @@ public class TrailRenderer {
     }
 
     private Trail.Point copyTrailPointNewPos(Trail.Point point, Vec3 newPos, boolean visible) {
-        return new Trail.Point(newPos, point.epoch(), point.speedData(), visible);
+        return new Trail.Point(newPos, point.epoch(), point.speedData(), visible, newPos);
     }
 
 
@@ -227,7 +227,7 @@ public class TrailRenderer {
         Vec3 chord = endPos.subtract(startPos);
 
         double chordLenSq = chord.lengthSqr();
-        if (chordLenSq > 400) {
+        if (!modConfig.applyWind && chordLenSq > 400) {
             if (modConfig.logTrails) {
                 LOGGER.info("Trail removed for entity {}, trail segment was too long and discarded as invalid", trail.entityId());
             }

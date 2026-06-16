@@ -209,11 +209,11 @@ public class ClientConfig {
                 1,
                 0.0,
                 false,
-                5,
-                45,
+                10,
+                90,
                 false,
-                5,
-                45,
+                10,
+                90,
                 false
         );
     }

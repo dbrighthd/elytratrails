@@ -14,10 +14,10 @@ public final class EmfWingTipHooks {
     }
 
 
-    public static List<SpawnerPath> findAllSpawnerPaths(ModelPart leftWingRoot, ModelPart rightWingRoot, boolean FAPlayerCheck) {
+    public static List<SpawnerPath> findAllSpawnerPaths(ModelPart leftWingRoot, ModelPart rightWingRoot) {
         ArrayList<SpawnerPath> out = new ArrayList<>();
-        if (leftWingRoot != null) out.addAll(findSpawnerPaths(leftWingRoot, WhichRoot.LEFT_WING, FAPlayerCheck));
-        if (rightWingRoot != null) out.addAll(findSpawnerPaths(rightWingRoot, WhichRoot.RIGHT_WING, FAPlayerCheck));
+        if (leftWingRoot != null) out.addAll(findSpawnerPaths(leftWingRoot, WhichRoot.LEFT_WING));
+        if (rightWingRoot != null) out.addAll(findSpawnerPaths(rightWingRoot, WhichRoot.RIGHT_WING));
 
         out.sort(Comparator
                 .comparing((SpawnerPath p) -> p.where().ordinal())
@@ -27,9 +27,9 @@ public final class EmfWingTipHooks {
         return out;
     }
 
-    public static List<SpawnerPath> findAllSpawnerPathsGeneric(ModelPart modelRoot, boolean FAPlayerCheck) {
+    public static List<SpawnerPath> findAllSpawnerPathsGeneric(ModelPart modelRoot) {
         ArrayList<SpawnerPath> out = new ArrayList<>();
-        if (modelRoot != null) out.addAll(findSpawnerPaths(modelRoot, WhichRoot.LEFT_WING, FAPlayerCheck));
+        if (modelRoot != null) out.addAll(findSpawnerPaths(modelRoot, WhichRoot.LEFT_WING));
 
         out.sort(Comparator
                 .comparing((SpawnerPath p) -> p.where().ordinal())
@@ -39,7 +39,7 @@ public final class EmfWingTipHooks {
         return out;
     }
 
-    private static List<SpawnerPath> findSpawnerPaths(ModelPart root, WhichRoot where, boolean FAPlayerCheck) {
+    private static List<SpawnerPath> findSpawnerPaths(ModelPart root, WhichRoot where) {
         ArrayList<SpawnerPath> found = new ArrayList<>();
         Deque<Node> stack = new ArrayDeque<>();
         stack.push(new Node(root, ""));
@@ -54,7 +54,7 @@ public final class EmfWingTipHooks {
 
                 String childPath = n.path.isEmpty() ? key : (n.path + "/" + key);
 
-                if (matchesKeyword(key, FAPlayerCheck)) {
+                if (matchesKeyword(key)) {
                     found.add(new SpawnerPath(where, childPath, key));
                 }
 
@@ -64,10 +64,10 @@ public final class EmfWingTipHooks {
         return found;
     }
 
-    private static boolean matchesKeyword(String key, boolean FAPlayerCheck) {
+    private static boolean matchesKeyword(String key) {
         if (key == null) return false;
         String lower = key.toLowerCase();
-        return lower.contains("wingtip") || lower.contains("trailspawner") || (FAPlayerCheck && (lower.contains("left_wing2") || lower.contains("right_wing2")));
+        return lower.contains("wingtip") || lower.contains("trailspawner");
     }
 
     private record Found(WhichRoot where, String path, String key, ModelPart part) {

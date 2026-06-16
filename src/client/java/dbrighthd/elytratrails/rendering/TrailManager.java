@@ -10,7 +10,6 @@ import it.unimi.dsi.fastutil.ints.Int2ObjectMap;
 import it.unimi.dsi.fastutil.ints.Int2ObjectOpenHashMap;
 import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents;
 import net.fabricmc.fabric.api.client.rendering.v1.level.LevelRenderEvents;
-import net.fabricmc.loader.impl.lib.sat4j.core.Vec;
 import net.minecraft.client.Minecraft;
 import net.minecraft.util.RandomSource;
 import net.minecraft.world.entity.Avatar;
@@ -42,7 +41,7 @@ public class TrailManager {
     private final PerlinNoise perlinNoise = PerlinNoise.create(RandomSource.create(), List.of(1));
     private final List<Trail> trails = new ArrayList<>();
     private float lastSample;
-    private Set<Long> trailsToRemove = new HashSet<>();
+    private final Set<Long> trailsToRemove = new HashSet<>();
     private float now = ElytraTimeUtil.currentMillis();
     private float past = ElytraTimeUtil.currentMillis();
     private float deltaT;
@@ -93,7 +92,7 @@ public class TrailManager {
         for (Trail trail : trails) {
             List<Trail.Point> points = trail.points();
 
-            points.replaceAll(point -> point.addPositionOffset(deltaCameraSpace));
+            points.replaceAll(point -> point.addCameraOffset(deltaCameraSpace));
 
         }
         if(modConfig.applyWind)
@@ -108,13 +107,14 @@ public class TrailManager {
         prevCameraSpace = Minecraft.getInstance().gameRenderer.getMainCamera().position();
     }
 
+    //This might not be a good way to make a 3d direction based on position, but its what I could think of
     Vec3 positionToWindVector(Trail.Point point, Vec3 cameraPos)
     {
         Vec3 combined = point.pos().add(cameraPos).scale(0.02 * modConfig.windScale);
         double outPerlin1 = perlinNoise.getValue(combined.x, combined.y, combined.z);
-        double outPerlin2 = perlinNoise.getValue(combined.x + 100, combined.y + 50, combined.z -100);
+        double outPerlin2 = perlinNoise.getValue(combined.x + 100, combined.y + 50, combined.z -100); //arbitrary offset just so the second angle is different
         double angleRad1 = outPerlin1 * 2 * Math.PI;
-        double angleRad2 = outPerlin1 * 2 * Math.PI;
+        double angleRad2 = outPerlin2 * 2 * Math.PI;
         return (new Vec3(sin(angleRad1) * cos(angleRad2), cos(angleRad1), sin(angleRad1) * sin(angleRad2))).scale(0.0005).scale(deltaT * modConfig.windSpeed);
     }
     public long newTrailId() {

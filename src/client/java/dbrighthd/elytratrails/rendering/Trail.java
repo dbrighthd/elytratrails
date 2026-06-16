@@ -25,13 +25,18 @@ public record Trail(Identifier texture, List<Point> points, ResolvedTrailSetting
      * @param pos   position of trail point
      * @param epoch time of creation, in milliseconds
      */
-    public record Point(Vec3 pos, long epoch, PlayerSpeedData speedData, boolean visible) {
+    public record Point(Vec3 pos, long epoch, PlayerSpeedData speedData, boolean visible, Vec3 posAtEmission) {
         public Point(Vec3 pos, PlayerSpeedData speed, boolean visible) {
-            this(pos, ElytraTimeUtil.currentMillis(), speed, visible);
+            this(pos, ElytraTimeUtil.currentMillis(), speed, visible, pos);
         }
-        public Point addPositionOffset(Vec3 cameraDelta)
+        public Point addCameraOffset(Vec3 cameraDelta)
         {
-            return new Point(pos.add(cameraDelta), epoch, speedData, visible);
+            return new Point(pos.add(cameraDelta), epoch, speedData, visible, posAtEmission.add(cameraDelta));
+        }
+        //don't change posAtEmission
+        public Point addPositionOffset(Vec3 offset)
+        {
+            return new Point(pos.add(offset), epoch, speedData, visible, posAtEmission);
         }
     }
 

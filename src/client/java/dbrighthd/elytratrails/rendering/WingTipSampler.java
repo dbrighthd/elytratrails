@@ -107,7 +107,7 @@ public class WingTipSampler {
             int variant = getModelVariantFromModel(animatedElytraRoot);
 
             if (!emfCache.containsKey(eid) || !(emfCache.get(eid).variant() == variant)) {
-                emfCache.put(eid, new EmfInfo("elytra", variant, getSpawnersInfo(EmfWingTipHooks.findAllSpawnerPaths(leftWing, rightWing, modConfig.hardCodedFreshAnimationsPlayerWingtips))));
+                emfCache.put(eid, new EmfInfo("elytra", variant, getSpawnersInfo(EmfWingTipHooks.findAllSpawnerPaths(leftWing, rightWing))));
                 return List.of();
             }
             EmfInfo emfInfo = emfCache.get(eid);
@@ -157,7 +157,7 @@ public class WingTipSampler {
             int variant = getModelVariantFromModel(animatedRoot);
 
             if (!emfCacheGeneric.containsKey(eid) || !(emfCacheGeneric.get(eid).variant() == variant)) {
-                List<EmfWingTipHooks.SpawnerPath> found = EmfWingTipHooks.findAllSpawnerPathsGeneric(animatedRoot, false);
+                List<EmfWingTipHooks.SpawnerPath> found = EmfWingTipHooks.findAllSpawnerPathsGeneric(animatedRoot);
                 emfCacheGeneric.put(eid, new EmfInfo(entity.getType().toShortString(), variant, getSpawnersInfo(found)));
                 return new EntityEmitters(List.of(), true);
             }
@@ -216,7 +216,7 @@ public class WingTipSampler {
         for (SpawnerInfo spawner : spawners) {
             ModelPart wingRoot = (spawner.spawner.where() == EmfWingTipHooks.WhichRoot.LEFT_WING) ? leftWing : rightWing;
 
-            ResolvedEmitterPoint cameraRelative = transformLocalPointThroughPath(stack, elytraRoot, wingRoot, spawner.pathSegments(), getEmitterLocalOffset(spawner));
+            ResolvedEmitterPoint cameraRelative = transformLocalPointThroughPath(stack, elytraRoot, wingRoot, spawner.pathSegments());
             if (cameraRelative == null) continue;
 
             emitters.add(new Emitter(cameraRelative.position().add(entityWorldOffset.subtract(cameraPos)), spawner.isLeftWing, "elytra" + (emfInfo.variant > 1 ? emfInfo.variant : ""), spawner.spawner.path(), cameraRelative.visible));
@@ -273,16 +273,6 @@ public class WingTipSampler {
     }
 
 
-    private static Vec3 getEmitterLocalOffset(SpawnerInfo spawner) {
-        String key = spawner.spawner.key();
-        if (key == null) return Vec3.ZERO;
-        return switch (key.toLowerCase()) {
-            case "emf_left_wing2" -> FRESH_ANIMATIONS_LEFT_WINGTIP_OFFSET;
-            case "emf_right_wing2" -> FRESH_ANIMATIONS_RIGHT_WINGTIP_OFFSET;
-            default -> Vec3.ZERO;
-        };
-    }
-
     private @NotNull Vec3 computeTransformedWingTip(@NotNull PoseStack stack, @Nullable ModelPart elytraRoot, @NotNull ModelPart wingRoot, @NotNull Vec3 localPos, Avatar player) {
         float wingspread = ModelTransformationUtil.computeWingOpenness(wingRoot);
 
@@ -311,7 +301,7 @@ public class WingTipSampler {
         return point;
     }
 
-    private @Nullable ResolvedEmitterPoint transformLocalPointThroughPath(@NotNull PoseStack stack, @Nullable ModelPart elytraRoot, @NotNull ModelPart wingRoot, String[] pathSegments, @NotNull Vec3 localOffset) {
+    private @Nullable ResolvedEmitterPoint transformLocalPointThroughPath(@NotNull PoseStack stack, @Nullable ModelPart elytraRoot, @NotNull ModelPart wingRoot, String[] pathSegments) {
         if (pathSegments.length == 0) return null;
 
         stack.pushPose();
@@ -334,7 +324,7 @@ public class WingTipSampler {
             current = child;
         }
 
-        Vec3 point = ModelTransformationUtil.transformPoint(stack.last().pose(), localOffset);
+        Vec3 point = ModelTransformationUtil.transformPoint(stack.last().pose(), Vec3.ZERO);
         boolean visible = current.visible;
         stack.popPose();
         return new ResolvedEmitterPoint(point, visible);
@@ -453,7 +443,7 @@ public class WingTipSampler {
                 fallback = submit;
             }
             if (animatedRoot == null) continue;
-            List<EmfWingTipHooks.SpawnerPath> found = EmfWingTipHooks.findAllSpawnerPathsGeneric(animatedRoot, false);
+            List<EmfWingTipHooks.SpawnerPath> found = EmfWingTipHooks.findAllSpawnerPathsGeneric(animatedRoot);
             if (!found.isEmpty()) {
                 return submit;
 

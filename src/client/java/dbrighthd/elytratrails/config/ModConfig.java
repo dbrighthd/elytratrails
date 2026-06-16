@@ -30,8 +30,6 @@ public class ModConfig {
     public boolean applyWind = false;
     public double windScale = 1.0;
     public double windSpeed = 1.0;
-    //fresh took too long to update and people are complaining to me
-    public boolean hardCodedFreshAnimationsPlayerWingtips = false;
     public ClearTrails clearTrailsOption = ClearTrails.NO;
 
     public enum ClearTrails {

@@ -15,6 +15,7 @@
   },
   "mixins": [
     "compat.EmfModelPartRootRegisterMixin",
+    "compat.RecorderMixin",
     "compat.cpm.CPMOrderedSubmitNodeCollectorMixin"
   ]
 }

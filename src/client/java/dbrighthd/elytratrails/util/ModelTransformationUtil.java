@@ -19,8 +19,6 @@ public class ModelTransformationUtil {
 
     public static final Vec3 VANILLA_LEFT_WING_TIP = new Vec3(-11.0 / 16.0, 21.0 / 16.0, 3.0 / 16.0);
     public static final Vec3 VANILLA_RIGHT_WING_TIP = new Vec3(11.0 / 16.0, 21.0 / 16.0, 3.0 / 16.0);
-    public static final Vec3 FRESH_ANIMATIONS_LEFT_WINGTIP_OFFSET = new Vec3(-11.0 / 16.0, 21.0 / 16.0, 3.0 / 16.0);
-    public static final Vec3 FRESH_ANIMATIONS_RIGHT_WINGTIP_OFFSET = new Vec3(11.0 / 16.0, 21.0 / 16.0, 3.0 / 16.0);
 
     public static Vec3 transformPoint(Matrix4f matrix, Vec3 localPoint) {
         Vector4f homogeneous = new Vector4f((float) localPoint.x, (float) localPoint.y, (float) localPoint.z, 1.0f);
@@ -41,7 +39,9 @@ public class ModelTransformationUtil {
     public static float getUnsignedAOA(LivingEntity entity)
     {
         float AOARaw = getUnsignedAOARaw(entity);
-        return AOARaw + (float)getTwirlProgress(entity.getId());
+
+        //I want the twirl to affect the AOA of the emitters but I no no wanna do the math so here's an approximation
+        return AOARaw + (float)getTwirlProgress(entity.getId())/1.5f;
     }
 
 

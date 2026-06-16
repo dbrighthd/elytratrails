@@ -38,5 +38,12 @@
   "wingtipVerticalPosition": 0.5,
   "wingtipHorizontalPosition": 1.0,
   "wingtipDepthPosition": 1.0,
-  "distanceTillTrailEnd": 0.0
+  "distanceTillTrailEnd": 0.0,
+  "aoaBasedAlpha": false,
+  "minAlphaAOA": 10.0,
+  "maxAlphaAOA": 90.0,
+  "aoaBasedWidth": false,
+  "minWidthAOA": 10.0,
+  "maxWidthAOA": 90.0,
+  "edgeFade": false
 }

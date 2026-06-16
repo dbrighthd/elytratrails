@@ -86,11 +86,6 @@ public class ConfigScreenBuilder {
                 .setTooltip(Component.translatable("text.elytratrails.option.alwaysSnapTrail.@Tooltip"))
                 .setSaveConsumer(newValue -> config.alwaysSnapTrail = newValue)
                 .build());
-        general.addEntry(entryBuilder.startBooleanToggle(Component.translatable("text.elytratrails.option.hardCodedFreshAnimationsPlayerWingtips"), config.hardCodedFreshAnimationsPlayerWingtips)
-                .setDefaultValue(defaultModConfig.hardCodedFreshAnimationsPlayerWingtips)
-                .setTooltip(Component.translatable("text.elytratrails.option.hardCodedFreshAnimationsPlayerWingtips.@Tooltip"))
-                .setSaveConsumer(newValue -> config.hardCodedFreshAnimationsPlayerWingtips = newValue)
-                .build());
         general.addEntry(entryBuilder.startBooleanToggle(Component.translatable("text.elytratrails.option.cameraDistanceFade"), config.tryNearTrailFade)
                 .setDefaultValue(defaultModConfig.tryNearTrailFade)
                 .setTooltip(Component.translatable("text.elytratrails.option.cameraDistanceFade.@Tooltip"))
