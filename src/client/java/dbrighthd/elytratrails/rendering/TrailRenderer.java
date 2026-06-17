@@ -453,7 +453,7 @@ public class TrailRenderer {
     private float computeLifetimeFadeout(double epoch, long currentTime, long maxLifetime) {
         long age = (long) (currentTime - epoch);
         if (age >= maxLifetime) return 0.0f;
-        else return 1.0f - (age / (float) maxLifetime);
+        else return (float)Math.pow(1.0f - (age / (float) maxLifetime),2);
     }
 
     @SuppressWarnings("unused")
