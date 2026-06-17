@@ -10,7 +10,7 @@ public class TrailSystem {
     private static final TrailRenderer renderer = new TrailRenderer(manager);
 
     public static void init() {
-        LevelRenderEvents.AFTER_TRANSLUCENT_TERRAIN.register(ctx -> {
+        LevelRenderEvents.COLLECT_SUBMITS.register(ctx -> {
             ModConfig config = ElytraTrailsClient.getConfig();
             if (!config.enableAllTrails) return;
             renderer.renderAllTrails(ctx, sampler.gatheredTrailsThisFrame);

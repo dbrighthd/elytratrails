@@ -54,11 +54,10 @@ public class TrailManager {
         this.sampler = sampler;
 
         ClientTickEvents.END_CLIENT_TICK.register(this::removeDeadPoints);
-        LevelRenderEvents.AFTER_TRANSLUCENT_FEATURES.register(_ -> {
+        LevelRenderEvents.END_EXTRACTION.register(_ -> {
             modConfig = getConfig();
             now = ElytraTimeUtil.currentMillis();
             deltaT = now - past;
-//            doCameraOffset();
             doWindOffset();
             boolean recordEmitters = true;
             if ((now - lastSample) < (1000f / modConfig.maxSamplePerSecond)) {
@@ -80,23 +79,6 @@ public class TrailManager {
             }
             past = ElytraTimeUtil.currentMillis();
         });
-    }
-
-    public void doCameraOffset()
-    {
-        Vec3 cameraPos = Minecraft.getInstance().gameRenderer.mainCamera().position();
-        if(prevCameraSpace == null)
-        {
-            prevCameraSpace = cameraPos;
-        }
-        deltaCameraSpace = prevCameraSpace.subtract(cameraPos);
-        for (Trail trail : trails) {
-            List<Trail.Point> points = trail.points();
-
-            points.replaceAll(point -> point.addCameraOffset(deltaCameraSpace));
-
-        }
-        prevCameraSpace = Minecraft.getInstance().gameRenderer.mainCamera().position();
     }
     public void doWindOffset()
     {
@@ -126,6 +108,16 @@ public class TrailManager {
 
     public boolean isActiveTrail(Trail trail) {
         return (activeTrails.containsKey(trail.entityId()) && activeTrails.get(trail.entityId()).trails().contains(trail));
+    }
+
+    public Trail getTrail(long id)
+    {
+        for(Trail trail : trails)
+        {
+            if(trail.trailId() == id)
+                return trail;
+        }
+        return null;
     }
 
     public PlayerSpeedData getPlayerSpeedData(LivingEntity entity, ResolvedTrailSettings trailSettings)
