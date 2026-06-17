@@ -30,8 +30,6 @@ public class TrailManager {
     private final Int2ObjectMap<EntityTrailGroup> activeTrails = new Int2ObjectOpenHashMap<>();
     public final Map<Long, Float> deadPointDistance = new HashMap<>();
     long trailId = 0;
-    public Vec3 prevCameraSpace;
-    public Vec3 deltaCameraSpace;
     private final List<Trail> trails = new ArrayList<>();
     private final Set<Long> trailsToRemove = new HashSet<>();
     private float lastSample;
@@ -42,7 +40,6 @@ public class TrailManager {
         this.sampler = sampler;
         ClientTickEvents.END_CLIENT_TICK.register(this::removeDeadPoints);
         WorldRenderEvents.AFTER_ENTITIES.register(cxt -> {
-            doCameraOffset();
             modConfig = getConfig();
             float now = TimeUtil.currentMillis();
             boolean recordEmitters = true;
@@ -64,22 +61,6 @@ public class TrailManager {
                 gatherEntityTrails(Minecraft.getInstance(), recordEmitters);
             }
         });
-    }
-    public void doCameraOffset()
-    {
-        Vec3 cameraPos = Minecraft.getInstance().gameRenderer.getMainCamera().position();
-        if(prevCameraSpace == null)
-        {
-            prevCameraSpace = cameraPos;
-        }
-        deltaCameraSpace = prevCameraSpace.subtract(cameraPos);
-        for (Trail trail : trails) {
-            List<Trail.Point> points = trail.points();
-
-            points.replaceAll(point -> point.addPositionOffset(deltaCameraSpace));
-
-        }
-        prevCameraSpace = Minecraft.getInstance().gameRenderer.getMainCamera().position();
     }
     public long newTrailId() {
         return trailId++;

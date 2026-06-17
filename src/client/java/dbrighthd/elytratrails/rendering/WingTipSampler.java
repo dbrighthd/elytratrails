@@ -223,7 +223,7 @@ public class WingTipSampler {
             ResolvedEmitterPoint cameraRelative = transformLocalPointThroughPath(stack, elytraRoot, wingRoot, spawner.pathSegments(), getEmitterLocalOffset(spawner));
             if (cameraRelative == null) continue;
 
-            emitters.add(new Emitter(cameraRelative.position().add(entityWorldOffset.subtract(cameraPos)), spawner.isLeftWing, "elytra" + (emfInfo.variant > 1 ? emfInfo.variant : ""), spawner.spawner.path(), cameraRelative.visible));
+            emitters.add(new Emitter(cameraRelative.position().add(entityWorldOffset), spawner.isLeftWing, "elytra" + (emfInfo.variant > 1 ? emfInfo.variant : ""), spawner.spawner.path(), cameraRelative.visible));
         }
         return emitters;
     }
@@ -239,7 +239,7 @@ public class WingTipSampler {
             );
             if (cameraRelative == null) continue;
 
-            emitters.add(new Emitter(cameraRelative.position().add(entityWorldOffset.subtract(cameraPos)), spawner.isLeftWing, emfInfo.name + (emfInfo.variant > 1 ? emfInfo.variant : ""), spawner.spawner.path(), cameraRelative.visible));
+            emitters.add(new Emitter(cameraRelative.position().add(entityWorldOffset), spawner.isLeftWing, emfInfo.name + (emfInfo.variant > 1 ? emfInfo.variant : ""), spawner.spawner.path(), cameraRelative.visible));
         }
         return emitters;
     }
@@ -262,8 +262,8 @@ public class WingTipSampler {
         Vec3 rightTip = computeTransformedWingTip(stack, elytraRoot, rightWing, ModelTransformationUtil.VANILLA_RIGHT_WING_TIP, player);
 
         return List.of(
-                new Emitter(leftTip.add(entityWorldOffset.subtract(cameraPos)), true, "elytra", "/leftWingTip", true),
-                new Emitter(rightTip.add(entityWorldOffset.subtract(cameraPos)), false, "elytra", "/rightWingTip", true)
+                new Emitter(leftTip.add(entityWorldOffset), true, "elytra", "/leftWingTip", true),
+                new Emitter(rightTip.add(entityWorldOffset), false, "elytra", "/rightWingTip", true)
         );
     }
 
@@ -272,7 +272,7 @@ public class WingTipSampler {
         ModelPart modelPart = animatedRoot != null ? animatedRoot : model.root();
         Vec3 tip = computeTransformedPoint(stack, modelPart, modelPart, offsets);
         return List.of(
-                new Emitter(tip.add(entityWorldOffset.subtract(cameraPos)), true, entity.getType().toShortString(), "/trailspawner", true)
+                new Emitter(tip.add(entityWorldOffset), true, entity.getType().toShortString(), "/trailspawner", true)
         );
     }
 

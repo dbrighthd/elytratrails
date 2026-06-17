@@ -239,8 +239,8 @@ public class TrailRenderer {
             }
 
             if (trailSettings.enableRandomWidth()) {
-                scaleStart = scaleStart * (float) trailSettings.randomWidthVariation() * ((float) (perlinNoise.getValue(startPos.x + cameraPosition.x, startPos.y + cameraPosition.y, startPos.z + cameraPosition.z)) + 1);
-                scaleEnd = scaleEnd * (float) trailSettings.randomWidthVariation() * ((float) (perlinNoise.getValue(endPos.x + cameraPosition.x, endPos.y + cameraPosition.y, endPos.z + cameraPosition.z)) + 1);
+                scaleStart = scaleStart * (float) trailSettings.randomWidthVariation() * ((float) (perlinNoise.getValue(startPos.x , startPos.y, startPos.z)) + 1);
+                scaleEnd = scaleEnd * (float) trailSettings.randomWidthVariation() * ((float) (perlinNoise.getValue(endPos.x, endPos.y, endPos.z)) + 1);
             }
             if (trailSettings.increaseWidthOverTime()) {
                 scaleStart *= getWidthOverTimeScale(start, currentTime, (long) (trailLifetimeMillis), trailSettings);
@@ -263,8 +263,8 @@ public class TrailRenderer {
                 scaleEnd *= inverseLerpTwoVals(point1.speedAtEmission(), trailSettings.minWidthSpeed(), trailSettings.maxWidthSpeed());
             }
             if (modConfig.tryNearTrailFade) {
-                alphaStart *= cameraDistanceFade((float) startPos.length());
-                alphaEnd *= cameraDistanceFade((float) endPos.length());
+                alphaStart *= cameraDistanceFade((float) startPos.distanceTo(cameraPosition));
+                alphaEnd *= cameraDistanceFade((float) endPos.distanceTo(cameraPosition));
             }
             float halfWidthStart = (float) (trailSettings.maxWidth() / 2f) * scaleStart;
             float halfWidthEnd = (float) (trailSettings.maxWidth() / 2f) * scaleEnd;
@@ -286,8 +286,8 @@ public class TrailRenderer {
                 Vec3 startTan = SplineInterpolation.catmullRomTangent(p0, p1, p2, p3, tStart).normalize();
                 Vec3 endTan = SplineInterpolation.catmullRomTangent(p0, p1, p2, p3, tEnd).normalize();
 
-                Vec3 sideA = startTan.cross(startPos.normalize()).normalize();
-                Vec3 sideB = endTan.cross(endPos.normalize()).normalize();
+                Vec3 sideA = startTan.cross(startPos.subtract(cameraPosition).normalize()).normalize();
+                Vec3 sideB = endTan.cross(endPos.subtract(cameraPosition).normalize()).normalize();
 
                 float removeDist = manager.deadPointDistance.getOrDefault(trail.trailId(), 0f);
                 v1 += removeDist;
@@ -414,10 +414,10 @@ public class TrailRenderer {
             Vec3 a, Vec3 b, Vec3 sideA, Vec3 sideB,
             float halfWidthStart, float halfWidthEnd, float v1, float v2, float alphaStart, float alphaEnd, boolean flipUv, int color
     ) {
-        Vector3f p1 = a.add(sideA.scale(halfWidthStart)).toVector3f();
-        Vector3f p2 = b.add(sideB.scale(halfWidthEnd)).toVector3f();
-        Vector3f p3 = b.subtract(sideB.scale(halfWidthEnd)).toVector3f();
-        Vector3f p4 = a.subtract(sideA.scale(halfWidthStart)).toVector3f();
+        Vector3f p1 = a.add(sideA.scale(halfWidthStart)).subtract(cameraPosition).toVector3f();
+        Vector3f p2 = b.add(sideB.scale(halfWidthEnd)).subtract(cameraPosition).toVector3f();
+        Vector3f p3 = b.subtract(sideB.scale(halfWidthEnd)).subtract(cameraPosition).toVector3f();
+        Vector3f p4 = a.subtract(sideA.scale(halfWidthStart)).subtract(cameraPosition).toVector3f();
 
         int overlay = OverlayTexture.NO_OVERLAY;
         int lightStart = useLightMap ? computeLightTexture(a) : LightTexture.FULL_BRIGHT;
