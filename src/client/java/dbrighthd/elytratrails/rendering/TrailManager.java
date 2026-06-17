@@ -34,8 +34,6 @@ public class TrailManager {
     private static final Logger LOGGER = LoggerFactory.getLogger(TrailManager.class);
 
     private final Int2ObjectMap<EntityTrailGroup> activeTrails = new Int2ObjectOpenHashMap<>();
-    public Vec3 prevCameraSpace;
-    public Vec3 deltaCameraSpace;
     public final Map<Long, Float> deadPointDistance = new HashMap<>();
     long trailId = 0;
     private final PerlinNoise perlinNoise = PerlinNoise.create(RandomSource.create(), List.of(1));
@@ -58,7 +56,7 @@ public class TrailManager {
             modConfig = getConfig();
             now = ElytraTimeUtil.currentMillis();
             deltaT = now - past;
-            doCameraOffset();
+            doWindOffset();
             boolean recordEmitters = true;
             if ((now - lastSample) < (1000f / modConfig.maxSamplePerSecond)) {
                 if (modConfig.alwaysSnapTrail) {
@@ -80,37 +78,22 @@ public class TrailManager {
             past = ElytraTimeUtil.currentMillis();
         });
     }
-
-    public void doCameraOffset()
+    public void doWindOffset()
     {
-        Vec3 cameraPos = Minecraft.getInstance().gameRenderer.getMainCamera().position();
-        if(prevCameraSpace == null)
-        {
-            prevCameraSpace = cameraPos;
-        }
-        deltaCameraSpace = prevCameraSpace.subtract(cameraPos);
-        for (Trail trail : trails) {
-            List<Trail.Point> points = trail.points();
-
-            points.replaceAll(point -> point.addCameraOffset(deltaCameraSpace));
-
-        }
         if(modConfig.applyWind)
         {
             for (Trail trail : trails) {
                 List<Trail.Point> points = trail.points();
 
-                points.replaceAll(point -> point.addPositionOffset(positionToWindVector(point,cameraPos)));
+                points.replaceAll(point -> point.addPositionOffset(positionToWindVector(point)));
 
             }
         }
-        prevCameraSpace = Minecraft.getInstance().gameRenderer.getMainCamera().position();
     }
-
     //This might not be a good way to make a 3d direction based on position, but its what I could think of
-    Vec3 positionToWindVector(Trail.Point point, Vec3 cameraPos)
+    Vec3 positionToWindVector(Trail.Point point)
     {
-        Vec3 combined = point.pos().add(cameraPos).scale(0.02 * modConfig.windScale);
+        Vec3 combined = point.pos().scale(0.02 * modConfig.windScale);
         double outPerlin1 = perlinNoise.getValue(combined.x, combined.y, combined.z);
         double outPerlin2 = perlinNoise.getValue(combined.x + 100, combined.y + 50, combined.z -100); //arbitrary offset just so the second angle is different
         double angleRad1 = outPerlin1 * 2 * Math.PI;
