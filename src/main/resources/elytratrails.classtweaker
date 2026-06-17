@@ -3,3 +3,8 @@ accessible field net/minecraft/client/model/geom/ModelPart children Ljava/util/M
 accessible field net/minecraft/client/KeyMapping key Lcom/mojang/blaze3d/platform/InputConstants$Key;
 accessible field net/minecraft/client/model/object/equipment/ElytraModel rightWing Lnet/minecraft/client/model/geom/ModelPart;
 accessible field net/minecraft/client/model/object/equipment/ElytraModel leftWing Lnet/minecraft/client/model/geom/ModelPart;
+accessible field net/minecraft/client/renderer/feature/phase/SimpleFeatureRenderPhase submitsByFeature [Lnet/minecraft/client/renderer/feature/phase/SimpleFeatureRenderPhase$FeatureSubmits;
+accessible class net/minecraft/client/renderer/feature/phase/SimpleFeatureRenderPhase$FeatureSubmits
+accessible field net/minecraft/client/renderer/feature/phase/SimpleFeatureRenderPhase$FeatureSubmits unbatched Ljava/util/List;
+accessible field net/minecraft/client/renderer/feature/phase/SimpleFeatureRenderPhase$FeatureSubmits batches Ljava/util/Map;
+accessible field net/minecraft/client/renderer/feature/phase/TranslucentFeatureRenderPhase submits Ljava/util/List;

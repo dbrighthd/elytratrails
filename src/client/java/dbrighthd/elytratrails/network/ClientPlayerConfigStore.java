@@ -1,7 +1,7 @@
 package dbrighthd.elytratrails.network;
 
 //import dbrighthd.elytratrails.compat.flashback.FlashbackCompat;
-import dbrighthd.elytratrails.compat.flashback.FlashbackCompat;
+//import dbrighthd.elytratrails.compat.flashback.FlashbackCompat;
 import dbrighthd.elytratrails.config.ModConfig;
 import dbrighthd.elytratrails.util.EasingUtil;
 import net.fabricmc.loader.api.FabricLoader;
@@ -281,12 +281,12 @@ public final class ClientPlayerConfigStore {
 
     public static PlayerConfig getOrDefault(int entityId) {
         if (Minecraft.getInstance().player != null && Minecraft.getInstance().player.getId() == entityId) {
-            if (FLASHBACK_LOADED && FlashbackCompat.isInReplay()) //return the config that was set at the time if it exists
-            {
-                if (CLIENT_PLAYER_CONFIGS.containsKey(entityId)) {
-                    return CLIENT_PLAYER_CONFIGS.get(entityId);
-                }
-            }
+//            if (FLASHBACK_LOADED && FlashbackCompat.isInReplay()) //return the config that was set at the time if it exists
+//            {
+//                if (CLIENT_PLAYER_CONFIGS.containsKey(entityId)) {
+//                    return CLIENT_PLAYER_CONFIGS.get(entityId);
+//                }
+//            }
             return getLocalPlayerConfig();
         } else if (CLIENT_PLAYER_CONFIGS.containsKey(entityId)) {
             return CLIENT_PLAYER_CONFIGS.get(entityId);

@@ -83,7 +83,7 @@ public class TrailManager {
 
     public void doCameraOffset()
     {
-        Vec3 cameraPos = Minecraft.getInstance().gameRenderer.getMainCamera().position();
+        Vec3 cameraPos = Minecraft.getInstance().gameRenderer.mainCamera().position();
         if(prevCameraSpace == null)
         {
             prevCameraSpace = cameraPos;
@@ -104,7 +104,7 @@ public class TrailManager {
 
             }
         }
-        prevCameraSpace = Minecraft.getInstance().gameRenderer.getMainCamera().position();
+        prevCameraSpace = Minecraft.getInstance().gameRenderer.mainCamera().position();
     }
 
     //This might not be a good way to make a 3d direction based on position, but its what I could think of

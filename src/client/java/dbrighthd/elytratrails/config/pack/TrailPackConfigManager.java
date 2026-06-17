@@ -31,6 +31,7 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.Stream;
 
 import static dbrighthd.elytratrails.ElytraTrailsClient.getConfig;
+import static dbrighthd.elytratrails.util.EntityTypeUtil.parseEntityString;
 
 public final class TrailPackConfigManager {
     private TrailPackConfigManager() {
@@ -114,7 +115,7 @@ public final class TrailPackConfigManager {
                 String modelKey = modelKeyFromTrailConfigsPath(resourceId.getPath());
                 if (modelKey == null) continue;
 
-                EntityType.byString(sanitizeModelKey(modelKey)).ifPresent(entitiesWithTrailOverrides::add);
+                parseEntityString(sanitizeModelKey(modelKey)).ifPresent(entitiesWithTrailOverrides::add);
                 loadAndCacheModelConfig(modelKey, resource);
                 setDefaultEntitySettingsOverrides();
             }

@@ -2,22 +2,26 @@ package dbrighthd.elytratrails.rendering;
 
 import com.mojang.blaze3d.vertex.PoseStack;
 import dbrighthd.elytratrails.compat.ModStatuses;
-import dbrighthd.elytratrails.compat.cpm.CpmModelStorage;
+//import dbrighthd.elytratrails.compat.cpm.CpmModelStorage;
 import dbrighthd.elytratrails.compat.emf.EmfAnimationHooks;
 import dbrighthd.elytratrails.compat.emf.EmfWingTipHooks;
 import dbrighthd.elytratrails.config.ModConfig;
 import dbrighthd.elytratrails.config.pack.ResolvedSampleSettings;
-import dbrighthd.elytratrails.accessor.ModelFeatureStorageAccess;
+//import dbrighthd.elytratrails.accessor.ModelFeatureStorageAccess;
 import dbrighthd.elytratrails.network.ClientPlayerConfigStore;
 import dbrighthd.elytratrails.network.PlayerConfig;
 import dbrighthd.elytratrails.util.ModelTransformationUtil;
 import dbrighthd.elytratrails.util.ShaderChecksUtil;
+import net.minecraft.CrashReport;
+import net.minecraft.CrashReportCategory;
+import net.minecraft.ReportedException;
 import net.minecraft.client.Camera;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.model.EntityModel;
 import net.minecraft.client.model.geom.ModelPart;
 import net.minecraft.client.model.object.equipment.ElytraModel;
 import net.minecraft.client.renderer.SubmitNodeCollection;
+import net.minecraft.client.renderer.SubmitNodeCollector;
 import net.minecraft.client.renderer.SubmitNodeStorage;
 import net.minecraft.client.renderer.entity.EntityRenderDispatcher;
 import net.minecraft.client.renderer.entity.EntityRenderer;
@@ -25,6 +29,11 @@ import net.minecraft.client.renderer.entity.state.AvatarRenderState;
 import net.minecraft.client.renderer.entity.state.EntityRenderState;
 import net.minecraft.client.renderer.entity.state.HumanoidRenderState;
 import net.minecraft.client.renderer.feature.ModelFeatureRenderer;
+import net.minecraft.client.renderer.feature.phase.FeatureRenderPhase;
+import net.minecraft.client.renderer.feature.phase.SimpleFeatureRenderPhase;
+import net.minecraft.client.renderer.feature.phase.TranslucentFeatureRenderPhase;
+import net.minecraft.client.renderer.feature.submit.SubmitNode;
+import net.minecraft.client.renderer.feature.submit.TranslucentSubmit;
 import net.minecraft.client.renderer.rendertype.RenderType;
 import net.minecraft.client.renderer.state.level.CameraRenderState;
 import net.minecraft.core.BlockPos;
@@ -40,7 +49,7 @@ import java.util.*;
 
 import static dbrighthd.elytratrails.ElytraTrailsClient.getConfig;
 import static dbrighthd.elytratrails.compat.ModStatuses.CPM_LOADED;
-import static dbrighthd.elytratrails.compat.cpm.CpmModelStorage.findCPMElytraModelSubmit;
+//import static dbrighthd.elytratrails.compat.cpm.CpmModelStorage.findCPMElytraModelSubmit;
 import static dbrighthd.elytratrails.compat.emf.EmfTrailSpawnerRegistry.getModelVariantFromModel;
 import static dbrighthd.elytratrails.util.ModelTransformationUtil.*;
 
@@ -66,22 +75,22 @@ public class WingTipSampler {
         gatheredTrailsThisFrame.clear();
         if(CPM_LOADED)
         {
-            CpmModelStorage.resetSubmits();
+//            CpmModelStorage.resetSubmits();
         }
     }
 
     public @NotNull List<Emitter> getPlayerTrailEmitterPositions(Avatar player, float partialTick, ModConfig modConfig) {
         if(CPM_LOADED)
         {
-            CpmModelStorage.resetSubmits();
+//            CpmModelStorage.resetSubmits();
         }
         ModConfig config = getConfig();
         Minecraft mc = Minecraft.getInstance();
         if (mc.level == null || ShaderChecksUtil.isShadowPass()) return List.of();
 
-        Camera camera = mc.gameRenderer.getMainCamera();
+        Camera camera = mc.gameRenderer.mainCamera();
         CameraRenderState cameraState = buildCameraState(camera);
-        SubmitNodeStorage.ModelSubmit<?> elytraSubmit = extractElytraRenderState(player, mc, cameraState, partialTick);
+        ModelFeatureRenderer.Submit<?> elytraSubmit = extractElytraRenderState(player, mc, cameraState, partialTick);
         if(elytraSubmit == null)
         {
             elytraSubmit = extractElytraRenderState(player, mc, cameraState, partialTick);
@@ -141,9 +150,9 @@ public class WingTipSampler {
         Minecraft mc = Minecraft.getInstance();
         if (mc.level == null || ShaderChecksUtil.isShadowPass())  return new EntityEmitters(List.of(),false);
 
-        Camera camera = mc.gameRenderer.getMainCamera();
+        Camera camera = mc.gameRenderer.mainCamera();
         CameraRenderState cameraState = buildCameraState(camera);
-        SubmitNodeStorage.ModelSubmit<?> entitySubmit = extractEntityRenderState(entity, mc, cameraState, partialTick);
+        ModelFeatureRenderer.Submit<?> entitySubmit = extractEntityRenderState(entity, mc, cameraState, partialTick);
         if (entitySubmit == null || !(entitySubmit.model() instanceof EntityModel<?> entityModel) || !(entitySubmit.state() instanceof EntityRenderState entityRenderState))
             return new EntityEmitters(List.of(), false);
         setupAnyModelAnim(entityModel, entityRenderState);
@@ -408,45 +417,48 @@ public class WingTipSampler {
     }
 
     @SuppressWarnings("unchecked")
-    private SubmitNodeStorage.ModelSubmit<?> extractElytraRenderState(Avatar player, Minecraft mc, CameraRenderState cameraRenderState, float partialTick) {
+    private ModelFeatureRenderer.Submit<?> extractElytraRenderState(Avatar player, Minecraft mc, CameraRenderState cameraRenderState, float partialTick) {
         EntityRenderDispatcher dispatcher = mc.getEntityRenderDispatcher();
         AvatarRenderState state = new AvatarRenderState();
 
         EntityRenderer<@NotNull Avatar, @NotNull AvatarRenderState> renderer = (EntityRenderer<@NotNull Avatar, @NotNull AvatarRenderState>) dispatcher.getRenderer(state);
         renderer.extractRenderState(player, state, partialTick);
 
-        submitStorage.clear();
+        submitStorage.getSubmitsPerOrder().clear();
         dispatcher.submit(state, cameraRenderState, 0, 0, 0, new PoseStack(), submitStorage);
         return findElytraModelSubmit();
     }
 
-    private SubmitNodeStorage.ModelSubmit<?> extractEntityRenderState(Entity entity, Minecraft mc, CameraRenderState cameraRenderState, float partialTick) {
+    private ModelFeatureRenderer.Submit<?> extractEntityRenderState(Entity entity, Minecraft mc, CameraRenderState cameraRenderState, float partialTick) {
         EntityRenderDispatcher dispatcher = mc.getEntityRenderDispatcher();
 
         EntityRenderState state = dispatcher.extractEntity(entity, partialTick);
-        submitStorage.clear();
+        submitStorage.getSubmitsPerOrder().clear();
         dispatcher.submit(state, cameraRenderState, 0, 0, 0, new PoseStack(), submitStorage);
 
-        List<SubmitNodeStorage.ModelSubmit<?>> submits = getAllModelSubmits();
-        SubmitNodeStorage.ModelSubmit<?> fallback = null;
-        for (SubmitNodeStorage.ModelSubmit<?> submit : submits) {
-            if(submit.model() instanceof ElytraModel)
+        List<SubmitNode> submits = getAllModelSubmits();
+        ModelFeatureRenderer.Submit<?> fallback = null;
+        for (SubmitNode submit : submits) {
+            if(submit instanceof ModelFeatureRenderer.Submit<?> modelSubmit)
             {
-                continue;
-            }
-            if (!(submit.model() instanceof EntityModel<?> entityModel)) continue;
-            if (!(submit.state() instanceof EntityRenderState entityRenderState)) continue;
+                if(modelSubmit.model() instanceof ElytraModel)
+                {
+                    continue;
+                }
+                if (!(modelSubmit.model() instanceof EntityModel<?> entityModel)) continue;
+                if (!(modelSubmit.state() instanceof EntityRenderState entityRenderState)) continue;
 
-            setupAnyModelAnim(entityModel, entityRenderState);
-            ModelPart animatedRoot = tryGetAnimatedEntityRoot(entityModel, entity);
-            if (fallback == null) {
-                fallback = submit;
-            }
-            if (animatedRoot == null) continue;
-            List<EmfWingTipHooks.SpawnerPath> found = EmfWingTipHooks.findAllSpawnerPathsGeneric(animatedRoot);
-            if (!found.isEmpty()) {
-                return submit;
+                setupAnyModelAnim(entityModel, entityRenderState);
+                ModelPart animatedRoot = tryGetAnimatedEntityRoot(entityModel, entity);
+                if (fallback == null) {
+                    fallback = modelSubmit;
+                }
+                if (animatedRoot == null) continue;
+                List<EmfWingTipHooks.SpawnerPath> found = EmfWingTipHooks.findAllSpawnerPathsGeneric(animatedRoot);
+                if (!found.isEmpty()) {
+                    return modelSubmit;
 
+                }
             }
 
         }
@@ -456,52 +468,77 @@ public class WingTipSampler {
     /**
      * I know this is super cursed but im not sure how else to get the accurate positions without requiring an entity to be rendered (so that I can get the wingtips in first person)n
      */
-    private SubmitNodeStorage.@Nullable ModelSubmit<?> findElytraModelSubmit() {
+    private ModelFeatureRenderer.Submit<?> findElytraModelSubmit() {
         for (SubmitNodeCollection collection : submitStorage.getSubmitsPerOrder().values()) {
-            ModelFeatureRenderer.Storage modelStorage = collection.getModelSubmits();
-            ModelFeatureStorageAccess accessor = (ModelFeatureStorageAccess) modelStorage;
-            Map<RenderType, List<SubmitNodeStorage.ModelSubmit<?>>> opaqueByType =
-                    accessor.elytratrails$getSolidModelSubmits();
-            for (List<SubmitNodeStorage.ModelSubmit<?>> submits : opaqueByType.values()) {
-                for (SubmitNodeStorage.ModelSubmit<?> submit : submits) {
-                    if (submit.model() instanceof ElytraModel) return submit;
+            List<SubmitNode> submits = getAllModelSubmits();
+            for (SubmitNode submit : submits) {
+                if(submit instanceof ModelFeatureRenderer.Submit<?> modelSubmit && modelSubmit.model() instanceof ElytraModel)
+                {
+                    return modelSubmit;
                 }
-            }
-
-            List<SubmitNodeStorage.TranslucentModelSubmit<?>> translucentSubmits =
-                    accessor.elytratrails$getTranslucentModelSubmits();
-            for (SubmitNodeStorage.TranslucentModelSubmit<?> translucent : translucentSubmits) {
-                SubmitNodeStorage.ModelSubmit<?> submit = translucent.modelSubmit();
-                if (submit.model() instanceof ElytraModel) return submit;
             }
         }
         if(CPM_LOADED)
         {
-            return findCPMElytraModelSubmit();
+//            return findCPMElytraModelSubmit();
         }
         return null;
     }
 
-    private List<SubmitNodeStorage.ModelSubmit<?>> getAllModelSubmits() {
-        List<SubmitNodeStorage.ModelSubmit<?>> out = new ArrayList<>();
+//    private List<SubmitNodeStorage.ModelSubmit<?>> getAllModelSubmits() {
+//        List<SubmitNodeStorage.ModelSubmit<?>> out = new ArrayList<>();
+//
+//        for (SubmitNodeCollection collection : submitStorage.getSubmitsPerOrder().values()) {
+//            ModelFeatureRenderer.Storage modelStorage = collection.getModelSubmits();
+//            ModelFeatureStorageAccess accessor = (ModelFeatureStorageAccess) modelStorage;
+//
+//            Map<RenderType, List<SubmitNodeStorage.ModelSubmit<?>>> opaqueByType =
+//                    accessor.elytratrails$getSolidModelSubmits();
+//            for (List<SubmitNodeStorage.ModelSubmit<?>> submits : opaqueByType.values()) {
+//                out.addAll(submits);
+//            }
+//
+//            List<SubmitNodeStorage.TranslucentModelSubmit<?>> translucentSubmits =
+//                    accessor.elytratrails$getTranslucentModelSubmits();
+//            for (SubmitNodeStorage.TranslucentModelSubmit<?> translucent : translucentSubmits) {
+//                out.add(translucent.modelSubmit());
+//            }
+//        }
+//
+//        return out;
+//    }
+
+    private List<SubmitNode> getAllModelSubmits() {
+        List<SubmitNode> out = new ArrayList<>();
 
         for (SubmitNodeCollection collection : submitStorage.getSubmitsPerOrder().values()) {
-            ModelFeatureRenderer.Storage modelStorage = collection.getModelSubmits();
-            ModelFeatureStorageAccess accessor = (ModelFeatureStorageAccess) modelStorage;
+            SimpleFeatureRenderPhase solids = collection.solid;
 
-            Map<RenderType, List<SubmitNodeStorage.ModelSubmit<?>>> opaqueByType =
-                    accessor.elytratrails$getSolidModelSubmits();
-            for (List<SubmitNodeStorage.ModelSubmit<?>> submits : opaqueByType.values()) {
-                out.addAll(submits);
+            for(SimpleFeatureRenderPhase.FeatureSubmits<?> submits: Arrays.stream(solids.submitsByFeature).toList())
+            {
+                if(submits == null)
+                {
+                    continue;
+                }
+                out.addAll(submits.unbatched);
+                for(List<?> submitList : submits.batches.values())
+                {
+                    for(var item : submitList)
+                    {
+                        if(item instanceof SubmitNode itemSubmitNot)
+                        {
+                            out.add(itemSubmitNot);
+                        }
+                    }
+                }
             }
-
-            List<SubmitNodeStorage.TranslucentModelSubmit<?>> translucentSubmits =
-                    accessor.elytratrails$getTranslucentModelSubmits();
-            for (SubmitNodeStorage.TranslucentModelSubmit<?> translucent : translucentSubmits) {
-                out.add(translucent.modelSubmit());
-            }
+            TranslucentFeatureRenderPhase translucents = collection.translucentModels;
+//
+//            for(TranslucentSubmit submit: (translucents.submits))
+//            {
+//                out.add((ModelFeatureRenderer.Submit) submit);
+//            }
         }
-
         return out;
     }
 

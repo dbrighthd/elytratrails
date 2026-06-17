@@ -1,11 +1,9 @@
 package dbrighthd.elytratrails.rendering;
 
-import com.mojang.blaze3d.pipeline.BlendFunction;
-import com.mojang.blaze3d.pipeline.ColorTargetState;
-import com.mojang.blaze3d.pipeline.DepthStencilState;
-import com.mojang.blaze3d.pipeline.RenderPipeline;
+import com.mojang.blaze3d.pipeline.*;
 import com.mojang.blaze3d.platform.CompareOp;
 import com.mojang.blaze3d.platform.PolygonMode;
+import com.mojang.blaze3d.shaders.UniformType;
 import dbrighthd.elytratrails.ElytraTrails;
 import net.minecraft.client.renderer.RenderPipelines;
 import net.minecraft.client.renderer.rendertype.RenderSetup;
@@ -18,16 +16,21 @@ import java.util.function.Function;
 
 public class TrailPipelines {
     public static final ColorTargetState TRANSLUCENT_COLOR_STATE = new ColorTargetState(BlendFunction.TRANSLUCENT);
-    public static final DepthStencilState DEFAULT_STENCIL_WITH_FALSE_DEPTHWRITE = new DepthStencilState(CompareOp.LESS_THAN_OR_EQUAL, true);
+    public static final DepthStencilState DEFAULT_STENCIL_WITH_FALSE_DEPTHWRITE = new DepthStencilState(CompareOp.GREATER_THAN_OR_EQUAL, true);
+    public static final BindGroupLayout EXAMPLE_LAYOUT = BindGroupLayout.builder()
+            // Specifies that the shaders have a 'Sampler0' sampler
+            .withSampler("Sampler1")
+            // Specifies that the shaders have access to the 'Globals' uniform
+            .build();
     public static final RenderPipeline PIPELINE_ENTITY_TRANSLUCENT_CULL = RenderPipelines.register(RenderPipeline.builder(RenderPipelines.ENTITY_SNIPPET)
             .withLocation(Identifier.fromNamespaceAndPath(ElytraTrails.MOD_ID, "pipeline/entity_translucent_cull"))
             .withShaderDefine("ALPHA_CUTOUT", 0.1F)
             .withShaderDefine("PER_FACE_LIGHTING")
-            .withSampler("Sampler1")
             //.withBlend(BlendFunction.TRANSLUCENT)
             .withColorTargetState(TRANSLUCENT_COLOR_STATE)
             .withDepthStencilState(DEFAULT_STENCIL_WITH_FALSE_DEPTHWRITE)
             .withCull(false)
+            .withBindGroupLayout(EXAMPLE_LAYOUT)
             .build());
 
     private static final Function<Identifier, RenderType> ENTITY_TRANSLUCENT_CULL = Util.memoize(
@@ -49,10 +52,10 @@ public class TrailPipelines {
             .withShaderDefine("ALPHA_CUTOUT", 0.1F)
             .withShaderDefine("PER_FACE_LIGHTING")
             .withPolygonMode(PolygonMode.WIREFRAME)
-            .withSampler("Sampler1")
             .withColorTargetState(TRANSLUCENT_COLOR_STATE)
             .withDepthStencilState(DEFAULT_STENCIL_WITH_FALSE_DEPTHWRITE)
             .withCull(false)
+            .withBindGroupLayout(EXAMPLE_LAYOUT)
             .build());
 
     private static final Function<Identifier, RenderType> ENTITY_TRANSLUCENT_CULL_WIREFRAME = Util.memoize(
@@ -75,9 +78,9 @@ public class TrailPipelines {
                     .withLocation(Identifier.parse("elytratrails:pipeline/entity_translucent_emissive_unlit"))
                     .withShaderDefine("ALPHA_CUTOUT", 0.1F)
                     .withShaderDefine("NO_CARDINAL_LIGHTING")
-                    .withSampler("Sampler1")
                     .withColorTargetState(TRANSLUCENT_COLOR_STATE)
                     .withCull(false)
+                    .withBindGroupLayout(EXAMPLE_LAYOUT)
                     .withDepthStencilState(DEFAULT_STENCIL_WITH_FALSE_DEPTHWRITE)
                     .build());
 
@@ -86,10 +89,10 @@ public class TrailPipelines {
                     .withLocation(Identifier.parse("elytratrails:pipeline/entity_translucent_emissive_unlit"))
                     .withShaderDefine("ALPHA_CUTOUT", 0.1F)
                     .withShaderDefine("NO_CARDINAL_LIGHTING")
-                    .withSampler("Sampler1")
                     .withPolygonMode(PolygonMode.WIREFRAME)
                     .withColorTargetState(TRANSLUCENT_COLOR_STATE)
                     .withCull(false)
+                    .withBindGroupLayout(EXAMPLE_LAYOUT)
                     .withDepthStencilState(DEFAULT_STENCIL_WITH_FALSE_DEPTHWRITE)
                     .build());
 
@@ -98,8 +101,8 @@ public class TrailPipelines {
                     .withLocation(Identifier.parse("elytratrails:pipeline/entity_cutout_emissive_unlit"))
                     .withShaderDefine("ALPHA_CUTOUT", 0.1F)
                     .withShaderDefine("NO_CARDINAL_LIGHTING")
-                    .withSampler("Sampler1")
                     .withCull(false)
+                    .withBindGroupLayout(EXAMPLE_LAYOUT)
                     .build());
 
     public static final RenderPipeline PIPELINE_ENTITY_CUTOUT_EMISSIVE_UNLIT_WIREFRAME =
@@ -107,9 +110,8 @@ public class TrailPipelines {
                     .withLocation(Identifier.parse("elytratrails:pipeline/entity_cutout_emissive_unlit"))
                     .withShaderDefine("ALPHA_CUTOUT", 0.1F)
                     .withShaderDefine("NO_CARDINAL_LIGHTING")
-                    .withPolygonMode(PolygonMode.WIREFRAME)
-                    .withSampler("Sampler1")
                     .withCull(false)
+                    .withBindGroupLayout(EXAMPLE_LAYOUT)
                     .build());
 
 
@@ -117,9 +119,9 @@ public class TrailPipelines {
             RenderPipelines.register(RenderPipeline.builder(RenderPipelines.ENTITY_SNIPPET)
                     .withLocation(Identifier.parse("elytratrails:pipeline/entity_cutout_lit"))
                     .withShaderDefine("ALPHA_CUTOUT", 0.1F)
-                    .withSampler("Sampler1")
                     .withShaderDefine("PER_FACE_LIGHTING")
                     .withCull(false)
+                    .withBindGroupLayout(EXAMPLE_LAYOUT)
                     // Intentionally no blend (cutout)
                     .build());
     private static final BiFunction<Identifier, Boolean, RenderType> RENDER_TYPE_ENTITY_TRANSLUCENT_EMISSIVE_UNLIT =
@@ -214,4 +216,5 @@ public class TrailPipelines {
     public static RenderType entityTranslucentCullWireFrame(Identifier texture) {
         return ENTITY_TRANSLUCENT_CULL_WIREFRAME.apply(texture);
     }
+
 }

@@ -214,11 +214,11 @@ public final class ElytraTrailsKeybind {
             while (OPEN_SETTINGS.consumeClick()) {
                 if(CLOTH_LOADED)
                 {
-                    client.setScreen(ConfigScreenBuilder.buildConfigScreen(client.screen, modConfig));
+                    client.setScreenAndShow(ConfigScreenBuilder.buildConfigScreen(client.gui.screen(), modConfig));
                 }
                 else
                 {
-                    client.setScreen(new FallbackConfigMessageScreen(client.screen));
+                    client.setScreenAndShow(new FallbackConfigMessageScreen(client.gui.screen()));
                 }
             }
 

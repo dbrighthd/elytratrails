@@ -7,6 +7,7 @@ import it.unimi.dsi.fastutil.objects.ObjectOpenHashSet;
 import net.minecraft.client.model.Model;
 import net.minecraft.client.model.geom.ModelPart;
 import net.minecraft.client.renderer.SubmitNodeStorage;
+import net.minecraft.client.renderer.feature.ModelFeatureRenderer;
 import net.minecraft.world.entity.EntityType;
 import org.jetbrains.annotations.Nullable;
 import traben.entity_model_features.EMFManager;
@@ -17,6 +18,7 @@ import traben.entity_model_features.models.parts.EMFModelPartWithState;
 import java.util.*;
 
 import static dbrighthd.elytratrails.config.pack.TrailPackConfigManager.entitiesWithTrails;
+import static dbrighthd.elytratrails.util.EntityTypeUtil.parseEntityString;
 
 public final class EmfTrailSpawnerRegistry {
     private EmfTrailSpawnerRegistry() {
@@ -75,7 +77,7 @@ public final class EmfTrailSpawnerRegistry {
         SPAWNER_PATHS_BY_TYPE.put(typeString, spawnerPaths);
 
         if (!spawnerPaths.isEmpty()) {
-            Optional<EntityType<?>> entityType = EntityType.byString(typeString.substring(typeString.lastIndexOf(".") + 1));
+            Optional<EntityType<?>> entityType = parseEntityString(typeString.substring(typeString.lastIndexOf(".") + 1));
             entityType.ifPresent(entitiesWithTrails::add);
             entityType.ifPresent(TrailPackConfigManager::setEntityDefaultModel);
             TYPES_WITH_SPAWNERS.add(typeString);
@@ -153,7 +155,7 @@ public final class EmfTrailSpawnerRegistry {
     @SuppressWarnings("unused")
     public static @Nullable TypeDef getOrBuildTypeDef(
             @Nullable String typeString,
-            @Nullable List<SubmitNodeStorage.ModelSubmit<?>> submits
+            @Nullable List<ModelFeatureRenderer.Submit<?>> submits
     ) {
         ensureInitialized();
         if (typeString == null) return null;
@@ -200,7 +202,7 @@ public final class EmfTrailSpawnerRegistry {
     private static boolean isStillValid(
             TypeDef cached,
             boolean shouldHaveSpawners,
-            @Nullable List<SubmitNodeStorage.ModelSubmit<?>> submits
+            @Nullable List<ModelFeatureRenderer.Submit<?>> submits
     ) {
         if (cached.locators().isEmpty()) {
             return !shouldHaveSpawners;
@@ -209,13 +211,13 @@ public final class EmfTrailSpawnerRegistry {
     }
 
     private static boolean containsAnyPoseModel(
-            @Nullable List<SubmitNodeStorage.ModelSubmit<?>> submits,
+            @Nullable List<ModelFeatureRenderer.Submit<?>> submits,
             List<Locator> locators
     ) {
         if (submits == null || submits.isEmpty()) return false;
 
         for (Locator locator : locators) {
-            for (SubmitNodeStorage.ModelSubmit<?> submit : submits) {
+            for (ModelFeatureRenderer.Submit<?> submit : submits) {
                 if (submit != null && submit.model() == locator.poseModel()) {
                     return true;
                 }
@@ -227,11 +229,11 @@ public final class EmfTrailSpawnerRegistry {
     @SuppressWarnings("unused")
     private static @Nullable TypeDef tryBuildTypeDefFromSubmits(
             String typeString,
-            List<SubmitNodeStorage.ModelSubmit<?>> submits
+            List<ModelFeatureRenderer.Submit<?>> submits
     ) {
         ArrayList<Locator> locators = new ArrayList<>();
 
-        for (SubmitNodeStorage.ModelSubmit<?> submit : submits) {
+        for (ModelFeatureRenderer.Submit<?> submit : submits) {
             if (submit == null) continue;
 
             Model<?> model = submit.model();
@@ -264,7 +266,7 @@ public final class EmfTrailSpawnerRegistry {
 
     private static @Nullable TypeDef tryBuildTypeDefFromRegistry(
             String typeString,
-            List<SubmitNodeStorage.ModelSubmit<?>> submits
+            List<ModelFeatureRenderer.Submit<?>> submits
     ) {
         ModelPart registeredRoot = getRoot(typeString);
         List<String> registeredPaths = getSpawnerPaths(typeString);
@@ -282,8 +284,8 @@ public final class EmfTrailSpawnerRegistry {
         return new TypeDef(Collections.unmodifiableList(locators));
     }
 
-    private static @Nullable Model<?> chooseNonElytraModel(List<SubmitNodeStorage.ModelSubmit<?>> submits) {
-        for (SubmitNodeStorage.ModelSubmit<?> submit : submits) {
+    private static @Nullable Model<?> chooseNonElytraModel(List<ModelFeatureRenderer.Submit<?>> submits) {
+        for (ModelFeatureRenderer.Submit<?> submit : submits) {
             if (submit == null) continue;
             Model<?> model = submit.model();
             if (!isElytraModel(model)) return model;

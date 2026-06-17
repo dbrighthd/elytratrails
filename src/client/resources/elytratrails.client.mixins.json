@@ -7,15 +7,12 @@
     "AvatarRendererMixin",
     "CameraTwirlMixin",
     "ClientLevelEntityRemovalMixin",
-    "ClientPacketListenerRemoveEntitiesMixin",
-    "ModelFeatureStorageAccessor"
+    "ClientPacketListenerRemoveEntitiesMixin"
   ],
   "injectors": {
     "defaultRequire": 1
   },
   "mixins": [
-    "compat.EmfModelPartRootRegisterMixin",
-    "compat.RecorderMixin",
-    "compat.cpm.CPMOrderedSubmitNodeCollectorMixin"
+    "compat.EmfModelPartRootRegisterMixin"
   ]
 }

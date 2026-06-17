@@ -31,7 +31,7 @@ public class FallbackConfigMessageScreen extends Screen {
         int firstButtonY = centerY - 6;
 
         this.addRenderableWidget(
-                Button.builder(Component.literal("Return"), button -> this.minecraft.setScreen(this.parent))
+                Button.builder(Component.literal("Return"), button -> this.minecraft.setScreenAndShow(this.parent))
                         .size(BUTTON_WIDTH, BUTTON_HEIGHT)
                         .pos(buttonX, firstButtonY + BUTTON_HEIGHT + BUTTON_SPACING)
                         .build()
@@ -54,7 +54,7 @@ public class FallbackConfigMessageScreen extends Screen {
 
     @Override
     public boolean shouldCloseOnEsc() {
-        this.minecraft.setScreen(this.parent);
+        this.minecraft.setScreenAndShow(this.parent);
         return true;
     }
 }
