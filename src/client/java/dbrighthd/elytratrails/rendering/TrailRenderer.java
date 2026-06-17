@@ -69,8 +69,6 @@ public class TrailRenderer {
 
         modConfig = getConfig();
         cameraPosition = camera.getPosition();
-        Vec3 scaledPos = cameraPosition.scale(-1f);
-        stack.translate(scaledPos.x, scaledPos.y, scaledPos.z);
         for (Trail trail : manager.trails()) {
             List<Trail.Point> points = trail.points();
             int size = points.size();
@@ -418,10 +416,10 @@ public class TrailRenderer {
             Vec3 a, Vec3 b, Vec3 sideA, Vec3 sideB,
             float halfWidthStart, float halfWidthEnd, float v1, float v2, float alphaStart, float alphaEnd, boolean flipUv, int color
     ) {
-        Vector3f p1 = a.add(sideA.scale(halfWidthStart)).toVector3f();
-        Vector3f p2 = b.add(sideB.scale(halfWidthEnd)).toVector3f();
-        Vector3f p3 = b.subtract(sideB.scale(halfWidthEnd)).toVector3f();
-        Vector3f p4 = a.subtract(sideA.scale(halfWidthStart)).toVector3f();
+        Vector3f p1 = a.add(sideA.scale(halfWidthStart)).subtract(cameraPosition).toVector3f();
+        Vector3f p2 = b.add(sideB.scale(halfWidthEnd)).subtract(cameraPosition).toVector3f();
+        Vector3f p3 = b.subtract(sideB.scale(halfWidthEnd)).subtract(cameraPosition).toVector3f();
+        Vector3f p4 = a.subtract(sideA.scale(halfWidthStart)).subtract(cameraPosition).toVector3f();
 
         int overlay = OverlayTexture.NO_OVERLAY;
         int lightStart = useLightMap ? computeLightTexture(a) : LightTexture.FULL_BRIGHT;
