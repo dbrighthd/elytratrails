@@ -58,7 +58,8 @@ public class TrailManager {
             modConfig = getConfig();
             now = ElytraTimeUtil.currentMillis();
             deltaT = now - past;
-            doCameraOffset();
+//            doCameraOffset();
+            doWindOffset();
             boolean recordEmitters = true;
             if ((now - lastSample) < (1000f / modConfig.maxSamplePerSecond)) {
                 if (modConfig.alwaysSnapTrail) {
@@ -95,22 +96,24 @@ public class TrailManager {
             points.replaceAll(point -> point.addCameraOffset(deltaCameraSpace));
 
         }
+        prevCameraSpace = Minecraft.getInstance().gameRenderer.mainCamera().position();
+    }
+    public void doWindOffset()
+    {
         if(modConfig.applyWind)
         {
             for (Trail trail : trails) {
                 List<Trail.Point> points = trail.points();
 
-                points.replaceAll(point -> point.addPositionOffset(positionToWindVector(point,cameraPos)));
+                points.replaceAll(point -> point.addPositionOffset(positionToWindVector(point)));
 
             }
         }
-        prevCameraSpace = Minecraft.getInstance().gameRenderer.mainCamera().position();
     }
-
     //This might not be a good way to make a 3d direction based on position, but its what I could think of
-    Vec3 positionToWindVector(Trail.Point point, Vec3 cameraPos)
+    Vec3 positionToWindVector(Trail.Point point)
     {
-        Vec3 combined = point.pos().add(cameraPos).scale(0.02 * modConfig.windScale);
+        Vec3 combined = point.pos().scale(0.02 * modConfig.windScale);
         double outPerlin1 = perlinNoise.getValue(combined.x, combined.y, combined.z);
         double outPerlin2 = perlinNoise.getValue(combined.x + 100, combined.y + 50, combined.z -100); //arbitrary offset just so the second angle is different
         double angleRad1 = outPerlin1 * 2 * Math.PI;

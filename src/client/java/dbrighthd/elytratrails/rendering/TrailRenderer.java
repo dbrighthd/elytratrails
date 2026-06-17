@@ -70,6 +70,7 @@ public class TrailRenderer {
 
         modConfig = getConfig();
         cameraPosition = camera.position();
+        stack.translate(cameraPosition.scale(-1));
         for (Trail trail : manager.trails()) {
             List<Trail.Point> points = trail.points();
             int size = points.size();
@@ -94,6 +95,7 @@ public class TrailRenderer {
             }
 
             final Trail.Point effectiveLastPoint = snappedLastPoint != null ? snappedLastPoint : points.get(last);
+
 
             ctx.submitNodeCollector().order(1).submitCustomGeometry(stack, renderType, (pose, consumer) -> {
                 useLightMap = renderType == TrailPipelines.entityTranslucentCull(trail.texture()) || renderType == TrailPipelines.entityTranslucentCullWireFrame(trail.texture()) || renderType == TrailPipelines.entityCutoutLit(trail.texture());
@@ -294,8 +296,8 @@ public class TrailRenderer {
             }
 
             if (trailSettings.enableRandomWidth()) {
-                scaleStart = scaleStart * (float) trailSettings.randomWidthVariation() * ((float) (perlinNoise.getValue(startPos.x + cameraPosition.x, startPos.y + cameraPosition.y, startPos.z + cameraPosition.z)) + 1);
-                scaleEnd = scaleEnd * (float) trailSettings.randomWidthVariation() * ((float) (perlinNoise.getValue(endPos.x + cameraPosition.x, endPos.y + cameraPosition.y, endPos.z + cameraPosition.z)) + 1);
+                scaleStart = scaleStart * (float) trailSettings.randomWidthVariation() * ((float) (perlinNoise.getValue(startPos.x , startPos.y, startPos.z)) + 1);
+                scaleEnd = scaleEnd * (float) trailSettings.randomWidthVariation() * ((float) (perlinNoise.getValue(endPos.x, endPos.y, endPos.z)) + 1);
 
             }
             if (trailSettings.increaseWidthOverTime()) {
@@ -327,8 +329,8 @@ public class TrailRenderer {
                 scaleEnd *= inverseLerpTwoVals(point1SpeedData.aoa(), trailSettings.minWidthAOA(), trailSettings.maxWidthAOA());
             }
             if (modConfig.tryNearTrailFade) {
-                alphaStart *= cameraDistanceFade((float) startPos.length());
-                alphaEnd *= cameraDistanceFade((float) endPos.length());
+                alphaStart *= cameraDistanceFade((float) startPos.distanceTo(cameraPosition));
+                alphaEnd *= cameraDistanceFade((float) endPos.distanceTo(cameraPosition));
             }
             float halfWidthStart = (float) (trailSettings.maxWidth() / 2f) * scaleStart;
             float halfWidthEnd = (float) (trailSettings.maxWidth() / 2f) * scaleEnd;
@@ -350,8 +352,8 @@ public class TrailRenderer {
                 Vec3 startTan = SplineInterpolation.catmullRomTangent(p0, p1, p2, p3, tStart).normalize();
                 Vec3 endTan = SplineInterpolation.catmullRomTangent(p0, p1, p2, p3, tEnd).normalize();
 
-                Vec3 sideA = startTan.cross(startPos.normalize()).normalize();
-                Vec3 sideB = endTan.cross(endPos.normalize()).normalize();
+                Vec3 sideA = startTan.cross(startPos.subtract(cameraPosition).normalize()).normalize();
+                Vec3 sideB = endTan.cross(endPos.subtract(cameraPosition).normalize()).normalize();
 
                 float removeDist = manager.deadPointDistance.getOrDefault(trail.trailId(), 0f);
                 v1 += removeDist;
@@ -469,7 +471,7 @@ public class TrailRenderer {
     private int computeLightTexture(Vec3 pos) {
         if (minecraft.level == null) return LightCoordsUtil.FULL_BRIGHT;
 
-        BlockPos blockPos = BlockPos.containing(pos.add(cameraPosition));
+        BlockPos blockPos = BlockPos.containing(pos);
         return LightCoordsUtil.getLightCoords(minecraft.level, blockPos);
     }
 
