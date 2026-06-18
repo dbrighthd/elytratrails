@@ -70,7 +70,7 @@ public class WingTipSampler {
         }
     }
 
-    public @NotNull List<Emitter> getPlayerTrailEmitterPositions(Avatar player, float partialTick, ModConfig modConfig) {
+    public @NotNull List<Emitter> getPlayerTrailEmitterPositions(Avatar player, float partialTick) {
         if(CPM_LOADED)
         {
             CpmModelStorage.resetSubmits();
@@ -112,14 +112,14 @@ public class WingTipSampler {
             }
             EmfInfo emfInfo = emfCache.get(eid);
             if (!emfInfo.spawners.isEmpty()) {
-                List<Emitter> gatheredTrails = getTrailEmittersFromBones(basePose, animatedElytraRoot, elytraModel, camera.position(), entityWorldOffset, emfInfo);
+                List<Emitter> gatheredTrails = getTrailEmittersFromBones(basePose, animatedElytraRoot, elytraModel, entityWorldOffset, emfInfo);
                 if (config.alwaysSnapTrail) {
                     putOrAppendGatheredThisFrame(eid, gatheredTrails);
                 }
                 return gatheredTrails;
             }
         }
-        List<Emitter> gatheredTrails = getVanillaTrailEmitters(basePose, animatedElytraRoot, elytraModel, camera.position(), entityWorldOffset, player);
+        List<Emitter> gatheredTrails = getVanillaTrailEmitters(basePose, animatedElytraRoot, elytraModel, entityWorldOffset, player);
         if (config.alwaysSnapTrail) {
             gatheredTrailsThisFrame.put(eid, gatheredTrails);
         }
@@ -165,7 +165,7 @@ public class WingTipSampler {
             EmfInfo emfInfo = emfCacheGeneric.get(eid);
 
             if (!emfInfo.spawners.isEmpty()) {
-                List<Emitter> gatheredTrails = getTrailEmittersFromBonesGeneric(basePose, animatedRoot, camera.position(), entityWorldOffset, emfInfo);
+                List<Emitter> gatheredTrails = getTrailEmittersFromBonesGeneric(basePose, animatedRoot, entityWorldOffset, emfInfo);
                 if (config.alwaysSnapTrail) {
                     putOrAppendGatheredThisFrame(eid, gatheredTrails);
                 }
@@ -175,7 +175,7 @@ public class WingTipSampler {
         if(!sampleSettings.useWithoutEmf()) {
             return new EntityEmitters(List.of(), false);
         }
-        List<Emitter> gatheredTrails = getVanillaTrailEmittersGeneric(basePose, animatedRoot, entityModel, camera.position(), entityWorldOffset, entity, sampleSettings);
+        List<Emitter> gatheredTrails = getVanillaTrailEmittersGeneric(basePose, animatedRoot, entityModel, entityWorldOffset, entity, sampleSettings);
         if (config.alwaysSnapTrail) {
             putOrAppendGatheredThisFrame(eid, gatheredTrails);
         }
@@ -207,7 +207,7 @@ public class WingTipSampler {
         return path.split("/");
     }
 
-    private @NotNull List<Emitter> getTrailEmittersFromBones(@NotNull PoseStack stack, @Nullable ModelPart elytraRoot, @NotNull ElytraModel model, @NotNull Vec3 cameraPos, @NotNull Vec3 entityWorldOffset, EmfInfo emfInfo) {
+    private @NotNull List<Emitter> getTrailEmittersFromBones(@NotNull PoseStack stack, @Nullable ModelPart elytraRoot, @NotNull ElytraModel model, @NotNull Vec3 entityWorldOffset, EmfInfo emfInfo) {
         ModelPart leftWing = model.leftWing;
         ModelPart rightWing = model.rightWing;
         List<SpawnerInfo> spawners = emfInfo.spawners;
@@ -224,7 +224,7 @@ public class WingTipSampler {
         return emitters;
     }
 
-    private @NotNull List<Emitter> getTrailEmittersFromBonesGeneric(@NotNull PoseStack stack, @Nullable ModelPart elytraRoot, @NotNull Vec3 cameraPos, @NotNull Vec3 entityWorldOffset, EmfInfo emfInfo) {
+    private @NotNull List<Emitter> getTrailEmittersFromBonesGeneric(@NotNull PoseStack stack, @Nullable ModelPart elytraRoot, @NotNull Vec3 entityWorldOffset, EmfInfo emfInfo) {
         List<SpawnerInfo> spawners = emfInfo.spawners;
 
         List<Emitter> emitters = new ArrayList<>();
@@ -250,7 +250,7 @@ public class WingTipSampler {
         return (modelRoot == EmfWingTipHooks.WhichRoot.LEFT_WING);
     }
 
-    private @NotNull List<Emitter> getVanillaTrailEmitters(@NotNull PoseStack stack, @Nullable ModelPart elytraRoot, @NotNull ElytraModel model, @NotNull Vec3 cameraPos, @NotNull Vec3 entityWorldOffset, Avatar player) {
+    private @NotNull List<Emitter> getVanillaTrailEmitters(@NotNull PoseStack stack, @Nullable ModelPart elytraRoot, @NotNull ElytraModel model, @NotNull Vec3 entityWorldOffset, Avatar player) {
         ModelPart leftWing = model.leftWing;
         ModelPart rightWing = model.rightWing;
 
@@ -263,7 +263,7 @@ public class WingTipSampler {
         );
     }
 
-    private @NotNull List<Emitter> getVanillaTrailEmittersGeneric(@NotNull PoseStack stack, @Nullable ModelPart animatedRoot, @NotNull EntityModel<?> model, @NotNull Vec3 cameraPos, @NotNull Vec3 entityWorldOffset, Entity entity, ResolvedSampleSettings sampleSettings) {
+    private @NotNull List<Emitter> getVanillaTrailEmittersGeneric(@NotNull PoseStack stack, @Nullable ModelPart animatedRoot, @NotNull EntityModel<?> model, @NotNull Vec3 entityWorldOffset, Entity entity, ResolvedSampleSettings sampleSettings) {
         Vec3 offsets = new Vec3(-sampleSettings.xOffset() / 16, -sampleSettings.yOffset() / 16, -sampleSettings.zOffset() / 16);
         ModelPart modelPart = animatedRoot != null ? animatedRoot : model.root();
         Vec3 tip = computeTransformedPoint(stack, modelPart, modelPart, offsets);

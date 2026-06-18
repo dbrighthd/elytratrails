@@ -198,7 +198,7 @@ public class TrailManager {
             boolean valid = TrailManager.isPlayerTrailValid(config, player);
 
             if (valid) {
-                List<Emitter> emitters = new ArrayList<>(sampler.getPlayerTrailEmitterPositions(player, ctx.getDeltaTracker().getGameTimeDeltaPartialTick(false), modConfig));
+                List<Emitter> emitters = new ArrayList<>(sampler.getPlayerTrailEmitterPositions(player, ctx.getDeltaTracker().getGameTimeDeltaPartialTick(false)));
                 PlayerSpeedData speedData = getPlayerSpeedData(player, config);
                 if (emitters.isEmpty()) {
                     if (modConfig.logTrails) {
