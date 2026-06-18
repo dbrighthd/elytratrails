@@ -4,7 +4,7 @@
   "speedDependentTrail": true,
   "trailMinSpeed": 0.8,
   "trailMovesWithElytraAngle": true,
-  "maxWidth": 0.05,
+  "maxWidth": 0.075,
   "trailLifetime": 2.5,
   "startRampDistance": 4.0,
   "endRampDistance": 10.0,
