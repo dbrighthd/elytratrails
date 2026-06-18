@@ -25,7 +25,8 @@
   "text.elytratrails.option.PresetOthers": "Other's Selected Preset",
   "text.elytratrails.option.PresetOthers.@Tooltip": "Preset that is selected will override \"Other's Trails\" settings upon saving config",
 
-
+  "text.elytratrails.option.skipLengthCheck" : "Skip Trail Length Check",
+  "text.elytratrails.option.skipLengthCheck.@Tooltip" : "Prevents trails being removed if a segment is too long (enable this if wind is causing issues)",
 
   "text.elytratrails.option.export": "Export as Preset",
   "text.elytratrails.option.export.@Tooltip": "Exports above setting as a preset (located in config/elytratrails_presets) upon config saving. PRESET NAME IS REQUIRED FOR SAVING",
@@ -249,9 +250,6 @@
 
   "text.elytratrails.option.logTrails" : "Log Trails",
   "text.elytratrails.option.logTrails.@Tooltip" : "Logs trail creation/deletion",
-
-  "text.elytratrails.option.hardCodedFreshAnimationsPlayerWingtips" : "Check for FA+Player Wingtips",
-  "text.elytratrails.option.hardCodedFreshAnimationsPlayerWingtips.@Tooltip" : "Tries to assume wingtip position in FA+Player elytra model. This option will be deleted if FA+Player updates to support this mod.",
 
   "text.elytratrails.category.advanced" : "Advanced Trail Settings",
 
