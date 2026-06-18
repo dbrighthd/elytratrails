@@ -227,7 +227,7 @@ public class TrailRenderer {
         Vec3 chord = endPos.subtract(startPos);
 
         double chordLenSq = chord.lengthSqr();
-        if (!modConfig.applyWind && chordLenSq > 400) {
+        if (!modConfig.skipLengthCheck && chordLenSq > 400) {
             if (modConfig.logTrails) {
                 LOGGER.info("Trail removed for entity {}, trail segment was too long and discarded as invalid", trail.entityId());
             }

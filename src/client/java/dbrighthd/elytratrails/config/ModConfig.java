@@ -68,6 +68,8 @@ public class ModConfig {
 
     public double particlesVelocityBackwards = 0;
 
+    public boolean skipLengthCheck = false;
+
     public void validate() {
         if (clientPlayerConfig == null) {
             clientPlayerConfig = ClientConfig.getDefaultClientConfig();
