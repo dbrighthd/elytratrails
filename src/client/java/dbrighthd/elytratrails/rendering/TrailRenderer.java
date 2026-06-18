@@ -10,6 +10,7 @@ import net.fabricmc.fabric.api.client.rendering.v1.level.LevelRenderContext;
 import net.minecraft.client.Camera;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.LevelRenderer;
+import net.minecraft.client.renderer.SubmitNodeCollector;
 import net.minecraft.util.LightCoordsUtil;
 import net.minecraft.client.renderer.rendertype.RenderType;
 import net.minecraft.client.renderer.texture.OverlayTexture;
@@ -62,11 +63,13 @@ public class TrailRenderer {
     }
 
     public void renderAllTrails(@NotNull LevelRenderContext ctx, Map<Integer, List<Emitter>> gatheredThisFrame) {
-        PoseStack stack = ctx.poseStack();
+        submitAllTrails(ctx.poseStack(), ctx.submitNodeCollector(), ctx.gameRenderer().mainCamera(), gatheredThisFrame);
+    }
+
+    public void submitAllTrails(PoseStack poseStack, SubmitNodeCollector collector, Camera camera, Map<Integer, List<Emitter>> gatheredThisFrame) {
+        PoseStack stack = poseStack;
         minecraft = Minecraft.getInstance();
         stack.pushPose();
-
-        Camera camera = ctx.gameRenderer().mainCamera();
 
         modConfig = getConfig();
         cameraPosition = camera.position();
@@ -96,7 +99,7 @@ public class TrailRenderer {
             final Trail.Point effectiveLastPoint = snappedLastPoint != null ? snappedLastPoint : points.get(last);
 
 
-            ctx.submitNodeCollector().order(1).submitCustomGeometry(stack, renderType, (pose, consumer) -> {
+            collector.order(1).submitCustomGeometry(stack, renderType, (pose, consumer) -> {
                 useLightMap = renderType == TrailPipelines.entityTranslucentCull(trail.texture()) || renderType == TrailPipelines.entityTranslucentCullWireFrame(trail.texture()) || renderType == TrailPipelines.entityCutoutLit(trail.texture());
                 totalTrailLength = 0f;
                 currentTime = ElytraTimeUtil.currentMillis();

@@ -251,6 +251,9 @@
   "text.elytratrails.option.logTrails" : "Log Trails",
   "text.elytratrails.option.logTrails.@Tooltip" : "Logs trail creation/deletion",
 
+  "text.elytratrails.option.useOldRenderer" : "Use Legacy Render",
+  "text.elytratrails.option.useOldRenderer.@Tooltip" : "When to use the normal renderer. The new system is a bit invasive, so this exists to render it the old way (broken translucents!",
+
   "text.elytratrails.category.advanced" : "Advanced Trail Settings",
 
   "text.elytratrails.category.elytra.advanced" : "Advanced Settings",

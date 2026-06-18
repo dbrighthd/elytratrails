@@ -457,6 +457,14 @@ public class ConfigScreenBuilder {
                 .setSaveConsumer(newValue -> config.alwaysGlowWhenShaderTranslucent = newValue)
                 .requireRestart()
                 .build());
+        debug.addEntry(entryBuilder.startEnumSelector(
+                        Component.translatable("text.elytratrails.option.useOldRenderer"),
+                        ModConfig.LegacyTrailRender.class,
+                        config.useOldRenderer)
+                .setDefaultValue(defaultModConfig.useOldRenderer)
+                .setTooltip(Component.translatable("text.elytratrails.option.useOldRenderer.@Tooltip"))
+                .setSaveConsumer(newValue -> config.useOldRenderer = newValue)
+                .build());
         debug.addEntry(entryBuilder.startBooleanToggle(Component.translatable("text.elytratrails.option.skipLengthCheck"), config.skipLengthCheck)
                 .setDefaultValue(defaultModConfig.skipLengthCheck)
                 .setTooltip(Component.translatable("text.elytratrails.option.skipLengthCheck.@Tooltip"))

@@ -70,6 +70,14 @@ public class ModConfig {
 
     public boolean skipLengthCheck = false;
 
+    public LegacyTrailRender useOldRenderer = LegacyTrailRender.SHADERS;
+
+    public enum LegacyTrailRender {
+        SHADERS,
+        NEVER,
+        ALWAYS
+    }
+
     public void validate() {
         if (clientPlayerConfig == null) {
             clientPlayerConfig = ClientConfig.getDefaultClientConfig();
