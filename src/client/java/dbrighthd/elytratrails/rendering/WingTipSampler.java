@@ -469,7 +469,7 @@ public class WingTipSampler {
      * I know this is super cursed but im not sure how else to get the accurate positions without requiring an entity to be rendered (so that I can get the wingtips in first person)n
      */
     private ModelFeatureRenderer.Submit<?> findElytraModelSubmit() {
-        for (SubmitNodeCollection collection : submitStorage.getSubmitsPerOrder().values()) {
+
             List<SubmitNode> submits = getAllModelSubmits();
             for (SubmitNode submit : submits) {
                 if(submit instanceof ModelFeatureRenderer.Submit<?> modelSubmit && modelSubmit.model() instanceof ElytraModel)
@@ -477,7 +477,6 @@ public class WingTipSampler {
                     return modelSubmit;
                 }
             }
-        }
         if(CPM_LOADED)
         {
 //            return findCPMElytraModelSubmit();
@@ -521,23 +520,20 @@ public class WingTipSampler {
                     continue;
                 }
                 out.addAll(submits.unbatched);
-                for(List<?> submitList : submits.batches.values())
+                for(List<?  > submitList : submits.batches.values())
                 {
                     for(var item : submitList)
                     {
-                        if(item instanceof SubmitNode itemSubmitNot)
+                        if(item instanceof SubmitNode submitNode)
                         {
-                            out.add(itemSubmitNot);
+                            out.add(submitNode);
                         }
                     }
                 }
             }
             TranslucentFeatureRenderPhase translucents = collection.translucentModels;
-//
-//            for(TranslucentSubmit submit: (translucents.submits))
-//            {
-//                out.add((ModelFeatureRenderer.Submit) submit);
-//            }
+
+            out.addAll((translucents.submits));
         }
         return out;
     }
