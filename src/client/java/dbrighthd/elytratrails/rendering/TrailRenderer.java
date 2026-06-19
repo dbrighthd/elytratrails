@@ -9,7 +9,6 @@ import dbrighthd.elytratrails.util.ElytraTimeUtil;
 import net.fabricmc.fabric.api.client.rendering.v1.level.LevelRenderContext;
 import net.minecraft.client.Camera;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.renderer.LevelRenderer;
 import net.minecraft.client.renderer.SubmitNodeCollector;
 import net.minecraft.util.LightCoordsUtil;
 import net.minecraft.client.renderer.rendertype.RenderType;
@@ -18,7 +17,6 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.resources.Identifier;
 import net.minecraft.util.Mth;
 import net.minecraft.util.RandomSource;
-import net.minecraft.util.TimeUtil;
 import net.minecraft.world.level.levelgen.synth.PerlinNoise;
 import net.minecraft.world.phys.Vec3;
 import org.jetbrains.annotations.NotNull;
@@ -67,9 +65,8 @@ public class TrailRenderer {
     }
 
     public void submitAllTrails(PoseStack poseStack, SubmitNodeCollector collector, Camera camera, Map<Integer, List<Emitter>> gatheredThisFrame) {
-        PoseStack stack = poseStack;
         minecraft = Minecraft.getInstance();
-        stack.pushPose();
+        poseStack.pushPose();
 
         modConfig = getConfig();
         cameraPosition = camera.position();
@@ -99,7 +96,7 @@ public class TrailRenderer {
             final Trail.Point effectiveLastPoint = snappedLastPoint != null ? snappedLastPoint : points.get(last);
 
 
-            collector.order(1).submitCustomGeometry(stack, renderType, (pose, consumer) -> {
+            collector.order(1).submitCustomGeometry(poseStack, renderType, (pose, consumer) -> {
                 useLightMap = renderType == TrailPipelines.entityTranslucentCull(trail.texture()) || renderType == TrailPipelines.entityTranslucentCullWireFrame(trail.texture()) || renderType == TrailPipelines.entityCutoutLit(trail.texture());
                 totalTrailLength = 0f;
                 currentTime = ElytraTimeUtil.currentMillis();
@@ -156,62 +153,9 @@ public class TrailRenderer {
                     renderSubdividedSegment(pose, consumer, point0, point1, point2, 0f, 1f, p0, p1, p2, p3, startPos, endPos, trail, trailSettings.color(), trailSettings);
                 }
             });
-//                useLightMap = renderType == TrailPipelines.entityTranslucentCull(trail.texture()) || renderType == TrailPipelines.entityTranslucentCullWireFrame(trail.texture()) || renderType == TrailPipelines.entityCutoutLit(trail.texture());
-//                totalTrailLength = 0f;
-//                currentTime = ElytraTimeUtil.currentMillis();
-//                for (int i = 0; i < last; i++) {
-//                    int i0 = (i > 0) ? i - 1 : 0;
-//                    int i2 = i + 1;
-//                    int i3 = (i + 2 < size) ? i + 2 : last;
-//
-//                    Trail.Point p0Point = points.get(i0);
-//                    Trail.Point p1Point = points.get(i);
-//                    Trail.Point p2Point = (i2 == last) ? effectiveLastPoint : points.get(i2);
-//                    Trail.Point p3Point = (i3 == last) ? effectiveLastPoint : points.get(i3);
-//
-//                    Vec3 p0 = p0Point.pos();
-//                    Vec3 p1 = p1Point.pos();
-//                    Vec3 p2 = p2Point.pos();
-//                    Vec3 p3 = p3Point.pos();
-//
-//                    Vec3 startPos = modConfig.useSplines ? SplineInterpolation.catmullRom(p0, p1, p2, p3, 0f) : p1;
-//                    Vec3 endPos = modConfig.useSplines ? SplineInterpolation.catmullRom(p0, p1, p2, p3, 1f) : p2;
-//                    calculateSubdivideLength(p0, p1, p2, p3, 0f, 1f, startPos, endPos);
-//                }
-//
-//                totalTrailLength -= (float) trailSettings.distanceTillTrailStart();
-//                totalTrailLength = max(totalTrailLength, 0);
-//                endCorrection = 0f;
-//                this.accumDist = 0f;
-//
-//                this.atEnd = false;
-//                this.isFirstPerson =
-//                        ((minecraft.player != null)
-//                                && trail.entityId() == minecraft.player.getId())
-//                                && minecraft.options.getCameraType().isFirstPerson()
-//                                && minecraft.getCameraEntity() == minecraft.player;
-//                for (int i = 0; i < last; i++) {
-//                    int i0 = (i > 0) ? i - 1 : 0;
-//                    int i2 = i + 1;
-//                    int i3 = (i + 2 < size) ? i + 2 : last;
-//
-//                    Trail.Point point0 = points.get(i0);
-//                    Trail.Point point1 = points.get(i);
-//                    Trail.Point point2 = (i2 == last) ? effectiveLastPoint : points.get(i2);
-//                    Trail.Point point3 = (i3 == last) ? effectiveLastPoint : points.get(i3);
-//
-//                    Vec3 p0 = point0.pos();
-//                    Vec3 p1 = point1.pos();
-//                    Vec3 p2 = point2.pos();
-//                    Vec3 p3 = point3.pos();
-//
-//                    Vec3 startPos = modConfig.useSplines ? SplineInterpolation.catmullRom(p0, p1, p2, p3, 0f) : p1;
-//                    Vec3 endPos = modConfig.useSplines ? SplineInterpolation.catmullRom(p0, p1, p2, p3, 1f) : p2;
-//                    renderSubdividedSegment(stack.last(), ctx.bufferSource().getBuffer(renderType), point0, point1, point2, 0f, 1f, p0, p1, p2, p3, startPos, endPos, trail, trailSettings.color(), trailSettings);
-//                }
         }
 
-        stack.popPose();
+        poseStack.popPose();
     }
 
     private Trail.Point copyTrailPointNewPos(Trail.Point point, Vec3 newPos, boolean visible) {

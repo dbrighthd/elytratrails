@@ -27,7 +27,6 @@ import org.jetbrains.annotations.NotNull;
 
 import java.util.Objects;
 
-//import static dbrighthd.elytratrails.compat.emf.EmfTrailSpawnerRegistry.onResourceReload;
 import static dbrighthd.elytratrails.network.ClientPlayerConfigStore.refreshLocalConfigs;
 
 

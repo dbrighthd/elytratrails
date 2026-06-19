@@ -1,6 +1,5 @@
 package dbrighthd.elytratrails.util;
 
-//import dbrighthd.elytratrails.compat.IrisCompat;
 import dbrighthd.elytratrails.compat.IrisCompat;
 import net.fabricmc.loader.api.FabricLoader;
 
