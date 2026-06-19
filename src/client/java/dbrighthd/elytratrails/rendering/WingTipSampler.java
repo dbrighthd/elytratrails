@@ -2,26 +2,21 @@ package dbrighthd.elytratrails.rendering;
 
 import com.mojang.blaze3d.vertex.PoseStack;
 import dbrighthd.elytratrails.compat.ModStatuses;
-//import dbrighthd.elytratrails.compat.cpm.CpmModelStorage;
+import dbrighthd.elytratrails.compat.cpm.CpmModelStorage;
 import dbrighthd.elytratrails.compat.emf.EmfAnimationHooks;
 import dbrighthd.elytratrails.compat.emf.EmfWingTipHooks;
 import dbrighthd.elytratrails.config.ModConfig;
 import dbrighthd.elytratrails.config.pack.ResolvedSampleSettings;
-//import dbrighthd.elytratrails.accessor.ModelFeatureStorageAccess;
 import dbrighthd.elytratrails.network.ClientPlayerConfigStore;
 import dbrighthd.elytratrails.network.PlayerConfig;
 import dbrighthd.elytratrails.util.ModelTransformationUtil;
 import dbrighthd.elytratrails.util.ShaderChecksUtil;
-import net.minecraft.CrashReport;
-import net.minecraft.CrashReportCategory;
-import net.minecraft.ReportedException;
 import net.minecraft.client.Camera;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.model.EntityModel;
 import net.minecraft.client.model.geom.ModelPart;
 import net.minecraft.client.model.object.equipment.ElytraModel;
 import net.minecraft.client.renderer.SubmitNodeCollection;
-import net.minecraft.client.renderer.SubmitNodeCollector;
 import net.minecraft.client.renderer.SubmitNodeStorage;
 import net.minecraft.client.renderer.entity.EntityRenderDispatcher;
 import net.minecraft.client.renderer.entity.EntityRenderer;
@@ -29,12 +24,9 @@ import net.minecraft.client.renderer.entity.state.AvatarRenderState;
 import net.minecraft.client.renderer.entity.state.EntityRenderState;
 import net.minecraft.client.renderer.entity.state.HumanoidRenderState;
 import net.minecraft.client.renderer.feature.ModelFeatureRenderer;
-import net.minecraft.client.renderer.feature.phase.FeatureRenderPhase;
 import net.minecraft.client.renderer.feature.phase.SimpleFeatureRenderPhase;
 import net.minecraft.client.renderer.feature.phase.TranslucentFeatureRenderPhase;
 import net.minecraft.client.renderer.feature.submit.SubmitNode;
-import net.minecraft.client.renderer.feature.submit.TranslucentSubmit;
-import net.minecraft.client.renderer.rendertype.RenderType;
 import net.minecraft.client.renderer.state.level.CameraRenderState;
 import net.minecraft.core.BlockPos;
 import net.minecraft.util.Mth;
@@ -49,7 +41,7 @@ import java.util.*;
 
 import static dbrighthd.elytratrails.ElytraTrailsClient.getConfig;
 import static dbrighthd.elytratrails.compat.ModStatuses.CPM_LOADED;
-//import static dbrighthd.elytratrails.compat.cpm.CpmModelStorage.findCPMElytraModelSubmit;
+import static dbrighthd.elytratrails.compat.cpm.CpmModelStorage.findCPMElytraModelSubmit;
 import static dbrighthd.elytratrails.compat.emf.EmfTrailSpawnerRegistry.getModelVariantFromModel;
 import static dbrighthd.elytratrails.util.ModelTransformationUtil.*;
 
@@ -75,14 +67,14 @@ public class WingTipSampler {
         gatheredTrailsThisFrame.clear();
         if(CPM_LOADED)
         {
-//            CpmModelStorage.resetSubmits();
+            CpmModelStorage.resetSubmits();
         }
     }
 
-    public @NotNull List<Emitter> getPlayerTrailEmitterPositions(Avatar player, float partialTick, ModConfig modConfig) {
+    public @NotNull List<Emitter> getPlayerTrailEmitterPositions(Avatar player, float partialTick) {
         if(CPM_LOADED)
         {
-//            CpmModelStorage.resetSubmits();
+            CpmModelStorage.resetSubmits();
         }
         ModConfig config = getConfig();
         Minecraft mc = Minecraft.getInstance();
@@ -121,14 +113,14 @@ public class WingTipSampler {
             }
             EmfInfo emfInfo = emfCache.get(eid);
             if (!emfInfo.spawners.isEmpty()) {
-                List<Emitter> gatheredTrails = getTrailEmittersFromBones(basePose, animatedElytraRoot, elytraModel, camera.position(), entityWorldOffset, emfInfo);
+                List<Emitter> gatheredTrails = getTrailEmittersFromBones(basePose, animatedElytraRoot, elytraModel, entityWorldOffset, emfInfo);
                 if (config.alwaysSnapTrail) {
                     putOrAppendGatheredThisFrame(eid, gatheredTrails);
                 }
                 return gatheredTrails;
             }
         }
-        List<Emitter> gatheredTrails = getVanillaTrailEmitters(basePose, animatedElytraRoot, elytraModel, camera.position(), entityWorldOffset, player);
+        List<Emitter> gatheredTrails = getVanillaTrailEmitters(basePose, animatedElytraRoot, elytraModel, entityWorldOffset, player);
         if (config.alwaysSnapTrail) {
             gatheredTrailsThisFrame.put(eid, gatheredTrails);
         }
@@ -174,7 +166,7 @@ public class WingTipSampler {
             EmfInfo emfInfo = emfCacheGeneric.get(eid);
 
             if (!emfInfo.spawners.isEmpty()) {
-                List<Emitter> gatheredTrails = getTrailEmittersFromBonesGeneric(basePose, animatedRoot, camera.position(), entityWorldOffset, emfInfo);
+                List<Emitter> gatheredTrails = getTrailEmittersFromBonesGeneric(basePose, animatedRoot, entityWorldOffset, emfInfo);
                 if (config.alwaysSnapTrail) {
                     putOrAppendGatheredThisFrame(eid, gatheredTrails);
                 }
@@ -184,7 +176,7 @@ public class WingTipSampler {
         if(!sampleSettings.useWithoutEmf()) {
             return new EntityEmitters(List.of(), false);
         }
-        List<Emitter> gatheredTrails = getVanillaTrailEmittersGeneric(basePose, animatedRoot, entityModel, camera.position(), entityWorldOffset, entity, sampleSettings);
+        List<Emitter> gatheredTrails = getVanillaTrailEmittersGeneric(basePose, animatedRoot, entityModel, entityWorldOffset, entity, sampleSettings);
         if (config.alwaysSnapTrail) {
             putOrAppendGatheredThisFrame(eid, gatheredTrails);
         }
@@ -216,7 +208,7 @@ public class WingTipSampler {
         return path.split("/");
     }
 
-    private @NotNull List<Emitter> getTrailEmittersFromBones(@NotNull PoseStack stack, @Nullable ModelPart elytraRoot, @NotNull ElytraModel model, @NotNull Vec3 cameraPos, @NotNull Vec3 entityWorldOffset, EmfInfo emfInfo) {
+    private @NotNull List<Emitter> getTrailEmittersFromBones(@NotNull PoseStack stack, @Nullable ModelPart elytraRoot, @NotNull ElytraModel model, @NotNull Vec3 entityWorldOffset, EmfInfo emfInfo) {
         ModelPart leftWing = model.leftWing;
         ModelPart rightWing = model.rightWing;
         List<SpawnerInfo> spawners = emfInfo.spawners;
@@ -233,7 +225,7 @@ public class WingTipSampler {
         return emitters;
     }
 
-    private @NotNull List<Emitter> getTrailEmittersFromBonesGeneric(@NotNull PoseStack stack, @Nullable ModelPart elytraRoot, @NotNull Vec3 cameraPos, @NotNull Vec3 entityWorldOffset, EmfInfo emfInfo) {
+    private @NotNull List<Emitter> getTrailEmittersFromBonesGeneric(@NotNull PoseStack stack, @Nullable ModelPart elytraRoot, @NotNull Vec3 entityWorldOffset, EmfInfo emfInfo) {
         List<SpawnerInfo> spawners = emfInfo.spawners;
 
         List<Emitter> emitters = new ArrayList<>();
@@ -259,7 +251,7 @@ public class WingTipSampler {
         return (modelRoot == EmfWingTipHooks.WhichRoot.LEFT_WING);
     }
 
-    private @NotNull List<Emitter> getVanillaTrailEmitters(@NotNull PoseStack stack, @Nullable ModelPart elytraRoot, @NotNull ElytraModel model, @NotNull Vec3 cameraPos, @NotNull Vec3 entityWorldOffset, Avatar player) {
+    private @NotNull List<Emitter> getVanillaTrailEmitters(@NotNull PoseStack stack, @Nullable ModelPart elytraRoot, @NotNull ElytraModel model, @NotNull Vec3 entityWorldOffset, Avatar player) {
         ModelPart leftWing = model.leftWing;
         ModelPart rightWing = model.rightWing;
 
@@ -272,7 +264,7 @@ public class WingTipSampler {
         );
     }
 
-    private @NotNull List<Emitter> getVanillaTrailEmittersGeneric(@NotNull PoseStack stack, @Nullable ModelPart animatedRoot, @NotNull EntityModel<?> model, @NotNull Vec3 cameraPos, @NotNull Vec3 entityWorldOffset, Entity entity, ResolvedSampleSettings sampleSettings) {
+    private @NotNull List<Emitter> getVanillaTrailEmittersGeneric(@NotNull PoseStack stack, @Nullable ModelPart animatedRoot, @NotNull EntityModel<?> model, @NotNull Vec3 entityWorldOffset, Entity entity, ResolvedSampleSettings sampleSettings) {
         Vec3 offsets = new Vec3(-sampleSettings.xOffset() / 16, -sampleSettings.yOffset() / 16, -sampleSettings.zOffset() / 16);
         ModelPart modelPart = animatedRoot != null ? animatedRoot : model.root();
         Vec3 tip = computeTransformedPoint(stack, modelPart, modelPart, offsets);
@@ -479,33 +471,10 @@ public class WingTipSampler {
             }
         if(CPM_LOADED)
         {
-//            return findCPMElytraModelSubmit();
+            return findCPMElytraModelSubmit();
         }
         return null;
     }
-
-//    private List<SubmitNodeStorage.ModelSubmit<?>> getAllModelSubmits() {
-//        List<SubmitNodeStorage.ModelSubmit<?>> out = new ArrayList<>();
-//
-//        for (SubmitNodeCollection collection : submitStorage.getSubmitsPerOrder().values()) {
-//            ModelFeatureRenderer.Storage modelStorage = collection.getModelSubmits();
-//            ModelFeatureStorageAccess accessor = (ModelFeatureStorageAccess) modelStorage;
-//
-//            Map<RenderType, List<SubmitNodeStorage.ModelSubmit<?>>> opaqueByType =
-//                    accessor.elytratrails$getSolidModelSubmits();
-//            for (List<SubmitNodeStorage.ModelSubmit<?>> submits : opaqueByType.values()) {
-//                out.addAll(submits);
-//            }
-//
-//            List<SubmitNodeStorage.TranslucentModelSubmit<?>> translucentSubmits =
-//                    accessor.elytratrails$getTranslucentModelSubmits();
-//            for (SubmitNodeStorage.TranslucentModelSubmit<?> translucent : translucentSubmits) {
-//                out.add(translucent.modelSubmit());
-//            }
-//        }
-//
-//        return out;
-//    }
 
     private List<SubmitNode> getAllModelSubmits() {
         List<SubmitNode> out = new ArrayList<>();

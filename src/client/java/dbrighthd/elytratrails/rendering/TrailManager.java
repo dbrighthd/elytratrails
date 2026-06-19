@@ -34,8 +34,6 @@ public class TrailManager {
     private static final Logger LOGGER = LoggerFactory.getLogger(TrailManager.class);
 
     private final Int2ObjectMap<EntityTrailGroup> activeTrails = new Int2ObjectOpenHashMap<>();
-    public Vec3 prevCameraSpace;
-    public Vec3 deltaCameraSpace;
     public final Map<Long, Float> deadPointDistance = new HashMap<>();
     long trailId = 0;
     private final PerlinNoise perlinNoise = PerlinNoise.create(RandomSource.create(), List.of(1));
@@ -54,6 +52,7 @@ public class TrailManager {
         this.sampler = sampler;
 
         ClientTickEvents.END_CLIENT_TICK.register(this::removeDeadPoints);
+        //noinspection deprecation
         LevelRenderEvents.END_EXTRACTION.register(_ -> {
             modConfig = getConfig();
             now = ElytraTimeUtil.currentMillis();
@@ -108,16 +107,6 @@ public class TrailManager {
 
     public boolean isActiveTrail(Trail trail) {
         return (activeTrails.containsKey(trail.entityId()) && activeTrails.get(trail.entityId()).trails().contains(trail));
-    }
-
-    public Trail getTrail(long id)
-    {
-        for(Trail trail : trails)
-        {
-            if(trail.trailId() == id)
-                return trail;
-        }
-        return null;
     }
 
     public PlayerSpeedData getPlayerSpeedData(LivingEntity entity, ResolvedTrailSettings trailSettings)
@@ -210,7 +199,7 @@ public class TrailManager {
             boolean valid = TrailManager.isPlayerTrailValid(config, player);
 
             if (valid) {
-                List<Emitter> emitters = new ArrayList<>(sampler.getPlayerTrailEmitterPositions(player, ctx.getDeltaTracker().getGameTimeDeltaPartialTick(false), modConfig));
+                List<Emitter> emitters = new ArrayList<>(sampler.getPlayerTrailEmitterPositions(player, ctx.getDeltaTracker().getGameTimeDeltaPartialTick(false)));
                 PlayerSpeedData speedData = getPlayerSpeedData(player, config);
                 if (emitters.isEmpty()) {
                     if (modConfig.logTrails) {
