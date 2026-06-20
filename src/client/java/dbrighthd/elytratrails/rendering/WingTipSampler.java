@@ -31,6 +31,8 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.util.Mth;
 import net.minecraft.world.entity.Avatar;
 import net.minecraft.world.entity.Entity;
+import net.minecraft.world.entity.projectile.FireworkRocketEntity;
+import net.minecraft.world.entity.projectile.throwableitemprojectile.ThrowableItemProjectile;
 import net.minecraft.world.phys.Vec3;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -141,11 +143,18 @@ public class WingTipSampler {
         Minecraft mc = Minecraft.getInstance();
         if (mc.level == null || ShaderChecksUtil.isShadowPass())  return new EntityEmitters(List.of(),false);
 
+        if(entity instanceof ThrowableItemProjectile || entity instanceof FireworkRocketEntity)
+        {
+            return new EntityEmitters(List.of(new Emitter(entity.getPosition(partialTick).add(new Vec3(sampleSettings.xOffset(), sampleSettings.yOffset(), sampleSettings.zOffset())),false, entity.getType().toShortString(), "trailSpawner", true)),false);
+        }
+
         Camera camera = mc.gameRenderer.getMainCamera();
         CameraRenderState cameraState = buildCameraState(camera);
         SubmitNodeStorage.ModelSubmit<?> entitySubmit = extractEntityRenderState(entity, mc, cameraState, partialTick);
+
         if (entitySubmit == null || !(entitySubmit.model() instanceof EntityModel<?> entityModel) || !(entitySubmit.state() instanceof EntityRenderState entityRenderState))
             return new EntityEmitters(List.of(), false);
+
         setupAnyModelAnim(entityModel, entityRenderState);
         PoseStack basePose = new PoseStack();
         basePose.last().set(entitySubmit.pose());
@@ -153,6 +162,7 @@ public class WingTipSampler {
         Vec3 entityWorldOffset = new Vec3(entityRenderState.x, entityRenderState.y, entityRenderState.z);
         ModelPart animatedRoot = tryGetAnimatedEntityRoot(entityModel, entity);
         int eid = entity.getId();
+
         if (ModStatuses.EMF_LOADED && config.emfSupport) {
             int variant = getModelVariantFromModel(animatedRoot);
 
