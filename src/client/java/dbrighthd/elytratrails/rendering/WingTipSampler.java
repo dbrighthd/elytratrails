@@ -31,6 +31,7 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.util.Mth;
 import net.minecraft.world.entity.Avatar;
 import net.minecraft.world.entity.Entity;
+import net.minecraft.world.entity.ExperienceOrb;
 import net.minecraft.world.entity.projectile.FireworkRocketEntity;
 import net.minecraft.world.entity.projectile.throwableitemprojectile.ThrowableItemProjectile;
 import net.minecraft.world.phys.Vec3;
@@ -143,7 +144,7 @@ public class WingTipSampler {
         Minecraft mc = Minecraft.getInstance();
         if (mc.level == null || ShaderChecksUtil.isShadowPass())  return new EntityEmitters(List.of(),false);
 
-        if(entity instanceof ThrowableItemProjectile || entity instanceof FireworkRocketEntity)
+        if(entity instanceof ThrowableItemProjectile || entity instanceof FireworkRocketEntity || entity instanceof ExperienceOrb)
         {
             return new EntityEmitters(List.of(new Emitter(entity.getPosition(partialTick).add(new Vec3(sampleSettings.xOffset(), sampleSettings.yOffset(), sampleSettings.zOffset())),false, entity.getType().toShortString(), "trailSpawner", true)),false);
         }
