@@ -25,13 +25,14 @@ import net.minecraft.client.renderer.entity.state.EntityRenderState;
 import net.minecraft.client.renderer.entity.state.HumanoidRenderState;
 import net.minecraft.client.renderer.feature.ModelFeatureRenderer;
 import net.minecraft.client.renderer.feature.phase.SimpleFeatureRenderPhase;
-import net.minecraft.client.renderer.feature.phase.TranslucentFeatureRenderPhase;
 import net.minecraft.client.renderer.feature.submit.SubmitNode;
 import net.minecraft.client.renderer.state.level.CameraRenderState;
 import net.minecraft.core.BlockPos;
 import net.minecraft.util.Mth;
 import net.minecraft.world.entity.Avatar;
 import net.minecraft.world.entity.Entity;
+import net.minecraft.world.entity.projectile.FireworkRocketEntity;
+import net.minecraft.world.entity.projectile.throwableitemprojectile.ThrowableItemProjectile;
 import net.minecraft.world.phys.Vec3;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -141,12 +142,17 @@ public class WingTipSampler {
         ModConfig config = getConfig();
         Minecraft mc = Minecraft.getInstance();
         if (mc.level == null || ShaderChecksUtil.isShadowPass())  return new EntityEmitters(List.of(),false);
-
+        if(entity instanceof ThrowableItemProjectile || entity instanceof FireworkRocketEntity)
+        {
+            return new EntityEmitters(List.of(new Emitter(entity.getPosition(partialTick).add(new Vec3(sampleSettings.xOffset(), sampleSettings.yOffset(), sampleSettings.zOffset())),false, entity.getType().toShortString(), "trailSpawner", true)),false);
+        }
         Camera camera = mc.gameRenderer.mainCamera();
         CameraRenderState cameraState = buildCameraState(camera);
         ModelFeatureRenderer.Submit<?> entitySubmit = extractEntityRenderState(entity, mc, cameraState, partialTick);
+
         if (entitySubmit == null || !(entitySubmit.model() instanceof EntityModel<?> entityModel) || !(entitySubmit.state() instanceof EntityRenderState entityRenderState))
             return new EntityEmitters(List.of(), false);
+
         setupAnyModelAnim(entityModel, entityRenderState);
         PoseStack basePose = new PoseStack();
         basePose.last().set(entitySubmit.pose());
@@ -154,6 +160,7 @@ public class WingTipSampler {
         Vec3 entityWorldOffset = new Vec3(entityRenderState.x, entityRenderState.y, entityRenderState.z);
         ModelPart animatedRoot = tryGetAnimatedEntityRoot(entityModel, entity);
         int eid = entity.getId();
+
         if (ModStatuses.EMF_LOADED && config.emfSupport) {
             int variant = getModelVariantFromModel(animatedRoot);
 
@@ -439,7 +446,6 @@ public class WingTipSampler {
                 }
                 if (!(modelSubmit.model() instanceof EntityModel<?> entityModel)) continue;
                 if (!(modelSubmit.state() instanceof EntityRenderState entityRenderState)) continue;
-
                 setupAnyModelAnim(entityModel, entityRenderState);
                 ModelPart animatedRoot = tryGetAnimatedEntityRoot(entityModel, entity);
                 if (fallback == null) {
@@ -500,9 +506,8 @@ public class WingTipSampler {
                     }
                 }
             }
-            TranslucentFeatureRenderPhase translucents = collection.translucentModels;
+            out.addAll((collection.translucentModels.submits));
 
-            out.addAll((translucents.submits));
         }
         return out;
     }
