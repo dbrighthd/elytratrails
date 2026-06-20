@@ -405,7 +405,7 @@ public class TrailRenderer {
     private int computeLightTexture(Vec3 pos) {
         if (minecraft.level == null) return LightTexture.FULL_BRIGHT;
 
-        BlockPos blockPos = BlockPos.containing(pos.add(cameraPosition));
+        BlockPos blockPos = BlockPos.containing(pos);
         return LevelRenderer.getLightColor(minecraft.level,blockPos);
     }
 
