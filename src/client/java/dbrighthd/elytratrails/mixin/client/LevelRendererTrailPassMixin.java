@@ -101,7 +101,9 @@ public abstract class LevelRendererTrailPassMixin {
 
     @Unique
     private static void elytraTrails$applyCameraCorrection(PoseStack poseStack, Camera camera) {
-        poseStack.mulPose(Axis.XP.rotationDegrees(camera.xRot()));
-        poseStack.mulPose(Axis.YP.rotationDegrees(camera.yRot() + 180.0F));
+//        poseStack.mulPose(Axis.XP.rotationDegrees(camera.xRot()));
+//        poseStack.mulPose(Axis.YP.rotationDegrees(camera.yRot() + 180.0F));
+        poseStack.mulPose(camera.rotation().invert());
+
     }
 }
