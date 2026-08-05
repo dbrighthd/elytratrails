@@ -346,7 +346,7 @@ public class ConfigScreenBuilder {
 
 
         String encodedParticle = encodeParticle(config.particle);
-        HolderLookup.Provider lookup = VanillaRegistries.createLookup();
+        HolderLookup.Provider lookup = VanillaRegistries.createWorldLookup();
         particles.addEntry(entryBuilder.startTextDescription(
                         Component.translatable("text.elytratrails.category.particles.desc"))
                 .build());

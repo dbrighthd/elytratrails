@@ -51,48 +51,48 @@ public final class ElytraTrailsKeybind {
     public static void init() {
         DO_A_LIL_TWIRL_RANDOM = KeyMappingHelper.registerKeyMapping(new KeyMapping(
                 "key.elytratrails.twirl_random",
-                InputConstants.Type.KEYSYM,
+                InputConstants.Type.KEYBOARD,
                 InputConstants.UNKNOWN.getValue(),
                 CATEGORY
         ));
         OPEN_SETTINGS = KeyMappingHelper.registerKeyMapping(new KeyMapping(
                 "key.elytratrails.open_settings",
-                InputConstants.Type.KEYSYM,
+                InputConstants.Type.KEYBOARD,
                 InputConstants.UNKNOWN.getValue(),
                 CATEGORY
         ));
 
         DO_A_LIL_TWIRL_L = KeyMappingHelper.registerKeyMapping(new KeyMapping(
                 "key.elytratrails.twirl_l",
-                InputConstants.Type.KEYSYM,
+                InputConstants.Type.KEYBOARD,
                 InputConstants.UNKNOWN.getValue(),
                 CATEGORY
         ));
 
         DO_A_LIL_TWIRL_R = KeyMappingHelper.registerKeyMapping(new KeyMapping(
                 "key.elytratrails.twirl_r",
-                InputConstants.Type.KEYSYM,
+                InputConstants.Type.KEYBOARD,
                 InputConstants.UNKNOWN.getValue(),
                 CATEGORY
         ));
 
         DO_A_LIL_CONTINUOUS_TWIRL_L = KeyMappingHelper.registerKeyMapping(new KeyMapping(
                 "key.elytratrails.continuous_twirl_l",
-                InputConstants.Type.KEYSYM,
+                InputConstants.Type.KEYBOARD,
                 InputConstants.UNKNOWN.getValue(),
                 CATEGORY
         ));
 
         DO_A_LIL_CONTINUOUS_TWIRL_R = KeyMappingHelper.registerKeyMapping(new KeyMapping(
                 "key.elytratrails.continuous_twirl_r",
-                InputConstants.Type.KEYSYM,
+                InputConstants.Type.KEYBOARD,
                 InputConstants.UNKNOWN.getValue(),
                 CATEGORY
         ));
 
         TOGGLE_TRAILS = KeyMappingHelper.registerKeyMapping(new KeyMapping(
                 "key.elytratrails.toggle",
-                InputConstants.Type.KEYSYM,
+                InputConstants.Type.KEYBOARD,
                 InputConstants.UNKNOWN.getValue(),
                 CATEGORY
         ));

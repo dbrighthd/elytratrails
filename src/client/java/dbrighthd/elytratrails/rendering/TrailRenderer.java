@@ -43,7 +43,7 @@ public class TrailRenderer {
 
     private float accumDist = 0.0f;
     private ModConfig modConfig;
-    private final PerlinNoise perlinNoise = PerlinNoise.create(RandomSource.create(), List.of(1));
+    private final PerlinNoise perlinNoise = new PerlinNoise(RandomSource.create());
     private float totalTrailLength;
     boolean isFirstPerson;
     boolean atEnd;
@@ -242,8 +242,8 @@ public class TrailRenderer {
             }
 
             if (trailSettings.enableRandomWidth()) {
-                scaleStart = scaleStart * (float) trailSettings.randomWidthVariation() * ((float) (perlinNoise.getValue(startPos.x , startPos.y, startPos.z)) + 1);
-                scaleEnd = scaleEnd * (float) trailSettings.randomWidthVariation() * ((float) (perlinNoise.getValue(endPos.x, endPos.y, endPos.z)) + 1);
+                scaleStart = scaleStart * (float) trailSettings.randomWidthVariation() * ((float) (perlinNoise.get(startPos.x , startPos.y, startPos.z)) + 1);
+                scaleEnd = scaleEnd * (float) trailSettings.randomWidthVariation() * ((float) (perlinNoise.get(endPos.x, endPos.y, endPos.z)) + 1);
 
             }
             if (trailSettings.increaseWidthOverTime()) {

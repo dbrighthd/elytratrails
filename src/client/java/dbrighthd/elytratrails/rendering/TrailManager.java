@@ -36,7 +36,7 @@ public class TrailManager {
     private final Int2ObjectMap<EntityTrailGroup> activeTrails = new Int2ObjectOpenHashMap<>();
     public final Map<Long, Float> deadPointDistance = new HashMap<>();
     long trailId = 0;
-    private final PerlinNoise perlinNoise = PerlinNoise.create(RandomSource.create(), List.of(1));
+    private final PerlinNoise perlinNoise = new PerlinNoise(RandomSource.create());
     private final List<Trail> trails = new ArrayList<>();
     private float lastSample;
     private final Set<Long> trailsToRemove = new HashSet<>();
@@ -95,8 +95,8 @@ public class TrailManager {
     Vec3 positionToWindVector(Trail.Point point)
     {
         Vec3 combined = point.pos().scale(0.02 * modConfig.windScale);
-        double outPerlin1 = perlinNoise.getValue(combined.x, combined.y, combined.z);
-        double outPerlin2 = perlinNoise.getValue(combined.x + 100, combined.y + 50, combined.z -100); //arbitrary offset just so the second angle is different
+        double outPerlin1 = perlinNoise.get(combined.x, combined.y, combined.z);
+        double outPerlin2 = perlinNoise.get(combined.x + 100, combined.y + 50, combined.z -100); //arbitrary offset just so the second angle is different
         double angleRad1 = outPerlin1 * 2 * Math.PI;
         double angleRad2 = outPerlin2 * 2 * Math.PI;
         return (new Vec3(sin(angleRad1) * cos(angleRad2), cos(angleRad1), sin(angleRad1) * sin(angleRad2))).scale(0.0005).scale(deltaT * modConfig.windSpeed);

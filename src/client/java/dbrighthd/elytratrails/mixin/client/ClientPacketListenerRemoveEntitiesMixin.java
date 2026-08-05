@@ -16,7 +16,7 @@ public class ClientPacketListenerRemoveEntitiesMixin {
 
     @Inject(method = "handleRemoveEntities", at = @At("HEAD"))
     private void elytraTrails$onRemoveEntities(ClientboundRemoveEntitiesPacket packet, CallbackInfo ci) {
-        for (int id : packet.getEntityIds()) {
+        for (int id : packet.entityIds()) {
             TrailSystem.getTrailManager().removeTrail(id);
         }
     }

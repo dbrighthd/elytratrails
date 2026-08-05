@@ -27,13 +27,7 @@ public class TrailSystem {
 
 
     public static boolean shouldUseLegacyRender() {
-        ModConfig config = ElytraTrailsClient.getConfig();
-        switch(config.useOldRenderer)
-        {
-            case ALWAYS -> {return true;}
-            case NEVER -> {return false;}
-            default -> {return ShaderChecksUtil.isUsingShaders();}
-        }
+        return true;
     }
 
     public static TrailManager getTrailManager() {

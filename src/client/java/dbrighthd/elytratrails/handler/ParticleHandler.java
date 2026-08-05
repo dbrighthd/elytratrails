@@ -81,7 +81,7 @@ public class ParticleHandler {
 
     public static ParticleOptions decodeParticle(String newValue)
     {
-        HolderLookup.Provider lookup = VanillaRegistries.createLookup();
+        HolderLookup.Provider lookup = VanillaRegistries.createWorldLookup();
 
         try {
             return ParticleArgument.readParticle(new StringReader(newValue), lookup);

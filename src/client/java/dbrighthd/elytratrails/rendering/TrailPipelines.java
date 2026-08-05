@@ -1,10 +1,13 @@
 package dbrighthd.elytratrails.rendering;
 
-import com.mojang.blaze3d.pipeline.*;
-import com.mojang.blaze3d.platform.CompareOp;
-import com.mojang.blaze3d.platform.PolygonMode;
+import com.mojang.renderpearl.api.pipeline.CompareOp;
+import com.mojang.renderpearl.api.pipeline.PolygonMode;
+import com.mojang.renderpearl.api.pipeline.*;
+import com.mojang.renderpearl.api.pipeline.PolygonMode;
 import dbrighthd.elytratrails.ElytraTrails;
+import net.minecraft.client.renderer.BindGroupLayouts;
 import net.minecraft.client.renderer.RenderPipelines;
+import net.minecraft.client.renderer.oit.OitPipelineSet;
 import net.minecraft.client.renderer.rendertype.RenderSetup;
 import net.minecraft.client.renderer.rendertype.RenderType;
 import net.minecraft.resources.Identifier;
@@ -13,15 +16,19 @@ import net.minecraft.util.Util;
 import java.util.function.BiFunction;
 import java.util.function.Function;
 
+import static net.minecraft.client.renderer.RenderPipelines.*;
+
+
 public class TrailPipelines {
     public static final ColorTargetState TRANSLUCENT_COLOR_STATE = new ColorTargetState(BlendFunction.TRANSLUCENT);
     public static final DepthStencilState DEFAULT_STENCIL_WITH_FALSE_DEPTHWRITE = new DepthStencilState(CompareOp.GREATER_THAN_OR_EQUAL, true);
     public static final BindGroupLayout EXAMPLE_LAYOUT = BindGroupLayout.builder()
             // Specifies that the shaders have a 'Sampler0' sampler
-            .withSampler("Sampler1")
+            .withUniform("Sampler1",UniformType.COMBINED_IMAGE_SAMPLER)
             // Specifies that the shaders have access to the 'Globals' uniform
             .build();
-    public static final RenderPipeline PIPELINE_ENTITY_TRANSLUCENT_CULL = RenderPipelines.register(RenderPipeline.builder(RenderPipelines.ENTITY_SNIPPET)
+
+    public static final RenderPipeline PIPELINE_ENTITY_TRANSLUCENT_CULL = RenderPipelines.register(RenderPipeline.builder(ENTITY_SNIPPET)
             .withLocation(Identifier.fromNamespaceAndPath(ElytraTrails.MOD_ID, "pipeline/entity_translucent_cull"))
             .withShaderDefine("ALPHA_CUTOUT", 0.1F)
             .withShaderDefine("PER_FACE_LIGHTING")
@@ -31,7 +38,6 @@ public class TrailPipelines {
             .withCull(false)
             .withBindGroupLayout(EXAMPLE_LAYOUT)
             .build());
-
     private static final Function<Identifier, RenderType> ENTITY_TRANSLUCENT_CULL = Util.memoize(
             (identifier) -> {
                 RenderSetup renderSetup = RenderSetup.builder(PIPELINE_ENTITY_TRANSLUCENT_CULL)
@@ -41,12 +47,13 @@ public class TrailPipelines {
                         .affectsCrumbling()
                         .sortOnUpload()
                         .setOutline(RenderSetup.OutlineProperty.AFFECTS_OUTLINE)
+                        .setOitPipelines(OIT_ENTITY)
                         .createRenderSetup();
                 return RenderType.create("entity_translucent_cull", renderSetup);
             }
     );
 
-    public static final RenderPipeline PIPELINE_ENTITY_TRANSLUCENT_CULL_WIREFRAME = RenderPipelines.register(RenderPipeline.builder(RenderPipelines.ENTITY_SNIPPET)
+    public static final RenderPipeline PIPELINE_ENTITY_TRANSLUCENT_CULL_WIREFRAME = RenderPipelines.register(RenderPipeline.builder(ENTITY_SNIPPET)
             .withLocation(Identifier.fromNamespaceAndPath(ElytraTrails.MOD_ID, "pipeline/entity_translucent_cull"))
             .withShaderDefine("ALPHA_CUTOUT", 0.1F)
             .withShaderDefine("PER_FACE_LIGHTING")
@@ -66,6 +73,7 @@ public class TrailPipelines {
                         .affectsCrumbling()
                         .sortOnUpload()
                         .setOutline(RenderSetup.OutlineProperty.AFFECTS_OUTLINE)
+                        .setOitPipelines(OIT_ENTITY)
                         .createRenderSetup();
                 return RenderType.create("entity_translucent_cull", renderSetup);
             }
@@ -115,7 +123,7 @@ public class TrailPipelines {
 
 
     public static final RenderPipeline PIPELINE_ENTITY_CUTOUT_LIT =
-            RenderPipelines.register(RenderPipeline.builder(RenderPipelines.ENTITY_SNIPPET)
+            RenderPipelines.register(RenderPipeline.builder(ENTITY_SNIPPET)
                     .withLocation(Identifier.parse("elytratrails:pipeline/entity_cutout_lit"))
                     .withShaderDefine("ALPHA_CUTOUT", 0.1F)
                     .withShaderDefine("PER_FACE_LIGHTING")
@@ -131,6 +139,7 @@ public class TrailPipelines {
                         .affectsCrumbling()
                         .sortOnUpload()
                         .setOutline(outline ? RenderSetup.OutlineProperty.AFFECTS_OUTLINE : RenderSetup.OutlineProperty.NONE)
+                        .setOitPipelines(OIT_ENTITY)
                         .createRenderSetup();
                 return RenderType.create("elytratrails_entity_translucent_emissive_unlit", renderSetup);
             });
@@ -143,6 +152,7 @@ public class TrailPipelines {
                         .affectsCrumbling()
                         .sortOnUpload()
                         .setOutline(outline ? RenderSetup.OutlineProperty.AFFECTS_OUTLINE : RenderSetup.OutlineProperty.NONE)
+                        .setOitPipelines(OIT_ENTITY)
                         .createRenderSetup();
                 return RenderType.create("elytratrails_entity_translucent_emissive_unlit", renderSetup);
             });
@@ -155,6 +165,7 @@ public class TrailPipelines {
                         .affectsCrumbling()
                         .sortOnUpload()
                         .setOutline(outline ? RenderSetup.OutlineProperty.AFFECTS_OUTLINE : RenderSetup.OutlineProperty.NONE)
+                        .setOitPipelines(OIT_ENTITY)
                         .createRenderSetup();
                 return RenderType.create("elytratrails_entity_cutout_emissive_unlit", renderSetup);
             });
@@ -167,6 +178,7 @@ public class TrailPipelines {
                         .affectsCrumbling()
                         .sortOnUpload()
                         .setOutline(outline ? RenderSetup.OutlineProperty.AFFECTS_OUTLINE : RenderSetup.OutlineProperty.NONE)
+                        .setOitPipelines(OIT_ENTITY)
                         .createRenderSetup();
                 return RenderType.create("elytratrails_entity_cutout_emissive_unlit", renderSetup);
             });
@@ -180,6 +192,7 @@ public class TrailPipelines {
                         .affectsCrumbling()
                         .sortOnUpload()
                         .setOutline(outline ? RenderSetup.OutlineProperty.AFFECTS_OUTLINE : RenderSetup.OutlineProperty.NONE)
+                        .setOitPipelines(OIT_ENTITY)
                         .createRenderSetup();
                 return RenderType.create("elytratrails_entity_cutout_lit", renderSetup);
             });

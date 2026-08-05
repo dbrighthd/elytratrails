@@ -13,7 +13,6 @@
     "defaultRequire": 1
   },
   "mixins": [
-    "LevelRendererTrailPassMixin",
     "compat.EmfModelPartRootRegisterMixin",
     "compat.RecorderMixin",
     "compat.cpm.CPMOrderedSubmitNodeCollectorMixin"

@@ -507,7 +507,6 @@ public class WingTipSampler {
                     }
                 }
             }
-            out.addAll((collection.translucentModels.submits));
 
         }
         return out;
