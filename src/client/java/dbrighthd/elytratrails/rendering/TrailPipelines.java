@@ -108,6 +108,7 @@ public class TrailPipelines {
             RenderPipelines.register(RenderPipeline.builder(RenderPipelines.ENTITY_EMISSIVE_SNIPPET)
                     .withLocation(Identifier.parse("elytratrails:pipeline/entity_cutout_emissive_unlit"))
                     .withShaderDefine("ALPHA_CUTOUT", 0.1F)
+                    .withPolygonMode(PolygonMode.WIREFRAME)
                     .withShaderDefine("NO_CARDINAL_LIGHTING")
                     .withCull(false)
                     .withBindGroupLayout(EXAMPLE_LAYOUT)

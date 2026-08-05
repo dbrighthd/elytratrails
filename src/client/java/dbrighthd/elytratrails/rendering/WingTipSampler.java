@@ -62,7 +62,7 @@ public class WingTipSampler {
     private record ResolvedEmitterPoint(Vec3 position, boolean visible) {
     }
     public record EntityEmitters(List<Emitter> emitters, boolean changedModelVariant){}
-
+    public record PlayerEmitters(boolean valid, List<Emitter> emitters){};
     public Map<Integer, List<Emitter>> gatheredTrailsThisFrame = new HashMap<>();
 
     public void clearFrameCache() {
@@ -73,14 +73,14 @@ public class WingTipSampler {
         }
     }
 
-    public @NotNull List<Emitter> getPlayerTrailEmitterPositions(Avatar player, float partialTick) {
+    public @NotNull PlayerEmitters getPlayerTrailEmitterPositions(Avatar player, float partialTick) {
         if(CPM_LOADED)
         {
             CpmModelStorage.resetSubmits();
         }
         ModConfig config = getConfig();
         Minecraft mc = Minecraft.getInstance();
-        if (mc.level == null || ShaderChecksUtil.isShadowPass()) return List.of();
+        if (mc.level == null || ShaderChecksUtil.isShadowPass()) return new PlayerEmitters(true, List.of());
 
         Camera camera = mc.gameRenderer.mainCamera();
         CameraRenderState cameraState = buildCameraState(camera);
@@ -91,9 +91,15 @@ public class WingTipSampler {
         }
         if (elytraSubmit == null || !(elytraSubmit.model() instanceof ElytraModel elytraModel) || !(elytraSubmit.state() instanceof HumanoidRenderState humanoidState))
         {
-            return List.of();
+            return new PlayerEmitters(true, List.of());
         }
-
+        if(elytraSubmit.state() instanceof AvatarRenderState avatarRenderState)
+        {
+            if(avatarRenderState.fallFlyingScale() < 1.0F)
+            {
+               return new PlayerEmitters(false, List.of());
+            }
+        }
         elytraModel.setupAnim(humanoidState);
 
         ModelPart leftWing = elytraModel.leftWing;
@@ -111,7 +117,7 @@ public class WingTipSampler {
 
             if (!emfCache.containsKey(eid) || !(emfCache.get(eid).variant() == variant)) {
                 emfCache.put(eid, new EmfInfo("elytra", variant, getSpawnersInfo(EmfWingTipHooks.findAllSpawnerPaths(leftWing, rightWing))));
-                return List.of();
+                return new PlayerEmitters(true, List.of());
             }
             EmfInfo emfInfo = emfCache.get(eid);
             if (!emfInfo.spawners.isEmpty()) {
@@ -119,14 +125,14 @@ public class WingTipSampler {
                 if (config.alwaysSnapTrail) {
                     putOrAppendGatheredThisFrame(eid, gatheredTrails);
                 }
-                return gatheredTrails;
+                return new PlayerEmitters(true, gatheredTrails);
             }
         }
         List<Emitter> gatheredTrails = getVanillaTrailEmitters(basePose, animatedElytraRoot, elytraModel, entityWorldOffset, player);
         if (config.alwaysSnapTrail) {
             gatheredTrailsThisFrame.put(eid, gatheredTrails);
         }
-        return gatheredTrails;
+        return new PlayerEmitters(true, gatheredTrails);
     }
 
     public void putOrAppendGatheredThisFrame(int eid, List<Emitter> emitters) {
