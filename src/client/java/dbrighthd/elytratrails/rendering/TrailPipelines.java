@@ -28,6 +28,7 @@ public class TrailPipelines {
             // Specifies that the shaders have access to the 'Globals' uniform
             .build();
 
+    public static final OitPipelineSet OIT_ENTITY_WIREFRAME = register(OitPipelineSet.builder("entity", RenderPipeline.builder(new RenderPipeline.Snippet[]{OIT_ENTITY_SNIPPET}).withPolygonMode(PolygonMode.WIREFRAME).withCull(false)).withAccumulateModifier((accumulate) -> accumulate.withShaderDefine("PER_FACE_LIGHTING").withBindGroupLayout(BindGroupLayouts.SAMPLER1).withBindGroupLayout(BindGroupLayouts.SAMPLER2)).build());
     public static final RenderPipeline PIPELINE_ENTITY_TRANSLUCENT_CULL = RenderPipelines.register(RenderPipeline.builder(ENTITY_SNIPPET)
             .withLocation(Identifier.fromNamespaceAndPath(ElytraTrails.MOD_ID, "pipeline/entity_translucent_cull"))
             .withShaderDefine("ALPHA_CUTOUT", 0.1F)
@@ -73,9 +74,9 @@ public class TrailPipelines {
                         .affectsCrumbling()
                         .sortOnUpload()
                         .setOutline(RenderSetup.OutlineProperty.AFFECTS_OUTLINE)
-                        .setOitPipelines(OIT_ENTITY)
+                        .setOitPipelines(OIT_ENTITY_WIREFRAME)
                         .createRenderSetup();
-                return RenderType.create("entity_translucent_cull", renderSetup);
+                return RenderType.create("entity_translucent_cull_wireframe", renderSetup);
             }
     );
 
@@ -153,9 +154,9 @@ public class TrailPipelines {
                         .affectsCrumbling()
                         .sortOnUpload()
                         .setOutline(outline ? RenderSetup.OutlineProperty.AFFECTS_OUTLINE : RenderSetup.OutlineProperty.NONE)
-                        .setOitPipelines(OIT_ENTITY)
+                        .setOitPipelines(OIT_ENTITY_WIREFRAME)
                         .createRenderSetup();
-                return RenderType.create("elytratrails_entity_translucent_emissive_unlit", renderSetup);
+                return RenderType.create("elytratrails_entity_translucent_emissive_unlit_wireframe", renderSetup);
             });
 
     private static final BiFunction<Identifier, Boolean, RenderType> RENDER_TYPE_ENTITY_CUTOUT_EMISSIVE_UNLIT =
@@ -179,9 +180,9 @@ public class TrailPipelines {
                         .affectsCrumbling()
                         .sortOnUpload()
                         .setOutline(outline ? RenderSetup.OutlineProperty.AFFECTS_OUTLINE : RenderSetup.OutlineProperty.NONE)
-                        .setOitPipelines(OIT_ENTITY)
+                        .setOitPipelines(OIT_ENTITY_WIREFRAME)
                         .createRenderSetup();
-                return RenderType.create("elytratrails_entity_cutout_emissive_unlit", renderSetup);
+                return RenderType.create("elytratrails_entity_cutout_emissive_unlit_wireframe", renderSetup);
             });
 
     private static final BiFunction<Identifier, Boolean, RenderType> RENDER_TYPE_ENTITY_CUTOUT_LIT =
