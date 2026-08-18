@@ -27,7 +27,7 @@ public class ModConfig {
     public boolean alwaysSnapTrail = true;
     public boolean logTrails = false;
     public boolean inputBuffer = true;
-    public boolean forceHiddenEntityRenderPass = true;
+    public boolean forceHiddenEntityRenderPass = false;
     //fresh took too long to update and people are complaining to me
     public boolean hardCodedFreshAnimationsPlayerWingtips = false;
     public ClearTrails clearTrailsOption = ClearTrails.NO;

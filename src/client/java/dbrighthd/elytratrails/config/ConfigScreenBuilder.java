@@ -86,6 +86,11 @@ public class ConfigScreenBuilder {
                 .setTooltip(Component.translatable("text.elytratrails.option.enableAllTrails.@Tooltip"))
                 .setSaveConsumer(newValue -> config.enableAllTrails = newValue)
                 .build());
+        general.addEntry(entryBuilder.startBooleanToggle(Component.translatable("text.elytratrails.option.forceHiddenEntityRenderPass"), config.forceHiddenEntityRenderPass)
+                .setDefaultValue(defaultModConfig.forceHiddenEntityRenderPass)
+                .setTooltip(Component.translatable("text.elytratrails.option.forceHiddenEntityRenderPass.@Tooltip"))
+                .setSaveConsumer(newValue -> config.forceHiddenEntityRenderPass = newValue)
+                .build());
         general.addEntry(entryBuilder.startBooleanToggle(Component.translatable("text.elytratrails.option.alwaysSnapTrail"), config.alwaysSnapTrail)
                 .setDefaultValue(defaultModConfig.alwaysSnapTrail)
                 .setTooltip(Component.translatable("text.elytratrails.option.alwaysSnapTrail.@Tooltip"))

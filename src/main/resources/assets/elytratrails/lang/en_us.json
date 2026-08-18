@@ -44,6 +44,10 @@
   "text.elytratrails.option.enableTrail": "Enable Elytra Trail",
   "text.elytratrails.option.enableTrail.@Tooltip": "Toggle if elytra trails render",
 
+  "text.elytratrails.option.forceHiddenEntityRenderPass": "Force First Person Render",
+  "text.elytratrails.option.forceHiddenEntityRenderPass.@Tooltip": "Toggle if having issues (CRASHING WITH ESSENTIAL?)",
+
+
   "text.elytratrails.option.enableTwirls": "Enable Twirling",
   "text.elytratrails.option.enableTwirls.@Tooltip": "If turned on, you can twirl with the keybinds (look for them in Controls!)",
 
