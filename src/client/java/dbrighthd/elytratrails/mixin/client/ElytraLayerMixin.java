@@ -14,6 +14,7 @@ import net.minecraft.client.model.geom.ModelPart;
 import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.util.Mth;
 import net.minecraft.world.phys.Vec3;
+import org.joml.Quaternionf;
 import org.joml.Vector4f;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Unique;
@@ -82,13 +83,15 @@ public class ElytraLayerMixin {
 
         Vec3 cameraPos = minecraft.gameRenderer.getMainCamera().getPosition();
 
-        float cameraYaw = minecraft.gameRenderer.getMainCamera().getYRot();
-        float cameraPitch = minecraft.gameRenderer.getMainCamera().getXRot();
+//        float cameraYaw = minecraft.gameRenderer.getMainCamera().getYRot();
+//        float cameraPitch = minecraft.gameRenderer.getMainCamera().getXRot();
 
         PoseStack inverseCameraStack = new PoseStack();
-        inverseCameraStack.mulPose(Axis.YP.rotationDegrees(-cameraYaw - 180.0F));
-        inverseCameraStack.mulPose(Axis.XP.rotationDegrees(-cameraPitch));
-
+//        inverseCameraStack.mulPose(Axis.YP.rotationDegrees(-cameraYaw - 180.0F));
+//        inverseCameraStack.mulPose(Axis.XP.rotationDegrees(-cameraPitch));
+        //why are quaternions evil
+        inverseCameraStack.mulPose(minecraft.gameRenderer.getMainCamera().rotation());
+        inverseCameraStack.mulPose(Axis.YP.rotationDegrees(180F));
         Vector4f vector = new Vector4f((float) viewSpacePoint.x, (float) viewSpacePoint.y, (float) viewSpacePoint.z, 1.0F);
         vector.mul(inverseCameraStack.last().pose());
         return new Vec3(vector.x() + cameraPos.x, vector.y() + cameraPos.y, vector.z() + cameraPos.z);
