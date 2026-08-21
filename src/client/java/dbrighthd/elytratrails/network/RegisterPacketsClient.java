@@ -1,7 +1,7 @@
 package dbrighthd.elytratrails.network;
 
-import dbrighthd.elytratrails.controller.EntityTwirlManager;
 import dbrighthd.elytratrails.rendering.TrailSystem;
+import dbrighthd.elytratrails.twirling.TwirlManager;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents;
@@ -19,8 +19,8 @@ public class RegisterPacketsClient {
     private static int pendingConfigRequestTicks = -1;
 
     public static void initClient() {
-        ClientPlayNetworking.registerGlobalReceiver(TwirlStateS2CPayload.ID, (payload, context) ->
-                EntityTwirlManager.setEntityTwirlState(payload.entityId(), payload.twirlState()));
+        ClientPlayNetworking.registerGlobalReceiver(NetworkTwirlS2CPayload.ID, (payload, context) ->
+                TwirlManager.receiveTwirlPacket(payload.entityId(), payload.networkTwirl()));
         ClientPlayNetworking.registerGlobalReceiver(PlayerConfigS2CPayload.ID, (payload, context) ->
         {
             TrailSystem.getTrailManager().removeTrail(payload.entityId());

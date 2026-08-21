@@ -5,14 +5,14 @@ import dbrighthd.elytratrails.compat.Compatibility;
 import dbrighthd.elytratrails.config.ConfigManager;
 import dbrighthd.elytratrails.config.ModConfig;
 import dbrighthd.elytratrails.config.pack.TrailPackConfigManager;
-import dbrighthd.elytratrails.controller.ContinuousTwirlController;
-import dbrighthd.elytratrails.controller.TwirlController;
 import dbrighthd.elytratrails.handler.CommandHandler;
 import dbrighthd.elytratrails.handler.ParticleHandler;
 import dbrighthd.elytratrails.network.RegisterPacketsClient;
 import dbrighthd.elytratrails.rendering.TrailPipelines;
 import dbrighthd.elytratrails.rendering.TrailSystem;
 import dbrighthd.elytratrails.rendering.TrailTextureRegistry;
+import dbrighthd.elytratrails.twirling.EaseTypes;
+import dbrighthd.elytratrails.twirling.TwirlManager;
 import dbrighthd.elytratrails.util.ElytraTimeUtil;
 import net.fabricmc.api.ClientModInitializer;
 import net.fabricmc.fabric.api.resource.ResourceManagerHelper;
@@ -45,10 +45,11 @@ public class ElytraTrailsClient implements ClientModInitializer {
         TrailSystem.init();
         ParticleHandler.init();
         refreshLocalConfigs();
+
         RegisterPacketsClient.initClient();
         CommandHandler.init();
-        ContinuousTwirlController.setDurations();
-        TwirlController.setDurations();
+        EaseTypes.registerTypes();
+        TwirlManager.Init();
         TrailPackConfigManager.setDefaultSampleSettings();
         ResourceManagerHelper.get(PackType.CLIENT_RESOURCES).registerReloadListener(
                 new SimpleSynchronousResourceReloadListener() {

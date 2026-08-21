@@ -4,8 +4,7 @@ import com.mojang.blaze3d.platform.InputConstants;
 import dbrighthd.elytratrails.config.ConfigScreenBuilder;
 import dbrighthd.elytratrails.config.FallbackConfigMessageScreen;
 import dbrighthd.elytratrails.config.ModConfig;
-import dbrighthd.elytratrails.controller.ContinuousTwirlController;
-import dbrighthd.elytratrails.controller.TwirlController;
+import dbrighthd.elytratrails.twirling.TwirlManager;
 import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents;
 import net.fabricmc.fabric.api.client.keymapping.v1.KeyMappingHelper;
 import net.minecraft.client.KeyMapping;
@@ -28,6 +27,8 @@ public final class ElytraTrailsKeybind {
     public static KeyMapping OPEN_SETTINGS;
     public static KeyMapping TOGGLE_TRAILS;
 
+    public static int LEFT = -1;
+    public static int RIGHT = 1;
     private static final int INPUT_BUFFER_TICKS = 4;
 
     private static boolean prevTwirlLDown;
@@ -104,112 +105,35 @@ public final class ElytraTrailsKeybind {
             boolean canTwirl = client.player.isFallFlying();
             boolean inputBufferEnabled = modConfig.inputBuffer;
 
+            while (DO_A_LIL_TWIRL_L.consumeClick())
+            {
+                TwirlManager.clientTwirlInput(LEFT, modConfig);
+            }
+            while (DO_A_LIL_TWIRL_R.consumeClick())
+            {
+                TwirlManager.clientTwirlInput(RIGHT,modConfig);
+            }
+            while (DO_A_LIL_CONTINUOUS_TWIRL_L.consumeClick())
+            {
+                TwirlManager.holdTwirlSend(LEFT, modConfig);
+            }
+            while (DO_A_LIL_CONTINUOUS_TWIRL_R.consumeClick())
+            {
+                TwirlManager.holdTwirlSend(RIGHT,modConfig);
+            }
             boolean twirlLPhysicalDown = DO_A_LIL_TWIRL_L.isDown();
             boolean twirlRPhysicalDown = DO_A_LIL_TWIRL_R.isDown();
             boolean twirlRandomPhysicalDown = DO_A_LIL_TWIRL_RANDOM.isDown();
 
-            boolean continuousLPhysicalDown = DO_A_LIL_CONTINUOUS_TWIRL_R.isDown();
-            boolean continuousRPhysicalDown = DO_A_LIL_CONTINUOUS_TWIRL_L.isDown();
-
-            boolean twirlLPressed = twirlLPhysicalDown && !prevTwirlLDown;
-            boolean twirlRPressed = twirlRPhysicalDown && !prevTwirlRDown;
-            boolean twirlRandomPressed = twirlRandomPhysicalDown && !prevTwirlRandomDown;
-            boolean continuousLPressed = continuousLPhysicalDown && !prevContinuousLDown;
-            boolean continuousRPressed = continuousRPhysicalDown && !prevContinuousRDown;
-
+            boolean continuousLPhysicalDown = DO_A_LIL_CONTINUOUS_TWIRL_L.isDown();
+            boolean continuousRPhysicalDown = DO_A_LIL_CONTINUOUS_TWIRL_R.isDown();
             prevTwirlLDown = twirlLPhysicalDown;
             prevTwirlRDown = twirlRPhysicalDown;
             prevTwirlRandomDown = twirlRandomPhysicalDown;
             prevContinuousLDown = continuousLPhysicalDown;
             prevContinuousRDown = continuousRPhysicalDown;
 
-            boolean normalActive = TwirlController.isActive();
-            boolean contActive = ContinuousTwirlController.isActive();
 
-            boolean normalDown = canTwirl && (twirlLPhysicalDown || twirlRPhysicalDown || twirlRandomPhysicalDown);
-            int desiredMode = heldMode(
-                    canTwirl && twirlLPhysicalDown,
-                    canTwirl && twirlRPhysicalDown,
-                    canTwirl && twirlRandomPhysicalDown
-            );
-
-            boolean continuousDown = canTwirl && (continuousLPhysicalDown || continuousRPhysicalDown);
-            int continuousMode = heldMode(
-                    canTwirl && continuousLPhysicalDown,
-                    canTwirl && continuousRPhysicalDown,
-                    false
-            );
-
-            if (inputBufferEnabled) {
-                tickBuffers();
-
-                if (canTwirl) {
-                    int normalPressedMode = firstPressedMode(twirlLPressed, twirlRPressed, twirlRandomPressed, true);
-                    if (normalPressedMode != Integer.MIN_VALUE) {
-                        handleNormalPress(normalPressedMode, normalActive);
-                    }
-
-                    int continuousPressedMode = firstPressedMode(continuousLPressed, continuousRPressed, false, false);
-                    if (continuousPressedMode != Integer.MIN_VALUE) {
-                        handleContinuousPress(continuousPressedMode, contActive);
-                    }
-                }
-
-                boolean bufferedNormalReady = canTwirl && (bufferedNormalTicks > 0 || queuedNormalRestart);
-                boolean bufferedContinuousReady = canTwirl && (bufferedContinuousTicks > 0 || queuedContinuousRestart);
-
-                if (normalActive) {
-                    TwirlController.tickTwirlKey(normalDown, desiredMode);
-                    ContinuousTwirlController.tickContinuousTwirlKey(false, continuousMode);
-                } else if (contActive) {
-                    ContinuousTwirlController.tickContinuousTwirlKey(continuousDown, continuousMode);
-                    TwirlController.tickTwirlKey(false, desiredMode);
-                } else if (bufferedNormalReady) {
-                    int modeToUse = queuedNormalRestart ? queuedNormalMode : bufferedNormalMode;
-
-                    TwirlController.tickTwirlKey(true, modeToUse);
-                    ContinuousTwirlController.tickContinuousTwirlKey(false, continuousMode);
-
-                    bufferedNormalTicks = 0;
-                    queuedNormalRestart = false;
-                } else if (bufferedContinuousReady) {
-                    int modeToUse = queuedContinuousRestart ? queuedContinuousMode : bufferedContinuousMode;
-
-                    ContinuousTwirlController.tickContinuousTwirlKey(true, modeToUse);
-                    TwirlController.tickTwirlKey(false, desiredMode);
-
-                    bufferedContinuousTicks = 0;
-                    queuedContinuousRestart = false;
-                } else if (normalDown) {
-                    TwirlController.tickTwirlKey(true, desiredMode);
-                    ContinuousTwirlController.tickContinuousTwirlKey(false, continuousMode);
-                } else if (continuousDown) {
-                    ContinuousTwirlController.tickContinuousTwirlKey(true, continuousMode);
-                    TwirlController.tickTwirlKey(false, desiredMode);
-                } else {
-                    TwirlController.tickTwirlKey(false, desiredMode);
-                    ContinuousTwirlController.tickContinuousTwirlKey(false, continuousMode);
-                }
-            } else {
-                clearInputBuffers();
-
-                if (normalActive) {
-                    TwirlController.tickTwirlKey(normalDown, desiredMode);
-                    ContinuousTwirlController.tickContinuousTwirlKey(false, continuousMode);
-                } else if (contActive) {
-                    ContinuousTwirlController.tickContinuousTwirlKey(continuousDown, continuousMode);
-                    TwirlController.tickTwirlKey(false, desiredMode);
-                } else if (normalDown) {
-                    TwirlController.tickTwirlKey(true, desiredMode);
-                    ContinuousTwirlController.tickContinuousTwirlKey(false, continuousMode);
-                } else if (continuousDown) {
-                    ContinuousTwirlController.tickContinuousTwirlKey(true, continuousMode);
-                    TwirlController.tickTwirlKey(false, desiredMode);
-                } else {
-                    TwirlController.tickTwirlKey(false, desiredMode);
-                    ContinuousTwirlController.tickContinuousTwirlKey(false, continuousMode);
-                }
-            }
 
             while (OPEN_SETTINGS.consumeClick()) {
                 if(CLOTH_LOADED)
@@ -268,37 +192,37 @@ public final class ElytraTrailsKeybind {
         queuedContinuousMode = mode;
     }
 
-    private static void handleNormalPress(int mode, boolean normalActive) {
-        if (mode != 0 && TwirlController.canBufferBackReverse(mode)) {
-            if (TwirlController.canStillReverseFromBufferedBackInput(mode)) {
-                TwirlController.bufferReverseRequest(mode, INPUT_BUFFER_TICKS);
-            } else {
-                queueNormalRestart(mode);
-            }
-            return;
-        }
-
-        if (normalActive) {
-            queueNormalRestart(mode);
-        } else {
-            setNormalBuffer(mode);
-        }
-    }
-
-    private static void handleContinuousPress(int mode, boolean contActive) {
-        if (ContinuousTwirlController.canBufferBackReverse(mode)) {
-            if (ContinuousTwirlController.canStillReverseFromBufferedBackInput(mode)) {
-                ContinuousTwirlController.bufferReverseRequest(mode, INPUT_BUFFER_TICKS);
-            } else {
-                queueContinuousRestart(mode);
-            }
-            return;
-        }
-
-        if (!contActive || ContinuousTwirlController.getCurrentDir() != mode) {
-            setContinuousBuffer(mode);
-        }
-    }
+//    private static void handleNormalPress(int mode, boolean normalActive) {
+//        if (mode != 0 && TwirlController.canBufferBackReverse(mode)) {
+//            if (TwirlController.canStillReverseFromBufferedBackInput(mode)) {
+//                TwirlController.bufferReverseRequest(mode, INPUT_BUFFER_TICKS);
+//            } else {
+//                queueNormalRestart(mode);
+//            }
+//            return;
+//        }
+//
+//        if (normalActive) {
+//            queueNormalRestart(mode);
+//        } else {
+//            setNormalBuffer(mode);
+//        }
+//    }
+//
+//    private static void handleContinuousPress(int mode, boolean contActive) {
+//        if (ContinuousTwirlController.canBufferBackReverse(mode)) {
+//            if (ContinuousTwirlController.canStillReverseFromBufferedBackInput(mode)) {
+//                ContinuousTwirlController.bufferReverseRequest(mode, INPUT_BUFFER_TICKS);
+//            } else {
+//                queueContinuousRestart(mode);
+//            }
+//            return;
+//        }
+//
+//        if (!contActive || ContinuousTwirlController.getCurrentDir() != mode) {
+//            setContinuousBuffer(mode);
+//        }
+//    }
 
     /**
      * -1: for left

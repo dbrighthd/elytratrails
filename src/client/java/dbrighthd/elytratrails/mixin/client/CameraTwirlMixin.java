@@ -1,6 +1,6 @@
 package dbrighthd.elytratrails.mixin.client;
 
-import dbrighthd.elytratrails.controller.EntityTwirlManager;
+import dbrighthd.elytratrails.twirling.TwirlManager;
 import net.minecraft.client.Camera;
 import net.minecraft.client.Minecraft;
 import net.minecraft.world.entity.Entity;
@@ -51,7 +51,7 @@ public class CameraTwirlMixin {
         if (!isFirstPerson && !fishysStupidThirdPersonCameraRoll) {
             return;
         }
-        float extra = EntityTwirlManager.getExtraRollRadians(camEntity.getId());
+        float extra = TwirlManager.getExtraRollRadians(camEntity.getId());
 
         if (frontView) {
             extra *= -1;

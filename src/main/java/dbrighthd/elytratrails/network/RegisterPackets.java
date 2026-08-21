@@ -15,6 +15,10 @@ import java.util.UUID;
 public class RegisterPackets {
     public static Set<UUID> playersReceivedWarnings = new HashSet<>();
     public static void initCommon() {
+        PayloadTypeRegistry.clientboundPlay().register(NetworkTwirlS2CPayload.ID,NetworkTwirlS2CPayload.CODEC);
+        PayloadTypeRegistry.serverboundPlay().register(NetworkTwirlC2SPayload.ID,NetworkTwirlC2SPayload.CODEC);
+
+
         PayloadTypeRegistry.clientboundPlay().register(TwirlStateS2CPayload.ID,TwirlStateS2CPayload.CODEC);
         PayloadTypeRegistry.serverboundPlay().register(TwirlStateC2SPayload.ID,TwirlStateC2SPayload.CODEC);
         PayloadTypeRegistry.clientboundPlay().register(PlayerConfigS2CPayload.ID,PlayerConfigS2CPayload.CODEC);
@@ -33,6 +37,17 @@ public class RegisterPackets {
                 ServerPlayNetworking.send(player, serverPayload);
             }
         });
+
+
+        ServerPlayNetworking.registerGlobalReceiver(NetworkTwirlC2SPayload.ID, (payload, context) -> {
+            Entity entity = context.player();
+            NetworkTwirlS2CPayload serverPayload = new NetworkTwirlS2CPayload(entity.getId(), payload.networkTwirl());
+            for (ServerPlayer player : context.server().getPlayerList().getPlayers()) {
+                ServerPlayNetworking.send(player, serverPayload);
+            }
+        });
+
+
         ServerPlayNetworking.registerGlobalReceiver(PlayerConfigC2SPayload.ID, (payload, context) -> {
             Entity entity = context.player();
             ServerPlayerConfigStore.SERVER_PLAYER_CONFIGS.put(entity.getId(),payload.configTag());

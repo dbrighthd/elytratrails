@@ -25,7 +25,7 @@ import java.util.*;
 
 import static dbrighthd.elytratrails.ElytraTrailsClient.getConfig;
 import static dbrighthd.elytratrails.config.pack.TrailPackConfigManager.*;
-import static dbrighthd.elytratrails.controller.EntityTwirlManager.isRolling;
+import static dbrighthd.elytratrails.twirling.TwirlManager.isRolling;
 import static dbrighthd.elytratrails.util.ModelTransformationUtil.getUnsignedAOA;
 import static java.lang.Math.cos;
 import static java.lang.Math.sin;

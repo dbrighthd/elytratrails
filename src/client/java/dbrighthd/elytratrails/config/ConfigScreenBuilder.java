@@ -4,8 +4,6 @@ import com.mojang.brigadier.StringReader;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import dbrighthd.elytratrails.ElytraTrailsKeybind;
 import dbrighthd.elytratrails.config.pack.TrailPackConfigManager;
-import dbrighthd.elytratrails.controller.ContinuousTwirlController;
-import dbrighthd.elytratrails.controller.TwirlController;
 import dbrighthd.elytratrails.network.GetAllRequestC2SPayload;
 import dbrighthd.elytratrails.network.PlayerConfigC2SPayload;
 import dbrighthd.elytratrails.network.RemoveFromStoreC2SPayload;
@@ -477,8 +475,6 @@ public class ConfigScreenBuilder {
             exportPreset(config);
             applyPresetsToConfig(config);
             refreshConfig();
-            TwirlController.setDurations();
-            ContinuousTwirlController.setDurations();
             ConfigManager.save();
             var mc = Minecraft.getInstance();
             refreshLocalConfigs();
