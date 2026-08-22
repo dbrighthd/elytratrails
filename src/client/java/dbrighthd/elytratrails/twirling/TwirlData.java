@@ -18,6 +18,7 @@ public class TwirlData {
     EaseType lastNonLinearEase;
     double easedTwirlProgress;
     long twirlStartTimeMillis;
+    double packetSendProgressTime = 0.75;
     int currDirection;
     List<Twirl> twirlQueue = new ArrayList<>();
 
@@ -25,12 +26,9 @@ public class TwirlData {
     {
         twirlStartTimeMillis = ElytraTimeUtil.currentMillis();
     }
+
     public void updateTwirl(long currentMillis)
     {
-        if(isClient)
-        {
-            Minecraft.getInstance().gui.hud.setOverlayMessage(Component.literal("Twirl Progress: " + Math.round(easedTwirlProgress*10d)/10d + " Twirl Queue: " + twirlQueue.size()), false);
-        }
         if(twirlQueue.isEmpty())
         {
             easedTwirlProgress = 0;
@@ -38,23 +36,23 @@ public class TwirlData {
             return;
         }
         Twirl currTwirl = twirlQueue.getFirst();
-
+        double packetGraceTime = (twirlQueue.size() > 1 && currTwirl.easeMode() == EaseTypes.EaseMode.OUT && currTwirl.easeType().flipTime() > 0 && currTwirl.easeType().flipTime() < 1) ? currTwirl.easeType().flipTime() : packetSendProgressTime;
         twirlProgress = twirlOffset + (double) (currentMillis - twirlStartTimeMillis) /currTwirl.twirlTime();
         if(twirlProgress > 1)
         {
             nextTwirl(currentMillis,0);
         }
-        else if(isClient && twirlProgress > 0.75 && !hasSent && twirlQueue.size() > 1)
+        else if(isClient && (twirlProgress > packetGraceTime) && !hasSent && twirlQueue.size() > 1)
         {
-            sendTwirlpacket(twirlQueue.get(1));
+            sendTwirlPacket(twirlQueue.get(1));
             hasSent = true;
         }
         else if(twirlQueue.size() > 1 && currTwirl.easeMode() == EaseTypes.EaseMode.OUT)
         {
+            double flipTime = currTwirl.easeType().flipTime();
             Twirl nextTwirl = twirlQueue.get(1);
             if(currTwirl.direction() != nextTwirl.direction())
             {
-                double flipTime = currTwirl.easeType().flipTime();
                 if(twirlProgress > flipTime && twirlProgress < flipTime + 0.05)
                 {
                     nextTwirl(currentMillis, nextTwirl.easeType().flipStart());
@@ -66,7 +64,7 @@ public class TwirlData {
     }
     public void nextTwirl(long currentMillis, double offset)
     {
-        if(twirlQueue.getFirst().easeType() != EaseTypes.get("None"))
+        if(twirlQueue.getFirst().easeType() != EaseTypes.LINEAR)
         {
             lastNonLinearEase = twirlQueue.getLast().easeType();
         }
@@ -78,14 +76,14 @@ public class TwirlData {
     }
     public void addInBetweenLinearTwirl(long twirlTime)
     {
-        if(twirlQueue.size() != 2)
+        if(twirlQueue.size() != 2 || hasSent || twirlProgress < 0.5)
         {
             return;
         }
-        EaseType easeType = EaseTypes.get("None");
-        if(twirlQueue.getFirst().easeType() == EaseTypes.get("Random"))
+        EaseType easeType = EaseTypes.LINEAR;
+        if(twirlQueue.getFirst().easeType() == EaseTypes.RANDOM)
         {
-            easeType = EaseTypes.get("Random");
+            easeType = EaseTypes.RANDOM;
         }
         addTwirl(twirlQueue.size()-1,new Twirl(easeType,twirlQueue.getFirst().direction(),twirlTime/2, EaseTypes.EaseMode.BOTH, 0.5));
     }
@@ -121,7 +119,7 @@ public class TwirlData {
         twirlQueue.addLast(twirl);
     }
 
-    public static void sendTwirlpacket(Twirl twirl) {
+    public static void sendTwirlPacket(Twirl twirl) {
         var mc = Minecraft.getInstance();
         if (mc.level == null || mc.player == null || mc.getConnection() == null) return;
         NetworkTwirlC2SPayload payload = new NetworkTwirlC2SPayload(twirl.toNetworkTwirl());

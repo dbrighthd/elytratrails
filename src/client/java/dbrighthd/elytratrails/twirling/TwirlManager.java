@@ -2,18 +2,15 @@ package dbrighthd.elytratrails.twirling;
 
 import dbrighthd.elytratrails.config.ModConfig;
 import dbrighthd.elytratrails.network.NetworkTwirl;
-import dbrighthd.elytratrails.network.NetworkTwirlC2SPayload;
-import dbrighthd.elytratrails.network.TwirlStateC2SPayload;
 import dbrighthd.elytratrails.twirling.types.EaseType;
 import dbrighthd.elytratrails.util.ElytraTimeUtil;
-import net.fabricmc.fabric.api.client.networking.v1.ClientPlayNetworking;
 import net.fabricmc.fabric.api.client.rendering.v1.level.LevelRenderEvents;
 import net.minecraft.client.Minecraft;
 
 import java.util.HashMap;
 import java.util.Map;
 
-import static dbrighthd.elytratrails.twirling.TwirlData.sendTwirlpacket;
+import static dbrighthd.elytratrails.twirling.TwirlData.sendTwirlPacket;
 
 public class TwirlManager {
     public static Map<Integer,TwirlData> twirlMap = new HashMap<>();
@@ -49,6 +46,7 @@ public class TwirlManager {
 
     public static void receiveTwirlPacket(int entityId, NetworkTwirl networkTwirl)
     {
+
         if(entityId == Minecraft.getInstance().player.getId())
         {
             return;
@@ -117,7 +115,10 @@ public class TwirlManager {
 
         Twirl firstTwirl = new Twirl(easeType, direction, (long)(modConfig.clientPlayerConfig.twirlTime * 1000 * mult/2), EaseTypes.EaseMode.IN);
         clientData.addTwirlToEnd(firstTwirl);
-        sendTwirlpacket(firstTwirl);
+        if(clientData.twirlQueue.size() == 1)
+        {
+            sendTwirlPacket(firstTwirl);
+        }
         clientData.addTwirlToEnd(new Twirl(easeType, direction, (long)(modConfig.clientPlayerConfig.twirlTime * 1000 * mult/2), EaseTypes.EaseMode.OUT));
     }
     public static boolean isRolling(int entityId)

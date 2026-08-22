@@ -113,11 +113,11 @@ public final class ElytraTrailsKeybind {
             {
                 TwirlManager.clientTwirlInput(RIGHT,modConfig);
             }
-            while (DO_A_LIL_CONTINUOUS_TWIRL_L.consumeClick())
+            if (DO_A_LIL_CONTINUOUS_TWIRL_L.isDown())
             {
                 TwirlManager.holdTwirlSend(LEFT, modConfig);
             }
-            while (DO_A_LIL_CONTINUOUS_TWIRL_R.consumeClick())
+            if (DO_A_LIL_CONTINUOUS_TWIRL_R.isDown())
             {
                 TwirlManager.holdTwirlSend(RIGHT,modConfig);
             }
