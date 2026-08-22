@@ -1,7 +1,7 @@
 package dbrighthd.elytratrails.twirling.types;
 
 public interface EaseType {
-    public String id();
+    String id();
 
     default double easeIn(double t){
         return t;

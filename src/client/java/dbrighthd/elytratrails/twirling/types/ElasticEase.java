@@ -1,7 +1,5 @@
 package dbrighthd.elytratrails.twirling.types;
 
-import net.minecraft.util.Ease;
-
 public class ElasticEase implements EaseType {
     @Override
     public String id() {

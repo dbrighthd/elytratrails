@@ -6,6 +6,7 @@ import dbrighthd.elytratrails.twirling.types.EaseType;
 import dbrighthd.elytratrails.util.ElytraTimeUtil;
 import net.fabricmc.fabric.api.client.rendering.v1.level.LevelRenderEvents;
 import net.minecraft.client.Minecraft;
+import net.minecraft.world.entity.player.Player;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -17,9 +18,7 @@ public class TwirlManager {
 
     public static void Init()
     {
-        LevelRenderEvents.END_MAIN.register(_ -> {
-            updateAllTwirls();
-        });
+        LevelRenderEvents.END_MAIN.register(_ -> updateAllTwirls());
     }
     public static float getExtraRollRadians(int entityId)
     {
@@ -46,8 +45,12 @@ public class TwirlManager {
 
     public static void receiveTwirlPacket(int entityId, NetworkTwirl networkTwirl)
     {
-
-        if(entityId == Minecraft.getInstance().player.getId())
+        Player player = Minecraft.getInstance().player;
+        if(player == null)
+        {
+            return;
+        }
+        if(entityId == player.getId())
         {
             return;
         }
@@ -67,7 +70,12 @@ public class TwirlManager {
 
     public static void clientTwirlInput(int direction, ModConfig modConfig)
     {
-        int clientEid = Minecraft.getInstance().player.getId();
+        Player player = Minecraft.getInstance().player;
+        if(player == null)
+        {
+            return;
+        }
+        int clientEid = player.getId();
 
         if(!twirlMap.containsKey(clientEid))
         {
@@ -83,8 +91,12 @@ public class TwirlManager {
     }
     public static void holdTwirlSend(int direction, ModConfig modConfig)
     {
-        int clientEid = Minecraft.getInstance().player.getId();
-
+        Player player = Minecraft.getInstance().player;
+        if(player == null)
+        {
+            return;
+        }
+        int clientEid = player.getId();
         if(!twirlMap.containsKey(clientEid))
         {
             twirlMap.put(clientEid,new TwirlData());

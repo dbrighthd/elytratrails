@@ -19,7 +19,6 @@ public class ModConfig {
     public boolean resourcePackOverride = true;
     public boolean fishysStupidCameraRoll = false;
     public boolean fishysStupidThirdPersonCameraRoll = false;
-    public String easeTypeId = "back";
     public boolean emfSupport = true;
     public boolean extendedEmfSupport = true;
     public boolean tryWithoutEmf = true;
