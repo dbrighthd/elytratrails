@@ -5,20 +5,20 @@ import com.mojang.blaze3d.vertex.PoseStack;
 import dbrighthd.elytratrails.compat.ModStatuses;
 import net.minecraft.client.model.Model;
 import net.minecraft.client.model.geom.ModelPart;
+import net.minecraft.client.renderer.entity.state.EntityRenderState;
 import net.minecraft.world.entity.Entity;
 import org.jetbrains.annotations.Nullable;
 import traben.entity_model_features.models.IEMFModel;
-import traben.entity_model_features.models.animation.EMFAnimationEntityContext;
 import traben.entity_model_features.models.animation.state.EMFEntityRenderStateViaReference;
 import traben.entity_model_features.models.parts.EMFModelPartRoot;
 import traben.entity_model_features.utils.EMFEntity;
+import traben.entity_texture_features.features.state.ETFState;
 
 public final class EmfAnimationHooks {
     private EmfAnimationHooks() {
     }
 
-    @SuppressWarnings("deprecation")
-    public static @Nullable ModelPart applyManualAnimationAndGetRoot(Model<?> model, Entity entity) {
+    public static @Nullable ModelPart applyManualAnimationAndGetRoot(Model<?> model, Entity entity, EntityRenderState renderState) {
         if (model == null || entity == null) return null;
 
         ModelPart root = model.root();
@@ -38,15 +38,15 @@ public final class EmfAnimationHooks {
                     try {
                         if (entity instanceof EMFEntity emfEntity) {
                             EMFEntityRenderStateViaReference state = new EMFEntityRenderStateViaReference(emfEntity);
-                            EMFAnimationEntityContext.setCurrentEntityNoIteration(state);
+                            ETFState.mount(state);
                             contextSet = true;
                         }
-
+                        setupAnimGeneric(model, renderState);
                         emfRoot.triggerManualAnimation(new PoseStack());
                         return emfRoot;
                     } finally {
                         if (contextSet) {
-                            EMFAnimationEntityContext.setCurrentEntityNoIteration(null);
+                            ETFState.unMount();
                         }
                     }
                 }
@@ -55,5 +55,16 @@ public final class EmfAnimationHooks {
         }
 
         return root;
+    }
+
+    /**
+     *  :(
+     */
+    @SuppressWarnings({"rawtypes", "unchecked"})
+    private static void setupAnimGeneric(
+            Model<?> model,
+            EntityRenderState state
+    ) {
+        ((Model) model).setupAnim(state);
     }
 }

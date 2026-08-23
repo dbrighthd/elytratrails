@@ -109,7 +109,7 @@ public class WingTipSampler {
         basePose.last().set(elytraSubmit.pose());
 
         Vec3 entityWorldOffset = new Vec3(humanoidState.x, humanoidState.y, humanoidState.z);
-        ModelPart animatedElytraRoot = tryGetAnimatedElytraRoot(elytraModel, player);
+        ModelPart animatedElytraRoot = tryGetAnimatedElytraRoot(elytraModel, player, humanoidState);
         int eid = player.getId();
         if (ModStatuses.EMF_LOADED && config.emfSupport) {
 
@@ -165,7 +165,7 @@ public class WingTipSampler {
         basePose.last().set(entitySubmit.pose());
 
         Vec3 entityWorldOffset = new Vec3(entityRenderState.x, entityRenderState.y, entityRenderState.z);
-        ModelPart animatedRoot = tryGetAnimatedEntityRoot(entityModel, entity);
+        ModelPart animatedRoot = tryGetAnimatedEntityRoot(entityModel, entity, entityRenderState);
         int eid = entity.getId();
 
         if (ModStatuses.EMF_LOADED && config.emfSupport) {
@@ -395,19 +395,19 @@ public class WingTipSampler {
         return cachedChildren.get(name.toLowerCase());
     }
 
-    private @Nullable ModelPart tryGetAnimatedElytraRoot(ElytraModel model, Avatar player) {
+    private @Nullable ModelPart tryGetAnimatedElytraRoot(ElytraModel model, Avatar player, EntityRenderState state) {
         if (!ModStatuses.EMF_LOADED || !getConfig().emfSupport) return null;
         try {
-            return EmfAnimationHooks.applyManualAnimationAndGetRoot(model, player);
+            return EmfAnimationHooks.applyManualAnimationAndGetRoot(model, player, state);
         } catch (Throwable ignored) {
             return null;
         }
     }
 
-    private @Nullable ModelPart tryGetAnimatedEntityRoot(EntityModel<?> model, Entity entity) {
+    private @Nullable ModelPart tryGetAnimatedEntityRoot(EntityModel<?> model, Entity entity, EntityRenderState state) {
         if (!ModStatuses.EMF_LOADED || !getConfig().emfSupport) return null;
         try {
-            return EmfAnimationHooks.applyManualAnimationAndGetRoot(model, entity);
+            return EmfAnimationHooks.applyManualAnimationAndGetRoot(model, entity, state);
         } catch (Throwable e) {
             return null;
         }
@@ -454,7 +454,7 @@ public class WingTipSampler {
                 if (!(modelSubmit.model() instanceof EntityModel<?> entityModel)) continue;
                 if (!(modelSubmit.state() instanceof EntityRenderState entityRenderState)) continue;
                 setupAnyModelAnim(entityModel, entityRenderState);
-                ModelPart animatedRoot = tryGetAnimatedEntityRoot(entityModel, entity);
+                ModelPart animatedRoot = tryGetAnimatedEntityRoot(entityModel, entity, entityRenderState);
                 if (fallback == null) {
                     fallback = modelSubmit;
                 }
