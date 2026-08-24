@@ -7,8 +7,12 @@ import dbrighthd.elytratrails.config.ModConfig;
 import dbrighthd.elytratrails.twirling.TwirlManager;
 import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents;
 import net.fabricmc.fabric.api.client.keymapping.v1.KeyMappingHelper;
+import net.minecraft.ChatFormatting;
 import net.minecraft.client.KeyMapping;
+import net.minecraft.client.Minecraft;
+import net.minecraft.network.chat.Component;
 import net.minecraft.resources.Identifier;
+import net.minecraft.world.entity.player.Player;
 
 import static dbrighthd.elytratrails.ElytraTrailsClient.getConfig;
 import static dbrighthd.elytratrails.ElytraTrailsClient.setConfig;
@@ -142,6 +146,9 @@ public final class ElytraTrailsKeybind {
 
             while (TOGGLE_TRAILS.consumeClick()) {
                 modConfig.enableAllTrails = !modConfig.enableAllTrails;
+                Component status = Component.literal(modConfig.enableAllTrails ? "ON" : "OFF").withStyle(modConfig.enableAllTrails ? ChatFormatting.GREEN : ChatFormatting.RED);
+                Component message = Component.empty().append(Component.literal("Toggled Elytra Contrails ")).append(status);
+                Minecraft.getInstance().gui.hud.setOverlayMessage(message,false);
                 setConfig(modConfig);
             }
         });
