@@ -38,7 +38,7 @@ public class ModelTransformationUtil {
         float AOARaw = getUnsignedAOARaw(entity);
 
         //I want the twirl to affect the AOA of the emitters but I no no wanna do the math so here's an approximation
-        return AOARaw + (float)getTwirlProgress(entity.getId())/1.5f;
+        return AOARaw + getTwirlProgress(entity.getId())/1.5f;
     }
 
 

@@ -113,7 +113,7 @@ public class WingTipSampler {
         int eid = player.getId();
         if (ModStatuses.EMF_LOADED && config.emfSupport) {
 
-            int variant = getModelVariantFromModel(animatedElytraRoot);
+            int variant = getModelVariantFromModel(elytraModel);
 
             if (!emfCache.containsKey(eid) || !(emfCache.get(eid).variant() == variant)) {
                 emfCache.put(eid, new EmfInfo("elytra", variant, getSpawnersInfo(EmfWingTipHooks.findAllSpawnerPaths(leftWing, rightWing))));
@@ -169,7 +169,7 @@ public class WingTipSampler {
         int eid = entity.getId();
 
         if (ModStatuses.EMF_LOADED && config.emfSupport) {
-            int variant = getModelVariantFromModel(animatedRoot);
+            int variant = getModelVariantFromModel(entityModel);
 
             if (!emfCacheGeneric.containsKey(eid) || !(emfCacheGeneric.get(eid).variant() == variant)) {
                 List<EmfWingTipHooks.SpawnerPath> found = EmfWingTipHooks.findAllSpawnerPathsGeneric(animatedRoot);

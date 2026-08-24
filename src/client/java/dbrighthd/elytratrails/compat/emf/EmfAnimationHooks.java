@@ -14,6 +14,8 @@ import traben.entity_model_features.models.parts.EMFModelPartRoot;
 import traben.entity_model_features.utils.EMFEntity;
 import traben.entity_texture_features.features.state.ETFState;
 
+import static dbrighthd.elytratrails.util.ModelTransformationUtil.setupAnyModelAnim;
+
 public final class EmfAnimationHooks {
     private EmfAnimationHooks() {
     }
@@ -41,7 +43,7 @@ public final class EmfAnimationHooks {
                             ETFState.mount(state);
                             contextSet = true;
                         }
-                        setupAnimGeneric(model, renderState);
+                        setupAnyModelAnim(model, renderState);
                         emfRoot.triggerManualAnimation(new PoseStack());
                         return emfRoot;
                     } finally {
@@ -55,16 +57,5 @@ public final class EmfAnimationHooks {
         }
 
         return root;
-    }
-
-    /**
-     *  :(
-     */
-    @SuppressWarnings({"rawtypes", "unchecked"})
-    private static void setupAnimGeneric(
-            Model<?> model,
-            EntityRenderState state
-    ) {
-        ((Model) model).setupAnim(state);
     }
 }
