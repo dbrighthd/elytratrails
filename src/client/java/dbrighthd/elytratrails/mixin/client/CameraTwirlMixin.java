@@ -57,7 +57,7 @@ public class CameraTwirlMixin {
             extra *= -1;
         }
         if (extra != 0f) {
-            this.rotation.rotateZ(-extra);
+            this.rotation.rotateAxis(-extra, TwirlManager.getAxisVector(camEntity.getId()));
         }
     }
 }

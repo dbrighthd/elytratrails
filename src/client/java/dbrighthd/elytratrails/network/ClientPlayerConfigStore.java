@@ -1,10 +1,7 @@
 package dbrighthd.elytratrails.network;
 
-//import dbrighthd.elytratrails.compat.flashback.FlashbackCompat;
-//import dbrighthd.elytratrails.compat.flashback.FlashbackCompat;
 import dbrighthd.elytratrails.compat.flashback.FlashbackCompat;
 import dbrighthd.elytratrails.config.ModConfig;
-import dbrighthd.elytratrails.util.EasingUtil;
 import net.fabricmc.loader.api.FabricLoader;
 import net.minecraft.client.Minecraft;
 import net.minecraft.nbt.CompoundTag;
@@ -122,12 +119,10 @@ public final class ClientPlayerConfigStore {
                 incomingConfig.wireframeTrails(),
                 incomingConfig.alwaysShowTrailDuringTwirl(),
                 safePrideRight,
-                incomingConfig.twirlTime(),
                 incomingConfig.increaseWidthOverTime(),
                 incomingConfig.startingWidthMultiplier(),
                 incomingConfig.endingWidthMultiplier(),
                 incomingConfig.distanceTillTrailStart(),
-                incomingConfig.easeType(),
                 incomingConfig.endDistanceFade(),
                 incomingConfig.endDistanceFadeAmount(),
                 incomingConfig.playerName(),
@@ -186,12 +181,10 @@ public final class ClientPlayerConfigStore {
         boolean wireframeTrails = tag.getBooleanOr("wireframeTrails", fallbackConfig.wireframeTrails());
         boolean alwaysShowTrailDuringTwirl = tag.getBooleanOr("alwaysShowTrailDuringTwirl", fallbackConfig.alwaysShowTrailDuringTwirl());
         String prideTrailRight = tag.getStringOr("prideTrailRight", fallbackConfig.prideTrailRight());
-        double twirlTime = tag.getDoubleOr("twirlTime", fallbackConfig.twirlTime());
         boolean increaseWidthOverTime = tag.getBooleanOr("increaseWidthOverTime", fallbackConfig.increaseWidthOverTime());
         double startingWidthMultiplier = tag.getDoubleOr("startingWidthMultiplier", fallbackConfig.startingWidthMultiplier());
         double endingWidthMultiplier = tag.getDoubleOr("endingWidthMultiplier", fallbackConfig.endingWidthMultiplier());
         double distanceTillTrailStart = tag.getDoubleOr("distanceTillTrailStart", fallbackConfig.distanceTillTrailStart());
-        EasingUtil.EaseType easeType = readEnum(tag, "easeType", EasingUtil.EaseType.class, fallbackConfig.easeType());
         boolean endDistanceFade = tag.getBooleanOr("endDistanceFade", fallbackConfig.endDistanceFade());
         double endDistanceFadeAmount = tag.getDoubleOr("endDistanceFadeAmount", fallbackConfig.endDistanceFadeAmount());
         String playerName = tag.getStringOr("playerName", fallbackConfig.playerName());
@@ -237,12 +230,10 @@ public final class ClientPlayerConfigStore {
                 wireframeTrails,
                 alwaysShowTrailDuringTwirl,
                 prideTrailRight,
-                twirlTime,
                 increaseWidthOverTime,
                 startingWidthMultiplier,
                 endingWidthMultiplier,
                 distanceTillTrailStart,
-                easeType,
                 endDistanceFade,
                 endDistanceFadeAmount,
                 playerName,
@@ -267,17 +258,6 @@ public final class ClientPlayerConfigStore {
                 maxWidthAOA,
                 edgeFade
         );
-    }
-
-    public static <E extends Enum<E>> E readEnum(CompoundTag tag, String key, Class<E> enumClass, E fallback) {
-        if (!tag.contains(key)) return fallback;
-
-        String s = tag.getStringOr(key, "Sine");
-        try {
-            return Enum.valueOf(enumClass, s);
-        } catch (IllegalArgumentException ignored) {
-            return fallback;
-        }
     }
 
     public static PlayerConfig getOrDefault(int entityId) {

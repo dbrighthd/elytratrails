@@ -30,7 +30,7 @@ public abstract class AvatarRendererMixin {
 
         float extra = TwirlManager.getExtraRollRadians(state.id);
         if (extra != 0f) {
-            poseStack.mulPose(Axis.YP.rotation(extra));
+            poseStack.mulPose(TwirlManager.getAxis(state.id).rotation(extra));
         }
     }
 }

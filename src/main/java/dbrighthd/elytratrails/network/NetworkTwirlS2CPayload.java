@@ -27,6 +27,7 @@ public record NetworkTwirlS2CPayload(int entityId, NetworkTwirl networkTwirl) im
                     Codec.INT.fieldOf("direction").forGetter(NetworkTwirl::direction),
                     Codec.LONG.fieldOf("twirlTime").forGetter(NetworkTwirl::twirlTime),
                     Codec.INT.fieldOf("easeMode").forGetter(NetworkTwirl::easeMode),
+                    Codec.INT.fieldOf("axis").forGetter(NetworkTwirl::axis),
                     Codec.DOUBLE.fieldOf("offset").forGetter(NetworkTwirl::offset)
             ).apply(instance, NetworkTwirl::new));
 

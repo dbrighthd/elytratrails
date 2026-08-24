@@ -1,5 +1,6 @@
 package dbrighthd.elytratrails.config;
 
+import dbrighthd.elytratrails.twirling.EaseTypes;
 import net.minecraft.core.particles.ParticleOptions;
 import net.minecraft.core.particles.ParticleTypes;
 
@@ -32,12 +33,23 @@ public class ModConfig {
     public double windSpeed = 1.0;
     public ClearTrails clearTrailsOption = ClearTrails.NO;
 
+
     public enum ClearTrails {
         NO,
         CLEAR,
     }
 
     public boolean alwaysGlowWhenShaderTranslucent = true;
+
+    //twirlstuff
+    public String twirlOneEaseType = "Back";
+    public String twirlTwoEaseType = "Sine";
+
+    public double twirlOneTime = 0.67;
+    public double twirlTwoTime = 0.67;
+
+    public EaseTypes.AxisType twirlOneAxis = EaseTypes.AxisType.YP;
+    public EaseTypes.AxisType twirlTwoAxis = EaseTypes.AxisType.YP;
 
     //server stuff
     public boolean syncWithServer = true;

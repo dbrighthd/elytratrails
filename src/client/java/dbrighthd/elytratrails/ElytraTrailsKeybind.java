@@ -17,12 +17,13 @@ import static dbrighthd.elytratrails.compat.ModStatuses.CLOTH_LOADED;
 public final class ElytraTrailsKeybind {
     public static final KeyMapping.Category CATEGORY = KeyMapping.Category.register(Identifier.fromNamespaceAndPath("elytratrails", "skibidi"));
 
-    public static KeyMapping DO_A_LIL_TWIRL_RANDOM;
-    public static KeyMapping DO_A_LIL_TWIRL_L;
-    public static KeyMapping DO_A_LIL_TWIRL_R;
+    public static KeyMapping DO_A_LIL_ALTERNATING_TWIRL_ONE;
+    public static KeyMapping DO_A_LIL_ALTERNATING_TWIRL_TWO;
+    public static KeyMapping DO_A_LIL_TWIRL_L_ONE;
+    public static KeyMapping DO_A_LIL_TWIRL_R_ONE;
 
-    public static KeyMapping DO_A_LIL_CONTINUOUS_TWIRL_L;
-    public static KeyMapping DO_A_LIL_CONTINUOUS_TWIRL_R;
+    public static KeyMapping DO_A_LIL_TWIRL_L_TWO;
+    public static KeyMapping DO_A_LIL_TWIRL_R_TWO;
     public static KeyMapping OPEN_SETTINGS;
     public static KeyMapping TOGGLE_TRAILS;
 
@@ -30,8 +31,14 @@ public final class ElytraTrailsKeybind {
     public static int RIGHT = 1;
 
     public static void init() {
-        DO_A_LIL_TWIRL_RANDOM = KeyMappingHelper.registerKeyMapping(new KeyMapping(
+        DO_A_LIL_ALTERNATING_TWIRL_ONE = KeyMappingHelper.registerKeyMapping(new KeyMapping(
                 "key.elytratrails.twirl_random",
+                InputConstants.Type.KEYSYM,
+                InputConstants.UNKNOWN.getValue(),
+                CATEGORY
+        ));
+        DO_A_LIL_ALTERNATING_TWIRL_TWO = KeyMappingHelper.registerKeyMapping(new KeyMapping(
+                "key.elytratrails.twirl_random_two",
                 InputConstants.Type.KEYSYM,
                 InputConstants.UNKNOWN.getValue(),
                 CATEGORY
@@ -43,28 +50,28 @@ public final class ElytraTrailsKeybind {
                 CATEGORY
         ));
 
-        DO_A_LIL_TWIRL_L = KeyMappingHelper.registerKeyMapping(new KeyMapping(
+        DO_A_LIL_TWIRL_L_ONE = KeyMappingHelper.registerKeyMapping(new KeyMapping(
                 "key.elytratrails.twirl_l",
                 InputConstants.Type.KEYSYM,
                 InputConstants.UNKNOWN.getValue(),
                 CATEGORY
         ));
 
-        DO_A_LIL_TWIRL_R = KeyMappingHelper.registerKeyMapping(new KeyMapping(
+        DO_A_LIL_TWIRL_R_ONE = KeyMappingHelper.registerKeyMapping(new KeyMapping(
                 "key.elytratrails.twirl_r",
                 InputConstants.Type.KEYSYM,
                 InputConstants.UNKNOWN.getValue(),
                 CATEGORY
         ));
 
-        DO_A_LIL_CONTINUOUS_TWIRL_L = KeyMappingHelper.registerKeyMapping(new KeyMapping(
+        DO_A_LIL_TWIRL_L_TWO = KeyMappingHelper.registerKeyMapping(new KeyMapping(
                 "key.elytratrails.continuous_twirl_l",
                 InputConstants.Type.KEYSYM,
                 InputConstants.UNKNOWN.getValue(),
                 CATEGORY
         ));
 
-        DO_A_LIL_CONTINUOUS_TWIRL_R = KeyMappingHelper.registerKeyMapping(new KeyMapping(
+        DO_A_LIL_TWIRL_R_TWO = KeyMappingHelper.registerKeyMapping(new KeyMapping(
                 "key.elytratrails.continuous_twirl_r",
                 InputConstants.Type.KEYSYM,
                 InputConstants.UNKNOWN.getValue(),
@@ -82,22 +89,45 @@ public final class ElytraTrailsKeybind {
             if (client.player == null || client.isPaused()) return;
 
             ModConfig modConfig = getConfig();
-
-            while (DO_A_LIL_TWIRL_L.consumeClick())
+            boolean can_twirl = client.player.isFallFlying() && modConfig.enableTwirls;
+            if (DO_A_LIL_ALTERNATING_TWIRL_ONE.isDown())
             {
-                TwirlManager.clientTwirlInput(LEFT, modConfig);
+                if(can_twirl)
+                {
+                    TwirlManager.alternatingTwirlInput(modConfig, 1);
+                }
             }
-            while (DO_A_LIL_TWIRL_R.consumeClick())
+            if (DO_A_LIL_ALTERNATING_TWIRL_TWO.isDown())
             {
-                TwirlManager.clientTwirlInput(RIGHT,modConfig);
+                if(can_twirl)
+                {
+                    TwirlManager.alternatingTwirlInput(modConfig, 2);
+                }
             }
-            if (DO_A_LIL_CONTINUOUS_TWIRL_L.isDown())
+            if (DO_A_LIL_TWIRL_L_ONE.isDown())
             {
-                TwirlManager.holdTwirlSend(LEFT, modConfig);
+                if(can_twirl)
+                {
+                    TwirlManager.holdTwirlSend(LEFT, modConfig, 1);
+                }
             }
-            if (DO_A_LIL_CONTINUOUS_TWIRL_R.isDown())
+            if (DO_A_LIL_TWIRL_R_ONE.isDown())
             {
-                TwirlManager.holdTwirlSend(RIGHT,modConfig);
+                if(can_twirl) {
+                    TwirlManager.holdTwirlSend(RIGHT, modConfig, 1);
+                }
+            }
+            if (DO_A_LIL_TWIRL_L_TWO.isDown())
+            {
+                if(can_twirl) {
+                    TwirlManager.holdTwirlSend(LEFT, modConfig, 2);
+                }
+            }
+            if (DO_A_LIL_TWIRL_R_TWO.isDown())
+            {
+                if(can_twirl) {
+                    TwirlManager.holdTwirlSend(RIGHT, modConfig, 2);
+                }
             }
             while (OPEN_SETTINGS.consumeClick()) {
                 if(CLOTH_LOADED)
@@ -115,8 +145,5 @@ public final class ElytraTrailsKeybind {
                 setConfig(modConfig);
             }
         });
-    }
-
-    private ElytraTrailsKeybind() {
     }
 }

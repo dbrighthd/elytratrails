@@ -50,7 +50,7 @@ public class TwirlData {
         {
             double flipTime = currTwirl.easeType().flipTime();
             Twirl nextTwirl = twirlQueue.get(1);
-            if(currTwirl.direction() != nextTwirl.direction())
+            if(currTwirl.direction() != nextTwirl.direction() && currTwirl.axis().equals(nextTwirl.axis()) && currTwirl.easeType() == nextTwirl.easeType())
             {
                 if(twirlProgress > flipTime && twirlProgress < flipTime + 0.05)
                 {
@@ -84,7 +84,7 @@ public class TwirlData {
         {
             easeType = EaseTypes.RANDOM;
         }
-        addTwirl(twirlQueue.size()-1,new Twirl(easeType,twirlQueue.getFirst().direction(),twirlTime/2, EaseTypes.EaseMode.BOTH, 0.5));
+        addTwirl(twirlQueue.size()-1,new Twirl(easeType,twirlQueue.getFirst().direction(),twirlTime/2, EaseTypes.EaseMode.BOTH, twirlQueue.getFirst().axis(), 0.5));
     }
 
     public double doEase()

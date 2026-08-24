@@ -23,6 +23,7 @@ public record NetworkTwirlC2SPayload(NetworkTwirl networkTwirl) implements Custo
                     Codec.INT.fieldOf("direction").forGetter(NetworkTwirl::direction),
                     Codec.LONG.fieldOf("twirlTime").forGetter(NetworkTwirl::twirlTime),
                     Codec.INT.fieldOf("easeMode").forGetter(NetworkTwirl::easeMode),
+                    Codec.INT.fieldOf("axis").forGetter(NetworkTwirl::axis),
                     Codec.DOUBLE.fieldOf("offset").forGetter(NetworkTwirl::offset)
             ).apply(instance, NetworkTwirl::new));
     public static final StreamCodec<RegistryFriendlyByteBuf, NetworkTwirlC2SPayload> CODEC =

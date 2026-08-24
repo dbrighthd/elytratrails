@@ -45,7 +45,6 @@ public class ElytraTrailsClient implements ClientModInitializer {
         TrailSystem.init();
         ParticleHandler.init();
         refreshLocalConfigs();
-
         RegisterPacketsClient.initClient();
         CommandHandler.init();
         EaseTypes.registerTypes();

@@ -12,7 +12,6 @@ import net.minecraft.world.entity.EntityType;
 import org.jetbrains.annotations.Nullable;
 import traben.entity_model_features.EMFAnimationApi;
 import traben.entity_model_features.EMFManager;
-import traben.entity_model_features.models.IEMFModel;
 import traben.entity_model_features.models.parts.EMFModelPartRoot;
 
 import java.util.*;
@@ -35,10 +34,6 @@ public final class EmfTrailSpawnerRegistry {
     private static final Comparator<Locator> LOCATOR_ORDER = Comparator.comparing((Locator locator) -> System.identityHashCode(locator.poseModel())).thenComparing(Locator::childPath);
 
     public record Locator(Model<?> poseModel, @Nullable String typeStringForRoot, String childPath) {
-        public static Locator forModelRoot(Model<?> model, String childPath) {
-            return new Locator(model, null, childPath);
-        }
-
         public static Locator forRegisteredRoot(Model<?> poseModel, String typeString, String childPath) {
             return new Locator(poseModel, typeString, childPath);
         }
@@ -169,12 +164,6 @@ public final class EmfTrailSpawnerRegistry {
             TYPE_DEFS.put(typeString, empty);
             return empty;
         }
-
-        TypeDef fromSubmits = tryBuildTypeDefFromSubmits(typeString, submits);
-        if (fromSubmits != null) {
-            TYPE_DEFS.put(typeString, fromSubmits);
-            return fromSubmits;
-        }
         if (shouldHaveSpawners) {
             TypeDef fromRegistry = tryBuildTypeDefFromRegistry(typeString, submits);
             if (fromRegistry != null) {
@@ -215,44 +204,6 @@ public final class EmfTrailSpawnerRegistry {
             }
         }
         return false;
-    }
-
-    @SuppressWarnings("unused")
-    private static @Nullable TypeDef tryBuildTypeDefFromSubmits(
-            String typeString,
-            List<ModelFeatureRenderer.Submit<?>> submits
-    ) {
-        ArrayList<Locator> locators = new ArrayList<>();
-
-        for (ModelFeatureRenderer.Submit<?> submit : submits) {
-            if (submit == null) continue;
-
-            Model<?> model = submit.model();
-            if (isElytraModel(model)) continue;
-            if (!(model instanceof IEMFModel emfModel)) continue;
-
-            ModelPart root;
-            try {
-                root = emfModel.emf$getEMFRootModel();
-            } catch (Throwable ignored) {
-                continue;
-            }
-            //noinspection ConstantValue
-            if (root == null) continue;
-
-            List<String> spawnerPaths = findSpawnerPaths(root);
-            if (spawnerPaths.isEmpty()) continue;
-
-            for (String path : spawnerPaths) {
-                locators.add(Locator.forModelRoot(model, path));
-            }
-        }
-
-        //noinspection ConstantValue
-        if (locators.isEmpty()) return null;
-
-        locators.sort(LOCATOR_ORDER);
-        return new TypeDef(Collections.unmodifiableList(locators));
     }
 
     private static @Nullable TypeDef tryBuildTypeDefFromRegistry(
