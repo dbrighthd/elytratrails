@@ -10,44 +10,49 @@ import net.minecraft.util.Mth;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ *  Each player has a TwirlData corresponding to them when they twirl. this holds information about the twirls they are doing, have done in the recent past, and will do soon.
+ **/
 public class TwirlData {
+
+    boolean stagnant = false;
     boolean isClient;
     boolean hasSent;
     double twirlProgress;
     double twirlOffset;
     double prevTickBakedTwirlProgress;
     double bakedTwirlProgress;
-    double prevPrevTwirlProgress;
+    double prePacketTwirlProgress;
     double prevTwirlProgress;
-    int emptyTicks;
+    int noTwirlGracePeriodTicks;
     double easedTwirlProgress;
     long twirlStartTimeMillis;
     double packetSendProgressTime = 0.75;
     int currDirection;
     List<Twirl> twirlQueue = new ArrayList<>();
 
+    /**
+     * If this is the first time a player is doing a twirl, then the twirlStartTimeMillis needs to be set accordingly. TwirlData only gets created when a twirl is done.
+     */
     public TwirlData()
     {
         twirlStartTimeMillis = ElytraTimeUtil.currentMillis();
     }
 
+    /**
+     * Run on every entity that has recently twirled
+     * @param currentMillis current time in millis
+     */
     public void updateTwirl(long currentMillis)
     {
         if(twirlQueue.isEmpty())
         {
-            if(emptyTicks < 1)
-            {
-                easedTwirlProgress = 0;
-            }
-            else
-            {
-                emptyTicks--;
-            }
-            twirlStartTimeMillis = ElytraTimeUtil.currentMillis();
+            handleEmptyQueue(currentMillis);
+            stagnant = noTwirlGracePeriodTicks <= 0;
             return;
         }
         prevTickBakedTwirlProgress = bakedTwirlProgress;
-        prevPrevTwirlProgress = prevTwirlProgress;
+        prePacketTwirlProgress = prevTwirlProgress;
         prevTwirlProgress = twirlProgress;
         Twirl currTwirl = twirlQueue.getFirst();
         double packetGraceTime = (twirlQueue.size() > 1 && currTwirl.easeMode() == EaseTypes.EaseMode.OUT && currTwirl.easeType().flipTime() > 0 && currTwirl.easeType().flipTime() < 1) ? currTwirl.easeType().flipTime() : packetSendProgressTime;
@@ -56,6 +61,15 @@ public class TwirlData {
         {
             double millisToEnd = (1.0 - twirlOffset) * currTwirl.twirlTime();
             double overshootMillis = (currentMillis - twirlStartTimeMillis) - millisToEnd;
+            if(twirlQueue.size() == 1)
+            {
+                twirlProgress = 1.0;
+                currDirection = currTwirl.direction();
+                easedTwirlProgress = doEase();
+                bakedTwirlProgress = getFallbackBakedTwirlProgress(currTwirl);
+                nextTwirl(currentMillis, 0, 0);
+                return;
+            }
             nextTwirl(currentMillis,0, overshootMillis);
         }
         else if(isClient && (twirlProgress > packetGraceTime) && !hasSent && twirlQueue.size() > 1)
@@ -67,25 +81,28 @@ public class TwirlData {
         {
             double flipTime = currTwirl.easeType().flipTime();
             Twirl nextTwirl = twirlQueue.get(1);
-            if(currTwirl.direction() != nextTwirl.direction() && currTwirl.axis().equals(nextTwirl.axis()) && currTwirl.easeType() == nextTwirl.easeType())
+            if(currTwirl.direction() != nextTwirl.direction() && currTwirl.axis().equals(nextTwirl.axis()) && currTwirl.easeType() == nextTwirl.easeType() && prePacketTwirlProgress <= flipTime && twirlProgress >= flipTime)
             {
-                if(prevPrevTwirlProgress <= flipTime && twirlProgress >= flipTime)
-                {
-                    nextTwirl(currentMillis, nextTwirl.easeType().flipStart(),0);
-                }
+                nextTwirl(currentMillis, nextTwirl.easeType().flipStart(),0);
             }
         }
         currDirection = twirlQueue.isEmpty()? 1 : twirlQueue.getFirst().direction();
         easedTwirlProgress = doEase();
         bakedTwirlProgress = getBakedTwirlProgress();
     }
+
+    /**
+     * Go to the next twirl
+     * @param currentMillis current time in millis
+     * @param offset progress offset; needed for the in between twirls that start at 180 degrees!
+     * @param overshootMillis we don't want to linger at 0 for a tick when the time indicates we should be past it!!
+     */
     public void nextTwirl(long currentMillis, double offset, double overshootMillis)
     {
         twirlQueue.removeFirst();
         twirlProgress = offset;
         twirlOffset = offset;
         hasSent = false;
-        twirlStartTimeMillis = currentMillis;
         if(!twirlQueue.isEmpty())
         {
             twirlStartTimeMillis = currentMillis - (long) overshootMillis;
@@ -94,9 +111,15 @@ public class TwirlData {
         }
         else
         {
-            emptyTicks = 5;
+            twirlStartTimeMillis = currentMillis;
+            noTwirlGracePeriodTicks = 10;
         }
     }
+
+    /**
+     * Determined whether you can put in a standard in between 360 degree twirl, and does so.
+     * @param twirlTime how long is the twirl?
+     */
     public void addInBetweenLinearTwirl(long twirlTime)
     {
         if(twirlQueue.size() != 2 || hasSent || twirlProgress < 0.4)
@@ -111,6 +134,34 @@ public class TwirlData {
         addTwirl(twirlQueue.size()-1,new Twirl(easeType,twirlQueue.getFirst().direction(),twirlTime/2, EaseTypes.EaseMode.BOTH, twirlQueue.getFirst().axis(), 0.5));
     }
 
+    /**
+     * Handles empty queue. This could mean that we are waiting for a packet from the other client, or it could mean
+     * the client just hasn't done a twirl in a while. we don't know! If we are waiting for a twirl from the client, linger
+     * at the current angle for a couple ticks. This might look weird, but with the way that twirl packets are overlapped with
+     * their start time, the current system already accounts for lag, so this shouldn't happen often in normal play.
+     * BUT in the event that it DOES happen, we don't want the player to snap to 0 angle if they are in the middle of a continuous
+     * or otherwise offset twirl! this still looks odd, but looks significantly less odd, especially with the trails showing the exact
+     * trajectory. Also, this fixes oddities that exist in flashback for some reason.
+     * @param currentMillis current time in millis
+     */
+    public void handleEmptyQueue(long currentMillis)
+    {
+        twirlStartTimeMillis = currentMillis;
+        if(noTwirlGracePeriodTicks > 0)
+        {
+            noTwirlGracePeriodTicks--;
+            prevTickBakedTwirlProgress = bakedTwirlProgress;
+            return;
+        }
+        easedTwirlProgress = 0;
+        bakedTwirlProgress = 0;
+        prevTickBakedTwirlProgress = 0;
+    }
+
+    /**
+     * Does the easing and returns accordingly
+     * @return eased twirl progress this tick
+     */
     public double doEase()
     {
         if(twirlQueue.isEmpty())
@@ -127,29 +178,58 @@ public class TwirlData {
         }
     }
 
-    public double getEasedTwirlProgress(float partialTick)
+    /**
+     * Does the interpolation between angles and sends back what angle should be rendered this frame for the given player
+     * @param partialTick progress in tick
+     * @return angle to render at (radians)
+     */
+    public double getEasedTwirlAngleRadians(float partialTick)
     {
-        if(twirlQueue.isEmpty())
-        {
-            bakedTwirlProgress = 0;
-            prevTickBakedTwirlProgress = 0;
-        }
-        return Mth.rotLerpRad(partialTick,(float)(prevTickBakedTwirlProgress * Math.TAU),(float)(bakedTwirlProgress * Math.TAU));
+        return Mth.rotLerpRad(partialTick, (float)(prevTickBakedTwirlProgress * Math.TAU), (float)(bakedTwirlProgress * Math.TAU));
     }
+
+    /**
+     * Get the twirl progress, or 0. "baked" to mean that the match for direction and empty is already inputted
+     * @return directional twirl progress
+     */
     public double getBakedTwirlProgress()
     {
         return (easedTwirlProgress + (twirlQueue.isEmpty() ? 0 : twirlQueue.getFirst().offset())) * currDirection;
     }
+
+    /**
+     * get the fallback progress from the last known twirl (currTwirl)
+     * @param currTwirl last known twirl
+     * @return directional twirl progress
+     */
+    public double getFallbackBakedTwirlProgress(Twirl currTwirl)
+    {
+        return (easedTwirlProgress + currTwirl.offset()) * currDirection;
+    }
+
+    /**
+     * add a twirl at a certain index
+     * @param index of queue
+     * @param twirl twirl to add
+     */
     public void addTwirl(int index, Twirl twirl)
     {
         twirlQueue.add(index,twirl);
     }
 
+    /**
+     * add a twirl to end of twirl queue. all packets being recieved should do this!
+     * @param twirl tiwrl to add to end of queue
+     */
     public void addTwirlToEnd(Twirl twirl)
     {
         twirlQueue.addLast(twirl);
     }
 
+    /**
+     * send a twirl packet to server
+     * @param twirl twirl to send
+     */
     public static void sendTwirlPacket(Twirl twirl) {
         var mc = Minecraft.getInstance();
         if (mc.level == null || mc.player == null || mc.getConnection() == null) return;

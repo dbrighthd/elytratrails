@@ -8,6 +8,10 @@ import java.util.List;
 import java.util.Map;
 import java.util.Random;
 
+/**
+ * EaseTypes can theoretically be added by mods that use the register() function.
+ * Inspired by how I did effects for the BugPunch musical
+ */
 public class EaseTypes {
     private static final Map<String, EaseType> EASE_TYPES = new HashMap<>();
 

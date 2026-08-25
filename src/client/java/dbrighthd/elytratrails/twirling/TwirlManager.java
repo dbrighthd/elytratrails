@@ -6,7 +6,6 @@ import dbrighthd.elytratrails.network.NetworkTwirl;
 import dbrighthd.elytratrails.twirling.types.EaseType;
 import dbrighthd.elytratrails.util.ElytraTimeUtil;
 import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents;
-import net.fabricmc.fabric.api.client.rendering.v1.level.LevelRenderEvents;
 import net.minecraft.client.Minecraft;
 import net.minecraft.world.entity.player.Player;
 import org.joml.Vector3f;
@@ -30,7 +29,7 @@ public class TwirlManager {
             return 0;
         }
         TwirlData twirlData = twirlMap.get(entityId);
-        return (float)(twirlData.getEasedTwirlProgress(partialTick));
+        return (float)(twirlData.getEasedTwirlAngleRadians(partialTick));
     }
     public static Axis getAxis(int entityId)
     {
@@ -68,16 +67,13 @@ public class TwirlManager {
         {
             twirlData.updateTwirl(currentMillis);
         }
+        twirlMap.entrySet().removeIf(s -> s.getValue().stagnant);
     }
 
     public static void receiveTwirlPacket(int entityId, NetworkTwirl networkTwirl)
     {
         Player player = Minecraft.getInstance().player;
-        if(player == null)
-        {
-            return;
-        }
-        if(entityId == player.getId())
+        if(player == null || entityId == player.getId())
         {
             return;
         }
