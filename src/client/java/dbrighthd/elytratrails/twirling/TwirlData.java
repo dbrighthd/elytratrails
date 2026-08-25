@@ -5,6 +5,7 @@ import dbrighthd.elytratrails.twirling.types.EaseType;
 import dbrighthd.elytratrails.util.ElytraTimeUtil;
 import net.fabricmc.fabric.api.client.networking.v1.ClientPlayNetworking;
 import net.minecraft.client.Minecraft;
+import net.minecraft.util.Mth;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -14,7 +15,11 @@ public class TwirlData {
     boolean hasSent;
     double twirlProgress;
     double twirlOffset;
-    EaseType lastNonLinearEase;
+    double prevTickBakedTwirlProgress;
+    double bakedTwirlProgress;
+    double prevPrevTwirlProgress;
+    double prevTwirlProgress;
+    int emptyTicks;
     double easedTwirlProgress;
     long twirlStartTimeMillis;
     double packetSendProgressTime = 0.75;
@@ -30,16 +35,28 @@ public class TwirlData {
     {
         if(twirlQueue.isEmpty())
         {
-            easedTwirlProgress = 0;
+            if(emptyTicks < 1)
+            {
+                easedTwirlProgress = 0;
+            }
+            else
+            {
+                emptyTicks--;
+            }
             twirlStartTimeMillis = ElytraTimeUtil.currentMillis();
             return;
         }
+        prevTickBakedTwirlProgress = bakedTwirlProgress;
+        prevPrevTwirlProgress = prevTwirlProgress;
+        prevTwirlProgress = twirlProgress;
         Twirl currTwirl = twirlQueue.getFirst();
         double packetGraceTime = (twirlQueue.size() > 1 && currTwirl.easeMode() == EaseTypes.EaseMode.OUT && currTwirl.easeType().flipTime() > 0 && currTwirl.easeType().flipTime() < 1) ? currTwirl.easeType().flipTime() : packetSendProgressTime;
         twirlProgress = twirlOffset + (double) (currentMillis - twirlStartTimeMillis) /currTwirl.twirlTime();
         if(twirlProgress > 1)
         {
-            nextTwirl(currentMillis,0);
+            double millisToEnd = (1.0 - twirlOffset) * currTwirl.twirlTime();
+            double overshootMillis = (currentMillis - twirlStartTimeMillis) - millisToEnd;
+            nextTwirl(currentMillis,0, overshootMillis);
         }
         else if(isClient && (twirlProgress > packetGraceTime) && !hasSent && twirlQueue.size() > 1)
         {
@@ -52,30 +69,37 @@ public class TwirlData {
             Twirl nextTwirl = twirlQueue.get(1);
             if(currTwirl.direction() != nextTwirl.direction() && currTwirl.axis().equals(nextTwirl.axis()) && currTwirl.easeType() == nextTwirl.easeType())
             {
-                if(twirlProgress > flipTime && twirlProgress < flipTime + 0.05)
+                if(prevPrevTwirlProgress <= flipTime && twirlProgress >= flipTime)
                 {
-                    nextTwirl(currentMillis, nextTwirl.easeType().flipStart());
+                    nextTwirl(currentMillis, nextTwirl.easeType().flipStart(),0);
                 }
             }
         }
         currDirection = twirlQueue.isEmpty()? 1 : twirlQueue.getFirst().direction();
         easedTwirlProgress = doEase();
+        bakedTwirlProgress = getBakedTwirlProgress();
     }
-    public void nextTwirl(long currentMillis, double offset)
+    public void nextTwirl(long currentMillis, double offset, double overshootMillis)
     {
-        if(twirlQueue.getFirst().easeType() != EaseTypes.LINEAR)
-        {
-            lastNonLinearEase = twirlQueue.getLast().easeType();
-        }
         twirlQueue.removeFirst();
         twirlProgress = offset;
         twirlOffset = offset;
         hasSent = false;
         twirlStartTimeMillis = currentMillis;
+        if(!twirlQueue.isEmpty())
+        {
+            twirlStartTimeMillis = currentMillis - (long) overshootMillis;
+            Twirl nextTwirl = twirlQueue.getFirst();
+            twirlProgress = twirlOffset + (double)(currentMillis - twirlStartTimeMillis) / nextTwirl.twirlTime();
+        }
+        else
+        {
+            emptyTicks = 5;
+        }
     }
     public void addInBetweenLinearTwirl(long twirlTime)
     {
-        if(twirlQueue.size() != 2 || hasSent || twirlProgress < 0.6)
+        if(twirlQueue.size() != 2 || hasSent || twirlProgress < 0.4)
         {
             return;
         }
@@ -103,11 +127,19 @@ public class TwirlData {
         }
     }
 
-    public double getEasedTwirlProgress()
+    public double getEasedTwirlProgress(float partialTick)
+    {
+        if(twirlQueue.isEmpty())
+        {
+            bakedTwirlProgress = 0;
+            prevTickBakedTwirlProgress = 0;
+        }
+        return Mth.rotLerpRad(partialTick,(float)(prevTickBakedTwirlProgress * Math.TAU),(float)(bakedTwirlProgress * Math.TAU));
+    }
+    public double getBakedTwirlProgress()
     {
         return (easedTwirlProgress + (twirlQueue.isEmpty() ? 0 : twirlQueue.getFirst().offset())) * currDirection;
     }
-
     public void addTwirl(int index, Twirl twirl)
     {
         twirlQueue.add(index,twirl);
@@ -125,4 +157,5 @@ public class TwirlData {
         if (!ClientPlayNetworking.canSend(payload.type())) return;
         ClientPlayNetworking.send(payload);
     }
+
 }

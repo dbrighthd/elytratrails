@@ -51,7 +51,7 @@ public class CameraTwirlMixin {
         if (!isFirstPerson && !fishysStupidThirdPersonCameraRoll) {
             return;
         }
-        float extra = TwirlManager.getExtraRollRadians(camEntity.getId());
+        float extra = TwirlManager.getExtraRollRadians(camEntity.getId(), mc.getDeltaTracker().getGameTimeDeltaPartialTick(false));
 
         if (frontView) {
             extra *= -1;

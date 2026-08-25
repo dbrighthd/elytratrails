@@ -5,6 +5,7 @@ import dbrighthd.elytratrails.config.ModConfig;
 import dbrighthd.elytratrails.network.NetworkTwirl;
 import dbrighthd.elytratrails.twirling.types.EaseType;
 import dbrighthd.elytratrails.util.ElytraTimeUtil;
+import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents;
 import net.fabricmc.fabric.api.client.rendering.v1.level.LevelRenderEvents;
 import net.minecraft.client.Minecraft;
 import net.minecraft.world.entity.player.Player;
@@ -20,16 +21,16 @@ public class TwirlManager {
 
     public static void Init()
     {
-        LevelRenderEvents.END_MAIN.register(_ -> updateAllTwirls());
+        ClientTickEvents.END_CLIENT_TICK.register(_ -> updateAllTwirls());
     }
-    public static float getExtraRollRadians(int entityId)
+    public static float getExtraRollRadians(int entityId, float partialTick)
     {
         if(!twirlMap.containsKey(entityId))
         {
             return 0;
         }
         TwirlData twirlData = twirlMap.get(entityId);
-        return (float)(twirlData.getEasedTwirlProgress() * Math.TAU);
+        return (float)(twirlData.getEasedTwirlProgress(partialTick));
     }
     public static Axis getAxis(int entityId)
     {
@@ -49,8 +50,8 @@ public class TwirlManager {
     {
         switch (EaseTypes.AxisType.fromAxis(getAxis(entityId)))
         {
-            case EaseTypes.AxisType.YP -> {return new Vector3f(0,0,1);}
             case EaseTypes.AxisType.XP -> {return new Vector3f(-1,0,0);}
+            case EaseTypes.AxisType.YP -> {return new Vector3f(0,0,1);}
             case EaseTypes.AxisType.ZP -> {return new Vector3f(0,-1,0);}
         }
         return new Vector3f(1,0,0);
