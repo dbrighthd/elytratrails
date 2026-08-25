@@ -117,6 +117,29 @@ public class TwirlManager {
     }
 
 
+    @SuppressWarnings("unused")
+    public static void sendSingleTwirl(int direction, ModConfig modConfig, int twirlIndex)
+    {
+        Player player = Minecraft.getInstance().player;
+        if(player == null)
+        {
+            return;
+        }
+        int clientEid = player.getId();
+
+        if(!twirlMap.containsKey(clientEid))
+        {
+            twirlMap.put(clientEid,new TwirlData());
+            twirlMap.get(clientEid).isClient=true;
+        }
+        TwirlData clientData = twirlMap.get(clientEid);
+        if(clientData.twirlQueue.size() > 1)
+        {
+            return;
+        }
+        sendEaseInOutTwirl(direction, modConfig, clientData, twirlIndex);
+    }
+
     public static void holdTwirlSend(int direction, ModConfig modConfig, int twirlIndex)
     {
         Player player = Minecraft.getInstance().player;

@@ -122,7 +122,7 @@ public class TwirlData {
      */
     public void addInBetweenLinearTwirl(long twirlTime)
     {
-        if(twirlQueue.size() != 2 || hasSent || twirlProgress < 0.4)
+        if(twirlQueue.size() != 2 || hasSent || twirlProgress < 0.5)
         {
             return;
         }

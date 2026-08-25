@@ -107,31 +107,11 @@ public final class ElytraTrailsKeybind {
                     TwirlManager.alternatingTwirlInput(modConfig, 2);
                 }
             }
-            if (DO_A_LIL_TWIRL_L_ONE.isDown())
-            {
-                if(can_twirl)
-                {
-                    TwirlManager.holdTwirlSend(LEFT, modConfig, 1);
-                }
-            }
-            if (DO_A_LIL_TWIRL_R_ONE.isDown())
-            {
-                if(can_twirl) {
-                    TwirlManager.holdTwirlSend(RIGHT, modConfig, 1);
-                }
-            }
-            if (DO_A_LIL_TWIRL_L_TWO.isDown())
-            {
-                if(can_twirl) {
-                    TwirlManager.holdTwirlSend(LEFT, modConfig, 2);
-                }
-            }
-            if (DO_A_LIL_TWIRL_R_TWO.isDown())
-            {
-                if(can_twirl) {
-                    TwirlManager.holdTwirlSend(RIGHT, modConfig, 2);
-                }
-            }
+            handleTwirlKey(DO_A_LIL_TWIRL_L_ONE,LEFT,modConfig,1,can_twirl);
+            handleTwirlKey(DO_A_LIL_TWIRL_R_ONE,RIGHT,modConfig,1,can_twirl);
+            handleTwirlKey(DO_A_LIL_TWIRL_L_TWO,LEFT,modConfig,2,can_twirl);
+            handleTwirlKey(DO_A_LIL_TWIRL_R_TWO,RIGHT,modConfig,2,can_twirl);
+
             while (OPEN_SETTINGS.consumeClick()) {
                 if(CLOTH_LOADED)
                 {
@@ -151,5 +131,16 @@ public final class ElytraTrailsKeybind {
                 setConfig(modConfig);
             }
         });
+    }
+
+    private static void handleTwirlKey(KeyMapping key, int direction, ModConfig modConfig, int twirlIndex, boolean canTwirl)
+    {
+        if (!canTwirl) {
+            return;
+        }
+        if (key.isDown())
+        {
+            TwirlManager.holdTwirlSend(direction, modConfig, twirlIndex);
+        }
     }
 }
