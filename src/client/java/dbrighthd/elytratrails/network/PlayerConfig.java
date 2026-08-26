@@ -51,7 +51,7 @@ public record PlayerConfig(
         double maxWidthAOA,
         boolean edgeFade
 ) {
-    public static final int CONFIG_VERSION = 1;
+    public static final int CONFIG_VERSION = 2;
 
     public CompoundTag toTag() {
         CompoundTag tag = new CompoundTag();

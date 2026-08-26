@@ -50,6 +50,17 @@ public class RegisterPackets {
 
         ServerPlayNetworking.registerGlobalReceiver(PlayerConfigC2SPayload.ID, (payload, context) -> {
             Entity entity = context.player();
+            int version = payload.configTag().getIntOr("v",0);
+            if(version < 2) //version when twirls changed
+            {
+                if(!playersReceivedWarnings.contains(context.player().getUUID()))
+                {
+                    context.player().sendSystemMessage(
+                            net.minecraft.network.chat.Component.literal("§cYou are using an outdated version of Elytra Contrails. To sync twirling with this server, you must update to Elytra Contrails 1.6.0+")
+                    );
+                }
+                playersReceivedWarnings.add(context.player().getUUID());
+            }
             ServerPlayerConfigStore.SERVER_PLAYER_CONFIGS.put(entity.getId(),payload.configTag());
             PlayerConfigS2CPayload serverPayload = new PlayerConfigS2CPayload(entity.getId(), payload.configTag());
             for (ServerPlayer player : context.server().getPlayerList().getPlayers()) {

@@ -37,7 +37,6 @@ public class ModConfig {
         NO,
         CLEAR,
     }
-
     public boolean simplifyLighting = false;
     public boolean alwaysGlowWhenShaderTranslucent = true;
 
