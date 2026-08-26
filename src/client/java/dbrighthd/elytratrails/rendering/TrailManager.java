@@ -11,6 +11,8 @@ import it.unimi.dsi.fastutil.ints.Int2ObjectOpenHashMap;
 import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents;
 import net.fabricmc.fabric.api.client.rendering.v1.level.LevelRenderEvents;
 import net.minecraft.client.Minecraft;
+import net.minecraft.core.BlockPos;
+import net.minecraft.util.LightCoordsUtil;
 import net.minecraft.util.RandomSource;
 import net.minecraft.world.entity.Avatar;
 import net.minecraft.world.entity.Entity;
@@ -85,7 +87,6 @@ public class TrailManager {
         {
             for (Trail trail : trails) {
                 List<Trail.Point> points = trail.points();
-
                 points.replaceAll(point -> point.addPositionOffset(positionToWindVector(point)));
 
             }
@@ -250,7 +251,7 @@ public class TrailManager {
 
                     Trail trail = trailGroup.trails().get(i);
                     Emitter emitter = emitters.get(i);
-                    trail.points().add(new Trail.Point(emitter.position(), speedData,emitter.visible()));}
+                    trail.points().add(new Trail.Point(emitter.position(), speedData,emitter.visible(),  modConfig.simplifyLighting ? LightCoordsUtil.getLightCoords(ctx.level, BlockPos.containing(emitter.position())) : LightCoordsUtil.FULL_BRIGHT));}
             } else {
                 removeTrail(eid);
             }
@@ -318,7 +319,7 @@ public class TrailManager {
 
                     Trail trail = trailGroup.trails().get(i);
                     Emitter emitter = emitters.get(i);
-                    trail.points().add(new Trail.Point(emitter.position(), new PlayerSpeedData(speed, 0, false), emitter.visible()));
+                    trail.points().add(new Trail.Point(emitter.position(), new PlayerSpeedData(speed, 0, false), emitter.visible(), modConfig.simplifyLighting ? LightCoordsUtil.getLightCoords(ctx.level, BlockPos.containing(emitter.position())) : LightCoordsUtil.FULL_BRIGHT));
                 }
             } else {
                 removeTrail(eid);

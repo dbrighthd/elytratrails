@@ -456,6 +456,11 @@ public class ConfigScreenBuilder {
         debug.addEntry(entryBuilder.startTextDescription(
                         Component.translatable("text.elytratrails.category.debug.desc"))
                 .build());
+        debug.addEntry(entryBuilder.startBooleanToggle(Component.translatable("text.elytratrails.option.simplifyLighting"), config.simplifyLighting)
+                .setDefaultValue(defaultModConfig.simplifyLighting)
+                .setTooltip(Component.translatable("text.elytratrails.option.simplifyLighting.@Tooltip"))
+                .setSaveConsumer(newValue -> config.simplifyLighting = newValue)
+                .build());
         debug.addEntry(entryBuilder.startBooleanToggle(Component.translatable("text.elytratrails.option.resourcePackOverride"), config.resourcePackOverride)
                 .setDefaultValue(defaultModConfig.resourcePackOverride)
                 .setTooltip(Component.translatable("text.elytratrails.option.resourcePackOverride.@Tooltip"))

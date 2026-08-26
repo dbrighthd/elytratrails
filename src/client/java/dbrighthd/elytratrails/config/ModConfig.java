@@ -33,12 +33,12 @@ public class ModConfig {
     public double windSpeed = 1.0;
     public ClearTrails clearTrailsOption = ClearTrails.NO;
 
-
     public enum ClearTrails {
         NO,
         CLEAR,
     }
 
+    public boolean simplifyLighting = false;
     public boolean alwaysGlowWhenShaderTranslucent = true;
 
     //twirlstuff

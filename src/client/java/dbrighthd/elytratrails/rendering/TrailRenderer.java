@@ -159,7 +159,7 @@ public class TrailRenderer {
     }
 
     private Trail.Point copyTrailPointNewPos(Trail.Point point, Vec3 newPos, boolean visible) {
-        return new Trail.Point(newPos, point.epoch(), point.speedData(), visible, newPos);
+        return new Trail.Point(newPos, point.epoch(), point.speedData(), visible, newPos, point.light());
     }
 
 
@@ -306,7 +306,7 @@ public class TrailRenderer {
                 v2 += removeDist;
                 v1 /= (float) trailSettings.maxWidth();
                 v2 /= (float) trailSettings.maxWidth();
-                quadBetweenPoints(pose, consumer, startPos, endPos, sideA, sideB, halfWidthStart, halfWidthEnd, v1, v2, alphaStart, alphaEnd, trail.isLeftWing(), color, trailSettings.edgeFade());
+                quadBetweenPoints(pose, consumer, startPos, endPos, sideA, sideB, halfWidthStart, halfWidthEnd, v1, v2, alphaStart, alphaEnd, trail.isLeftWing(), color, trailSettings.edgeFade(), point0.light(), point1.light());
             }
             this.accumDist += segmentLength;
         }
@@ -424,7 +424,7 @@ public class TrailRenderer {
     private void quadBetweenPoints(
             PoseStack.Pose pose, VertexConsumer consumer,
             Vec3 a, Vec3 b, Vec3 sideA, Vec3 sideB,
-            float halfWidthStart, float halfWidthEnd, float v1, float v2, float alphaStart, float alphaEnd, boolean flipUv, int color, boolean edgeFade
+            float halfWidthStart, float halfWidthEnd, float v1, float v2, float alphaStart, float alphaEnd, boolean flipUv, int color, boolean edgeFade, int lightA, int lightB
     ) {
         Vector3f p1 = a.add(sideA.scale(halfWidthStart)).subtract(cameraPosition).toVector3f();
         Vector3f p2 = b.add(sideB.scale(halfWidthEnd)).subtract(cameraPosition).toVector3f();
@@ -436,8 +436,8 @@ public class TrailRenderer {
         Vector3f p6 = b.toVector3f().sub(cameraPosition.toVector3f());
 
         int overlay = OverlayTexture.NO_OVERLAY;
-        int lightStart = useLightMap ? computeLightTexture(a) : LightCoordsUtil.FULL_BRIGHT;
-        int lightEnd = useLightMap ? computeLightTexture(b) : LightCoordsUtil.FULL_BRIGHT;
+        int lightStart = modConfig.simplifyLighting? lightA : (useLightMap ? computeLightTexture(a) : LightCoordsUtil.FULL_BRIGHT);
+        int lightEnd = modConfig.simplifyLighting? lightB : (useLightMap ? computeLightTexture(b) : LightCoordsUtil.FULL_BRIGHT);
 
         int colorStart = multiplyAlpha(color, alphaStart);
         int colorEnd = multiplyAlpha(color, alphaEnd);
