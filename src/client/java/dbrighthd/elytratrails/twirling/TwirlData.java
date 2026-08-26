@@ -218,8 +218,8 @@ public class TwirlData {
     }
 
     /**
-     * add a twirl to end of twirl queue. all packets being recieved should do this!
-     * @param twirl tiwrl to add to end of queue
+     * add a twirl to end of twirl queue. all packets being received should do this!
+     * @param twirl twirl to add to end of queue
      */
     public void addTwirlToEnd(Twirl twirl)
     {
