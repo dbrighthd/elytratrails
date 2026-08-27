@@ -8,3 +8,5 @@ accessible class net/minecraft/client/renderer/feature/phase/SimpleFeatureRender
 accessible field net/minecraft/client/renderer/feature/phase/SimpleFeatureRenderPhase$FeatureSubmits unbatched Ljava/util/List;
 accessible field net/minecraft/client/renderer/feature/phase/SimpleFeatureRenderPhase$FeatureSubmits batches Ljava/util/Map;
 accessible field net/minecraft/client/renderer/feature/phase/TranslucentFeatureRenderPhase submits Ljava/util/List;
+accessible field net/minecraft/client/player/LocalPlayer crouching Z
+accessible method net/minecraft/world/entity/player/Player canPlayerFitWithinBlocksAndEntitiesWhen (Lnet/minecraft/world/entity/Pose;)Z

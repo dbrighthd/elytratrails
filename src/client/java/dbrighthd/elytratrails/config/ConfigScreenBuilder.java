@@ -461,6 +461,11 @@ public class ConfigScreenBuilder {
                 .setTooltip(Component.translatable("text.elytratrails.option.simplifyLighting.@Tooltip"))
                 .setSaveConsumer(newValue -> config.simplifyLighting = newValue)
                 .build());
+        debug.addEntry(entryBuilder.startBooleanToggle(Component.translatable("text.elytratrails.option.fixFallFlyingCrouchBug"), config.fixFallFlyingCrouchBug)
+                .setDefaultValue(defaultModConfig.fixFallFlyingCrouchBug)
+                .setTooltip(Component.translatable("text.elytratrails.option.fixFallFlyingCrouchBug.@Tooltip"))
+                .setSaveConsumer(newValue -> config.fixFallFlyingCrouchBug = newValue)
+                .build());
         debug.addEntry(entryBuilder.startBooleanToggle(Component.translatable("text.elytratrails.option.resourcePackOverride"), config.resourcePackOverride)
                 .setDefaultValue(defaultModConfig.resourcePackOverride)
                 .setTooltip(Component.translatable("text.elytratrails.option.resourcePackOverride.@Tooltip"))
