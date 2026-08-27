@@ -12,6 +12,7 @@ import org.joml.Vector3f;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Objects;
 
 import static dbrighthd.elytratrails.twirling.TwirlData.sendTwirlPacket;
 
@@ -40,7 +41,7 @@ public class TwirlManager {
         TwirlData twirlData = twirlMap.get(entityId);
         if(twirlData.twirlQueue.isEmpty())
         {
-            return Axis.YP;
+            return Objects.requireNonNullElse(twirlData.lastKnownAxis, Axis.YP);
         }
         return twirlData.twirlQueue.getFirst().axis();
     }
@@ -49,9 +50,9 @@ public class TwirlManager {
     {
         switch (EaseTypes.AxisType.fromAxis(getAxis(entityId)))
         {
-            case EaseTypes.AxisType.XP -> {return new Vector3f(-1,0,0);}
-            case EaseTypes.AxisType.YP -> {return new Vector3f(0,0,1);}
-            case EaseTypes.AxisType.ZP -> {return new Vector3f(0,-1,0);}
+            case EaseTypes.AxisType.X -> {return new Vector3f(-1,0,0);}
+            case EaseTypes.AxisType.Y -> {return new Vector3f(0,0,1);}
+            case EaseTypes.AxisType.Z -> {return new Vector3f(0,-1,0);}
         }
         return new Vector3f(1,0,0);
     }

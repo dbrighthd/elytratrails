@@ -57,16 +57,16 @@ public class EaseTypes {
     }
 
     public enum AxisType {
-        YP,
-        XP,
-        ZP,
+        Y,
+        X,
+        Z,
         RANDOM;
 
         public Axis axis() {
             return switch (this) {
-                case XP -> Axis.XP;
-                case YP -> Axis.YP;
-                case ZP -> Axis.ZP;
+                case X -> Axis.XP;
+                case Y -> Axis.YP;
+                case Z -> Axis.ZP;
                 case RANDOM -> randomAxis();
             };
         }
@@ -81,10 +81,10 @@ public class EaseTypes {
         }
 
         public static AxisType fromAxis(Axis axis) {
-            if (axis == Axis.XP) return XP;
-            if (axis == Axis.YP) return YP;
-            if (axis == Axis.ZP) return ZP;
-            return YP;
+            if (axis == Axis.XP) return X;
+            if (axis == Axis.YP) return Y;
+            if (axis == Axis.ZP) return Z;
+            return Y;
         }
     }
 }

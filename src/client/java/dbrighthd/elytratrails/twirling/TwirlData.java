@@ -1,5 +1,6 @@
 package dbrighthd.elytratrails.twirling;
 
+import com.mojang.math.Axis;
 import dbrighthd.elytratrails.network.NetworkTwirlC2SPayload;
 import dbrighthd.elytratrails.twirling.types.EaseType;
 import dbrighthd.elytratrails.util.ElytraTimeUtil;
@@ -29,6 +30,7 @@ public class TwirlData {
     long twirlStartTimeMillis;
     double packetSendProgressTime = 0.75;
     int currDirection;
+    Axis lastKnownAxis;
     List<Twirl> twirlQueue = new ArrayList<>();
 
     /**
@@ -51,10 +53,12 @@ public class TwirlData {
             stagnant = noTwirlGracePeriodTicks <= 0;
             return;
         }
+
         prevTickBakedTwirlProgress = bakedTwirlProgress;
         prePacketTwirlProgress = prevTwirlProgress;
         prevTwirlProgress = twirlProgress;
         Twirl currTwirl = twirlQueue.getFirst();
+        lastKnownAxis = currTwirl.axis();
         double packetGraceTime = (twirlQueue.size() > 1 && currTwirl.easeMode() == EaseTypes.EaseMode.OUT && currTwirl.easeType().flipTime() > 0 && currTwirl.easeType().flipTime() < 1) ? currTwirl.easeType().flipTime() : packetSendProgressTime;
         twirlProgress = twirlOffset + (double) (currentMillis - twirlStartTimeMillis) /currTwirl.twirlTime();
         if(twirlProgress > 1)
@@ -74,14 +78,14 @@ public class TwirlData {
         }
         else if(isClient && (twirlProgress > packetGraceTime) && !hasSent && twirlQueue.size() > 1)
         {
-            sendTwirlPacket(twirlQueue.get(1));
+            sendProtectedTwirlPacket(twirlQueue.get(1));
             hasSent = true;
         }
         else if(twirlQueue.size() > 1 && currTwirl.easeMode() == EaseTypes.EaseMode.OUT)
         {
             double flipTime = currTwirl.easeType().flipTime();
             Twirl nextTwirl = twirlQueue.get(1);
-            if(currTwirl.direction() != nextTwirl.direction() && currTwirl.axis().equals(nextTwirl.axis()) && currTwirl.easeType() == nextTwirl.easeType() && prePacketTwirlProgress <= flipTime && twirlProgress >= flipTime)
+            if(currTwirl.direction() != nextTwirl.direction() && currTwirl.axis().equals(nextTwirl.axis()) && currTwirl.easeType() == nextTwirl.easeType() && prePacketTwirlProgress <= flipTime && getApproxNextHalfTickTwirlProgress(currentMillis,currTwirl) >= flipTime)
             {
                 nextTwirl(currentMillis, nextTwirl.easeType().flipStart(),0);
             }
@@ -102,11 +106,14 @@ public class TwirlData {
         twirlQueue.removeFirst();
         twirlProgress = offset;
         twirlOffset = offset;
-        hasSent = false;
         if(!twirlQueue.isEmpty())
         {
             twirlStartTimeMillis = currentMillis - (long) overshootMillis;
             Twirl nextTwirl = twirlQueue.getFirst();
+            if(isClient && !hasSent)
+            {
+                sendProtectedTwirlPacket(nextTwirl);
+            }
             twirlProgress = twirlOffset + (double)(currentMillis - twirlStartTimeMillis) / nextTwirl.twirlTime();
         }
         else
@@ -114,6 +121,12 @@ public class TwirlData {
             twirlStartTimeMillis = currentMillis;
             noTwirlGracePeriodTicks = 10;
         }
+        hasSent = false;
+    }
+
+    public double getApproxNextHalfTickTwirlProgress(long currentMillis, Twirl currTwirl)
+    {
+        return twirlOffset + (double) ((currentMillis + 25) - twirlStartTimeMillis) /currTwirl.twirlTime();
     }
 
     /**
@@ -122,7 +135,7 @@ public class TwirlData {
      */
     public void addInBetweenLinearTwirl(long twirlTime)
     {
-        if(twirlQueue.size() != 2 || hasSent || twirlProgress < 0.5)
+        if(twirlQueue.size() != 2 || hasSent || twirlProgress < 0.6)
         {
             return;
         }
@@ -131,7 +144,9 @@ public class TwirlData {
         {
             easeType = EaseTypes.RANDOM;
         }
-        addTwirl(twirlQueue.size()-1,new Twirl(easeType,twirlQueue.getFirst().direction(),twirlTime/2, EaseTypes.EaseMode.BOTH, twirlQueue.getFirst().axis(), 0.5));
+        Twirl twirlToSend = new Twirl(easeType,twirlQueue.getFirst().direction(),twirlTime/2, EaseTypes.EaseMode.BOTH, twirlQueue.getFirst().axis(), 0.5);
+        sendTwirlPacket(twirlToSend);
+        addTwirl(twirlQueue.size()-1,twirlToSend);
     }
 
     /**
@@ -231,6 +246,22 @@ public class TwirlData {
      * @param twirl twirl to send
      */
     public static void sendTwirlPacket(Twirl twirl) {
+        var mc = Minecraft.getInstance();
+        if (mc.level == null || mc.player == null || mc.getConnection() == null) return;
+        NetworkTwirlC2SPayload payload = new NetworkTwirlC2SPayload(twirl.toNetworkTwirl());
+        if (!ClientPlayNetworking.canSend(payload.type())) return;
+        ClientPlayNetworking.send(payload);
+    }
+
+    /**
+     * send a twirl packet to server
+     * @param twirl twirl to send
+     */
+    public static void sendProtectedTwirlPacket(Twirl twirl) {
+        if(twirl.easeMode() == EaseTypes.EaseMode.BOTH)
+        {
+            return;
+        }
         var mc = Minecraft.getInstance();
         if (mc.level == null || mc.player == null || mc.getConnection() == null) return;
         NetworkTwirlC2SPayload payload = new NetworkTwirlC2SPayload(twirl.toNetworkTwirl());

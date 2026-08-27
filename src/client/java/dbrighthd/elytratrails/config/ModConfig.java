@@ -47,8 +47,8 @@ public class ModConfig {
     public double twirlOneTime = 0.67;
     public double twirlTwoTime = 0.67;
 
-    public EaseTypes.AxisType twirlOneAxis = EaseTypes.AxisType.YP;
-    public EaseTypes.AxisType twirlTwoAxis = EaseTypes.AxisType.YP;
+    public EaseTypes.AxisType twirlOneAxis = EaseTypes.AxisType.Y;
+    public EaseTypes.AxisType twirlTwoAxis = EaseTypes.AxisType.Y;
 
     //server stuff
     public boolean syncWithServer = true;
@@ -97,6 +97,14 @@ public class ModConfig {
             otherPlayerConfig = ClientConfig.getDefaultClientConfig();
         }
 
+        if(twirlTwoAxis == null)
+        {
+            twirlTwoAxis = EaseTypes.AxisType.Y;
+        }
+        if(twirlOneAxis == null)
+        {
+            twirlOneAxis = EaseTypes.AxisType.Y;
+        }
         //these next three dont matter and will be set to "" on config screen opening
         if (exportPresetName == null) {
             exportPresetName = "";
