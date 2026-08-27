@@ -19,13 +19,17 @@ public abstract class LocalPlayerMixin {
     @Redirect(method = "aiStep", at = @At(value = "FIELD", target = "Lnet/minecraft/client/player/LocalPlayer;crouching:Z", opcode = Opcodes.PUTFIELD))
     private void injected(LocalPlayer localPlayer, boolean crouching, @Local(name = "abilities") Abilities abilities)
     {
-        if(getConfig().fixFallFlyingCrouchBug)
+        if(getConfig().disableFallFlyingCrouching)
+        {
+            localPlayer.crouching = crouching && !localPlayer.isFallFlying();
+        }
+        else if(getConfig().fixFallFlyingCrouchBug)
         {
             localPlayer.crouching = !abilities.flying
                     && !localPlayer.isSwimming()
                     && !localPlayer.isPassenger()
-                    && (localPlayer.canPlayerFitWithinBlocksAndEntitiesWhen(Pose.CROUCHING))
-                    && (localPlayer.isShiftKeyDown() || !localPlayer.isSleeping() && (!(localPlayer.canPlayerFitWithinBlocksAndEntitiesWhen(Pose.STANDING))) && !localPlayer.isFallFlying());
+                    && (localPlayer.canPlayerFitWithinBlocksAndEntitiesWhen(Pose.CROUCHING) || (localPlayer.isFallFlying()) && localPlayer.canPlayerFitWithinBlocksAndEntitiesWhen(Pose.FALL_FLYING))
+                    && (localPlayer.isShiftKeyDown() || !localPlayer.isSleeping() && (!localPlayer.canPlayerFitWithinBlocksAndEntitiesWhen(Pose.STANDING) && !localPlayer.isFallFlying()));
         }
         else
         {

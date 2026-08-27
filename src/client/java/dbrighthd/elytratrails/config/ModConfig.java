@@ -65,6 +65,7 @@ public class ModConfig {
     public boolean enableParticles = false;
     public boolean useSplines = true;
     public boolean fixFallFlyingCrouchBug = true;
+    public boolean disableFallFlyingCrouching = false;
 
     public ParticleOptions particle;
 
