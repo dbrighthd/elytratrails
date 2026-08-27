@@ -27,7 +27,6 @@ public class ModConfig {
     public boolean tryNearTrailFade = false;
     public boolean alwaysSnapTrail = true;
     public boolean logTrails = false;
-    public boolean inputBuffer = true;
     public boolean applyWind = false;
     public double windScale = 1.0;
     public double windSpeed = 1.0;
@@ -37,7 +36,7 @@ public class ModConfig {
         NO,
         CLEAR,
     }
-    public boolean simplifyLighting = false;
+    public boolean simplifyLighting = true;
     public boolean alwaysGlowWhenShaderTranslucent = true;
 
     //twirlstuff
@@ -59,7 +58,7 @@ public class ModConfig {
 
     public double maxOnlineWidth = 5.0;
 
-    public double maxOnlineLifetime = 120.0;
+    public double maxOnlineLifetime = 10.0;
 
     public boolean useSameDefaultsForOthers = false;
 

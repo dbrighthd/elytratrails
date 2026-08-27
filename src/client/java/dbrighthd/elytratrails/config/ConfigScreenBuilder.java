@@ -173,12 +173,6 @@ public class ConfigScreenBuilder {
                 .setSaveConsumer(newValue -> config.twirlTwoTime = newValue)
                 .build());
 
-        twirling.addEntry(entryBuilder.startBooleanToggle(Component.translatable("text.elytratrails.option.inputBuffer"), config.inputBuffer)
-                .setDefaultValue(defaultModConfig.inputBuffer)
-                .setTooltip(Component.translatable("text.elytratrails.option.inputBuffer.@Tooltip"))
-                .setSaveConsumer(newValue -> config.inputBuffer = newValue)
-                .build());
-
         twirling.addEntry(entryBuilder.startSelector(
                         Component.translatable("text.elytratrails.option.easeType1"),
                         EaseTypes.getTypes().toArray(),
