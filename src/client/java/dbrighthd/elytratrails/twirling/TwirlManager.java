@@ -58,6 +58,10 @@ public class TwirlManager {
     }
     public static float getTwirlProgress(int entityId)
     {
+        if(!twirlMap.containsKey(entityId))
+        {
+            return 0;
+        }
         TwirlData twirlData = twirlMap.get(entityId);
         return (float)twirlData.twirlProgress;
     }
