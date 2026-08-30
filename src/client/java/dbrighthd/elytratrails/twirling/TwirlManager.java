@@ -65,6 +65,30 @@ public class TwirlManager {
         TwirlData twirlData = twirlMap.get(entityId);
         return (float)twirlData.twirlProgress;
     }
+    public static float getTwirlAOAProgress(int entityId)
+    {
+        if(!twirlMap.containsKey(entityId))
+        {
+            return 0;
+        }
+        TwirlData twirlData = twirlMap.get(entityId);
+        if(twirlData.twirlQueue.isEmpty())
+        {
+            return 0;
+        }
+        Twirl twirl = twirlData.twirlQueue.getFirst();
+        switch(twirl.easeMode()) {
+            case EaseTypes.EaseMode.BOTH -> {
+                return 1;
+            }
+            case EaseTypes.EaseMode.IN -> {
+                return (float) twirlData.twirlProgress;
+            }
+            default -> {
+                return 1 - (float) twirlData.twirlProgress;
+            }
+        }
+    }
     public static void updateAllTwirls()
     {
         long currentMillis = ElytraTimeUtil.currentMillis();

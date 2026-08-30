@@ -9,6 +9,7 @@ import net.minecraft.world.phys.Vec3;
 import org.joml.Matrix4f;
 import org.joml.Vector4f;
 
+import static dbrighthd.elytratrails.twirling.TwirlManager.getTwirlAOAProgress;
 import static dbrighthd.elytratrails.twirling.TwirlManager.getTwirlProgress;
 
 
@@ -38,7 +39,7 @@ public class ModelTransformationUtil {
         float AOARaw = getUnsignedAOARaw(entity);
 
         //I want the twirl to affect the AOA of the emitters but I no no wanna do the math so here's an approximation
-        return AOARaw + getTwirlProgress(entity.getId())/1.5f;
+        return AOARaw + getTwirlAOAProgress(entity.getId())/1.5f;
     }
 
 
