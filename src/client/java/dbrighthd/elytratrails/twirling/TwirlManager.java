@@ -2,7 +2,9 @@ package dbrighthd.elytratrails.twirling;
 
 import com.mojang.math.Axis;
 import dbrighthd.elytratrails.config.ModConfig;
+import dbrighthd.elytratrails.config.pack.TrailOverrides;
 import dbrighthd.elytratrails.network.NetworkTwirl;
+import dbrighthd.elytratrails.rendering.Trail;
 import dbrighthd.elytratrails.twirling.types.EaseType;
 import dbrighthd.elytratrails.util.ElytraTimeUtil;
 import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents;
@@ -72,22 +74,7 @@ public class TwirlManager {
             return 0;
         }
         TwirlData twirlData = twirlMap.get(entityId);
-        if(twirlData.twirlQueue.isEmpty())
-        {
-            return 0;
-        }
-        Twirl twirl = twirlData.twirlQueue.getFirst();
-        switch(twirl.easeMode()) {
-            case EaseTypes.EaseMode.BOTH -> {
-                return 1;
-            }
-            case EaseTypes.EaseMode.IN -> {
-                return (float) twirlData.twirlProgress;
-            }
-            default -> {
-                return 1 - (float) twirlData.twirlProgress;
-            }
-        }
+        return twirlData.getTwirlAOAProgress();
     }
     public static void updateAllTwirls()
     {

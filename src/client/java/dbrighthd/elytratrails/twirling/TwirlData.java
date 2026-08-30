@@ -124,6 +124,13 @@ public class TwirlData {
         hasSent = false;
     }
 
+    /**
+     * This is for the stitching between back twirls (or whichever ease type has stitching if a mod defines their own).
+     * Getting a full tick in advance was too much and getting no tick in advance was too little so like. yea
+     * @param currentMillis current time in millis
+     * @param currTwirl current twirl
+     * @return twirl progress next half tick
+     */
     public double getApproxNextHalfTickTwirlProgress(long currentMillis, Twirl currTwirl)
     {
         return twirlOffset + (double) ((currentMillis + 25) - twirlStartTimeMillis) /currTwirl.twirlTime();
@@ -242,6 +249,39 @@ public class TwirlData {
     }
 
     /**
+     * pretty much get the estimated speed of rotation for the AOA approximation. not perfect but sells it okay I think
+     * @return fraction of full twirl speed approximation
+     */
+    public float getTwirlAOAProgress()
+    {
+        if(twirlQueue.isEmpty())
+        {
+            return 0;
+        }
+        Twirl twirl = twirlQueue.getFirst();
+        switch(twirl.easeMode()) {
+            case EaseTypes.EaseMode.BOTH -> {
+                return 1;
+            }
+            case EaseTypes.EaseMode.IN -> {
+                return (float) twirlProgress;
+            }
+            default -> {
+                return 1 - (float) twirlProgress;
+            }
+        }
+    }
+
+    /**
+     * no more twirling for this entity!
+     */
+    public void clearAllTwirlData()
+    {
+        stagnant = true;
+        twirlQueue.clear();
+    }
+
+    /**
      * send a twirl packet to server
      * @param twirl twirl to send
      */
@@ -268,5 +308,6 @@ public class TwirlData {
         if (!ClientPlayNetworking.canSend(payload.type())) return;
         ClientPlayNetworking.send(payload);
     }
+
 
 }

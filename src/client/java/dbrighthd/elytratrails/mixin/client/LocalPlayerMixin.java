@@ -11,7 +11,7 @@ import org.spongepowered.asm.mixin.injection.Redirect;
 import static dbrighthd.elytratrails.ElytraTrailsClient.getConfig;
 
 /**
- * Fixes a minecraft bug where you are forced to crouch when fallflying under a ceiling
+ * Fixes a minecraft bug where you are forced to crouch when fallflying under a ceiling around 1.5 blocks below it, and also the bug that makes it so you cant crouch while fallflying if too close to a ceiling.
  */
 @Mixin(LocalPlayer.class)
 public abstract class LocalPlayerMixin {

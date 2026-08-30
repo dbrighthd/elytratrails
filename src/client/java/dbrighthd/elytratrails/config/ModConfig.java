@@ -9,6 +9,10 @@ import net.minecraft.core.particles.ParticleTypes;
  */
 public class ModConfig {
 
+    /**
+     * clientPlayerConfig is all of the client-specific trail stuff, while
+     * otherPlayerConfig is anything that should be assumed as defaults for others.
+     */
     public ClientConfig clientPlayerConfig = ClientConfig.getDefaultClientConfig();
     public ClientConfig otherPlayerConfig = ClientConfig.getDefaultClientConfig();
     public boolean exportPreset = false;
