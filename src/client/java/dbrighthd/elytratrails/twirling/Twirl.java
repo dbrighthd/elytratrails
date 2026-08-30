@@ -27,6 +27,6 @@ public record Twirl(EaseType easeType, int direction, long twirlTime, EaseTypes.
 
     public static Twirl fromNetworkTwirl(NetworkTwirl networkTwirl)
     {
-        return new Twirl(EaseTypes.get(networkTwirl.twirlType()), networkTwirl.direction(), networkTwirl.twirlTime(), EaseTypes.EaseMode.values()[networkTwirl.easeMode()], EaseTypes.AxisType.values()[networkTwirl.axis()].axis(), networkTwirl.offset());
+        return new Twirl(EaseTypes.get(networkTwirl.twirlType()), (int)Math.signum(networkTwirl.direction()), networkTwirl.twirlTime(), EaseTypes.EaseMode.values()[networkTwirl.easeMode()], EaseTypes.AxisType.values()[networkTwirl.axis()].axis(), networkTwirl.offset());
     }
 }
