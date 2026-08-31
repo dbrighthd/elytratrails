@@ -7,9 +7,10 @@ public record ResolvedSampleSettings(
         double xOffset,
         double yOffset,
         double zOffset,
-        boolean billBoarded) {
+        boolean billBoarded,
+        boolean useColorOverride) {
     public static ResolvedSampleSettings defaults() {
-        return new ResolvedSampleSettings(false, false, 0, 0, 0, 0, false);
+        return new ResolvedSampleSettings(false, false, 0, 0, 0, 0, false, false);
     }
 
 }

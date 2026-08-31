@@ -6,6 +6,7 @@ import net.minecraft.resources.Identifier;
 import net.minecraft.util.Mth;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntityType;
+import net.minecraft.world.entity.ExperienceOrb;
 import net.minecraft.world.level.Level;
 
 import java.util.Optional;
@@ -16,14 +17,18 @@ public class EntityTypeUtil {
         return BuiltInRegistries.ENTITY_TYPE.getOptional(Identifier.tryParse(id));
     }
 
-    public static Integer expColor(int eid) {
+    /**
+     * "default" color override function. right now only for exp orbs, will expand int the future
+     * @param eid entity id
+     */
+    public static Integer defaultColorOverride(int eid) {
         Level level = Minecraft.getInstance().level;
         if(level == null)
         {
             return null;
         }
         Entity e = level.getEntity(eid);
-        if (e == null)
+        if (e == null || !(e instanceof ExperienceOrb))
         {
             return null;
         }

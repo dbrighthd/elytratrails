@@ -305,7 +305,7 @@ public class TrailManager {
                     List<Trail> emittedTrails = new ArrayList<>();
                     int emitterId = 0;
                     for (Emitter emitter : emitters) {
-                        emittedTrails.add(Trail.fromPlayerConfig(entity.getId(), emitter, emitterId, newTrailId(), entity instanceof ExperienceOrb ? new ColorOverride(EntityTypeUtil::expColor,eid) : null));
+                        emittedTrails.add(Trail.fromPlayerConfig(entity.getId(), emitter, emitterId, newTrailId(), config.useColorOverride()? new ColorOverride(EntityTypeUtil::defaultColorOverride,eid) : null));
                         emitterId++;
                     }
 
