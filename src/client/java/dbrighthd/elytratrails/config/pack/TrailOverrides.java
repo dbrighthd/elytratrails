@@ -144,7 +144,8 @@ public record TrailOverrides(JsonObject values) {
                 getDouble("trailMinSpeed"),
                 getDouble("xOffset"),
                 getDouble("yOffset"),
-                getDouble("zOffset"));
+                getDouble("zOffset"),
+                getBoolean("billBoarded"));
     }
 
     private int resolveColor(String key) {

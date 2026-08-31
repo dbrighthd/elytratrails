@@ -306,7 +306,7 @@ public class TrailRenderer {
                 v2 += removeDist;
                 v1 /= (float) trailSettings.maxWidth();
                 v2 /= (float) trailSettings.maxWidth();
-                quadBetweenPoints(pose, consumer, startPos, endPos, sideA, sideB, halfWidthStart, halfWidthEnd, v1, v2, alphaStart, alphaEnd, trail.isLeftWing(), color, trailSettings.edgeFade(), point0.light(), point1.light());
+                quadBetweenPoints(pose, consumer, startPos, endPos, sideA, sideB, halfWidthStart, halfWidthEnd, v1, v2, alphaStart, alphaEnd, trail.isLeftWing(), trail.colorOverride() != null ? trail.colorOverride().getColor() : color, trailSettings.edgeFade(), point0.light(), point1.light());
             }
             this.accumDist += segmentLength;
         }

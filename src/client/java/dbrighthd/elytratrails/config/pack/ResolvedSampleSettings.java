@@ -6,9 +6,10 @@ public record ResolvedSampleSettings(
         double trailMinSpeed,
         double xOffset,
         double yOffset,
-        double zOffset) {
+        double zOffset,
+        boolean billBoarded) {
     public static ResolvedSampleSettings defaults() {
-        return new ResolvedSampleSettings(false, false, 0, 0, 0, 0);
+        return new ResolvedSampleSettings(false, false, 0, 0, 0, 0, false);
     }
 
 }

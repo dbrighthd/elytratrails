@@ -9,12 +9,15 @@ import dbrighthd.elytratrails.twirling.types.EaseType;
 import dbrighthd.elytratrails.util.ElytraTimeUtil;
 import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents;
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.multiplayer.ClientLevel;
+import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.player.Player;
 import org.joml.Vector3f;
 
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
+import java.util.UUID;
 
 import static dbrighthd.elytratrails.twirling.TwirlData.sendTwirlPacket;
 
@@ -33,6 +36,21 @@ public class TwirlManager {
         }
         TwirlData twirlData = twirlMap.get(entityId);
         return (float)(twirlData.getEasedTwirlAngleRadians(partialTick));
+    }
+    public static float getExtraRollRadiansFromUUID(UUID uuid)
+    {
+        ClientLevel level = Minecraft.getInstance().level;
+        if(level == null)
+        {
+            return  0;
+        }
+        Entity e = Minecraft.getInstance().level.getEntity(uuid);
+        if(e == null)
+        {
+            return  0;
+        }
+        int entityId = e.getId();
+        return getExtraRollRadians(entityId, Minecraft.getInstance().getDeltaTracker().getGameTimeDeltaPartialTick(false));
     }
     public static Axis getAxis(int entityId)
     {

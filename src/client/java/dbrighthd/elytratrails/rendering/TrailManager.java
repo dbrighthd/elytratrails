@@ -6,6 +6,7 @@ import dbrighthd.elytratrails.config.pack.ResolvedTrailSettings;
 import dbrighthd.elytratrails.config.pack.TrailPackConfigManager;
 import dbrighthd.elytratrails.network.ClientPlayerConfigStore;
 import dbrighthd.elytratrails.util.ElytraTimeUtil;
+import dbrighthd.elytratrails.util.EntityTypeUtil;
 import it.unimi.dsi.fastutil.ints.Int2ObjectMap;
 import it.unimi.dsi.fastutil.ints.Int2ObjectOpenHashMap;
 import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents;
@@ -16,6 +17,7 @@ import net.minecraft.util.LightCoordsUtil;
 import net.minecraft.util.RandomSource;
 import net.minecraft.world.entity.Avatar;
 import net.minecraft.world.entity.Entity;
+import net.minecraft.world.entity.ExperienceOrb;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.levelgen.synth.PerlinNoise;
@@ -145,6 +147,10 @@ public class TrailManager {
         trailsToRemove.clear();
         trails.removeIf(t -> (t.points().isEmpty() || t.points().stream().allMatch(p -> currentTime - p.epoch() > t.config().trailLifetime() * 1000)) && removeTrailFromMap(t));
         for (Trail trail : trails) {
+            if(trail.colorOverride() != null)
+            {
+                trail.colorOverride().setColor();
+            }
             List<Trail.Point> points = trail.points();
             if (points.size() < 2) continue;
 
@@ -231,7 +237,7 @@ public class TrailManager {
                     List<Trail> emittedTrails = new ArrayList<>();
                     int emitterId = 0;
                     for (Emitter emitter : emitters) {
-                        emittedTrails.add(Trail.fromPlayerConfig(player.getId(), emitter, emitterId, newTrailId()));
+                        emittedTrails.add(Trail.fromPlayerConfig(player.getId(), emitter, emitterId, newTrailId(),null));
                         emitterId++;
                     }
 
@@ -299,7 +305,7 @@ public class TrailManager {
                     List<Trail> emittedTrails = new ArrayList<>();
                     int emitterId = 0;
                     for (Emitter emitter : emitters) {
-                        emittedTrails.add(Trail.fromPlayerConfig(entity.getId(), emitter, emitterId, newTrailId()));
+                        emittedTrails.add(Trail.fromPlayerConfig(entity.getId(), emitter, emitterId, newTrailId(), entity instanceof ExperienceOrb ? new ColorOverride(EntityTypeUtil::expColor,eid) : null));
                         emitterId++;
                     }
 
