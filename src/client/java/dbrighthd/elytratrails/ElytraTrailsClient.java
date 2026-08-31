@@ -26,6 +26,8 @@ import org.jetbrains.annotations.NotNull;
 
 import java.util.Objects;
 
+import static dbrighthd.elytratrails.compat.ModStatuses.EMF_LOADED;
+import static dbrighthd.elytratrails.compat.emf.EmfAnimationHooks.registerAnimationVariables;
 import static dbrighthd.elytratrails.compat.emf.EmfTrailSpawnerRegistry.onResourceReload;
 import static dbrighthd.elytratrails.network.ClientPlayerConfigStore.refreshLocalConfigs;
 
@@ -50,6 +52,10 @@ public class ElytraTrailsClient implements ClientModInitializer {
         EaseTypes.registerTypes();
         TwirlManager.Init();
         TrailPackConfigManager.setDefaultSampleSettings();
+        if(EMF_LOADED)
+        {
+            registerAnimationVariables();
+        }
         ResourceManagerHelper.get(PackType.CLIENT_RESOURCES).registerReloadListener(
                 new SimpleSynchronousResourceReloadListener() {
                     @Override

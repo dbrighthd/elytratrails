@@ -11,6 +11,7 @@ import net.minecraft.client.renderer.entity.state.EntityRenderState;
 import net.minecraft.util.valueproviders.SampledFloat;
 import net.minecraft.world.entity.Entity;
 import org.jetbrains.annotations.Nullable;
+import traben.entity_model_features.EMF;
 import traben.entity_model_features.EMFAnimationApi;
 import traben.entity_model_features.models.IEMFModel;
 import traben.entity_model_features.models.animation.state.EMFEntityRenderStateViaReference;
@@ -18,6 +19,7 @@ import traben.entity_model_features.models.parts.EMFModelPartRoot;
 import traben.entity_model_features.utils.EMFEntity;
 import traben.entity_texture_features.features.state.ETFState;
 
+import static dbrighthd.elytratrails.ElytraTrails.MOD_ID;
 import static dbrighthd.elytratrails.util.ModelTransformationUtil.setupAnyModelAnim;
 
 public final class EmfAnimationHooks {
@@ -61,5 +63,13 @@ public final class EmfAnimationHooks {
         }
 
         return root;
+    }
+
+    public static void registerAnimationVariables()
+    {
+        try {
+            EMFAnimationApi.registerUniqueAnimationVariableFactory(MOD_ID,"twirl_angle",new TwirlAnimFactory());
+        } catch (Exception ignored) {
+        }
     }
 }
