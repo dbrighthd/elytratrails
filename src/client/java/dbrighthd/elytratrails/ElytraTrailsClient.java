@@ -89,6 +89,12 @@ public class ElytraTrailsClient implements ClientModInitializer {
                 Component.literal("Allay Trails"),
                 ResourcePackActivationType.NORMAL
         ));
+        FabricLoader.getInstance().getModContainer("elytratrails").ifPresent(container -> ResourceManagerHelper.registerBuiltinResourcePack(
+                Identifier.fromNamespaceAndPath("elytratrails", "xptrails"),
+                container,
+                Component.literal("Experience Orb Trails"),
+                ResourcePackActivationType.NORMAL
+        ));
     }
 
     //eventually this call will be replaced with the call directly from ConfigManager

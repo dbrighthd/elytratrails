@@ -1,0 +1,10 @@
+{
+  "defaults": {
+    "parentPreset": "internal:exp",
+    "yOffset" : -0.1,
+    "billBoarded" : true,
+    "useColorOverride" : true,
+    "speedDependentTrail" : true,
+    "trailMinSpeed" : 0.005
+  }
+}
