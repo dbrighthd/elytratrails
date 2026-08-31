@@ -2,9 +2,7 @@ package dbrighthd.elytratrails.twirling;
 
 import com.mojang.math.Axis;
 import dbrighthd.elytratrails.config.ModConfig;
-import dbrighthd.elytratrails.config.pack.TrailOverrides;
 import dbrighthd.elytratrails.network.NetworkTwirl;
-import dbrighthd.elytratrails.rendering.Trail;
 import dbrighthd.elytratrails.twirling.types.EaseType;
 import dbrighthd.elytratrails.util.ElytraTimeUtil;
 import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents;
@@ -101,7 +99,25 @@ public class TwirlManager {
         {
             twirlData.updateTwirl(currentMillis);
         }
-        twirlMap.entrySet().removeIf(s -> s.getValue().stagnant);
+        ClientLevel level = Minecraft.getInstance().level;
+        twirlMap.entrySet().removeIf(s -> removeTwirlCheck(s,level));
+    }
+
+    public static boolean removeTwirlCheck(Map.Entry<Integer,TwirlData> twirlDataEntry, ClientLevel level)
+    {
+        if(twirlDataEntry.getValue().stagnant)
+        {
+            return true;
+        }
+        if (level != null)
+        {
+            Entity e = level.getEntity(twirlDataEntry.getKey());
+            if(e instanceof Player player)
+            {
+                return !player.isFallFlying();
+            }
+        }
+        return false;
     }
 
     public static void receiveTwirlPacket(int entityId, NetworkTwirl networkTwirl)

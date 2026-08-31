@@ -1,13 +1,10 @@
 package dbrighthd.elytratrails.compat.emf;
 
 import org.jetbrains.annotations.Nullable;
-import traben.entity_model_features.EMFAnimationApi;
 import traben.entity_model_features.models.animation.AnimSetupContext;
 import traben.entity_model_features.models.animation.math.expression_tree.MathValue;
 import traben.entity_model_features.models.animation.math.variables.factories.UniqueVariableFactory;
 import traben.entity_model_features.models.animation.state.EMFState;
-
-import java.util.Objects;
 
 import static dbrighthd.elytratrails.twirling.TwirlManager.getExtraRollRadiansFromUUID;
 
