@@ -46,7 +46,7 @@ public final class EmfAnimationHooks {
                             contextSet = true;
                         }
                         setupAnyModelAnim(model, renderState);
-                        emfRoot.triggerManualAnimation(new PoseStack());
+                        emfRoot.animate();
                         return emfRoot;
                     } finally {
                         if (contextSet) {
