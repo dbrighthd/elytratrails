@@ -72,8 +72,8 @@ public class ElytraTrailsClient implements ClientModInitializer {
                         if (FabricLoader.getInstance().isModLoaded("entity_model_features")) {
                             onResourceReload();
                         }
-                        TrailPackConfigManager.reload(manager);
                         TrailPackConfigManager.reloadPresets(manager);
+                        TrailPackConfigManager.reload(manager);
                     }
                 }
         );
