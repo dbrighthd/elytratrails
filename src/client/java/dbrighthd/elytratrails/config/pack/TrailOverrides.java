@@ -42,6 +42,35 @@ public record TrailOverrides(JsonObject values) {
 
         return new TrailOverrides(json);
     }
+    public static TrailOverrides fromBaseResolvedTrailSettings(ResolvedTrailSettings baseConfig) {
+        JsonObject json = new JsonObject();
+
+        try {
+            for (java.lang.reflect.RecordComponent component : ResolvedTrailSettings.class.getRecordComponents()) {
+                String name = component.getName();
+                Object value = component.getAccessor().invoke(baseConfig);
+                switch (value) {
+                    case Boolean b -> json.addProperty(name, b);
+                    case Number n -> json.addProperty(name, n);
+                    case Character c -> json.addProperty(name, c);
+                    case String s -> json.addProperty(name, s);
+                    case Enum<?> e -> json.addProperty(name, e.name());
+                    case null, default -> {
+                    }
+                }
+
+            }
+        } catch (ReflectiveOperationException e) {
+            throw new RuntimeException("Failed to copy PlayerConfig into TrailOverrides", e);
+        }
+
+        return new TrailOverrides(json);
+    }
+
+    public static JsonObject getBaseJson()
+    {
+        return TrailOverrides.fromBaseResolvedTrailSettings(ResolvedTrailSettings.defaults(true)).values();
+    }
 
     public static @Nullable TrailOverrides fromJson(@Nullable JsonObject json) {
         if (json == null) return null;

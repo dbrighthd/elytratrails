@@ -273,15 +273,6 @@ public class TwirlData {
     }
 
     /**
-     * no more twirling for this entity!
-     */
-    public void clearAllTwirlData()
-    {
-        stagnant = true;
-        twirlQueue.clear();
-    }
-
-    /**
      * send a twirl packet to server
      * @param twirl twirl to send
      */

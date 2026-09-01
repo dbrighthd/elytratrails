@@ -30,6 +30,7 @@ import static dbrighthd.elytratrails.compat.ModStatuses.EMF_LOADED;
 import static dbrighthd.elytratrails.compat.emf.EmfAnimationHooks.registerAnimationVariables;
 import static dbrighthd.elytratrails.compat.emf.EmfTrailSpawnerRegistry.onResourceReload;
 import static dbrighthd.elytratrails.network.ClientPlayerConfigStore.refreshLocalConfigs;
+import static dbrighthd.elytratrails.api.APIExample.RegisterExampleAPIHook;
 
 
 @SuppressWarnings("deprecation")
@@ -52,6 +53,7 @@ public class ElytraTrailsClient implements ClientModInitializer {
         EaseTypes.registerTypes();
         TwirlManager.Init();
         TrailPackConfigManager.setDefaultSampleSettings();
+        RegisterExampleAPIHook();
         if(EMF_LOADED)
         {
             registerAnimationVariables();
@@ -74,6 +76,7 @@ public class ElytraTrailsClient implements ClientModInitializer {
                         }
                         TrailPackConfigManager.reloadPresets(manager);
                         TrailPackConfigManager.reload(manager);
+                        TrailSystem.getTrailManager().removeAllTrails();
                     }
                 }
         );

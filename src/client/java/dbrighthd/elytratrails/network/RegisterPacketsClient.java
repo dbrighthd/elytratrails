@@ -19,21 +19,21 @@ public class RegisterPacketsClient {
     private static int pendingConfigRequestTicks = -1;
 
     public static void initClient() {
-        ClientPlayNetworking.registerGlobalReceiver(NetworkTwirlS2CPayload.ID, (payload, context) ->
+        ClientPlayNetworking.registerGlobalReceiver(NetworkTwirlS2CPayload.ID, (payload, _) ->
                 TwirlManager.receiveTwirlPacket(payload.entityId(), payload.networkTwirl()));
-        ClientPlayNetworking.registerGlobalReceiver(PlayerConfigS2CPayload.ID, (payload, context) ->
+        ClientPlayNetworking.registerGlobalReceiver(PlayerConfigS2CPayload.ID, (payload, _) ->
         {
             TrailSystem.getTrailManager().removeTrail(payload.entityId());
             ClientPlayerConfigStore.putSafeInitial(payload.entityId(), payload.configTag());
         });
-        ClientPlayNetworking.registerGlobalReceiver(RemoveFromStoreS2CPayload.ID, (payload, context) ->
+        ClientPlayNetworking.registerGlobalReceiver(RemoveFromStoreS2CPayload.ID, (payload, _) ->
         {
             if (CLIENT_PLAYER_CONFIGS.containsKey(payload.entityId())) {
                 ClientPlayerConfigStore.CLIENT_PLAYER_CONFIGS.remove(payload.entityId());
             }
             TrailSystem.getWingtipSampler().removeFromEmfCache(payload.entityId());
         });
-        ClientPlayNetworking.registerGlobalReceiver(LegacyPlayerConfigS2CPayload.ID, (payload, context) ->
+        ClientPlayNetworking.registerGlobalReceiver(LegacyPlayerConfigS2CPayload.ID, (_, _) ->
         {
             if (!hasRecievedThisSession) {
                 assert Minecraft.getInstance().player != null;
@@ -43,7 +43,7 @@ public class RegisterPacketsClient {
             }
             hasRecievedThisSession = true;
         });
-        ClientPlayConnectionEvents.JOIN.register((handler, sender, client) -> {
+        ClientPlayConnectionEvents.JOIN.register((_, _, _) -> {
             if (getConfig().shareTrail || !getConfig().showTrailToOtherPlayers) {
                 ClientPlayNetworking.send(new PlayerConfigC2SPayload(getLocalPlayerConfigToSend().toTag()));
             }
@@ -51,7 +51,7 @@ public class RegisterPacketsClient {
             pendingConfigRequestTicks = 10;
         });
 
-        ClientTickEvents.END_CLIENT_TICK.register(client -> {
+        ClientTickEvents.END_CLIENT_TICK.register(_ -> {
             if (pendingConfigRequestTicks > 0) {
                 pendingConfigRequestTicks--;
                 if (pendingConfigRequestTicks == 0) {
@@ -62,7 +62,7 @@ public class RegisterPacketsClient {
                 }
             }
         });
-        ClientPlayConnectionEvents.DISCONNECT.register((handler, sender) -> {
+        ClientPlayConnectionEvents.DISCONNECT.register((_, _) -> {
             TrailSystem.getWingtipSampler().removeAllEmfCache();
             hasRecievedThisSession = false;
             CLIENT_PLAYER_CONFIGS.clear();

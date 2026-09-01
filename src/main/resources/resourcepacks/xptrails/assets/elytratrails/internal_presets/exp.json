@@ -2,7 +2,7 @@
   "enableTrail": true,
   "enableRandomWidth": false,
   "speedDependentTrail": true,
-  "trailMinSpeed": 0.01,
+  "trailMinSpeed": 0.02,
   "trailMovesWithElytraAngle": true,
   "maxWidth": 0.1,
   "trailLifetime": 1.0,

@@ -5,6 +5,6 @@
     "billBoarded" : true,
     "useColorOverride" : true,
     "speedDependentTrail" : true,
-    "trailMinSpeed" : 0.005
+    "trailMinSpeed" : 0.02
   }
 }

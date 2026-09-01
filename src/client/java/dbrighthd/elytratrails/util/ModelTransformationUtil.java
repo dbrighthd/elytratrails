@@ -10,7 +10,6 @@ import org.joml.Matrix4f;
 import org.joml.Vector4f;
 
 import static dbrighthd.elytratrails.twirling.TwirlManager.getTwirlAOAProgress;
-import static dbrighthd.elytratrails.twirling.TwirlManager.getTwirlProgress;
 
 
 public class ModelTransformationUtil {

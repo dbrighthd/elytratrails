@@ -1,6 +1,7 @@
 package dbrighthd.elytratrails.rendering;
 
 import com.mojang.blaze3d.vertex.PoseStack;
+import dbrighthd.elytratrails.api.ElytraTrailsAPI;
 import dbrighthd.elytratrails.compat.ModStatuses;
 import dbrighthd.elytratrails.compat.cpm.CpmModelStorage;
 import dbrighthd.elytratrails.compat.emf.EmfAnimationHooks;
@@ -40,10 +41,10 @@ import org.jetbrains.annotations.Nullable;
 import org.joml.Quaterniond;
 import org.joml.Quaternionf;
 import org.joml.Vector3d;
-import org.joml.Vector3f;
 
 import java.util.*;
 
+import static dbrighthd.elytratrails.ElytraTrails.LOGGER;
 import static dbrighthd.elytratrails.ElytraTrailsClient.getConfig;
 import static dbrighthd.elytratrails.compat.ModStatuses.CPM_LOADED;
 import static dbrighthd.elytratrails.compat.cpm.CpmModelStorage.findCPMElytraModelSubmit;
@@ -65,7 +66,7 @@ public class WingTipSampler {
     private record ResolvedEmitterPoint(Vec3 position, boolean visible) {
     }
     public record EntityEmitters(List<Emitter> emitters, boolean changedModelVariant){}
-    public record PlayerEmitters(boolean valid, List<Emitter> emitters){};
+    public record PlayerEmitters(boolean valid, List<Emitter> emitters){}
     public Map<Integer, List<Emitter>> gatheredTrailsThisFrame = new HashMap<>();
 
     public void clearFrameCache() {
@@ -160,9 +161,13 @@ public class WingTipSampler {
         CameraRenderState cameraState = buildCameraState(camera);
         ModelFeatureRenderer.Submit<?> entitySubmit = extractEntityRenderState(entity, mc, cameraState, partialTick);
 
-        if (entitySubmit == null || !(entitySubmit.model() instanceof EntityModel<?> entityModel) || !(entitySubmit.state() instanceof EntityRenderState entityRenderState))
+        if (entitySubmit == null || !(entitySubmit.model() instanceof EntityModel<?> entityModel) || !(entitySubmit.state() instanceof EntityRenderState entityRenderState)) {
+            if(config.logTrails)
+            {
+                LOGGER.info("Entity {} ({}) is not a valid model, resetting trails if exist", entity.getId(), entity.getType());
+            }
             return new EntityEmitters(List.of(), false);
-
+        }
         setupAnyModelAnim(entityModel, entityRenderState);
         PoseStack basePose = new PoseStack();
         basePose.last().set(entitySubmit.pose());
@@ -171,7 +176,7 @@ public class WingTipSampler {
         ModelPart animatedRoot = tryGetAnimatedEntityRoot(entityModel, entity, entityRenderState);
         int eid = entity.getId();
 
-        if (ModStatuses.EMF_LOADED && config.emfSupport) {
+        if (!ElytraTrailsAPI.entityHasAnyTrailOverrides(entity) && ModStatuses.EMF_LOADED && config.emfSupport) {
             int variant = getModelVariantFromModel(entityModel);
 
             if (!emfCacheGeneric.containsKey(eid) || !(emfCacheGeneric.get(eid).variant() == variant)) {
@@ -191,6 +196,10 @@ public class WingTipSampler {
             }
         }
         if(!sampleSettings.useWithoutEmf()) {
+            if(config.logTrails)
+            {
+                LOGGER.info("Entity has {}, ({}) no EMF model and useWithoutEMF is false.", entity.getId(), entity.getType());
+            }
             return new EntityEmitters(List.of(), false);
         }
         List<Emitter> gatheredTrails = getVanillaTrailEmittersGeneric(basePose, animatedRoot, entityModel, entityWorldOffset, entity, sampleSettings);

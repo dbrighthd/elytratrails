@@ -15,9 +15,9 @@ import java.util.List;
 
 public record Trail(Identifier texture, List<Point> points, ResolvedTrailSettings config, boolean isLeftWing, int entityId, int emitterIndex, Long trailId, RenderType renderType, @Nullable ColorOverride colorOverride) {
 
-    public static Trail fromPlayerConfig(int playerId, Emitter emitter, int index, long trailId, ColorOverride colorOverride) {
+    public static Trail fromPlayerConfig(int playerId, Emitter emitter, int index, long trailId, ColorOverride colorOverride, ResolvedTrailSettings trailSettingOverrides) {
         PlayerConfig config = ClientPlayerConfigStore.getOrDefault(playerId);
-        ResolvedTrailSettings resolvedTrailSettings = TrailPackConfigManager.resolve(emitter.modelName(), emitter.boneName(), config, emitter.isLeftWing());
+        ResolvedTrailSettings resolvedTrailSettings = trailSettingOverrides != null? trailSettingOverrides : TrailPackConfigManager.resolve(emitter.modelName(), emitter.boneName(), config, emitter.isLeftWing());
         Identifier texture = TrailTextureRegistry.resolveTextureOrNull(resolvedTrailSettings.prideTrail());
         if (texture == null) texture = TrailRenderer.DEFAULT_TEXTURE;
         return new Trail(texture, new ArrayList<>(), resolvedTrailSettings, emitter.isLeftWing(), playerId, index, trailId, getRenderType(texture,resolvedTrailSettings), colorOverride);
