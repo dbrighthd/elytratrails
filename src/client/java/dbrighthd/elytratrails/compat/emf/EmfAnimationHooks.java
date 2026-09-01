@@ -1,7 +1,6 @@
 
 package dbrighthd.elytratrails.compat.emf;
 
-import com.mojang.blaze3d.vertex.PoseStack;
 import dbrighthd.elytratrails.compat.ModStatuses;
 import net.minecraft.client.model.Model;
 import net.minecraft.client.model.geom.ModelPart;
@@ -10,9 +9,8 @@ import net.minecraft.world.entity.Entity;
 import org.jetbrains.annotations.Nullable;
 import traben.entity_model_features.EMFAnimationApi;
 import traben.entity_model_features.models.IEMFModel;
-import traben.entity_model_features.models.animation.state.EMFEntityRenderStateViaReference;
+import traben.entity_model_features.models.animation.state.EMFEntityRenderState;
 import traben.entity_model_features.models.parts.EMFModelPartRoot;
-import traben.entity_model_features.utils.EMFEntity;
 import traben.entity_texture_features.features.state.ETFState;
 
 import static dbrighthd.elytratrails.ElytraTrails.MOD_ID;
@@ -40,11 +38,8 @@ public final class EmfAnimationHooks {
                 if (emfRoot != null) {
                     boolean contextSet = false;
                     try {
-                        if (entity instanceof EMFEntity emfEntity) {
-                            EMFEntityRenderStateViaReference state = new EMFEntityRenderStateViaReference(emfEntity);
-                            ETFState.mount(state);
-                            contextSet = true;
-                        }
+                        ETFState.mount(EMFEntityRenderState.from(renderState));
+                        contextSet = true;
                         setupAnyModelAnim(model, renderState);
                         emfRoot.animate();
                         return emfRoot;

@@ -11,7 +11,10 @@ import static dbrighthd.elytratrails.twirling.TwirlManager.getExtraRollRadiansFr
 public class TwirlAnimFactory extends UniqueVariableFactory {
     @Override
     public MathValue.@Nullable ResultSupplier getSupplierOrNull(String s, AnimSetupContext animSetupContext) {
-        return () -> EMFState.state() == null? 0 : getExtraRollRadiansFromUUID(EMFState.state().uuid());
+        return () -> {
+            var state = EMFState.state(); // Store so state mounting change due to resource reload won't break this
+            return state == null ? 0 : getExtraRollRadiansFromUUID(state.uuid());
+        };
     }
 
     @Override
