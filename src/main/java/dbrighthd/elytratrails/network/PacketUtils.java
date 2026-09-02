@@ -8,31 +8,25 @@ import net.minecraft.server.level.ServerPlayer;
 import java.util.Map;
 
 public class PacketUtils {
-    public static void sendToAllPlayers(ServerPlayNetworking.Context context, CustomPacketPayload serverPayload)
+    public static void sendToAllPlayers(MinecraftServer server, CustomPacketPayload serverPayload)
     {
-        for (ServerPlayer player : context.server().getPlayerList().getPlayers()) {
+        for (ServerPlayer player : server.getPlayerList().getPlayers()) {
             ServerPlayNetworking.send(player, serverPayload);
         }
     }
 
-    public static CompoundTag getHiddenConfigTag()
-    {
-        CompoundTag compoundTag = new CompoundTag();
-        compoundTag.putBoolean("enableTrail",false);
-        compoundTag.putString("playerName","Hidden Player");
-        return compoundTag;
-    }
-    public static void sendAllConfigToAllPlayers(MinecraftServer server, boolean isEnabled)
+    @SuppressWarnings("unused")
+    public static void sendAllConfigToAllPlayers(MinecraftServer server)
     {
         for (ServerPlayer player : server.getPlayerList().getPlayers()) {
-            sendAllConfigToPlayer(player, isEnabled);
+            sendAllConfigToPlayer(player);
         }
     }
 
-    public static void sendAllConfigToPlayer(ServerPlayer player, boolean isEnabled)
+    public static void sendAllConfigToPlayer(ServerPlayer player)
     {
         for (Map.Entry<Integer, CompoundTag> configPair : ServerPlayerConfigStore.SERVER_PLAYER_CONFIGS.entrySet()) {
-            PlayerConfigS2CPayload serverPayload = new PlayerConfigS2CPayload(configPair.getKey(), isEnabled ? configPair.getValue() : getHiddenConfigTag());
+            PlayerConfigS2CPayload serverPayload = new PlayerConfigS2CPayload(configPair.getKey(), configPair.getValue());
             ServerPlayNetworking.send(player, serverPayload);
         }
     }

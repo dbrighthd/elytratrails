@@ -1,5 +1,6 @@
 package dbrighthd.elytratrails;
 
+import dbrighthd.elytratrails.network.ServerTrailsStatusS2CPayload;
 import dbrighthd.elytratrails.network.RegisterPackets;
 import dbrighthd.elytratrails.network.ServerPlayerConfigStore;
 import net.fabricmc.api.ModInitializer;
@@ -12,7 +13,7 @@ import net.minecraft.world.level.gamerules.GameRuleCategory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import static dbrighthd.elytratrails.network.PacketUtils.sendAllConfigToAllPlayers;
+import static dbrighthd.elytratrails.network.PacketUtils.sendToAllPlayers;
 
 public class ElytraTrails implements ModInitializer {
 	public static final String MOD_ID = "elytratrails";
@@ -37,7 +38,7 @@ public class ElytraTrails implements ModInitializer {
 
 		GameRuleEvents.changeCallback(ENABLE_PLAYER_TRAILS_GAMERULE)
 				.register((enabled, server) -> {
-					sendAllConfigToAllPlayers(server, enabled);
-		});
+					sendToAllPlayers(server, new ServerTrailsStatusS2CPayload(enabled));
+				});
 	}
 }

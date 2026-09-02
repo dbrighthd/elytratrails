@@ -31,6 +31,7 @@ public class RegisterPackets {
         PayloadTypeRegistry.serverboundPlay().register(RemoveFromStoreC2SPayload.ID, RemoveFromStoreC2SPayload.CODEC);
         PayloadTypeRegistry.clientboundPlay().register(LegacyPlayerConfigS2CPayload.ID, LegacyPlayerConfigS2CPayload.CODEC);
         PayloadTypeRegistry.serverboundPlay().register(LegacyPlayerConfigC2SPayload.ID, LegacyPlayerConfigC2SPayload.CODEC);
+        PayloadTypeRegistry.clientboundPlay().register(ServerTrailsStatusS2CPayload.ID, ServerTrailsStatusS2CPayload.CODEC);
     }
 
     public static void initServer() {
@@ -39,7 +40,7 @@ public class RegisterPackets {
             {
                 Entity entity = context.player();
                 TwirlStateS2CPayload serverPayload = new TwirlStateS2CPayload(entity.getId(), payload.twirlState());
-                sendToAllPlayers(context, serverPayload);
+                sendToAllPlayers(context.server(), serverPayload);
             }
         });
 
@@ -48,7 +49,7 @@ public class RegisterPackets {
             if(context.server().getGameRules().get(ENABLE_PLAYER_TWIRLS_GAMERULE)) {
                 Entity entity = context.player();
                 NetworkTwirlS2CPayload serverPayload = new NetworkTwirlS2CPayload(entity.getId(), payload.networkTwirl());
-                sendToAllPlayers(context, serverPayload);
+                sendToAllPlayers(context.server(), serverPayload);
             }
         });
 
@@ -67,7 +68,7 @@ public class RegisterPackets {
             }
             ServerPlayerConfigStore.SERVER_PLAYER_CONFIGS.put(entity.getId(), payload.configTag());
             PlayerConfigS2CPayload serverPayload = new PlayerConfigS2CPayload(entity.getId(), payload.configTag());
-            sendToAllPlayers(context, serverPayload);
+            sendToAllPlayers(context.server(), serverPayload);
         });
         ServerPlayNetworking.registerGlobalReceiver(LegacyPlayerConfigC2SPayload.ID, (payload, context) -> {
             if (!playersReceivedWarnings.contains(context.player().getUUID())) {
@@ -78,7 +79,11 @@ public class RegisterPackets {
             playersReceivedWarnings.add(context.player().getUUID());
         });
         ServerPlayNetworking.registerGlobalReceiver(GetAllRequestC2SPayload.ID, (payload, context) -> {
-            sendAllConfigToPlayer(context.player(), context.server().getGameRules().get(ENABLE_PLAYER_TRAILS_GAMERULE));
+            sendAllConfigToPlayer(context.player());
+            if(!context.server().getGameRules().get(ENABLE_PLAYER_TRAILS_GAMERULE))
+            {
+                ServerPlayNetworking.send(context.player(),new ServerTrailsStatusS2CPayload(false));
+            }
         });
         ServerPlayNetworking.registerGlobalReceiver(RemoveFromStoreC2SPayload.ID, (payload, context) -> {
             ServerPlayerConfigStore.SERVER_PLAYER_CONFIGS.remove(context.player().getId());

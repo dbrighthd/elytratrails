@@ -190,7 +190,7 @@ public class WingTipSampler {
                 return new EntityEmitters(gatheredTrails,false);
             }
         }
-        if(!sampleSettings.useWithoutEmf()) {
+        if(!sampleSettings.useWithoutEmf() || entity instanceof Avatar) {
             return new EntityEmitters(List.of(), false);
         }
         List<Emitter> gatheredTrails = getVanillaTrailEmittersGeneric(basePose, animatedRoot, entityModel, entityWorldOffset, entity, sampleSettings);

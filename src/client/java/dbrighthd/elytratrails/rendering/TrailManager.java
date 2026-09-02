@@ -185,7 +185,7 @@ public class TrailManager {
     }
 
 
-    public void removeTrail(int entityId) {
+    public void stopTrail(int entityId) {
         if (getConfig().logTrails && activeTrails.containsKey(entityId)) {
             LOGGER.info("Stopped trail for entity {}", entityId);
         }
@@ -196,7 +196,7 @@ public class TrailManager {
         if (ctx.level == null) return;
         sampler.clearFrameCache();
         for (Entity entity : ctx.level.entitiesForRendering()) {
-            if (!(entity instanceof Avatar player)) {
+            if (!(entity instanceof Avatar player) || (!ClientPlayerConfigStore.serverTrailsEnabled && entity.getId() != (Minecraft.getInstance().player != null ? Minecraft.getInstance().player.getId() : 0))) {
                 continue;
             }
             int eid = player.getId();
@@ -258,7 +258,7 @@ public class TrailManager {
                     Emitter emitter = emitters.get(i);
                     trail.points().add(new Trail.Point(emitter.position(), speedData,emitter.visible(),  modConfig.simplifyLighting ? LightCoordsUtil.getLightCoords(ctx.level, BlockPos.containing(emitter.position())) : LightCoordsUtil.FULL_BRIGHT));}
             } else {
-                removeTrail(eid);
+                stopTrail(eid);
             }
         }
     }
@@ -281,7 +281,7 @@ public class TrailManager {
                 continue;
             }
             boolean hasAPIOverrides = ElytraTrailsAPI.entityHasAnyTrailOverrides(entity);
-            if (!hasAPIOverrides && (!TrailPackConfigManager.doesEntityHaveEmfTrails(entity) && ((!modConfig.tryWithoutEmf) && doesEntityHaveOverrides(entity)) || (!doesEntityHaveOverrides(entity) && !doesEntityHaveEmfTrails(entity)))) {
+            if (!hasAPIOverrides && (!doesEntityHaveEmfTrails(entity) && ((!modConfig.tryWithoutEmf) && doesEntityHaveOverrides(entity)) || (!doesEntityHaveOverrides(entity) && !doesEntityHaveEmfTrails(entity)))) {
                 continue;
             }
             int eid = entity.getId();
@@ -337,17 +337,17 @@ public class TrailManager {
                     trail.points().add(new Trail.Point(emitter.position(), new PlayerSpeedData(speed, 0, false), emitter.visible(), modConfig.simplifyLighting ? LightCoordsUtil.getLightCoords(ctx.level, BlockPos.containing(emitter.position())) : LightCoordsUtil.FULL_BRIGHT));
                 }
             } else {
-                removeTrail(eid);
+                stopTrail(eid);
             }
         }
     }
 
     public static ResolvedTrailSettings getConfigFromPlayerId(int entityId) {
-        return TrailPackConfigManager.resolveFromPlayerConfig(ClientPlayerConfigStore.getOrDefault(entityId));
+        return resolveFromPlayerConfig(ClientPlayerConfigStore.getOrDefault(entityId));
     }
 
     public static ResolvedSampleSettings getConfigFromEntity(Entity entity) {
-        return TrailPackConfigManager.getDefaultEntitySettings(entity);
+        return getDefaultEntitySettings(entity);
     }
 
     public static boolean isPlayerTrailValid(ResolvedTrailSettings config, Entity entity) {
@@ -378,5 +378,12 @@ public class TrailManager {
         }
         activeTrails.clear();
         trails.clear();
+    }
+
+    public void stopAllTrails() {
+        if (modConfig != null && modConfig.logTrails) {
+            LOGGER.info("Stopped {} active trails", activeTrails.size());
+        }
+        activeTrails.clear();
     }
 }

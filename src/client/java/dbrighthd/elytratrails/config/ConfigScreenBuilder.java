@@ -520,7 +520,7 @@ public class ConfigScreenBuilder {
             var mc = Minecraft.getInstance();
             refreshLocalConfigs();
             if (mc.getConnection() != null && mc.player != null && mc.level != null) {
-                TrailSystem.getTrailManager().removeTrail(mc.player.getId());
+                TrailSystem.getTrailManager().stopTrail(mc.player.getId());
                 TrailSystem.getWingtipSampler().removeAllEmfCache();
 
                 if (getConfig().shareTrail || !getConfig().showTrailToOtherPlayers) {

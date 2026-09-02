@@ -16,7 +16,7 @@ public final class ClientPlayerConfigStore {
     public static final ConcurrentHashMap<Integer, PlayerConfig> CLIENT_PLAYER_CONFIGS = new ConcurrentHashMap<>();
     public static final boolean FLASHBACK_LOADED = FabricLoader.getInstance().isModLoaded("flashback");
     public static PlayerConfig CLIENT_CONFIG;
-
+    public static boolean serverTrailsEnabled = true;
     public static PlayerConfig CLIENT_OTHERS_CONFIG;
 
     public static void refreshLocalConfigs() {

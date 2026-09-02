@@ -23,7 +23,7 @@ public class RegisterPacketsClient {
                 TwirlManager.receiveTwirlPacket(payload.entityId(), payload.networkTwirl()));
         ClientPlayNetworking.registerGlobalReceiver(PlayerConfigS2CPayload.ID, (payload, _) ->
         {
-            TrailSystem.getTrailManager().removeTrail(payload.entityId());
+            TrailSystem.getTrailManager().stopTrail(payload.entityId());
             ClientPlayerConfigStore.putSafeInitial(payload.entityId(), payload.configTag());
         });
         ClientPlayNetworking.registerGlobalReceiver(RemoveFromStoreS2CPayload.ID, (payload, _) ->
@@ -32,6 +32,15 @@ public class RegisterPacketsClient {
                 ClientPlayerConfigStore.CLIENT_PLAYER_CONFIGS.remove(payload.entityId());
             }
             TrailSystem.getWingtipSampler().removeFromEmfCache(payload.entityId());
+        });
+        ClientPlayNetworking.registerGlobalReceiver(ServerTrailsStatusS2CPayload.ID, (payload, _) ->
+        {
+            boolean enabled = payload.enabled();
+            ClientPlayerConfigStore.serverTrailsEnabled = enabled;
+            if(!enabled)
+            {
+                TrailSystem.getTrailManager().stopAllTrails();
+            }
         });
         ClientPlayNetworking.registerGlobalReceiver(LegacyPlayerConfigS2CPayload.ID, (_, _) ->
         {
@@ -64,6 +73,7 @@ public class RegisterPacketsClient {
         });
         ClientPlayConnectionEvents.DISCONNECT.register((_, _) -> {
             TrailSystem.getWingtipSampler().removeAllEmfCache();
+            ClientPlayerConfigStore.serverTrailsEnabled = true;
             hasRecievedThisSession = false;
             CLIENT_PLAYER_CONFIGS.clear();
         });

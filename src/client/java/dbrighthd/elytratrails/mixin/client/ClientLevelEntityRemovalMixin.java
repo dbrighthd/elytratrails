@@ -16,6 +16,6 @@ public class ClientLevelEntityRemovalMixin {
 
     @Inject(method = "removeEntity", at = @At("HEAD"))
     private void elytraTrails$onRemoveEntity(int entityId, Entity.RemovalReason reason, CallbackInfo ci) {
-        TrailSystem.getTrailManager().removeTrail(entityId);
+        TrailSystem.getTrailManager().stopTrail(entityId);
     }
 }
