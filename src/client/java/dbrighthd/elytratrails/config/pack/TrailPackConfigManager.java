@@ -363,7 +363,7 @@ public final class TrailPackConfigManager {
                     .filter(path -> path.getFileName().toString().toLowerCase(Locale.ROOT).endsWith(".json"))
                     .forEach(TrailPackConfigManager::loadAndCacheDiskPresetFile);
         } catch (Throwable exception) {
-            LOGGER.warn("Loading presets failed: {}", exception.getMessage());
+            LOGGER.warn("Reloading presets failed: {}", exception.getMessage());
 
         }
     }

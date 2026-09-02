@@ -7,12 +7,9 @@ import net.minecraft.client.multiplayer.ClientLevel;
 import net.minecraft.client.player.LocalPlayer;
 import net.minecraft.commands.arguments.ParticleArgument;
 import net.minecraft.core.BlockPos;
-import net.minecraft.core.Holder;
 import net.minecraft.core.HolderLookup;
-import net.minecraft.core.particles.ColorParticleOption;
 import net.minecraft.core.particles.ParticleOptions;
 import net.minecraft.core.particles.ParticleType;
-import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.data.registries.VanillaRegistries;
 import net.minecraft.nbt.NbtOps;
@@ -76,7 +73,7 @@ public class ParticleHandler {
 
 
         //noinspection unchecked
-        return id.toString() + codec.encodeStart(NbtOps.INSTANCE, particleOptions != null ? particleOptions : ParticleTypes.POOF).result().map(o -> ((Tag)o).toString()).orElse("");
+        return id.toString() + codec.encodeStart(NbtOps.INSTANCE, particleOptions).result().map(o -> ((Tag)o).toString()).orElse("");
     }
 
     public static ParticleOptions decodeParticle(String newValue)

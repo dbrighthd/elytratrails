@@ -93,6 +93,7 @@ public record TrailOverrides(JsonObject values) {
         return new TrailOverrides(json);
     }
 
+    @SuppressWarnings("unused")
     public static JsonObject getBaseJson()
     {
         return getBase().values();

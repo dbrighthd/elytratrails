@@ -233,29 +233,6 @@ public class ConfigScreenBuilder {
                     KeyMapping.resetMapping();
                 })
                 .build());
-
-        keybinds.addEntry(entryBuilder.startKeyCodeField(
-                        Component.translatable("text.elytratrails.option.twirl_r_key"),
-                        ElytraTrailsKeybind.DO_A_LIL_TWIRL_R_ONE.key
-                )
-                .setDefaultValue(ElytraTrailsKeybind.DO_A_LIL_TWIRL_R_ONE.getDefaultKey())
-                .setTooltip(Component.translatable("text.elytratrails.option.twirl_r_key.@Tooltip"))
-                .setKeySaveConsumer(newKey -> {
-                    ElytraTrailsKeybind.DO_A_LIL_TWIRL_R_ONE.setKey(newKey);
-                    KeyMapping.resetMapping();
-                })
-                .build());
-        keybinds.addEntry(entryBuilder.startKeyCodeField(
-                        Component.translatable("text.elytratrails.option.twirl_l_key"),
-                        ElytraTrailsKeybind.DO_A_LIL_TWIRL_L_ONE.key
-                )
-                .setDefaultValue(ElytraTrailsKeybind.DO_A_LIL_TWIRL_L_ONE.getDefaultKey())
-                .setTooltip(Component.translatable("text.elytratrails.option.twirl_l_key.@Tooltip"))
-                .setKeySaveConsumer(newKey -> {
-                    ElytraTrailsKeybind.DO_A_LIL_TWIRL_L_ONE.setKey(newKey);
-                    KeyMapping.resetMapping();
-                })
-                .build());
         keybinds.addEntry(entryBuilder.startKeyCodeField(
                         Component.translatable("text.elytratrails.option.twirl_random_key"),
                         ElytraTrailsKeybind.DO_A_LIL_ALTERNATING_TWIRL_ONE.key
@@ -264,6 +241,39 @@ public class ConfigScreenBuilder {
                 .setTooltip(Component.translatable("text.elytratrails.option.twirl_random_key.@Tooltip"))
                 .setKeySaveConsumer(newKey -> {
                     ElytraTrailsKeybind.DO_A_LIL_ALTERNATING_TWIRL_ONE.setKey(newKey);
+                    KeyMapping.resetMapping();
+                })
+                .build());
+        keybinds.addEntry(entryBuilder.startKeyCodeField(
+                        Component.translatable("text.elytratrails.option.twirl_r_continuous_key_two"),
+                        ElytraTrailsKeybind.DO_A_LIL_TWIRL_R_ONE.key
+                )
+                .setDefaultValue(ElytraTrailsKeybind.DO_A_LIL_TWIRL_R_ONE.getDefaultKey())
+                .setTooltip(Component.translatable("text.elytratrails.option.twirl_r_continuous_key_two.@Tooltip"))
+                .setKeySaveConsumer(newKey -> {
+                    ElytraTrailsKeybind.DO_A_LIL_TWIRL_R_ONE.setKey(newKey);
+                    KeyMapping.resetMapping();
+                })
+                .build());
+        keybinds.addEntry(entryBuilder.startKeyCodeField(
+                        Component.translatable("text.elytratrails.option.twirl_l_continuous_key_two"),
+                        ElytraTrailsKeybind.DO_A_LIL_TWIRL_L_ONE.key
+                )
+                .setDefaultValue(ElytraTrailsKeybind.DO_A_LIL_TWIRL_L_ONE.getDefaultKey())
+                .setTooltip(Component.translatable("text.elytratrails.option.twirl_l_continuous_key_two.@Tooltip"))
+                .setKeySaveConsumer(newKey -> {
+                    ElytraTrailsKeybind.DO_A_LIL_TWIRL_L_ONE.setKey(newKey);
+                    KeyMapping.resetMapping();
+                })
+                .build());
+        keybinds.addEntry(entryBuilder.startKeyCodeField(
+                        Component.translatable("text.elytratrails.option.twirl_random_key_two"),
+                        ElytraTrailsKeybind.DO_A_LIL_ALTERNATING_TWIRL_TWO.key
+                )
+                .setDefaultValue(ElytraTrailsKeybind.DO_A_LIL_ALTERNATING_TWIRL_TWO.getDefaultKey())
+                .setTooltip(Component.translatable("text.elytratrails.option.twirl_random_key_two.@Tooltip"))
+                .setKeySaveConsumer(newKey -> {
+                    ElytraTrailsKeybind.DO_A_LIL_ALTERNATING_TWIRL_TWO.setKey(newKey);
                     KeyMapping.resetMapping();
                 })
                 .build());
@@ -513,6 +523,7 @@ public class ConfigScreenBuilder {
         builder.setSavingRunnable(() -> {
             encodeConfigColors(config.clientPlayerConfig);
             encodeConfigColors(config.otherPlayerConfig);
+            Minecraft.getInstance().options.save();
             exportPreset(config);
             applyPresetsToConfig(config);
             refreshConfig();

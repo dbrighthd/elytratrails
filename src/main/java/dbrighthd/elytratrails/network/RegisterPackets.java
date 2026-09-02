@@ -70,7 +70,7 @@ public class RegisterPackets {
             PlayerConfigS2CPayload serverPayload = new PlayerConfigS2CPayload(entity.getId(), payload.configTag());
             sendToAllPlayers(context.server(), serverPayload);
         });
-        ServerPlayNetworking.registerGlobalReceiver(LegacyPlayerConfigC2SPayload.ID, (payload, context) -> {
+        ServerPlayNetworking.registerGlobalReceiver(LegacyPlayerConfigC2SPayload.ID, (_, context) -> {
             if (!playersReceivedWarnings.contains(context.player().getUUID())) {
                 context.player().sendSystemMessage(
                         net.minecraft.network.chat.Component.literal("§cYou are using an outdated version of Elytra Contrails. To sync with this server, you must update to Elytra Contrails 1.4.0+")
@@ -78,14 +78,14 @@ public class RegisterPackets {
             }
             playersReceivedWarnings.add(context.player().getUUID());
         });
-        ServerPlayNetworking.registerGlobalReceiver(GetAllRequestC2SPayload.ID, (payload, context) -> {
+        ServerPlayNetworking.registerGlobalReceiver(GetAllRequestC2SPayload.ID, (_, context) -> {
             sendAllConfigToPlayer(context.player());
             if(!context.server().getGameRules().get(ENABLE_PLAYER_TRAILS_GAMERULE))
             {
                 ServerPlayNetworking.send(context.player(),new ServerTrailsStatusS2CPayload(false));
             }
         });
-        ServerPlayNetworking.registerGlobalReceiver(RemoveFromStoreC2SPayload.ID, (payload, context) -> {
+        ServerPlayNetworking.registerGlobalReceiver(RemoveFromStoreC2SPayload.ID, (_, context) -> {
             ServerPlayerConfigStore.SERVER_PLAYER_CONFIGS.remove(context.player().getId());
             for (ServerPlayer player : context.server().getPlayerList().getPlayers()) {
                 RemoveFromStoreS2CPayload serverPayload = new RemoveFromStoreS2CPayload(context.player().getId());

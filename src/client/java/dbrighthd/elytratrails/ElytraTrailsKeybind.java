@@ -54,14 +54,14 @@ public final class ElytraTrailsKeybind {
         ));
 
         DO_A_LIL_TWIRL_L_ONE = KeyMappingHelper.registerKeyMapping(new KeyMapping(
-                "key.elytratrails.twirl_l",
+                "key.elytratrails.continuous_twirl_l_two",
                 InputConstants.Type.KEYSYM,
                 InputConstants.UNKNOWN.getValue(),
                 CATEGORY
         ));
 
         DO_A_LIL_TWIRL_R_ONE = KeyMappingHelper.registerKeyMapping(new KeyMapping(
-                "key.elytratrails.twirl_r",
+                "key.elytratrails.continuous_twirl_r_two",
                 InputConstants.Type.KEYSYM,
                 InputConstants.UNKNOWN.getValue(),
                 CATEGORY

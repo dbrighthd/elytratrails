@@ -41,6 +41,7 @@ public final class EmfAnimationHooks {
                         ETFState.mount(EMFEntityRenderState.from(renderState));
                         contextSet = true;
                         setupAnyModelAnim(model, renderState);
+                        //noinspection UnstableApiUsage
                         emfRoot.animate();
                         return emfRoot;
                     } finally {

@@ -4,7 +4,6 @@ import com.mojang.blaze3d.buffers.GpuBufferSlice;
 import com.mojang.blaze3d.resource.GraphicsResourceAllocator;
 import com.mojang.blaze3d.systems.RenderSystem;
 import com.mojang.blaze3d.vertex.PoseStack;
-import com.mojang.math.Axis;
 import dbrighthd.elytratrails.ElytraTrailsClient;
 import dbrighthd.elytratrails.config.ModConfig;
 import dbrighthd.elytratrails.rendering.TrailSystem;
@@ -101,8 +100,6 @@ public abstract class LevelRendererTrailPassMixin {
 
     @Unique
     private static void elytraTrails$applyCameraCorrection(PoseStack poseStack, Camera camera) {
-//        poseStack.mulPose(Axis.XP.rotationDegrees(camera.xRot()));
-//        poseStack.mulPose(Axis.YP.rotationDegrees(camera.yRot() + 180.0F));
         poseStack.mulPose(camera.rotation().invert());
 
     }
