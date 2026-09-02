@@ -1,8 +1,11 @@
 package dbrighthd.elytratrails.util;
 
+import dbrighthd.elytratrails.twirling.EaseTypes;
+import net.minecraft.client.Minecraft;
 import net.minecraft.client.model.EntityModel;
 import net.minecraft.client.model.geom.ModelPart;
 import net.minecraft.client.renderer.entity.state.EntityRenderState;
+import net.minecraft.network.chat.Component;
 import net.minecraft.util.Mth;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.phys.Vec3;
@@ -25,12 +28,12 @@ public class ModelTransformationUtil {
 
     public static float computeWingOpenness(ModelPart wingPart) {
         float wingRollAbs = Math.abs(wingPart.zRot);
-
         float fullyClosed = 0.28766277f;
         //float fullyOpen = 1.5707302f;
-        float fullyOpen = 1.5f;
+        float fullyOpen = 1.54f;
         float openness = (wingRollAbs - fullyClosed) / (fullyOpen - fullyClosed);
-        return Mth.clamp(openness, 0.0f, 1.0f);
+        return (float)EaseTypes.SINE.easeIn(openness);
+        //return Mth.clamp(openness, 0.0f, 1.0f);
     }
 
     public static float getUnsignedAOA(LivingEntity entity)
