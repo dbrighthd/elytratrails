@@ -44,7 +44,6 @@ import org.joml.Vector3d;
 
 import java.util.*;
 
-import static dbrighthd.elytratrails.ElytraTrails.LOGGER;
 import static dbrighthd.elytratrails.ElytraTrailsClient.getConfig;
 import static dbrighthd.elytratrails.compat.ModStatuses.CPM_LOADED;
 import static dbrighthd.elytratrails.compat.cpm.CpmModelStorage.findCPMElytraModelSubmit;
@@ -162,10 +161,6 @@ public class WingTipSampler {
         ModelFeatureRenderer.Submit<?> entitySubmit = extractEntityRenderState(entity, mc, cameraState, partialTick);
 
         if (entitySubmit == null || !(entitySubmit.model() instanceof EntityModel<?> entityModel) || !(entitySubmit.state() instanceof EntityRenderState entityRenderState)) {
-            if(config.logTrails)
-            {
-                LOGGER.info("Entity {} ({}) is not a valid model, resetting trails if exist", entity.getId(), entity.getType());
-            }
             return new EntityEmitters(List.of(), false);
         }
         setupAnyModelAnim(entityModel, entityRenderState);
@@ -196,10 +191,6 @@ public class WingTipSampler {
             }
         }
         if(!sampleSettings.useWithoutEmf()) {
-            if(config.logTrails)
-            {
-                LOGGER.info("Entity has {}, ({}) no EMF model and useWithoutEMF is false.", entity.getId(), entity.getType());
-            }
             return new EntityEmitters(List.of(), false);
         }
         List<Emitter> gatheredTrails = getVanillaTrailEmittersGeneric(basePose, animatedRoot, entityModel, entityWorldOffset, entity, sampleSettings);
