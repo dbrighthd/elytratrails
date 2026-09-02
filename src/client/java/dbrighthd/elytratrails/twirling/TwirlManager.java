@@ -24,7 +24,7 @@ public class TwirlManager {
 
     public static void Init()
     {
-        ClientTickEvents.END_CLIENT_TICK.register(_ -> updateAllTwirls());
+        ClientTickEvents.END_CLIENT_TICK.register(TwirlManager::updateAllTwirls);
     }
     public static float getExtraRollRadians(int entityId, float partialTick)
     {
@@ -94,8 +94,12 @@ public class TwirlManager {
         TwirlData twirlData = twirlMap.get(entityId);
         return twirlData.getTwirlAOAProgress();
     }
-    public static void updateAllTwirls()
+    public static void updateAllTwirls(Minecraft minecraft)
     {
+        if(minecraft.isPaused())
+        {
+            return;
+        }
         long currentMillis = ElytraTimeUtil.currentMillis();
         for (TwirlData twirlData : twirlMap.values())
         {
