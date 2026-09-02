@@ -83,6 +83,7 @@ public class ElytraTrailsAPI {
      * @param entity entity
      * @param trailOverrides the settings to override for this trail. see the TrailOverrides class for more information!
      */
+    @SuppressWarnings("unused") //it's an API method!
     public static void addEntityTrailOverridesIfNotPresent(Entity entity, TrailOverrides trailOverrides)
     {
         if(trailOverridesPerEntity.containsKey(entity))

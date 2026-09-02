@@ -74,6 +74,8 @@ public class TwirlManager {
         }
         return new Vector3f(1,0,0);
     }
+
+    @SuppressWarnings("unused")
     public static float getTwirlProgress(int entityId)
     {
         if(!twirlMap.containsKey(entityId))
