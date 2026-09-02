@@ -11,6 +11,7 @@ import net.fabricmc.loader.api.FabricLoader;
 import net.minecraft.resources.Identifier;
 import net.minecraft.server.packs.resources.Resource;
 import net.minecraft.server.packs.resources.ResourceManager;
+import net.minecraft.world.entity.Avatar;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntityType;
 import org.jetbrains.annotations.Nullable;
@@ -50,6 +51,7 @@ public final class TrailPackConfigManager {
     private static final ConcurrentHashMap<String, TrailOverrides> HIDDEN_CONFIG_PRESETS = new ConcurrentHashMap<>();
     private static final ConcurrentHashMap<EntityType<?>, ResolvedSampleSettings> entityDefaults = new ConcurrentHashMap<>();
     private static ResolvedSampleSettings defaultResolved;
+    private static ResolvedSampleSettings defaultPlayerResolved;
     public static final Set<EntityType<?>> entitiesWithTrails = new HashSet<>();
     public static final Set<EntityType<?>> entitiesWithTrailOverrides = new HashSet<>();
     private static double maxLifetimeOverrideSeconds = -1.0;
@@ -64,7 +66,7 @@ public final class TrailPackConfigManager {
     }
 
     public static ResolvedSampleSettings getDefaultEntitySettings(Entity entity) {
-        return entityDefaults.getOrDefault(entity.getType(), defaultResolved);
+        return entityDefaults.getOrDefault(entity.getType(), entity instanceof Avatar ? defaultPlayerResolved : defaultResolved);
     }
 
     public static void setDefaultEntitySettingsOverrides() {
@@ -72,11 +74,13 @@ public final class TrailPackConfigManager {
             entityDefaults.put(entityType, resolveSample(entityType.toShortString()));
         }
         defaultResolved = ResolvedSampleSettings.defaults();
+        defaultPlayerResolved = ResolvedSampleSettings.playerDefaults();
     }
 
     public static void setDefaultSampleSettings()
     {
         defaultResolved = ResolvedSampleSettings.defaults();
+        defaultPlayerResolved = ResolvedSampleSettings.playerDefaults();
     }
 
     public static void setEntityDefaultModel(EntityType<?> entityType) {
