@@ -15,16 +15,22 @@ import java.util.List;
 
 public record Trail(Identifier texture, List<Point> points, ResolvedTrailSettings config, boolean isLeftWing, int entityId, int emitterIndex, Long trailId, RenderType renderType, @Nullable ColorOverride colorOverride) {
 
-    public static Trail fromPlayerConfig(int playerId, Emitter emitter, int index, long trailId, ColorOverride colorOverride, ResolvedTrailSettings trailSettingOverrides) {
+    public static Trail createTrail(int playerId, Emitter emitter, int index, long trailId, ColorOverride colorOverride, ResolvedTrailSettings trailSettingOverrides) {
         PlayerConfig config = ClientPlayerConfigStore.getOrDefault(playerId);
         ResolvedTrailSettings resolvedTrailSettings = trailSettingOverrides != null? trailSettingOverrides : TrailPackConfigManager.resolve(emitter.modelName(), emitter.boneName(), config, emitter.isLeftWing());
         Identifier texture = TrailTextureRegistry.resolveTextureOrNull(resolvedTrailSettings.prideTrail());
         if (texture == null) texture = TrailRenderer.DEFAULT_TEXTURE;
         return new Trail(texture, new ArrayList<>(), resolvedTrailSettings, emitter.isLeftWing(), playerId, index, trailId, getRenderType(texture,resolvedTrailSettings), colorOverride);
     }
+
     /**
-     * @param pos   position of trail point
+     *
+     * @param pos position of trail point
      * @param epoch time of creation, in milliseconds
+     * @param speedData AOA/Speed of player at this point
+     * @param visible Should trail be visible at this point
+     * @param posAtEmission Position at emission (will change from position if there is wind)
+     * @param light Light level, if simplified light calc is on.
      */
     public record Point(Vec3 pos, long epoch, PlayerSpeedData speedData, boolean visible, Vec3 posAtEmission, int light) {
         public Point(Vec3 pos, PlayerSpeedData speed, boolean visible, int light) {

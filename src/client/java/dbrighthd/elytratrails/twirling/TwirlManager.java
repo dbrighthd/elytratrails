@@ -64,7 +64,7 @@ public class TwirlManager {
         return twirlData.twirlQueue.getFirst().axis();
     }
 
-    public static Vector3f getAxisVector(int entityId)
+    public static Vector3f getCameraAxisVector(int entityId)
     {
         switch (EaseTypes.AxisType.fromAxis(getAxis(entityId)))
         {

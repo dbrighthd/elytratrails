@@ -2,7 +2,9 @@ package dbrighthd.elytratrails.api;
 
 import dbrighthd.elytratrails.config.pack.TrailOverrides;
 import dbrighthd.elytratrails.rendering.ColorOverride;
+import dbrighthd.elytratrails.twirling.EaseTypes;
 import dbrighthd.elytratrails.twirling.TwirlManager;
+import dbrighthd.elytratrails.twirling.types.EaseType;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntityType;
 
@@ -19,6 +21,16 @@ public class ElytraTrailsAPI {
     private static final Map<EntityType<?>, ResolvedValues> trailOverridesPerEntityType = new HashMap<>();
     private static final Map<Entity,ResolvedValues> trailOverridesPerEntity = new HashMap<>();
 
+    /**
+     * If people want to register their own Ease Types, they can use this. It should then show up in the Elytra Contrails modmenu
+     * @param easeType new EaseType to register
+     * @return the same easeType back, in case they want to use it for their own purposes.
+     */
+    @SuppressWarnings("unused") //it's an API method!
+    public static EaseType registerEaseType(EaseType easeType)
+    {
+        return EaseTypes.register(easeType);
+    }
 
     /**
      * Set a color override for trails based on a condition function
