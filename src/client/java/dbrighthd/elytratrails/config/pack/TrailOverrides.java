@@ -7,7 +7,8 @@ import org.jetbrains.annotations.Nullable;
 import static dbrighthd.elytratrails.config.pack.TrailPackConfigManager.parseHexColor;
 
 /**
- * TrailOverrides store a json object that can have any or none of the properties in ResolvedTrailSettings. exists to have stuff override eachotheer,
+ * TrailOverrides store a json object that can have any or none of the properties in ResolvedTrailSettings, or ResolvedSampleSettings.
+ * these exists to have stuff override eachother
  * useful for presets and also resource packs.
  */
 public record TrailOverrides(JsonObject values) {
@@ -67,9 +68,39 @@ public record TrailOverrides(JsonObject values) {
         return new TrailOverrides(json);
     }
 
+    public static TrailOverrides fromBaseSampleSettings(ResolvedSampleSettings baseConfig) {
+        JsonObject json = new JsonObject();
+
+        try {
+            for (java.lang.reflect.RecordComponent component : ResolvedSampleSettings.class.getRecordComponents()) {
+                String name = component.getName();
+                Object value = component.getAccessor().invoke(baseConfig);
+                switch (value) {
+                    case Boolean b -> json.addProperty(name, b);
+                    case Number n -> json.addProperty(name, n);
+                    case Character c -> json.addProperty(name, c);
+                    case String s -> json.addProperty(name, s);
+                    case Enum<?> e -> json.addProperty(name, e.name());
+                    case null, default -> {
+                    }
+                }
+
+            }
+        } catch (ReflectiveOperationException e) {
+            throw new RuntimeException("Failed to copy PlayerConfig into TrailOverrides", e);
+        }
+
+        return new TrailOverrides(json);
+    }
+
     public static JsonObject getBaseJson()
     {
-        return TrailOverrides.fromBaseResolvedTrailSettings(ResolvedTrailSettings.defaults(true)).values();
+        return getBase().values();
+    }
+
+    public static TrailOverrides getBase()
+    {
+        return TrailOverrides.fromBaseResolvedTrailSettings(ResolvedTrailSettings.defaults(true)).with(fromBaseSampleSettings(ResolvedSampleSettings.defaults()));
     }
 
     public static @Nullable TrailOverrides fromJson(@Nullable JsonObject json) {

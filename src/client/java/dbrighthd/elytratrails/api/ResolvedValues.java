@@ -7,6 +7,7 @@ import dbrighthd.elytratrails.config.pack.TrailOverrides;
 public record ResolvedValues(ResolvedTrailSettings resolvedTrailSettings, ResolvedSampleSettings sampleSettings) {
     public ResolvedValues(TrailOverrides trailOverrides)
     {
-        this(trailOverrides.resolvedTrailSettings(true),trailOverrides.resolvedSampleSettings());
+        TrailOverrides newBase = TrailOverrides.getBase().with(trailOverrides);
+        this(newBase.resolvedTrailSettings(true),newBase.resolvedSampleSettings());
     }
 }

@@ -10,21 +10,42 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.function.Function;
 
+/**
+ * This is how other mods should interact with Elytra Contrails!
+ * Will be expanded in the future
+ */
 public class ElytraTrailsAPI {
     private static final Map<Function<Entity, Boolean>, Function<Integer, Integer>> conditionalColorOverrides = new HashMap<>();
     private static final Map<EntityType<?>, ResolvedValues> trailOverridesPerEntityType = new HashMap<>();
-    private static final Map<Integer,ResolvedValues> trailOverridesPerEntity = new HashMap<>();
+    private static final Map<Entity,ResolvedValues> trailOverridesPerEntity = new HashMap<>();
 
 
+    /**
+     * Set a color override for trails based on a condition function
+     * @param trailConditionFunction condition
+     * @param colorOverrideFunction color function (eid -> color)
+     */
     public static void setConditionalColorOverrides(Function<Entity, Boolean> trailConditionFunction, Function<Integer, Integer> colorOverrideFunction) {
         conditionalColorOverrides.put(trailConditionFunction, colorOverrideFunction);
     }
 
+    /**
+     * adds trail overrides per entity type;
+     * @param entityType entity type
+     * @param trailOverrides the settings to override for this trail. see the TrailOverrides class for more information!
+     */
+    @SuppressWarnings("unused") //it's an API method!
     public static void setEntityTypeTrailOverrides(EntityType<?> entityType, TrailOverrides trailOverrides)
     {
         trailOverridesPerEntityType.put(entityType, new ResolvedValues(trailOverrides));
     }
 
+    /**
+     * adds trail overrides per entity type if none exist.
+     * @param entityType entity type
+     * @param trailOverrides the settings to override for this trail. see the TrailOverrides class for more information!
+     */
+    @SuppressWarnings("unused") //it's an API method!
     public static void addEntityTypeTrailOverridesIfNotPresent(EntityType<?> entityType, TrailOverrides trailOverrides)
     {
         if(trailOverridesPerEntityType.containsKey(entityType))
@@ -34,44 +55,71 @@ public class ElytraTrailsAPI {
         trailOverridesPerEntityType.put(entityType, new ResolvedValues(trailOverrides));
     }
 
-    public static void setEntityTrailOverrides(int entityId, TrailOverrides trailOverrides)
+    /**
+     * adds trail overrides per entity
+     * @param entity entity
+     * @param trailOverrides the settings to override for this trail. see the TrailOverrides class for more information!
+     */
+    @SuppressWarnings("unused") //it's an API method!
+    public static void setEntityTrailOverrides(Entity entity, TrailOverrides trailOverrides)
     {
-        trailOverridesPerEntity.put(entityId, new ResolvedValues(trailOverrides));
+        trailOverridesPerEntity.put(entity, new ResolvedValues(trailOverrides));
     }
 
-    public static void addEntityTrailOverridesIfNotPresent(int eid, TrailOverrides trailOverrides)
+    /**
+     * adds trail overrides per entity if none exist
+     * @param entity entity
+     * @param trailOverrides the settings to override for this trail. see the TrailOverrides class for more information!
+     */
+    public static void addEntityTrailOverridesIfNotPresent(Entity entity, TrailOverrides trailOverrides)
     {
-        if(trailOverridesPerEntity.containsKey(eid))
+        if(trailOverridesPerEntity.containsKey(entity))
         {
             return;
         }
-        trailOverridesPerEntity.put(eid, new ResolvedValues(trailOverrides));
+        trailOverridesPerEntity.put(entity, new ResolvedValues(trailOverrides));
     }
 
+    /**
+     * removes trail color overrides
+     */
+    @SuppressWarnings("unused") //it's an API method!
     public static void removeConditionalColorOverrides(Function<Entity, Boolean> trailConditionFunction) {
         conditionalColorOverrides.remove(trailConditionFunction);
     }
 
+    /**
+     * removes EntityType trail overrides
+     * @param entityType EntityType
+     */
+    @SuppressWarnings("unused") //it's an API method!
     public static void removeEntityTypeTrailOverride(EntityType<?> entityType)
     {
         trailOverridesPerEntityType.remove(entityType);
     }
 
-    public static void removeEntityTrailOverride(int entityId)
+    /**
+     * Removes trail overrides for an entity
+     * @param entity entity to remove overrides from
+     */
+    @SuppressWarnings("unused") //it's an API method!
+    public static void removeEntityTrailOverride(Entity entity)
     {
-        trailOverridesPerEntity.remove(entityId);
+        trailOverridesPerEntity.remove(entity);
     }
 
     public static boolean entityHasAnyTrailOverrides(Entity entity)
     {
-        return trailOverridesPerEntity.containsKey(entity.getId()) || trailOverridesPerEntityType.containsKey(entity.getType());
+        return trailOverridesPerEntity.containsKey(entity) || trailOverridesPerEntityType.containsKey(entity.getType());
     }
 
+    @SuppressWarnings("unused") //it's an API method!
     public static boolean entityHasSpecificTrailOverrides(Entity entity)
     {
-        return trailOverridesPerEntity.containsKey(entity.getId());
+        return trailOverridesPerEntity.containsKey(entity);
     }
 
+    @SuppressWarnings("unused") //it's an API method!
     public static boolean entityTypeHasOverrides(EntityType<?> entityType)
     {
         return trailOverridesPerEntityType.containsKey(entityType);
@@ -80,9 +128,9 @@ public class ElytraTrailsAPI {
 
     public static ResolvedValues getTrailOverrides(Entity entity)
     {
-        if(trailOverridesPerEntity.containsKey(entity.getId()))
+        if(trailOverridesPerEntity.containsKey(entity))
         {
-            return trailOverridesPerEntity.get(entity.getId());
+            return trailOverridesPerEntity.get(entity);
         }
         if(trailOverridesPerEntityType.containsKey(entity.getType()))
         {
@@ -105,11 +153,13 @@ public class ElytraTrailsAPI {
         return null;
     }
 
+    @SuppressWarnings("unused") //it's an API method!
     public static boolean isEntityTwirling(Entity entity)
     {
         return TwirlManager.isRolling(entity.getId());
     }
 
+    @SuppressWarnings("unused") //it's an API method!
     public static float getEntityTwirlAngleRadians(Entity entity,float partialTick)
     {
         return TwirlManager.getExtraRollRadians(entity.getId(),partialTick);
