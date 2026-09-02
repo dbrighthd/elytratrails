@@ -1,12 +1,10 @@
 package dbrighthd.elytratrails.rendering;
 
-import com.google.gson.JsonObject;
 import dbrighthd.elytratrails.api.ElytraTrailsAPI;
 import dbrighthd.elytratrails.api.ResolvedValues;
 import dbrighthd.elytratrails.config.ModConfig;
 import dbrighthd.elytratrails.config.pack.ResolvedSampleSettings;
 import dbrighthd.elytratrails.config.pack.ResolvedTrailSettings;
-import dbrighthd.elytratrails.config.pack.TrailOverrides;
 import dbrighthd.elytratrails.config.pack.TrailPackConfigManager;
 import dbrighthd.elytratrails.network.ClientPlayerConfigStore;
 import dbrighthd.elytratrails.util.ElytraTimeUtil;
@@ -21,7 +19,6 @@ import net.minecraft.util.RandomSource;
 import net.minecraft.world.entity.Avatar;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.LivingEntity;
-import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.levelgen.synth.PerlinNoise;
 import net.minecraft.world.phys.Vec3;
 import org.slf4j.Logger;
@@ -208,7 +205,7 @@ public class TrailManager {
             boolean valid = TrailManager.isPlayerTrailValid(config, player);
 
             if (valid) {
-                WingTipSampler.PlayerEmitters playerEmitters =sampler.getPlayerTrailEmitterPositions(player, ctx.getDeltaTracker().getGameTimeDeltaPartialTick(false));
+                WingTipSampler.PlayerEmitters playerEmitters = sampler.getPlayerTrailEmitterPositions(player, ctx.getDeltaTracker().getGameTimeDeltaPartialTick(false));
                 if(!playerEmitters.valid())
                 {
                     continue;
@@ -280,6 +277,9 @@ public class TrailManager {
         if (ctx.level == null) return;
 
         for (Entity entity : ctx.level.entitiesForRendering()) {
+            if (entity instanceof Avatar) {
+                continue;
+            }
             boolean hasAPIOverrides = ElytraTrailsAPI.entityHasAnyTrailOverrides(entity);
             if (!hasAPIOverrides && (!TrailPackConfigManager.doesEntityHaveEmfTrails(entity) && ((!modConfig.tryWithoutEmf) && doesEntityHaveOverrides(entity)) || (!doesEntityHaveOverrides(entity) && !doesEntityHaveEmfTrails(entity)))) {
                 continue;
@@ -298,9 +298,6 @@ public class TrailManager {
             boolean valid = TrailManager.isEntityTrailValid(config, entity);
 
             if (valid) {
-                if (entity instanceof Player) {
-                    continue;
-                }
                 List<Emitter> emitters = sampler.getEntityTrailEmitterPositions(entity, ctx.getDeltaTracker().getGameTimeDeltaPartialTick(false), config).emitters();
                 double speed = entity.getDeltaMovement().length();
                 if (emitters.isEmpty()) {

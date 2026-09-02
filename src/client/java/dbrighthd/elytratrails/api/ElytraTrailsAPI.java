@@ -2,6 +2,7 @@ package dbrighthd.elytratrails.api;
 
 import dbrighthd.elytratrails.config.pack.TrailOverrides;
 import dbrighthd.elytratrails.rendering.ColorOverride;
+import dbrighthd.elytratrails.twirling.TwirlManager;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntityType;
 
@@ -18,8 +19,6 @@ public class ElytraTrailsAPI {
     public static void setConditionalColorOverrides(Function<Entity, Boolean> trailConditionFunction, Function<Integer, Integer> colorOverrideFunction) {
         conditionalColorOverrides.put(trailConditionFunction, colorOverrideFunction);
     }
-
-
 
     public static void setEntityTypeTrailOverrides(EntityType<?> entityType, TrailOverrides trailOverrides)
     {
@@ -104,5 +103,15 @@ public class ElytraTrailsAPI {
             }
         }
         return null;
+    }
+
+    public static boolean isEntityTwirling(Entity entity)
+    {
+        return TwirlManager.isRolling(entity.getId());
+    }
+
+    public static float getEntityTwirlAngleRadians(Entity entity,float partialTick)
+    {
+        return TwirlManager.getExtraRollRadians(entity.getId(),partialTick);
     }
 }
