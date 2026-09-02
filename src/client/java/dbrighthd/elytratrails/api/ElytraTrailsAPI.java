@@ -2,6 +2,7 @@ package dbrighthd.elytratrails.api;
 
 import dbrighthd.elytratrails.config.pack.TrailOverrides;
 import dbrighthd.elytratrails.rendering.ColorOverride;
+import dbrighthd.elytratrails.rendering.TrailSystem;
 import dbrighthd.elytratrails.twirling.EaseTypes;
 import dbrighthd.elytratrails.twirling.TwirlManager;
 import dbrighthd.elytratrails.twirling.types.EaseType;
@@ -126,12 +127,22 @@ public class ElytraTrailsAPI {
         return trailOverridesPerEntity.containsKey(entity) || trailOverridesPerEntityType.containsKey(entity.getType());
     }
 
+    /**
+     * Checks if entity has any API trail overrides
+     * @param entity entity to check
+     * @return if the entity has overrides
+     */
     @SuppressWarnings("unused") //it's an API method!
     public static boolean entityHasSpecificTrailOverrides(Entity entity)
     {
         return trailOverridesPerEntity.containsKey(entity);
     }
 
+    /**
+     * if the entityType has any trail overrides
+     * @param entityType EntityType to check
+     * @return if the entityType has overrides
+     */
     @SuppressWarnings("unused") //it's an API method!
     public static boolean entityTypeHasOverrides(EntityType<?> entityType)
     {
@@ -139,6 +150,11 @@ public class ElytraTrailsAPI {
     }
 
 
+    /**
+     * get API overrides of an entity
+     * @param entity entity to get overrides for
+     * @return trail overrides
+     */
     public static ResolvedValues getTrailOverrides(Entity entity)
     {
         if(trailOverridesPerEntity.containsKey(entity))
@@ -152,11 +168,20 @@ public class ElytraTrailsAPI {
         return null;
     }
 
+    /**
+     * Are there any API trail overrides to begin with?
+     * @return if there are any API trail overrides
+     */
     public static boolean doAPIOverridesExist()
     {
         return !trailOverridesPerEntityType.isEmpty() || !trailOverridesPerEntity.isEmpty();
     }
 
+    /**
+     * Get color overrides for entity
+     * @param entity entity to check overrides for
+     * @return color overrides
+     */
     public static ColorOverride getColorOverrideForEntity(Entity entity) {
         for (var pair : conditionalColorOverrides.entrySet()) {
             if (pair.getKey().apply(entity)) {
@@ -166,15 +191,37 @@ public class ElytraTrailsAPI {
         return null;
     }
 
+    /**
+     * Is the entity twirling?
+     * @param entity entity to check
+     * @return if its twirling
+     */
     @SuppressWarnings("unused") //it's an API method!
     public static boolean isEntityTwirling(Entity entity)
     {
         return TwirlManager.isRolling(entity.getId());
     }
 
+    /**
+     * Current rotation of a twirling entity
+     * @param entity entity to check
+     * @param partialTick current partial tick
+     * @return twirl angle (radians)
+     */
     @SuppressWarnings("unused") //it's an API method!
     public static float getEntityTwirlAngleRadians(Entity entity,float partialTick)
     {
         return TwirlManager.getExtraRollRadians(entity.getId(),partialTick);
+    }
+
+    /**
+     * does the entity have any active (emitting) trails?
+     * @param entity entity to check
+     * @return if the entity is currently emitting trails
+     */
+    @SuppressWarnings("unused")
+    public static boolean doesEntityHaveActiveTrails(Entity entity)
+    {
+        return TrailSystem.getTrailManager().entityHasActiveTrails(entity.getId());
     }
 }
