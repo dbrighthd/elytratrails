@@ -5,9 +5,9 @@ import dbrighthd.elytratrails.api.ResolvedValues;
 import dbrighthd.elytratrails.config.ModConfig;
 import dbrighthd.elytratrails.config.pack.ResolvedSampleSettings;
 import dbrighthd.elytratrails.config.pack.ResolvedTrailSettings;
-import dbrighthd.elytratrails.config.pack.TrailPackConfigManager;
 import dbrighthd.elytratrails.network.ClientPlayerConfigStore;
 import dbrighthd.elytratrails.util.ElytraTimeUtil;
+import dbrighthd.elytratrails.util.FlashBackUtil;
 import it.unimi.dsi.fastutil.ints.Int2ObjectMap;
 import it.unimi.dsi.fastutil.ints.Int2ObjectOpenHashMap;
 import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents;
@@ -194,9 +194,10 @@ public class TrailManager {
 
     private void gatherPlayerTrails(Minecraft ctx, boolean recordEmitter) {
         if (ctx.level == null) return;
+        boolean isInFlashback = FlashBackUtil.isInReplay();
         sampler.clearFrameCache();
         for (Entity entity : ctx.level.entitiesForRendering()) {
-            if (!(entity instanceof Avatar player) || (!ClientPlayerConfigStore.serverTrailsEnabled && entity.getId() != (Minecraft.getInstance().player != null ? Minecraft.getInstance().player.getId() : 0))) {
+            if (!(entity instanceof Avatar player) || ((!ClientPlayerConfigStore.serverTrailsEnabled) && entity.getId() != (Minecraft.getInstance().player != null ? Minecraft.getInstance().player.getId() : 0)) && !isInFlashback) {
                 continue;
             }
             int eid = player.getId();

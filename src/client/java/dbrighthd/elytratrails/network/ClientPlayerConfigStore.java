@@ -1,8 +1,7 @@
 package dbrighthd.elytratrails.network;
 
-import dbrighthd.elytratrails.compat.flashback.FlashbackCompat;
 import dbrighthd.elytratrails.config.ModConfig;
-import net.fabricmc.loader.api.FabricLoader;
+import dbrighthd.elytratrails.util.FlashBackUtil;
 import net.minecraft.client.Minecraft;
 import net.minecraft.nbt.CompoundTag;
 
@@ -14,7 +13,6 @@ import static java.lang.Math.clamp;
 
 public final class ClientPlayerConfigStore {
     public static final ConcurrentHashMap<Integer, PlayerConfig> CLIENT_PLAYER_CONFIGS = new ConcurrentHashMap<>();
-    public static final boolean FLASHBACK_LOADED = FabricLoader.getInstance().isModLoaded("flashback");
     public static PlayerConfig CLIENT_CONFIG;
     public static boolean serverTrailsEnabled = true;
     public static PlayerConfig CLIENT_OTHERS_CONFIG;
@@ -262,7 +260,7 @@ public final class ClientPlayerConfigStore {
 
     public static PlayerConfig getOrDefault(int entityId) {
         if (Minecraft.getInstance().player != null && Minecraft.getInstance().player.getId() == entityId) {
-            if (FLASHBACK_LOADED && FlashbackCompat.isInReplay()) //return the config that was set at the time if it exists
+            if (FlashBackUtil.isInReplay()) //return the config that was set at the time if it exists
             {
                 if (CLIENT_PLAYER_CONFIGS.containsKey(entityId)) {
                     return CLIENT_PLAYER_CONFIGS.get(entityId);
