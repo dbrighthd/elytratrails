@@ -11,17 +11,21 @@ public class RandomEase implements EaseType{
 
     @Override
     public double easeIn(double t) {
-        return random.nextDouble();
+        return random.nextDouble()  * 3;
     }
 
     @Override
     public double easeOut(double t) {
-        return random.nextDouble();
+        if(t >= 1)
+        {
+            return 1;
+        }
+        return random.nextDouble() * 3;
     }
 
     @Override
     public double easeInOut(double t) {
-        return random.nextDouble();
+        return random.nextDouble()  * 3;
     }
 
     @Override
