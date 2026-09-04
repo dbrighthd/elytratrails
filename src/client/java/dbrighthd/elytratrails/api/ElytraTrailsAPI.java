@@ -20,7 +20,7 @@ import java.util.function.Function;
 public class ElytraTrailsAPI {
     private static final Map<Function<Entity, Boolean>, Function<Integer, Integer>> conditionalColorOverrides = new HashMap<>();
     private static final Map<EntityType<?>, ResolvedValues> trailOverridesPerEntityType = new HashMap<>();
-    private static final Map<Entity,ResolvedValues> trailOverridesPerEntity = new HashMap<>();
+    private static final Map<Integer,ResolvedValues> trailOverridesPerEntity = new HashMap<>();
 
     /**
      * If people want to register their own Ease Types, they can use this. It should then show up in the Elytra Contrails modmenu
@@ -76,7 +76,7 @@ public class ElytraTrailsAPI {
     @SuppressWarnings("unused") //it's an API method!
     public static void setEntityTrailOverrides(Entity entity, TrailOverrides trailOverrides)
     {
-        trailOverridesPerEntity.put(entity, new ResolvedValues(trailOverrides));
+        trailOverridesPerEntity.put(entity.getId(), new ResolvedValues(trailOverrides));
     }
 
     /**
@@ -87,11 +87,11 @@ public class ElytraTrailsAPI {
     @SuppressWarnings("unused") //it's an API method!
     public static void addEntityTrailOverridesIfNotPresent(Entity entity, TrailOverrides trailOverrides)
     {
-        if(trailOverridesPerEntity.containsKey(entity))
+        if(trailOverridesPerEntity.containsKey(entity.getId()))
         {
             return;
         }
-        trailOverridesPerEntity.put(entity, new ResolvedValues(trailOverrides));
+        trailOverridesPerEntity.put(entity.getId(), new ResolvedValues(trailOverrides));
     }
 
     /**
@@ -119,12 +119,13 @@ public class ElytraTrailsAPI {
     @SuppressWarnings("unused") //it's an API method!
     public static void removeEntityTrailOverride(Entity entity)
     {
-        trailOverridesPerEntity.remove(entity);
+        trailOverridesPerEntity.remove(entity.getId());
+        TrailSystem.getTrailManager().stopTrail(entity.getId());
     }
 
     public static boolean entityHasAnyTrailOverrides(Entity entity)
     {
-        return trailOverridesPerEntity.containsKey(entity) || trailOverridesPerEntityType.containsKey(entity.getType());
+        return trailOverridesPerEntity.containsKey(entity.getId()) || trailOverridesPerEntityType.containsKey(entity.getType());
     }
 
     /**
@@ -135,7 +136,7 @@ public class ElytraTrailsAPI {
     @SuppressWarnings("unused") //it's an API method!
     public static boolean entityHasSpecificTrailOverrides(Entity entity)
     {
-        return trailOverridesPerEntity.containsKey(entity);
+        return trailOverridesPerEntity.containsKey(entity.getId());
     }
 
     /**
@@ -157,9 +158,9 @@ public class ElytraTrailsAPI {
      */
     public static ResolvedValues getTrailOverrides(Entity entity)
     {
-        if(trailOverridesPerEntity.containsKey(entity))
+        if(trailOverridesPerEntity.containsKey(entity.getId()))
         {
-            return trailOverridesPerEntity.get(entity);
+            return trailOverridesPerEntity.get(entity.getId());
         }
         if(trailOverridesPerEntityType.containsKey(entity.getType()))
         {
