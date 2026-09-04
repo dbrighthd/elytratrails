@@ -185,7 +185,7 @@ public class ConfigScreenBuilder {
                         Component.translatable("text.elytratrails.option.easeType2"),
                         EaseTypes.getTypes().toArray(),
                         config.twirlTwoEaseType)
-                .setDefaultValue(defaultModConfig.twirlOneEaseType)
+                .setDefaultValue(defaultModConfig.twirlTwoEaseType)
                 .setTooltip(Component.translatable("text.elytratrails.option.easeType2.@Tooltip"))
                 .setSaveConsumer(newValue -> config.twirlTwoEaseType = (String)newValue)
                 .build());

@@ -54,28 +54,28 @@ public final class ElytraTrailsKeybind {
         ));
 
         DO_A_LIL_TWIRL_L_ONE = KeyMappingHelper.registerKeyMapping(new KeyMapping(
-                "key.elytratrails.continuous_twirl_l_two",
-                InputConstants.Type.KEYSYM,
-                InputConstants.UNKNOWN.getValue(),
-                CATEGORY
-        ));
-
-        DO_A_LIL_TWIRL_R_ONE = KeyMappingHelper.registerKeyMapping(new KeyMapping(
-                "key.elytratrails.continuous_twirl_r_two",
-                InputConstants.Type.KEYSYM,
-                InputConstants.UNKNOWN.getValue(),
-                CATEGORY
-        ));
-
-        DO_A_LIL_TWIRL_L_TWO = KeyMappingHelper.registerKeyMapping(new KeyMapping(
                 "key.elytratrails.continuous_twirl_l",
                 InputConstants.Type.KEYSYM,
                 InputConstants.UNKNOWN.getValue(),
                 CATEGORY
         ));
 
-        DO_A_LIL_TWIRL_R_TWO = KeyMappingHelper.registerKeyMapping(new KeyMapping(
+        DO_A_LIL_TWIRL_R_ONE = KeyMappingHelper.registerKeyMapping(new KeyMapping(
                 "key.elytratrails.continuous_twirl_r",
+                InputConstants.Type.KEYSYM,
+                InputConstants.UNKNOWN.getValue(),
+                CATEGORY
+        ));
+
+        DO_A_LIL_TWIRL_L_TWO = KeyMappingHelper.registerKeyMapping(new KeyMapping(
+                "key.elytratrails.continuous_twirl_l_two",
+                InputConstants.Type.KEYSYM,
+                InputConstants.UNKNOWN.getValue(),
+                CATEGORY
+        ));
+
+        DO_A_LIL_TWIRL_R_TWO = KeyMappingHelper.registerKeyMapping(new KeyMapping(
+                "key.elytratrails.continuous_twirl_r_two",
                 InputConstants.Type.KEYSYM,
                 InputConstants.UNKNOWN.getValue(),
                 CATEGORY
