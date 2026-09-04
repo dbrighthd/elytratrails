@@ -1,5 +1,6 @@
 package dbrighthd.elytratrails.config;
 
+import dbrighthd.elytratrails.twirling.EaseTypes;
 import net.minecraft.core.particles.ParticleOptions;
 import net.minecraft.core.particles.ParticleTypes;
 
@@ -8,6 +9,10 @@ import net.minecraft.core.particles.ParticleTypes;
  */
 public class ModConfig {
 
+    /**
+     * clientPlayerConfig is all of the client-specific trail stuff, while
+     * otherPlayerConfig is anything that should be assumed as defaults for others.
+     */
     public ClientConfig clientPlayerConfig = ClientConfig.getDefaultClientConfig();
     public ClientConfig otherPlayerConfig = ClientConfig.getDefaultClientConfig();
     public boolean exportPreset = false;
@@ -26,7 +31,6 @@ public class ModConfig {
     public boolean tryNearTrailFade = false;
     public boolean alwaysSnapTrail = true;
     public boolean logTrails = false;
-    public boolean inputBuffer = true;
     public boolean applyWind = false;
     public double windScale = 1.0;
     public double windSpeed = 1.0;
@@ -36,8 +40,18 @@ public class ModConfig {
         NO,
         CLEAR,
     }
-
+    public boolean simplifyLighting = true;
     public boolean alwaysGlowWhenShaderTranslucent = true;
+
+    //twirlstuff
+    public String twirlOneEaseType = "Back";
+    public String twirlTwoEaseType = "Sine";
+
+    public double twirlOneTime = 0.67;
+    public double twirlTwoTime = 0.67;
+
+    public EaseTypes.AxisType twirlOneAxis = EaseTypes.AxisType.Y;
+    public EaseTypes.AxisType twirlTwoAxis = EaseTypes.AxisType.Y;
 
     //server stuff
     public boolean syncWithServer = true;
@@ -48,12 +62,14 @@ public class ModConfig {
 
     public double maxOnlineWidth = 5.0;
 
-    public double maxOnlineLifetime = 120.0;
+    public double maxOnlineLifetime = 10.0;
 
     public boolean useSameDefaultsForOthers = false;
 
     public boolean enableParticles = false;
     public boolean useSplines = true;
+    public boolean fixFallFlyingCrouchBug = true;
+    public boolean disableFallFlyingCrouching = false;
 
     public ParticleOptions particle;
 
@@ -86,6 +102,14 @@ public class ModConfig {
             otherPlayerConfig = ClientConfig.getDefaultClientConfig();
         }
 
+        if(twirlTwoAxis == null)
+        {
+            twirlTwoAxis = EaseTypes.AxisType.Y;
+        }
+        if(twirlOneAxis == null)
+        {
+            twirlOneAxis = EaseTypes.AxisType.Y;
+        }
         //these next three dont matter and will be set to "" on config screen opening
         if (exportPresetName == null) {
             exportPresetName = "";

@@ -7,7 +7,6 @@ import net.minecraft.network.chat.Component;
 import org.jetbrains.annotations.NotNull;
 
 public class FallbackConfigMessageScreen extends Screen {
-    private static final int PANEL_WIDTH = 220;
     private static final int PANEL_HEIGHT = 110;
     private static final int BUTTON_WIDTH = 160;
     private static final int BUTTON_HEIGHT = 20;
@@ -31,7 +30,7 @@ public class FallbackConfigMessageScreen extends Screen {
         int firstButtonY = centerY - 6;
 
         this.addRenderableWidget(
-                Button.builder(Component.literal("Return"), button -> this.minecraft.setScreenAndShow(this.parent))
+                Button.builder(Component.literal("Return"), _ -> this.minecraft.setScreenAndShow(this.parent))
                         .size(BUTTON_WIDTH, BUTTON_HEIGHT)
                         .pos(buttonX, firstButtonY + BUTTON_HEIGHT + BUTTON_SPACING)
                         .build()

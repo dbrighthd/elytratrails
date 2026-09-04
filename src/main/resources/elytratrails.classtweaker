@@ -8,6 +8,5 @@ accessible class net/minecraft/client/renderer/feature/phase/SimpleFeatureRender
 accessible field net/minecraft/client/renderer/feature/phase/SimpleFeatureRenderPhase$FeatureSubmits unbatched Ljava/util/List;
 accessible field net/minecraft/client/renderer/feature/phase/SimpleFeatureRenderPhase$FeatureSubmits batches Ljava/util/Map;
 accessible field net/minecraft/client/renderer/feature/phase/TranslucentFeatureRenderPhase submits Ljava/util/List;
-accessible field net/minecraft/client/renderer/RenderPipelines ENTITY_SNIPPET Lcom/mojang/renderpearl/api/pipeline/RenderPipeline$Snippet;
-accessible field net/minecraft/client/renderer/RenderPipelines ENTITY_EMISSIVE_SNIPPET Lcom/mojang/renderpearl/api/pipeline/RenderPipeline$Snippet;
-accessible method net/minecraft/client/renderer/RenderPipelines register (Lcom/mojang/renderpearl/api/pipeline/RenderPipeline;)Lcom/mojang/renderpearl/api/pipeline/RenderPipeline;
+accessible field net/minecraft/client/player/LocalPlayer crouching Z
+accessible method net/minecraft/world/entity/player/Player canPlayerFitWithinBlocksAndEntitiesWhen (Lnet/minecraft/world/entity/Pose;)Z

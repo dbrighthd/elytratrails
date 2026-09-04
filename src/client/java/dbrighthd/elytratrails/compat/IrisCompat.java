@@ -15,13 +15,13 @@ public class IrisCompat {
     }
 
     public static void registerPipelines() {
-        if (getConfig().alwaysGlowWhenShaderTranslucent) {
+//        if (getConfig().alwaysGlowWhenShaderTranslucent) {
 //            IrisApi.getInstance().assignPipeline(TrailPipelines.PIPELINE_ENTITY_TRANSLUCENT_CULL, IrisProgram.EMISSIVE_ENTITIES);
 //            IrisApi.getInstance().assignPipeline(TrailPipelines.PIPELINE_ENTITY_TRANSLUCENT_CULL_WIREFRAME, IrisProgram.EMISSIVE_ENTITIES);
-        } else {
+//        } else {
 //            IrisApi.getInstance().assignPipeline(TrailPipelines.PIPELINE_ENTITY_TRANSLUCENT_CULL, IrisProgram.ENTITIES_TRANSLUCENT);
 //            IrisApi.getInstance().assignPipeline(TrailPipelines.PIPELINE_ENTITY_TRANSLUCENT_CULL_WIREFRAME, IrisProgram.ENTITIES_TRANSLUCENT);
-        }
+//        }
 //        IrisApi.getInstance().assignPipeline(TrailPipelines.PIPELINE_ENTITY_CUTOUT_EMISSIVE_UNLIT, IrisProgram.EMISSIVE_ENTITIES);
 //        IrisApi.getInstance().assignPipeline(TrailPipelines.PIPELINE_ENTITY_TRANSLUCENT_EMISSIVE_UNLIT, IrisProgram.EMISSIVE_ENTITIES);
 //        IrisApi.getInstance().assignPipeline(TrailPipelines.PIPELINE_ENTITY_CUTOUT_EMISSIVE_UNLIT_WIREFRAME, IrisProgram.EMISSIVE_ENTITIES);

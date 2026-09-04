@@ -1,8 +1,8 @@
 package dbrighthd.elytratrails.mixin.client;
 
 import com.mojang.blaze3d.vertex.PoseStack;
-import com.mojang.math.Axis;
-import dbrighthd.elytratrails.controller.EntityTwirlManager;
+import dbrighthd.elytratrails.twirling.TwirlManager;
+import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.entity.player.AvatarRenderer;
 import net.minecraft.client.renderer.entity.state.AvatarRenderState;
 import org.spongepowered.asm.mixin.Mixin;
@@ -28,9 +28,9 @@ public abstract class AvatarRendererMixin {
         }
         if (!state.isFallFlying) return;
 
-        float extra = EntityTwirlManager.getExtraRollRadians(state.id);
+        float extra = TwirlManager.getExtraRollRadians(state.id, Minecraft.getInstance().getDeltaTracker().getGameTimeDeltaPartialTick(false));
         if (extra != 0f) {
-            poseStack.mulPose(Axis.YP.rotation(extra));
+            poseStack.rotate(TwirlManager.getAxis(state.id).rotation(extra));
         }
     }
 }

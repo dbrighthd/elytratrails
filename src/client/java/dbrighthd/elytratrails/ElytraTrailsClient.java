@@ -1,18 +1,17 @@
 package dbrighthd.elytratrails;
 
-//import dbrighthd.elytratrails.compat.Compatibility;
 import dbrighthd.elytratrails.compat.Compatibility;
 import dbrighthd.elytratrails.config.ConfigManager;
 import dbrighthd.elytratrails.config.ModConfig;
 import dbrighthd.elytratrails.config.pack.TrailPackConfigManager;
-import dbrighthd.elytratrails.controller.ContinuousTwirlController;
-import dbrighthd.elytratrails.controller.TwirlController;
 import dbrighthd.elytratrails.handler.CommandHandler;
 import dbrighthd.elytratrails.handler.ParticleHandler;
 import dbrighthd.elytratrails.network.RegisterPacketsClient;
 import dbrighthd.elytratrails.rendering.TrailPipelines;
 import dbrighthd.elytratrails.rendering.TrailSystem;
 import dbrighthd.elytratrails.rendering.TrailTextureRegistry;
+import dbrighthd.elytratrails.twirling.EaseTypes;
+import dbrighthd.elytratrails.twirling.TwirlManager;
 import dbrighthd.elytratrails.util.ElytraTimeUtil;
 import net.fabricmc.api.ClientModInitializer;
 import net.fabricmc.fabric.api.resource.ResourceManagerHelper;
@@ -27,7 +26,11 @@ import org.jetbrains.annotations.NotNull;
 
 import java.util.Objects;
 
+import static dbrighthd.elytratrails.compat.ModStatuses.EMF_LOADED;
+import static dbrighthd.elytratrails.compat.emf.EmfAnimationHooks.registerAnimationVariables;
+import static dbrighthd.elytratrails.compat.emf.EmfTrailSpawnerRegistry.onResourceReload;
 import static dbrighthd.elytratrails.network.ClientPlayerConfigStore.refreshLocalConfigs;
+import static dbrighthd.elytratrails.api.APIExample.RegisterExampleAPIHook;
 
 
 @SuppressWarnings("deprecation")
@@ -47,9 +50,14 @@ public class ElytraTrailsClient implements ClientModInitializer {
         refreshLocalConfigs();
         RegisterPacketsClient.initClient();
         CommandHandler.init();
-        ContinuousTwirlController.setDurations();
-        TwirlController.setDurations();
+        EaseTypes.registerTypes();
+        TwirlManager.Init();
         TrailPackConfigManager.setDefaultSampleSettings();
+        RegisterExampleAPIHook();
+        if(EMF_LOADED)
+        {
+            registerAnimationVariables();
+        }
         ResourceManagerHelper.get(PackType.CLIENT_RESOURCES).registerReloadListener(
                 new SimpleSynchronousResourceReloadListener() {
                     @Override
@@ -63,11 +71,12 @@ public class ElytraTrailsClient implements ClientModInitializer {
                                 .reloadNow(manager);
 
                         TrailSystem.getWingtipSampler().removeAllEmfCache();
-//                        if (FabricLoader.getInstance().isModLoaded("entity_model_features")) {
-//                            onResourceReload();
-//                        }
-                        TrailPackConfigManager.reload(manager);
+                        if (FabricLoader.getInstance().isModLoaded("entity_model_features")) {
+                            onResourceReload();
+                        }
                         TrailPackConfigManager.reloadPresets(manager);
+                        TrailPackConfigManager.reload(manager);
+                        TrailSystem.getTrailManager().removeAllTrails();
                     }
                 }
         );
@@ -81,6 +90,12 @@ public class ElytraTrailsClient implements ClientModInitializer {
                 Identifier.fromNamespaceAndPath("elytratrails", "allaytrails"),
                 container,
                 Component.literal("Allay Trails"),
+                ResourcePackActivationType.NORMAL
+        ));
+        FabricLoader.getInstance().getModContainer("elytratrails").ifPresent(container -> ResourceManagerHelper.registerBuiltinResourcePack(
+                Identifier.fromNamespaceAndPath("elytratrails", "xptrails"),
+                container,
+                Component.literal("Experience Orb Trails"),
                 ResourcePackActivationType.NORMAL
         ));
     }

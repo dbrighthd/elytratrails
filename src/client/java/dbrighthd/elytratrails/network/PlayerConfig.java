@@ -1,6 +1,5 @@
 package dbrighthd.elytratrails.network;
 
-import dbrighthd.elytratrails.util.EasingUtil;
 import net.minecraft.nbt.CompoundTag;
 
 public record PlayerConfig(
@@ -24,12 +23,10 @@ public record PlayerConfig(
         boolean wireframeTrails,
         boolean alwaysShowTrailDuringTwirl,
         String prideTrailRight,
-        double twirlTime,
         boolean increaseWidthOverTime,
         double startingWidthMultiplier,
         double endingWidthMultiplier,
         double distanceTillTrailStart,
-        EasingUtil.EaseType easeType,
         boolean endDistanceFade,
         double endDistanceFadeAmount,
         String playerName,
@@ -54,7 +51,7 @@ public record PlayerConfig(
         double maxWidthAOA,
         boolean edgeFade
 ) {
-    public static final int CONFIG_VERSION = 1;
+    public static final int CONFIG_VERSION = 2;
 
     public CompoundTag toTag() {
         CompoundTag tag = new CompoundTag();
@@ -80,12 +77,10 @@ public record PlayerConfig(
         tag.putBoolean("wireframeTrails", wireframeTrails);
         tag.putBoolean("alwaysShowTrailDuringTwirl", alwaysShowTrailDuringTwirl);
         tag.putString("prideTrailRight", prideTrailRight);
-        tag.putDouble("twirlTime", twirlTime);
         tag.putBoolean("increaseWidthOverTime", increaseWidthOverTime);
         tag.putDouble("startingWidthMultiplier", startingWidthMultiplier);
         tag.putDouble("endingWidthMultiplier", endingWidthMultiplier);
         tag.putDouble("distanceTillTrailStart", distanceTillTrailStart);
-        tag.putString("easeType", easeType.name());
         tag.putBoolean("endDistanceFade", endDistanceFade);
         tag.putDouble("endDistanceFadeAmount", endDistanceFadeAmount);
         tag.putString("playerName", playerName);

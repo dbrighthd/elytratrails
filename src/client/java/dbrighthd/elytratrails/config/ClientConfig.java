@@ -1,7 +1,6 @@
 package dbrighthd.elytratrails.config;
 
 import dbrighthd.elytratrails.network.PlayerConfig;
-import dbrighthd.elytratrails.util.EasingUtil;
 import net.minecraft.client.Minecraft;
 
 /**
@@ -30,12 +29,10 @@ public class ClientConfig {
     public boolean wireframeTrails;
     public boolean alwaysShowTrailDuringTwirl;
     public String prideTrailRight;
-    public double twirlTime;
     public boolean increaseWidthOverTime;
     public double startingWidthMultiplier;
     public double endingWidthMultiplier;
     public double distanceTillTrailStart;
-    public EasingUtil.EaseType easeType;
     public boolean endDistanceFade;
     public double endDistanceFadeAmount;
     public boolean speedBasedAlpha;
@@ -85,12 +82,10 @@ public class ClientConfig {
             boolean wireframeTrails,
             boolean alwaysShowTrailDuringTwirl,
             String prideTrailRight,
-            double twirlTime,
             boolean increaseWidthOverTime,
             double startingWidthMultiplier,
             double endingWidthMultiplier,
             double distanceTillTrailStart,
-            EasingUtil.EaseType easeType,
             boolean endDistanceFade,
             double endDistanceFadeAmount,
             boolean speedBasedAlpha,
@@ -135,12 +130,10 @@ public class ClientConfig {
         this.wireframeTrails = wireframeTrails;
         this.alwaysShowTrailDuringTwirl = alwaysShowTrailDuringTwirl;
         this.prideTrailRight = prideTrailRight;
-        this.twirlTime = twirlTime;
         this.increaseWidthOverTime = increaseWidthOverTime;
         this.startingWidthMultiplier = startingWidthMultiplier;
         this.endingWidthMultiplier = endingWidthMultiplier;
         this.distanceTillTrailStart = distanceTillTrailStart;
-        this.easeType = easeType;
         this.endDistanceFade = endDistanceFade;
         this.endDistanceFadeAmount = endDistanceFadeAmount;
         this.speedBasedAlpha = speedBasedAlpha;
@@ -187,12 +180,10 @@ public class ClientConfig {
                 false,
                 false,
                 "",
-                0.67,
                 false,
                 1.0,
                 5.0,
                 0.0,
-                EasingUtil.EaseType.Back,
                 false,
                 1.0,
                 false,
@@ -244,12 +235,10 @@ public class ClientConfig {
                 wireframeTrails,
                 alwaysShowTrailDuringTwirl,
                 prideTrailRight,
-                twirlTime,
                 increaseWidthOverTime,
                 startingWidthMultiplier,
                 endingWidthMultiplier,
                 distanceTillTrailStart,
-                easeType,
                 endDistanceFade,
                 endDistanceFadeAmount,
                 Minecraft.getInstance().getUser().getName(),
@@ -296,12 +285,10 @@ public class ClientConfig {
                 false,
                 false,
                 prideTrailRight,
-                twirlTime,
                 increaseWidthOverTime,
                 startingWidthMultiplier,
                 endingWidthMultiplier,
                 distanceTillTrailStart,
-                easeType,
                 endDistanceFade,
                 endDistanceFadeAmount,
                 "Hidden User",
@@ -332,9 +319,6 @@ public class ClientConfig {
         }
         if (prideTrailRight == null) {
             prideTrailRight = "";
-        }
-        if (easeType == null) {
-            easeType = EasingUtil.EaseType.Back;
         }
     }
 }

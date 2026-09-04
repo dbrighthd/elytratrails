@@ -1,5 +1,6 @@
 package dbrighthd.elytratrails.util;
 
+import dbrighthd.elytratrails.twirling.EaseTypes;
 import net.minecraft.client.model.EntityModel;
 import net.minecraft.client.model.geom.ModelPart;
 import net.minecraft.client.renderer.entity.state.EntityRenderState;
@@ -9,7 +10,7 @@ import net.minecraft.world.phys.Vec3;
 import org.joml.Matrix4f;
 import org.joml.Vector4f;
 
-import static dbrighthd.elytratrails.controller.EntityTwirlManager.getTwirlProgress;
+import static dbrighthd.elytratrails.twirling.TwirlManager.getTwirlAOAProgress;
 
 
 public class ModelTransformationUtil {
@@ -25,12 +26,12 @@ public class ModelTransformationUtil {
 
     public static float computeWingOpenness(ModelPart wingPart) {
         float wingRollAbs = Math.abs(wingPart.zRot);
-
         float fullyClosed = 0.28766277f;
         //float fullyOpen = 1.5707302f;
-        float fullyOpen = 1.5f;
+        float fullyOpen = 1.54f;
         float openness = (wingRollAbs - fullyClosed) / (fullyOpen - fullyClosed);
-        return Mth.clamp(openness, 0.0f, 1.0f);
+        return (float)EaseTypes.SINE.easeIn(openness);
+        //return Mth.clamp(openness, 0.0f, 1.0f);
     }
 
     public static float getUnsignedAOA(LivingEntity entity)
@@ -38,7 +39,7 @@ public class ModelTransformationUtil {
         float AOARaw = getUnsignedAOARaw(entity);
 
         //I want the twirl to affect the AOA of the emitters but I no no wanna do the math so here's an approximation
-        return AOARaw + (float)getTwirlProgress(entity.getId())/1.5f;
+        return AOARaw + getTwirlAOAProgress(entity.getId())/1.5f;
     }
 
 

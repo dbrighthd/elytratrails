@@ -1,6 +1,7 @@
 package dbrighthd.elytratrails.rendering;
 
 import com.mojang.blaze3d.vertex.PoseStack;
+import dbrighthd.elytratrails.api.ElytraTrailsAPI;
 import dbrighthd.elytratrails.compat.ModStatuses;
 import dbrighthd.elytratrails.compat.cpm.CpmModelStorage;
 import dbrighthd.elytratrails.compat.emf.EmfAnimationHooks;
@@ -37,7 +38,9 @@ import net.minecraft.world.entity.projectile.throwableitemprojectile.ThrowableIt
 import net.minecraft.world.phys.Vec3;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+import org.joml.Quaterniond;
 import org.joml.Quaternionf;
+import org.joml.Vector3d;
 
 import java.util.*;
 
@@ -62,7 +65,7 @@ public class WingTipSampler {
     private record ResolvedEmitterPoint(Vec3 position, boolean visible) {
     }
     public record EntityEmitters(List<Emitter> emitters, boolean changedModelVariant){}
-    public record PlayerEmitters(boolean valid, List<Emitter> emitters){};
+    public record PlayerEmitters(boolean valid, List<Emitter> emitters){}
     public Map<Integer, List<Emitter>> gatheredTrailsThisFrame = new HashMap<>();
 
     public void clearFrameCache() {
@@ -97,7 +100,7 @@ public class WingTipSampler {
         {
             if(avatarRenderState.fallFlyingScale() < 1.0F)
             {
-                return new PlayerEmitters(false, List.of());
+               return new PlayerEmitters(false, List.of());
             }
         }
         elytraModel.setupAnim(humanoidState);
@@ -109,11 +112,11 @@ public class WingTipSampler {
         basePose.last().set(elytraSubmit.pose());
 
         Vec3 entityWorldOffset = new Vec3(humanoidState.x, humanoidState.y, humanoidState.z);
-        ModelPart animatedElytraRoot = tryGetAnimatedElytraRoot(elytraModel, player);
+        ModelPart animatedElytraRoot = tryGetAnimatedElytraRoot(elytraModel, player, humanoidState);
         int eid = player.getId();
         if (ModStatuses.EMF_LOADED && config.emfSupport) {
 
-            int variant = getModelVariantFromModel(animatedElytraRoot);
+            int variant = getModelVariantFromModel(elytraModel);
 
             if (!emfCache.containsKey(eid) || !(emfCache.get(eid).variant() == variant)) {
                 emfCache.put(eid, new EmfInfo("elytra", variant, getSpawnersInfo(EmfWingTipHooks.findAllSpawnerPaths(leftWing, rightWing))));
@@ -151,25 +154,25 @@ public class WingTipSampler {
         if (mc.level == null || ShaderChecksUtil.isShadowPass())  return new EntityEmitters(List.of(),false);
         if(entity instanceof ThrowableItemProjectile || entity instanceof FireworkRocketEntity || entity instanceof ExperienceOrb)
         {
-            return new EntityEmitters(List.of(new Emitter(entity.getPosition(partialTick).add(new Vec3(sampleSettings.xOffset(), sampleSettings.yOffset(), sampleSettings.zOffset())),false, entity.getType().toShortString(), "trailSpawner", true)),false);
+            return new EntityEmitters(List.of(new Emitter(entity.getPosition(partialTick).add(offsetsFromSampleSettings(sampleSettings,1)),false, entity.getType().toShortString(), "trailSpawner", true)),false);
         }
         Camera camera = mc.gameRenderer.mainCamera();
         CameraRenderState cameraState = buildCameraState(camera);
         ModelFeatureRenderer.Submit<?> entitySubmit = extractEntityRenderState(entity, mc, cameraState, partialTick);
 
-        if (entitySubmit == null || !(entitySubmit.model() instanceof EntityModel<?> entityModel) || !(entitySubmit.state() instanceof EntityRenderState entityRenderState))
+        if (entitySubmit == null || !(entitySubmit.model() instanceof EntityModel<?> entityModel) || !(entitySubmit.state() instanceof EntityRenderState entityRenderState)) {
             return new EntityEmitters(List.of(), false);
-
+        }
         setupAnyModelAnim(entityModel, entityRenderState);
         PoseStack basePose = new PoseStack();
         basePose.last().set(entitySubmit.pose());
 
         Vec3 entityWorldOffset = new Vec3(entityRenderState.x, entityRenderState.y, entityRenderState.z);
-        ModelPart animatedRoot = tryGetAnimatedEntityRoot(entityModel, entity);
+        ModelPart animatedRoot = tryGetAnimatedEntityRoot(entityModel, entity, entityRenderState);
         int eid = entity.getId();
 
-        if (ModStatuses.EMF_LOADED && config.emfSupport) {
-            int variant = getModelVariantFromModel(animatedRoot);
+        if (!ElytraTrailsAPI.entityHasAnyTrailOverrides(entity) && ModStatuses.EMF_LOADED && config.emfSupport) {
+            int variant = getModelVariantFromModel(entityModel);
 
             if (!emfCacheGeneric.containsKey(eid) || !(emfCacheGeneric.get(eid).variant() == variant)) {
                 List<EmfWingTipHooks.SpawnerPath> found = EmfWingTipHooks.findAllSpawnerPathsGeneric(animatedRoot);
@@ -187,7 +190,7 @@ public class WingTipSampler {
                 return new EntityEmitters(gatheredTrails,false);
             }
         }
-        if(!sampleSettings.useWithoutEmf()) {
+        if(!sampleSettings.useWithoutEmf() || entity instanceof Avatar) {
             return new EntityEmitters(List.of(), false);
         }
         List<Emitter> gatheredTrails = getVanillaTrailEmittersGeneric(basePose, animatedRoot, entityModel, entityWorldOffset, entity, sampleSettings);
@@ -238,7 +241,6 @@ public class WingTipSampler {
         }
         return emitters;
     }
-
     private @NotNull List<Emitter> getTrailEmittersFromBonesGeneric(@NotNull PoseStack stack, @Nullable ModelPart elytraRoot, @NotNull Vec3 entityWorldOffset, EmfInfo emfInfo) {
         List<SpawnerInfo> spawners = emfInfo.spawners;
 
@@ -255,6 +257,16 @@ public class WingTipSampler {
         return emitters;
     }
 
+    private static Vec3 offsetsFromSampleSettings(ResolvedSampleSettings sampleSettings, double divideBy)
+    {
+        Vector3d offsets = new Vector3d(-sampleSettings.xOffset() / divideBy, -sampleSettings.yOffset() / divideBy, -sampleSettings.zOffset() / divideBy);
+        if(sampleSettings.billBoarded())
+        {
+            Camera camera = Minecraft.getInstance().gameRenderer.mainCamera();
+            offsets = offsets.rotate(new Quaterniond(camera.rotation()));
+        }
+        return new Vec3(offsets.x, offsets.y, offsets.z);
+    }
     private static boolean inferLeftWing(EmfWingTipHooks.WhichRoot modelRoot, String spawnerOrBoneName) {
 
         if (spawnerOrBoneName != null) {
@@ -279,7 +291,7 @@ public class WingTipSampler {
     }
 
     private @NotNull List<Emitter> getVanillaTrailEmittersGeneric(@NotNull PoseStack stack, @Nullable ModelPart animatedRoot, @NotNull EntityModel<?> model, @NotNull Vec3 entityWorldOffset, Entity entity, ResolvedSampleSettings sampleSettings) {
-        Vec3 offsets = new Vec3(-sampleSettings.xOffset() / 16, -sampleSettings.yOffset() / 16, -sampleSettings.zOffset() / 16);
+        Vec3 offsets = offsetsFromSampleSettings(sampleSettings,16);
         ModelPart modelPart = animatedRoot != null ? animatedRoot : model.root();
         Vec3 tip = computeTransformedPoint(stack, modelPart, modelPart, offsets);
         return List.of(
@@ -395,19 +407,19 @@ public class WingTipSampler {
         return cachedChildren.get(name.toLowerCase());
     }
 
-    private @Nullable ModelPart tryGetAnimatedElytraRoot(ElytraModel model, Avatar player) {
+    private @Nullable ModelPart tryGetAnimatedElytraRoot(ElytraModel model, Avatar player, EntityRenderState state) {
         if (!ModStatuses.EMF_LOADED || !getConfig().emfSupport) return null;
         try {
-            return EmfAnimationHooks.applyManualAnimationAndGetRoot(model, player);
+            return EmfAnimationHooks.applyManualAnimationAndGetRoot(model, player, state);
         } catch (Throwable ignored) {
             return null;
         }
     }
 
-    private @Nullable ModelPart tryGetAnimatedEntityRoot(EntityModel<?> model, Entity entity) {
+    private @Nullable ModelPart tryGetAnimatedEntityRoot(EntityModel<?> model, Entity entity, EntityRenderState state) {
         if (!ModStatuses.EMF_LOADED || !getConfig().emfSupport) return null;
         try {
-            return EmfAnimationHooks.applyManualAnimationAndGetRoot(model, entity);
+            return EmfAnimationHooks.applyManualAnimationAndGetRoot(model, entity, state);
         } catch (Throwable e) {
             return null;
         }
@@ -454,7 +466,7 @@ public class WingTipSampler {
                 if (!(modelSubmit.model() instanceof EntityModel<?> entityModel)) continue;
                 if (!(modelSubmit.state() instanceof EntityRenderState entityRenderState)) continue;
                 setupAnyModelAnim(entityModel, entityRenderState);
-                ModelPart animatedRoot = tryGetAnimatedEntityRoot(entityModel, entity);
+                ModelPart animatedRoot = tryGetAnimatedEntityRoot(entityModel, entity, entityRenderState);
                 if (fallback == null) {
                     fallback = modelSubmit;
                 }

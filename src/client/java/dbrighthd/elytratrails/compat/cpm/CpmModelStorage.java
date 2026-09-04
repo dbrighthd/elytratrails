@@ -18,7 +18,8 @@ public class CpmModelStorage {
         modelSubmits.clear();
     }
 
-    public static <S> void submitModel(final Model<? super S> model, final S state, final PoseStack poseStack,final RenderType renderType,final int lightCoords, final int overlayCoords, final int tintedColor, final @Nullable TextureAtlasSprite sprite, final int outlineColor, final ModelFeatureRenderer.@Nullable CrumblingOverlay crumblingOverlay)
+    @SuppressWarnings("unused")
+    public static <S> void submitModel(final Model<? super S> model, final S state, final PoseStack poseStack, final RenderType renderType, final int lightCoords, final int overlayCoords, final int tintedColor, final @Nullable TextureAtlasSprite sprite, final int outlineColor, final ModelFeatureRenderer.@Nullable CrumblingOverlay crumblingOverlay)
     {
         ModelFeatureRenderer.Submit<S> modelSubmit = new ModelFeatureRenderer.Submit<>(renderType, poseStack.last().copy(), model, state, lightCoords, overlayCoords, tintedColor, sprite,  new PoseStack.Pose());
         modelSubmits.add(modelSubmit);

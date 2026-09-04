@@ -86,7 +86,7 @@ public class TrailRenderer {
                 if (emitters != null && manager.isActiveTrail(trail)) {
                     if(emitters.size() <= trail.emitterIndex())
                     {
-                        manager.removeTrail(trail.entityId());
+                        manager.stopTrail(trail.entityId());
                     }
                     Emitter emitter = emitters.get(trail.emitterIndex());
                     snappedLastPoint = copyTrailPointNewPos(points.get(last), emitter.position(), emitter.visible());
@@ -101,16 +101,15 @@ public class TrailRenderer {
                 totalTrailLength = 0f;
                 currentTime = ElytraTimeUtil.currentMillis();
                 int sizeReal = points.size();
-                final int lastReal = sizeReal - 1;
-                for (int i = 0; i < lastReal; i++) {
+                for (int i = 0; i < sizeReal; i++) {
                     int i0 = (i > 0) ? i - 1 : 0;
                     int i2 = i + 1;
-                    int i3 = (i + 2 < sizeReal) ? i + 2 : lastReal;
+                    int i3 = Math.min(i + 2, sizeReal);
 
                     Trail.Point p0Point = points.get(i0);
                     Trail.Point p1Point = points.get(i);
-                    Trail.Point p2Point = (i2 == lastReal) ? effectiveLastPoint : points.get(i2);
-                    Trail.Point p3Point = (i3 == lastReal) ? effectiveLastPoint : points.get(i3);
+                    Trail.Point p2Point = (i2 == sizeReal) ? effectiveLastPoint : points.get(i2);
+                    Trail.Point p3Point = (i3 == sizeReal) ? effectiveLastPoint : points.get(i3);
 
                     Vec3 p0 = p0Point.pos();
                     Vec3 p1 = p1Point.pos();
@@ -133,15 +132,15 @@ public class TrailRenderer {
                                 && trail.entityId() == minecraft.player.getId())
                                 && minecraft.options.getCameraType().isFirstPerson()
                                 && minecraft.getCameraEntity() == minecraft.player;
-                for (int i = 0; i < lastReal; i++) {
+                for (int i = 0; i < sizeReal; i++) {
                     int i0 = (i > 0) ? i - 1 : 0;
                     int i2 = i + 1;
-                    int i3 = (i + 2 < sizeReal) ? i + 2 : lastReal;
+                    int i3 = Math.min(i + 2, sizeReal);
 
                     Trail.Point point0 = points.get(i0);
                     Trail.Point point1 = points.get(i);
-                    Trail.Point point2 = (i2 == lastReal) ? effectiveLastPoint : points.get(i2);
-                    Trail.Point point3 = (i3 == lastReal) ? effectiveLastPoint : points.get(i3);
+                    Trail.Point point2 = (i2 == sizeReal) ? effectiveLastPoint : points.get(i2);
+                    Trail.Point point3 = (i3 == sizeReal) ? effectiveLastPoint : points.get(i3);
 
                     Vec3 p0 = point0.pos();
                     Vec3 p1 = point1.pos();
@@ -150,7 +149,7 @@ public class TrailRenderer {
 
                     Vec3 startPos = modConfig.useSplines ? SplineInterpolation.catmullRom(p0, p1, p2, p3, 0f) : p1;
                     Vec3 endPos = modConfig.useSplines ? SplineInterpolation.catmullRom(p0, p1, p2, p3, 1f) : p2;
-                    renderSubdividedSegment(pose, consumer, point0, point1, point2, 0f, 1f, p0, p1, p2, p3, startPos, endPos, trail, trailSettings.color(), trailSettings);
+                    renderSubdividedSegment(pose, consumer, point0, point1, point2, 0f, 1f, p0, p1, p2, p3, startPos, endPos, trail, trailSettings.color(), trailSettings, point1.light(),point2.light());
                 }
             });
         }
@@ -159,7 +158,7 @@ public class TrailRenderer {
     }
 
     private Trail.Point copyTrailPointNewPos(Trail.Point point, Vec3 newPos, boolean visible) {
-        return new Trail.Point(newPos, point.epoch(), point.speedData(), visible, newPos);
+        return new Trail.Point(newPos, point.epoch(), point.speedData(), visible, newPos, point.light());
     }
 
 
@@ -170,7 +169,8 @@ public class TrailRenderer {
             float tStart, float tEnd,
             Vec3 p0, Vec3 p1, Vec3 p2, Vec3 p3,
             Vec3 startPos, Vec3 endPos,
-            Trail trail, int color, ResolvedTrailSettings trailSettings
+            Trail trail, int color, ResolvedTrailSettings trailSettings,
+            int lightStart, int lightEnd
     ) {
         float midT = (tStart + tEnd) / 2f;
         Vec3 midPos = SplineInterpolation.catmullRom(p0, p1, p2, p3, midT);
@@ -182,7 +182,7 @@ public class TrailRenderer {
             if (modConfig.logTrails) {
                 LOGGER.info("Trail removed for entity {}, trail segment was too long and discarded as invalid", trail.entityId());
             }
-            manager.removeTrail(trail.entityId());
+            manager.stopTrail(trail.entityId());
             manager.queueTrailDeletion(trail.trailId());
             return;
         }
@@ -201,8 +201,9 @@ public class TrailRenderer {
 
 
         if (needsSplit) {
-            renderSubdividedSegment(pose, consumer, point0, point1, point2, tStart, midT, p0, p1, p2, p3, startPos, midPos, trail, color, trailSettings);
-            renderSubdividedSegment(pose, consumer, point0, point1, point2, midT, tEnd, p0, p1, p2, p3, midPos, endPos, trail, color, trailSettings);
+            int lightMid = getMidPackedLight(lightStart,lightEnd);
+            renderSubdividedSegment(pose, consumer, point0, point1, point2, tStart, midT, p0, p1, p2, p3, startPos, midPos, trail, color, trailSettings, lightStart, lightMid);
+            renderSubdividedSegment(pose, consumer, point0, point1, point2, midT, tEnd, p0, p1, p2, p3, midPos, endPos, trail, color, trailSettings, lightMid, lightEnd);
         } else {
             PlayerSpeedData point0SpeedData = point0.speedData();
             PlayerSpeedData point1SpeedData = point1.speedData();
@@ -306,7 +307,7 @@ public class TrailRenderer {
                 v2 += removeDist;
                 v1 /= (float) trailSettings.maxWidth();
                 v2 /= (float) trailSettings.maxWidth();
-                quadBetweenPoints(pose, consumer, startPos, endPos, sideA, sideB, halfWidthStart, halfWidthEnd, v1, v2, alphaStart, alphaEnd, trail.isLeftWing(), color, trailSettings.edgeFade());
+                quadBetweenPoints(pose, consumer, startPos, endPos, sideA, sideB, halfWidthStart, halfWidthEnd, v1, v2, alphaStart, alphaEnd, trail.isLeftWing(), trail.colorOverride() != null ? trail.colorOverride().getColor() : color, trailSettings.edgeFade(), lightStart, lightEnd);
             }
             this.accumDist += segmentLength;
         }
@@ -424,7 +425,7 @@ public class TrailRenderer {
     private void quadBetweenPoints(
             PoseStack.Pose pose, VertexConsumer consumer,
             Vec3 a, Vec3 b, Vec3 sideA, Vec3 sideB,
-            float halfWidthStart, float halfWidthEnd, float v1, float v2, float alphaStart, float alphaEnd, boolean flipUv, int color, boolean edgeFade
+            float halfWidthStart, float halfWidthEnd, float v1, float v2, float alphaStart, float alphaEnd, boolean flipUv, int color, boolean edgeFade, int lightA, int lightB
     ) {
         Vector3f p1 = a.add(sideA.scale(halfWidthStart)).subtract(cameraPosition).toVector3f();
         Vector3f p2 = b.add(sideB.scale(halfWidthEnd)).subtract(cameraPosition).toVector3f();
@@ -436,8 +437,8 @@ public class TrailRenderer {
         Vector3f p6 = b.toVector3f().sub(cameraPosition.toVector3f());
 
         int overlay = OverlayTexture.NO_OVERLAY;
-        int lightStart = useLightMap ? computeLightTexture(a) : LightCoordsUtil.FULL_BRIGHT;
-        int lightEnd = useLightMap ? computeLightTexture(b) : LightCoordsUtil.FULL_BRIGHT;
+        int lightStart = modConfig.simplifyLighting? lightA : (useLightMap ? computeLightTexture(a) : LightCoordsUtil.FULL_BRIGHT);
+        int lightEnd = modConfig.simplifyLighting? lightB : (useLightMap ? computeLightTexture(b) : LightCoordsUtil.FULL_BRIGHT);
 
         int colorStart = multiplyAlpha(color, alphaStart);
         int colorEnd = multiplyAlpha(color, alphaEnd);
@@ -575,6 +576,12 @@ public class TrailRenderer {
         return t * t * (3f - 2f * t);
     }
 
+    private int getMidPackedLight(int lightStart, int lightEnd)
+    {
+        int lightMidSky = (LightCoordsUtil.sky(lightStart) + LightCoordsUtil.sky(lightEnd))/2;
+        int lightMidBlock = (LightCoordsUtil.block(lightStart) + LightCoordsUtil.block(lightEnd))/2;
+        return LightCoordsUtil.pack(lightMidBlock,lightMidSky);
+    }
     // minecraft's alpha multiply function sets color to 0 when alpha is 0, which breaks with our interpolation. this function does the same but just sets alpha to be min 0
     private int multiplyAlpha(int color, float alpha) {
         return alpha >= 1.0F ? color : color(alphaFloat(color) * max(0, alpha), color);

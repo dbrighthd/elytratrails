@@ -1,6 +1,7 @@
 package dbrighthd.elytratrails.mixin.client;
 
-import dbrighthd.elytratrails.controller.EntityTwirlManager;
+import com.mojang.math.Axis;
+import dbrighthd.elytratrails.twirling.TwirlManager;
 import net.minecraft.client.Camera;
 import net.minecraft.client.Minecraft;
 import net.minecraft.world.entity.Entity;
@@ -51,13 +52,14 @@ public class CameraTwirlMixin {
         if (!isFirstPerson && !fishysStupidThirdPersonCameraRoll) {
             return;
         }
-        float extra = EntityTwirlManager.getExtraRollRadians(camEntity.getId());
+        int eid = camEntity.getId();
+        float extra = TwirlManager.getExtraRollRadians(eid, mc.getDeltaTracker().getGameTimeDeltaPartialTick(false));
 
-        if (frontView) {
+        if (frontView && !TwirlManager.getAxis(eid).equals(Axis.ZP)) {
             extra *= -1;
         }
         if (extra != 0f) {
-            this.rotation.rotateZ(-extra);
+            this.rotation.rotateAxis(-extra, TwirlManager.getCameraAxisVector(eid));
         }
     }
 }

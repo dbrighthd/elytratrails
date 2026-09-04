@@ -8,6 +8,7 @@ public final class FlashbackCompat {
     private FlashbackCompat() {
     }
 
+    @SuppressWarnings("unused")
     public static boolean isReplayPaused() {
         ReplayServer replayServer = Flashback.getReplayServer();
         return replayServer != null && replayServer.replayPaused;

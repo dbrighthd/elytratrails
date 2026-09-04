@@ -1,21 +1,24 @@
 package dbrighthd.elytratrails.rendering;
 
+import dbrighthd.elytratrails.api.ElytraTrailsAPI;
+import dbrighthd.elytratrails.api.ResolvedValues;
 import dbrighthd.elytratrails.config.ModConfig;
 import dbrighthd.elytratrails.config.pack.ResolvedSampleSettings;
 import dbrighthd.elytratrails.config.pack.ResolvedTrailSettings;
-import dbrighthd.elytratrails.config.pack.TrailPackConfigManager;
 import dbrighthd.elytratrails.network.ClientPlayerConfigStore;
 import dbrighthd.elytratrails.util.ElytraTimeUtil;
+import dbrighthd.elytratrails.util.FlashBackUtil;
 import it.unimi.dsi.fastutil.ints.Int2ObjectMap;
 import it.unimi.dsi.fastutil.ints.Int2ObjectOpenHashMap;
 import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents;
 import net.fabricmc.fabric.api.client.rendering.v1.level.LevelRenderEvents;
 import net.minecraft.client.Minecraft;
+import net.minecraft.core.BlockPos;
+import net.minecraft.util.LightCoordsUtil;
 import net.minecraft.util.RandomSource;
 import net.minecraft.world.entity.Avatar;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.LivingEntity;
-import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.levelgen.synth.PerlinNoise;
 import net.minecraft.world.phys.Vec3;
 import org.slf4j.Logger;
@@ -25,7 +28,7 @@ import java.util.*;
 
 import static dbrighthd.elytratrails.ElytraTrailsClient.getConfig;
 import static dbrighthd.elytratrails.config.pack.TrailPackConfigManager.*;
-import static dbrighthd.elytratrails.controller.EntityTwirlManager.isRolling;
+import static dbrighthd.elytratrails.twirling.TwirlManager.isRolling;
 import static dbrighthd.elytratrails.util.ModelTransformationUtil.getUnsignedAOA;
 import static java.lang.Math.cos;
 import static java.lang.Math.sin;
@@ -73,7 +76,7 @@ public class TrailManager {
                 return;
             }
             gatherPlayerTrails(Minecraft.getInstance(), recordEmitters);
-            if (modConfig.extendedEmfSupport && (!entitiesWithTrails.isEmpty() || !entitiesWithTrailOverrides.isEmpty())) {
+            if (ElytraTrailsAPI.doAPIOverridesExist() || modConfig.extendedEmfSupport && (!entitiesWithTrails.isEmpty() || !entitiesWithTrailOverrides.isEmpty())) {
                 gatherEntityTrails(Minecraft.getInstance(), recordEmitters);
             }
             past = ElytraTimeUtil.currentMillis();
@@ -85,7 +88,6 @@ public class TrailManager {
         {
             for (Trail trail : trails) {
                 List<Trail.Point> points = trail.points();
-
                 points.replaceAll(point -> point.addPositionOffset(positionToWindVector(point)));
 
             }
@@ -144,6 +146,10 @@ public class TrailManager {
         trailsToRemove.clear();
         trails.removeIf(t -> (t.points().isEmpty() || t.points().stream().allMatch(p -> currentTime - p.epoch() > t.config().trailLifetime() * 1000)) && removeTrailFromMap(t));
         for (Trail trail : trails) {
+            if(trail.colorOverride() != null)
+            {
+                trail.colorOverride().setColor();
+            }
             List<Trail.Point> points = trail.points();
             if (points.size() < 2) continue;
 
@@ -179,7 +185,7 @@ public class TrailManager {
     }
 
 
-    public void removeTrail(int entityId) {
+    public void stopTrail(int entityId) {
         if (getConfig().logTrails && activeTrails.containsKey(entityId)) {
             LOGGER.info("Stopped trail for entity {}", entityId);
         }
@@ -188,9 +194,10 @@ public class TrailManager {
 
     private void gatherPlayerTrails(Minecraft ctx, boolean recordEmitter) {
         if (ctx.level == null) return;
+        boolean isInFlashback = FlashBackUtil.isInReplay();
         sampler.clearFrameCache();
         for (Entity entity : ctx.level.entitiesForRendering()) {
-            if (!(entity instanceof Avatar player)) {
+            if (!(entity instanceof Avatar player) || ((!ClientPlayerConfigStore.serverTrailsEnabled) && entity.getId() != (Minecraft.getInstance().player != null ? Minecraft.getInstance().player.getId() : 0)) && !isInFlashback) {
                 continue;
             }
             int eid = player.getId();
@@ -199,7 +206,7 @@ public class TrailManager {
             boolean valid = TrailManager.isPlayerTrailValid(config, player);
 
             if (valid) {
-                WingTipSampler.PlayerEmitters playerEmitters =sampler.getPlayerTrailEmitterPositions(player, ctx.getDeltaTracker().getGameTimeDeltaPartialTick(false));
+                WingTipSampler.PlayerEmitters playerEmitters = sampler.getPlayerTrailEmitterPositions(player, ctx.getDeltaTracker().getGameTimeDeltaPartialTick(false));
                 if(!playerEmitters.valid())
                 {
                     continue;
@@ -230,7 +237,7 @@ public class TrailManager {
                     List<Trail> emittedTrails = new ArrayList<>();
                     int emitterId = 0;
                     for (Emitter emitter : emitters) {
-                        emittedTrails.add(Trail.fromPlayerConfig(player.getId(), emitter, emitterId, newTrailId()));
+                        emittedTrails.add(Trail.createTrail(player.getId(), emitter, emitterId, newTrailId(),sampleSettings.useColorOverride() ? ElytraTrailsAPI.getColorOverrideForEntity(entity) : null, null));
                         emitterId++;
                     }
 
@@ -250,9 +257,9 @@ public class TrailManager {
 
                     Trail trail = trailGroup.trails().get(i);
                     Emitter emitter = emitters.get(i);
-                    trail.points().add(new Trail.Point(emitter.position(), speedData,emitter.visible()));}
+                    trail.points().add(new Trail.Point(emitter.position(), speedData,emitter.visible(),  modConfig.simplifyLighting ? LightCoordsUtil.getLightCoords(ctx.level, BlockPos.containing(emitter.position())) : LightCoordsUtil.FULL_BRIGHT));}
             } else {
-                removeTrail(eid);
+                stopTrail(eid);
             }
         }
     }
@@ -269,19 +276,29 @@ public class TrailManager {
 
     private void gatherEntityTrails(Minecraft ctx, boolean recordEmitter) {
         if (ctx.level == null) return;
-        for (Entity entity : ctx.level.entitiesForRendering()) {
 
-            if (!TrailPackConfigManager.doesEntityHaveEmfTrails(entity) && ((!modConfig.tryWithoutEmf) && doesEntityHaveOverrides(entity)) || (!doesEntityHaveOverrides(entity) && !doesEntityHaveEmfTrails(entity))) {
+        for (Entity entity : ctx.level.entitiesForRendering()) {
+            if (entity instanceof Avatar) {
+                continue;
+            }
+            boolean hasAPIOverrides = ElytraTrailsAPI.entityHasAnyTrailOverrides(entity);
+            if (!hasAPIOverrides && (!doesEntityHaveEmfTrails(entity) && ((!modConfig.tryWithoutEmf) && doesEntityHaveOverrides(entity)) || (!doesEntityHaveOverrides(entity) && !doesEntityHaveEmfTrails(entity)))) {
                 continue;
             }
             int eid = entity.getId();
-            ResolvedSampleSettings config = getConfigFromEntity(entity);
+            ResolvedValues resolvedValues;
+            if(hasAPIOverrides)
+            {
+                resolvedValues = ElytraTrailsAPI.getTrailOverrides(entity);
+            }
+            else
+            {
+                resolvedValues = null;
+            }
+            ResolvedSampleSettings config = resolvedValues != null ? resolvedValues.sampleSettings() : getConfigFromEntity(entity);
             boolean valid = TrailManager.isEntityTrailValid(config, entity);
 
             if (valid) {
-                if (entity instanceof Player) {
-                    continue;
-                }
                 List<Emitter> emitters = sampler.getEntityTrailEmitterPositions(entity, ctx.getDeltaTracker().getGameTimeDeltaPartialTick(false), config).emitters();
                 double speed = entity.getDeltaMovement().length();
                 if (emitters.isEmpty()) {
@@ -298,7 +315,7 @@ public class TrailManager {
                     List<Trail> emittedTrails = new ArrayList<>();
                     int emitterId = 0;
                     for (Emitter emitter : emitters) {
-                        emittedTrails.add(Trail.fromPlayerConfig(entity.getId(), emitter, emitterId, newTrailId()));
+                        emittedTrails.add(Trail.createTrail(entity.getId(), emitter, emitterId, newTrailId(), config.useColorOverride() ? ElytraTrailsAPI.getColorOverrideForEntity(entity) : null, resolvedValues != null ? resolvedValues.resolvedTrailSettings() : null));
                         emitterId++;
                     }
 
@@ -318,20 +335,20 @@ public class TrailManager {
 
                     Trail trail = trailGroup.trails().get(i);
                     Emitter emitter = emitters.get(i);
-                    trail.points().add(new Trail.Point(emitter.position(), new PlayerSpeedData(speed, 0, false), emitter.visible()));
+                    trail.points().add(new Trail.Point(emitter.position(), new PlayerSpeedData(speed, 0, false), emitter.visible(), modConfig.simplifyLighting ? LightCoordsUtil.getLightCoords(ctx.level, BlockPos.containing(emitter.position())) : LightCoordsUtil.FULL_BRIGHT));
                 }
             } else {
-                removeTrail(eid);
+                stopTrail(eid);
             }
         }
     }
 
     public static ResolvedTrailSettings getConfigFromPlayerId(int entityId) {
-        return TrailPackConfigManager.resolveFromPlayerConfig(ClientPlayerConfigStore.getOrDefault(entityId));
+        return resolveFromPlayerConfig(ClientPlayerConfigStore.getOrDefault(entityId));
     }
 
     public static ResolvedSampleSettings getConfigFromEntity(Entity entity) {
-        return TrailPackConfigManager.getDefaultEntitySettings(entity);
+        return getDefaultEntitySettings(entity);
     }
 
     public static boolean isPlayerTrailValid(ResolvedTrailSettings config, Entity entity) {
@@ -357,10 +374,17 @@ public class TrailManager {
     }
 
     public void removeAllTrails() {
-        if (modConfig.logTrails) {
+        if (modConfig != null && modConfig.logTrails) {
             LOGGER.info("Cleared {} trails, of which {} were active.", trails.size(), activeTrails.size());
         }
         activeTrails.clear();
         trails.clear();
+    }
+
+    public void stopAllTrails() {
+        if (modConfig != null && modConfig.logTrails) {
+            LOGGER.info("Stopped {} active trails", activeTrails.size());
+        }
+        activeTrails.clear();
     }
 }
