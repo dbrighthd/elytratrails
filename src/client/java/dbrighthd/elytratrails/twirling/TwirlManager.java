@@ -94,6 +94,33 @@ public class TwirlManager {
         TwirlData twirlData = twirlMap.get(entityId);
         return twirlData.getTwirlAOAProgress();
     }
+
+    public static float getTwirlEMFProgress(int entityId)
+    {
+        if(!twirlMap.containsKey(entityId))
+        {
+            return 0;
+        }
+        TwirlData twirlData = twirlMap.get(entityId);
+        return twirlData.getTwirlEMFProgress();
+    }
+
+    public static float getTwirlEMFProgressFromUUID(UUID uuid)
+    {
+        ClientLevel level = Minecraft.getInstance().level;
+        if(level == null)
+        {
+            return  0;
+        }
+        Entity e = Minecraft.getInstance().level.getEntity(uuid);
+        if(e == null)
+        {
+            return  0;
+        }
+        int entityId = e.getId();
+        return getTwirlEMFProgress(entityId);
+
+    }
     public static void updateAllTwirls(Minecraft minecraft)
     {
         if(minecraft.isPaused())

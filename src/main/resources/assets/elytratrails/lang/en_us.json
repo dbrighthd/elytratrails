@@ -1,4 +1,10 @@
 {
+  "text.elytratrails.animation.twirl_angle" : "twirl_angle",
+  "text.elytratrails.animation.twirl_angle_explanation" : "[Elytra Contrails Mod] Current angle in radians that the entity is twirling at with the Elytra Contrails mod.",
+
+  "text.elytratrails.animation.twirl_state" : "twirl_state",
+  "text.elytratrails.animation.twirl_state_explanation" : "[Elytra Contrails Mod] Progress in twirling. 0-1: Easing in, 1-2: In between twirl, 2-3: easing out",
+
   "text.elytratrails.category.elytra.@Tooltip": "Settings that affect your own trails.",
   "text.elytratrails.category.others.@Tooltip": "Defaults used for other players/entities (unless overridden by packs).",
   "text.elytratrails.category.server.@Tooltip": "Networking + safety limits for settings received from other players.",

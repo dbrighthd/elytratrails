@@ -60,7 +60,8 @@ public final class EmfAnimationHooks {
     public static void registerAnimationVariables()
     {
         try {
-            EMFAnimationApi.registerUniqueAnimationVariableFactory(MOD_ID,"twirl_angle",new TwirlAnimFactory());
+            EMFAnimationApi.registerUniqueAnimationVariableFactory(MOD_ID,"twirl_angle",new TwirlAngleAnimFactory());
+            EMFAnimationApi.registerUniqueAnimationVariableFactory(MOD_ID, "twirl_state", new TwirlStateAnimFactory());
         } catch (Exception ignored) {
         }
     }

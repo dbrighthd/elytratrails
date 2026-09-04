@@ -273,6 +273,32 @@ public class TwirlData {
     }
 
     /**
+     * 0-1: easing in
+     * 1-2: continuous twirl
+     * 2-3: easing out
+     * @return twirl "state" progress
+     */
+    public float getTwirlEMFProgress()
+    {
+        if(twirlQueue.isEmpty())
+        {
+            return 0;
+        }
+        Twirl twirl = twirlQueue.getFirst();
+        switch(twirl.easeMode()) {
+            case EaseTypes.EaseMode.BOTH -> {
+                return 1 + (float) twirlProgress;
+            }
+            case EaseTypes.EaseMode.IN -> {
+                return (float) twirlProgress;
+            }
+            default -> {
+                return 2 + (float) twirlProgress;
+            }
+        }
+    }
+
+    /**
      * send a twirl packet to server
      * @param twirl twirl to send
      */
