@@ -213,23 +213,23 @@ public class ConfigScreenBuilder {
                 .build());
         keybinds.addEntry(entryBuilder.startKeyCodeField(
                         Component.translatable("text.elytratrails.option.twirl_r_continuous_key"),
-                        ElytraTrailsKeybind.DO_A_LIL_TWIRL_R_TWO.key
+                        ElytraTrailsKeybind.DO_A_LIL_TWIRL_R_ONE.key
                 )
-                .setDefaultValue(ElytraTrailsKeybind.DO_A_LIL_TWIRL_R_TWO.getDefaultKey())
+                .setDefaultValue(ElytraTrailsKeybind.DO_A_LIL_TWIRL_R_ONE.getDefaultKey())
                 .setTooltip(Component.translatable("text.elytratrails.option.twirl_r_continuous_key.@Tooltip"))
                 .setKeySaveConsumer(newKey -> {
-                    ElytraTrailsKeybind.DO_A_LIL_TWIRL_R_TWO.setKey(newKey);
+                    ElytraTrailsKeybind.DO_A_LIL_TWIRL_R_ONE.setKey(newKey);
                     KeyMapping.resetMapping();
                 })
                 .build());
         keybinds.addEntry(entryBuilder.startKeyCodeField(
                         Component.translatable("text.elytratrails.option.twirl_l_continuous_key"),
-                        ElytraTrailsKeybind.DO_A_LIL_TWIRL_L_TWO.key
+                        ElytraTrailsKeybind.DO_A_LIL_TWIRL_L_ONE.key
                 )
-                .setDefaultValue(ElytraTrailsKeybind.DO_A_LIL_TWIRL_L_TWO.getDefaultKey())
+                .setDefaultValue(ElytraTrailsKeybind.DO_A_LIL_TWIRL_L_ONE.getDefaultKey())
                 .setTooltip(Component.translatable("text.elytratrails.option.twirl_l_continuous_key.@Tooltip"))
                 .setKeySaveConsumer(newKey -> {
-                    ElytraTrailsKeybind.DO_A_LIL_TWIRL_L_TWO.setKey(newKey);
+                    ElytraTrailsKeybind.DO_A_LIL_TWIRL_L_ONE.setKey(newKey);
                     KeyMapping.resetMapping();
                 })
                 .build());
@@ -246,23 +246,23 @@ public class ConfigScreenBuilder {
                 .build());
         keybinds.addEntry(entryBuilder.startKeyCodeField(
                         Component.translatable("text.elytratrails.option.twirl_r_continuous_key_two"),
-                        ElytraTrailsKeybind.DO_A_LIL_TWIRL_R_ONE.key
+                        ElytraTrailsKeybind.DO_A_LIL_TWIRL_R_TWO.key
                 )
-                .setDefaultValue(ElytraTrailsKeybind.DO_A_LIL_TWIRL_R_ONE.getDefaultKey())
+                .setDefaultValue(ElytraTrailsKeybind.DO_A_LIL_TWIRL_R_TWO.getDefaultKey())
                 .setTooltip(Component.translatable("text.elytratrails.option.twirl_r_continuous_key_two.@Tooltip"))
                 .setKeySaveConsumer(newKey -> {
-                    ElytraTrailsKeybind.DO_A_LIL_TWIRL_R_ONE.setKey(newKey);
+                    ElytraTrailsKeybind.DO_A_LIL_TWIRL_R_TWO.setKey(newKey);
                     KeyMapping.resetMapping();
                 })
                 .build());
         keybinds.addEntry(entryBuilder.startKeyCodeField(
                         Component.translatable("text.elytratrails.option.twirl_l_continuous_key_two"),
-                        ElytraTrailsKeybind.DO_A_LIL_TWIRL_L_ONE.key
+                        ElytraTrailsKeybind.DO_A_LIL_TWIRL_L_TWO.key
                 )
-                .setDefaultValue(ElytraTrailsKeybind.DO_A_LIL_TWIRL_L_ONE.getDefaultKey())
+                .setDefaultValue(ElytraTrailsKeybind.DO_A_LIL_TWIRL_L_TWO.getDefaultKey())
                 .setTooltip(Component.translatable("text.elytratrails.option.twirl_l_continuous_key_two.@Tooltip"))
                 .setKeySaveConsumer(newKey -> {
-                    ElytraTrailsKeybind.DO_A_LIL_TWIRL_L_ONE.setKey(newKey);
+                    ElytraTrailsKeybind.DO_A_LIL_TWIRL_L_TWO.setKey(newKey);
                     KeyMapping.resetMapping();
                 })
                 .build());
