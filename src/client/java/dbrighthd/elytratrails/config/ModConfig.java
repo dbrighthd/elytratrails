@@ -41,6 +41,8 @@ public class ModConfig {
         CLEAR,
     }
     public boolean simplifyLighting = true;
+    public boolean debugRender = false;
+    public boolean hideTrailDuringDebugRender = true;
     public boolean alwaysGlowWhenShaderTranslucent = true;
 
     //twirlstuff

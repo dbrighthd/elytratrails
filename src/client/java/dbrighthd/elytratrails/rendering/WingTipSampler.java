@@ -67,6 +67,18 @@ public class WingTipSampler {
     public record EntityEmitters(List<Emitter> emitters, boolean changedModelVariant){}
     public record PlayerEmitters(boolean valid, List<Emitter> emitters){}
     public Map<Integer, List<Emitter>> gatheredTrailsThisFrame = new HashMap<>();
+    public CameraRenderState cameraState;
+    private Minecraft mc;
+    private ModConfig config;
+
+    public void frameSetup(Minecraft minecraft, ModConfig modConfig)
+    {
+        clearFrameCache();
+        mc = minecraft;
+        config = modConfig;
+        Camera camera = minecraft.gameRenderer.mainCamera();
+        cameraState = buildCameraState(camera);
+    }
 
     public void clearFrameCache() {
         gatheredTrailsThisFrame.clear();
@@ -81,16 +93,11 @@ public class WingTipSampler {
         {
             CpmModelStorage.resetSubmits();
         }
-        ModConfig config = getConfig();
-        Minecraft mc = Minecraft.getInstance();
         if (mc.level == null || ShaderChecksUtil.isShadowPass()) return new PlayerEmitters(true, List.of());
-
-        Camera camera = mc.gameRenderer.mainCamera();
-        CameraRenderState cameraState = buildCameraState(camera);
-        ModelFeatureRenderer.Submit<?> elytraSubmit = extractElytraRenderState(player, mc, cameraState, partialTick);
+        ModelFeatureRenderer.Submit<?> elytraSubmit = extractElytraRenderState(player, partialTick);
         if(elytraSubmit == null)
         {
-            elytraSubmit = extractElytraRenderState(player, mc, cameraState, partialTick);
+            elytraSubmit = extractElytraRenderState(player, partialTick);
         }
         if (elytraSubmit == null || !(elytraSubmit.model() instanceof ElytraModel elytraModel) || !(elytraSubmit.state() instanceof HumanoidRenderState humanoidState))
         {
@@ -100,7 +107,7 @@ public class WingTipSampler {
         {
             if(avatarRenderState.fallFlyingScale() < 1.0F)
             {
-               return new PlayerEmitters(false, List.of());
+                return new PlayerEmitters(false, List.of());
             }
         }
         elytraModel.setupAnim(humanoidState);
@@ -112,7 +119,7 @@ public class WingTipSampler {
         basePose.last().set(elytraSubmit.pose());
 
         Vec3 entityWorldOffset = new Vec3(humanoidState.x, humanoidState.y, humanoidState.z);
-        ModelPart animatedElytraRoot = tryGetAnimatedElytraRoot(elytraModel, player, humanoidState);
+        ModelPart animatedElytraRoot = tryGetAnimatedEntityRoot(elytraModel, player, humanoidState);
         int eid = player.getId();
         if (ModStatuses.EMF_LOADED && config.emfSupport) {
 
@@ -149,16 +156,12 @@ public class WingTipSampler {
     }
 
     public @NotNull EntityEmitters getEntityTrailEmitterPositions(Entity entity, float partialTick, ResolvedSampleSettings sampleSettings) {
-        ModConfig config = getConfig();
-        Minecraft mc = Minecraft.getInstance();
         if (mc.level == null || ShaderChecksUtil.isShadowPass())  return new EntityEmitters(List.of(),false);
         if(entity instanceof ThrowableItemProjectile || entity instanceof FireworkRocketEntity || entity instanceof ExperienceOrb)
         {
-            return new EntityEmitters(List.of(new Emitter(entity.getPosition(partialTick).add(offsetsFromSampleSettings(sampleSettings,1)),false, entity.getType().toShortString(), "trailSpawner", true)),false);
+            return new EntityEmitters(List.of(new Emitter(entity.getPosition(partialTick).add(offsetsFromSampleSettings(sampleSettings,-1)),false, entity.getType().toShortString(), "trailSpawner", true)),false);
         }
-        Camera camera = mc.gameRenderer.mainCamera();
-        CameraRenderState cameraState = buildCameraState(camera);
-        ModelFeatureRenderer.Submit<?> entitySubmit = extractEntityRenderState(entity, mc, cameraState, partialTick);
+        ModelFeatureRenderer.Submit<?> entitySubmit = extractEntityRenderState(entity, partialTick);
 
         if (entitySubmit == null || !(entitySubmit.model() instanceof EntityModel<?> entityModel) || !(entitySubmit.state() instanceof EntityRenderState entityRenderState)) {
             return new EntityEmitters(List.of(), false);
@@ -257,14 +260,14 @@ public class WingTipSampler {
         return emitters;
     }
 
-    private static Vec3 offsetsFromSampleSettings(ResolvedSampleSettings sampleSettings, double divideBy)
+    private Vec3 offsetsFromSampleSettings(ResolvedSampleSettings sampleSettings, double divideBy)
     {
         Vector3d offsets = new Vector3d(-sampleSettings.xOffset() / divideBy, -sampleSettings.yOffset() / divideBy, -sampleSettings.zOffset() / divideBy);
         if(sampleSettings.billBoarded())
         {
-            Camera camera = Minecraft.getInstance().gameRenderer.mainCamera();
-            offsets = offsets.rotate(new Quaterniond(camera.rotation()));
+            new Quaterniond(cameraState.orientation).transform(offsets);
         }
+        offsets = offsets.add(new Vector3d(sampleSettings.xOffsetPostBillboard(), sampleSettings.yOffsetPostBillboard(), sampleSettings.zOffsetPostBillboard()));
         return new Vec3(offsets.x, offsets.y, offsets.z);
     }
     private static boolean inferLeftWing(EmfWingTipHooks.WhichRoot modelRoot, String spawnerOrBoneName) {
@@ -406,16 +409,6 @@ public class WingTipSampler {
 
         return cachedChildren.get(name.toLowerCase());
     }
-
-    private @Nullable ModelPart tryGetAnimatedElytraRoot(ElytraModel model, Avatar player, EntityRenderState state) {
-        if (!ModStatuses.EMF_LOADED || !getConfig().emfSupport) return null;
-        try {
-            return EmfAnimationHooks.applyManualAnimationAndGetRoot(model, player, state);
-        } catch (Throwable ignored) {
-            return null;
-        }
-    }
-
     private @Nullable ModelPart tryGetAnimatedEntityRoot(EntityModel<?> model, Entity entity, EntityRenderState state) {
         if (!ModStatuses.EMF_LOADED || !getConfig().emfSupport) return null;
         try {
@@ -435,7 +428,7 @@ public class WingTipSampler {
     }
 
     @SuppressWarnings("unchecked")
-    private ModelFeatureRenderer.Submit<?> extractElytraRenderState(Avatar player, Minecraft mc, CameraRenderState cameraRenderState, float partialTick) {
+    private ModelFeatureRenderer.Submit<?> extractElytraRenderState(Avatar player, float partialTick) {
         EntityRenderDispatcher dispatcher = mc.getEntityRenderDispatcher();
         AvatarRenderState state = new AvatarRenderState();
 
@@ -443,16 +436,16 @@ public class WingTipSampler {
         renderer.extractRenderState(player, state, partialTick);
 
         submitStorage.getSubmitsPerOrder().clear();
-        dispatcher.submit(state, cameraRenderState, 0, 0, 0, new PoseStack(), submitStorage);
+        dispatcher.submit(state, cameraState, 0, 0, 0, new PoseStack(), submitStorage);
         return findElytraModelSubmit();
     }
 
-    private ModelFeatureRenderer.Submit<?> extractEntityRenderState(Entity entity, Minecraft mc, CameraRenderState cameraRenderState, float partialTick) {
+    private ModelFeatureRenderer.Submit<?> extractEntityRenderState(Entity entity,float partialTick) {
         EntityRenderDispatcher dispatcher = mc.getEntityRenderDispatcher();
 
         EntityRenderState state = dispatcher.extractEntity(entity, partialTick);
         submitStorage.getSubmitsPerOrder().clear();
-        dispatcher.submit(state, cameraRenderState, 0, 0, 0, new PoseStack(), submitStorage);
+        dispatcher.submit(state, cameraState, 0, 0, 0, new PoseStack(), submitStorage);
 
         List<SubmitNode> submits = getAllModelSubmits();
         ModelFeatureRenderer.Submit<?> fallback = null;

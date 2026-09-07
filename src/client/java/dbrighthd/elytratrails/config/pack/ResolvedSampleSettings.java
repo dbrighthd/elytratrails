@@ -8,6 +8,9 @@ package dbrighthd.elytratrails.config.pack;
  * @param xOffset X offset from model origin. In relative  model unites (1/16th of a block) with entities with models, in absolute blockpos for projectiles
  * @param yOffset Y offset from model origin. In relative model unites (1/16th of a block) with entities with models, in absolute blockpos for projectiles
  * @param zOffset Z offset from model origin. In relative model unites (1/16th of a block) with entities with models, in absolute blockpos for projectiles
+ * @param xOffsetPostBillboard X offset from model origin after applying billboarding (if billBoarded is true)
+ * @param yOffsetPostBillboard Y offset from model origin after applying billboarding (if billBoarded is true)
+ * @param zOffsetPostBillboard Z offset from model origin after applying billboarding (if billBoarded is true)
  * @param billBoarded whether to billboard the XYZ offsets (useful for XP orbs and Ender Pearls)
  * @param useColorOverride whether to use the Color Override
  */
@@ -18,13 +21,16 @@ public record ResolvedSampleSettings(
         double xOffset,
         double yOffset,
         double zOffset,
+        double xOffsetPostBillboard,
+        double yOffsetPostBillboard,
+        double zOffsetPostBillboard,
         boolean billBoarded,
         boolean useColorOverride) {
     public static ResolvedSampleSettings defaults() {
-        return new ResolvedSampleSettings(true, false, 0, 0, 0, 0, false, true);
+        return new ResolvedSampleSettings(true, false, 0, 0, 0, 0, 0, 0, 0, false, true);
     }
     public static ResolvedSampleSettings playerDefaults() {
-        return new ResolvedSampleSettings(false, false, 0, 0, 0, 0, false, true);
+        return new ResolvedSampleSettings(false, false, 0, 0, 0, 0, 0,0,0, false, true);
     }
 
 }

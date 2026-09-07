@@ -10,6 +10,11 @@
   "text.elytratrails.category.server.@Tooltip": "Networking + safety limits for settings received from other players.",
   "text.elytratrails.category.particles.@Tooltip": "Optional particle effects while flying.",
 
+  "text.elytratrails.option.debugRender": "Debug Render",
+  "text.elytratrails.option.debugRender.@Tooltip": "Render dots at trail points. GREEN: Wingtip/last trail point, RED: trail point YELLOW: end of trail, BLUE: spline point",
+
+  "text.elytratrails.option.hideTrailDuringDebugRender" : "Hide Trail During Debug Render",
+  "text.elytratrails.option.hideTrailDuringDebugRender.@Tooltip" : "Skip trail rendering when rendering dots",
 
   "text.elytratrails.title": "Elytra Contrails Mod Settings",
 

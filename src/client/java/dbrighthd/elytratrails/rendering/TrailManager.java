@@ -175,6 +175,10 @@ public class TrailManager {
 
     public boolean removeTrailFromMap(Trail trail) {
         deadPointDistance.remove(trail.trailId());
+        if(isActiveTrail(trail))
+        {
+            stopTrail(trail.entityId());
+        }
         return true;
 
     }
@@ -195,7 +199,7 @@ public class TrailManager {
     private void gatherPlayerTrails(Minecraft ctx, boolean recordEmitter) {
         if (ctx.level == null) return;
         boolean isInFlashback = FlashBackUtil.isInReplay();
-        sampler.clearFrameCache();
+        sampler.frameSetup(ctx, modConfig);
         for (Entity entity : ctx.level.entitiesForRendering()) {
             if (!(entity instanceof Avatar player) || ((!ClientPlayerConfigStore.serverTrailsEnabled) && entity.getId() != (Minecraft.getInstance().player != null ? Minecraft.getInstance().player.getId() : 0)) && !isInFlashback) {
                 continue;
