@@ -1,7 +1,8 @@
 {
   "defaults": {
     "parentPreset": "internal:exp",
-    "yOffset" : -0.1,
+    "yOffset" : 0.1,
+    "yOffsetPostBillboard" : 0.1,
     "billBoarded" : true,
     "useColorOverride" : true,
     "speedDependentTrail" : true,

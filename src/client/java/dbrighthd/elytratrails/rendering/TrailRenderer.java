@@ -44,6 +44,7 @@ public class TrailRenderer {
     private float accumDist = 0.0f;
     private ModConfig modConfig;
     private final PerlinNoise perlinNoise = PerlinNoise.create(RandomSource.create(), List.of(1));
+    private final Identifier debugPointTexture = Identifier.parse("elytratrails:textures/debug/trailpoint.png");
     private float totalTrailLength;
     boolean isFirstPerson;
     boolean atEnd;
@@ -73,7 +74,7 @@ public class TrailRenderer {
         for (Trail trail : manager.trails()) {
             List<Trail.Point> points = trail.points();
             int size = points.size();
-            if (size < 4) continue;
+            if (size < 4 && !modConfig.debugRender) continue;
 
             ResolvedTrailSettings trailSettings = trail.config();
             RenderType renderType = trail.renderType();
@@ -81,7 +82,7 @@ public class TrailRenderer {
             final int last = size - 1;
 
             Trail.Point snappedLastPoint = null;
-            if (modConfig.alwaysSnapTrail && size > 4) {
+            if (modConfig.alwaysSnapTrail) {
                 List<Emitter> emitters = gatheredThisFrame.get(trail.entityId());
                 if (emitters != null && manager.isActiveTrail(trail)) {
                     if(emitters.size() <= trail.emitterIndex())
@@ -94,6 +95,73 @@ public class TrailRenderer {
             }
 
             final Trail.Point effectiveLastPoint = snappedLastPoint != null ? snappedLastPoint : points.get(last);
+
+            if(modConfig.debugRender)
+            {
+                collector.order(1).submitCustomGeometry(poseStack, TrailPipelines.entityCutoutEmissiveUnlit(debugPointTexture), (pose, consumer) -> {
+
+                    int overlay = OverlayTexture.NO_OVERLAY;
+
+                    for (int i = 0; i <= points.size(); i++) {
+                        Trail.Point point = (i == points.size())
+                                ? effectiveLastPoint
+                                : points.get(i);
+
+                        if(i == points.size()-1)
+                        {
+                            if(!manager.isActiveTrail(trail))
+                            {
+                                continue;
+                            }
+                        }
+                        Vec3 pos = point.pos();
+
+                        float dotSize = (i == points.size() || (i == 0)) ? 0.08f : 0.05f;
+                        Vec3 right = new Vec3(camera.leftVector()).scale(-dotSize);
+                        Vec3 up    = new Vec3(camera.upVector()).scale(dotSize);
+
+                        Vector3f p1 = pos.add(right).add(up).subtract(cameraPosition).toVector3f();
+                        Vector3f p2 = pos.subtract(right).add(up).subtract(cameraPosition).toVector3f();
+                        Vector3f p3 = pos.subtract(right).subtract(up).subtract(cameraPosition).toVector3f();
+                        Vector3f p4 = pos.add(right).subtract(up).subtract(cameraPosition).toVector3f();
+
+                        int light = LightCoordsUtil.FULL_BRIGHT;
+                        int color = (i == points.size()) ? 0xFF00FF00 : (i == 0) ? 0xFFFFFF00 : 0xFFFF0000;
+                        consumer.addVertex(pose, p1)
+                                .setNormal(0, -1, 0)
+                                .setOverlay(overlay)
+                                .setLight(light)
+                                .setColor(color)
+                                .setUv(0, 0);
+
+                        consumer.addVertex(pose, p2)
+                                .setNormal(0, -1, 0)
+                                .setOverlay(overlay)
+                                .setLight(light)
+                                .setColor(color)
+                                .setUv(1, 0);
+
+                        consumer.addVertex(pose, p3)
+                                .setNormal(0, -1, 0)
+                                .setOverlay(overlay)
+                                .setLight(light)
+                                .setColor(color)
+                                .setUv(1, 1);
+
+                        consumer.addVertex(pose, p4)
+                                .setNormal(0, -1, 0)
+                                .setOverlay(overlay)
+                                .setLight(light)
+                                .setColor(color)
+                                .setUv(0, 1);
+                    }
+                });
+                if(size < 4)
+                {
+                    continue;
+                }
+            }
+
 
 
             collector.order(1).submitCustomGeometry(poseStack, renderType, (pose, consumer) -> {
@@ -149,7 +217,7 @@ public class TrailRenderer {
 
                     Vec3 startPos = modConfig.useSplines ? SplineInterpolation.catmullRom(p0, p1, p2, p3, 0f) : p1;
                     Vec3 endPos = modConfig.useSplines ? SplineInterpolation.catmullRom(p0, p1, p2, p3, 1f) : p2;
-                    renderSubdividedSegment(pose, consumer, point0, point1, point2, 0f, 1f, p0, p1, p2, p3, startPos, endPos, trail, trailSettings.color(), trailSettings, point1.light(),point2.light());
+                    renderSubdividedSegment(pose, consumer, point0, point1, point2, 0f, 1f, p0, p1, p2, p3, startPos, endPos, trail, trailSettings.color(), trailSettings, point1.light(),point2.light(), true);
                 }
             });
         }
@@ -170,7 +238,8 @@ public class TrailRenderer {
             Vec3 p0, Vec3 p1, Vec3 p2, Vec3 p3,
             Vec3 startPos, Vec3 endPos,
             Trail trail, int color, ResolvedTrailSettings trailSettings,
-            int lightStart, int lightEnd
+            int lightStart, int lightEnd,
+            boolean atPoint
     ) {
         float midT = (tStart + tEnd) / 2f;
         Vec3 midPos = SplineInterpolation.catmullRom(p0, p1, p2, p3, midT);
@@ -202,8 +271,8 @@ public class TrailRenderer {
 
         if (needsSplit) {
             int lightMid = getMidPackedLight(lightStart,lightEnd);
-            renderSubdividedSegment(pose, consumer, point0, point1, point2, tStart, midT, p0, p1, p2, p3, startPos, midPos, trail, color, trailSettings, lightStart, lightMid);
-            renderSubdividedSegment(pose, consumer, point0, point1, point2, midT, tEnd, p0, p1, p2, p3, midPos, endPos, trail, color, trailSettings, lightMid, lightEnd);
+            renderSubdividedSegment(pose, consumer, point0, point1, point2, tStart, midT, p0, p1, p2, p3, startPos, midPos, trail, color, trailSettings, lightStart, lightMid, atPoint);
+            renderSubdividedSegment(pose, consumer, point0, point1, point2, midT, tEnd, p0, p1, p2, p3, midPos, endPos, trail, color, trailSettings, lightMid, lightEnd, false);
         } else {
             PlayerSpeedData point0SpeedData = point0.speedData();
             PlayerSpeedData point1SpeedData = point1.speedData();
@@ -307,7 +376,7 @@ public class TrailRenderer {
                 v2 += removeDist;
                 v1 /= (float) trailSettings.maxWidth();
                 v2 /= (float) trailSettings.maxWidth();
-                quadBetweenPoints(pose, consumer, startPos, endPos, sideA, sideB, halfWidthStart, halfWidthEnd, v1, v2, alphaStart, alphaEnd, trail.isLeftWing(), trail.colorOverride() != null ? trail.colorOverride().getColor() : color, trailSettings.edgeFade(), lightStart, lightEnd);
+                quadBetweenPoints(pose, consumer, startPos, endPos, sideA, sideB, halfWidthStart, halfWidthEnd, v1, v2, alphaStart, alphaEnd, trail.isLeftWing(), trail.colorOverride() != null ? trail.colorOverride().getColor() : color, trailSettings.edgeFade(), lightStart, lightEnd, atPoint);
             }
             this.accumDist += segmentLength;
         }
@@ -425,8 +494,16 @@ public class TrailRenderer {
     private void quadBetweenPoints(
             PoseStack.Pose pose, VertexConsumer consumer,
             Vec3 a, Vec3 b, Vec3 sideA, Vec3 sideB,
-            float halfWidthStart, float halfWidthEnd, float v1, float v2, float alphaStart, float alphaEnd, boolean flipUv, int color, boolean edgeFade, int lightA, int lightB
+            float halfWidthStart, float halfWidthEnd, float v1, float v2, float alphaStart, float alphaEnd, boolean flipUv, int color, boolean edgeFade, int lightA, int lightB, boolean atPoint
     ) {
+        if(modConfig.debugRender)
+        {
+            debugSplineRender(a,pose,consumer, atPoint);
+            if(modConfig.hideTrailDuringDebugRender)
+            {
+                return;
+            }
+        }
         Vector3f p1 = a.add(sideA.scale(halfWidthStart)).subtract(cameraPosition).toVector3f();
         Vector3f p2 = b.add(sideB.scale(halfWidthEnd)).subtract(cameraPosition).toVector3f();
         Vector3f p3 = b.subtract(sideB.scale(halfWidthEnd)).subtract(cameraPosition).toVector3f();
@@ -451,7 +528,6 @@ public class TrailRenderer {
 
         float widthStart = halfWidthStart <= 0 ? 0.5f : 1f;
         float widthEnd = halfWidthEnd <= 0 ? 0.5f : 1f;
-
         if(edgeFade)
         {
             float edgeA = flipUv ? 1f : 0f;
@@ -536,6 +612,56 @@ public class TrailRenderer {
                     .setColor(colorStart)
                     .setUv(v1, flipUv ? widthStart : -widthStart);
         }
+    }
+
+    private void debugSplineRender(Vec3 pos, PoseStack.Pose pose, VertexConsumer consumer, boolean atPoint)
+    {
+        if(atPoint)
+        {
+            return;
+        }
+        Camera camera = Minecraft.getInstance().gameRenderer.mainCamera();
+        float dotSize = 0.03f;
+
+        Vec3 right = new Vec3(camera.leftVector()).scale(dotSize);
+        Vec3 up    = new Vec3(camera.upVector()).scale(dotSize);
+
+        Vector3f p1 = pos.add(right).add(up).subtract(cameraPosition).toVector3f();
+        Vector3f p2 = pos.subtract(right).add(up).subtract(cameraPosition).toVector3f();
+        Vector3f p3 = pos.subtract(right).subtract(up).subtract(cameraPosition).toVector3f();
+        Vector3f p4 = pos.add(right).subtract(up).subtract(cameraPosition).toVector3f();
+
+        int light = LightCoordsUtil.FULL_BRIGHT;
+        int color = 0xFF0000FF;
+        int overlay = OverlayTexture.NO_OVERLAY;
+
+        consumer.addVertex(pose, p1)
+                .setNormal(0, -1, 0)
+                .setOverlay(overlay)
+                .setLight(light)
+                .setColor(color)
+                .setUv(0, 0);
+
+        consumer.addVertex(pose, p2)
+                .setNormal(0, -1, 0)
+                .setOverlay(overlay)
+                .setLight(light)
+                .setColor(color)
+                .setUv(1, 0);
+
+        consumer.addVertex(pose, p3)
+                .setNormal(0, -1, 0)
+                .setOverlay(overlay)
+                .setLight(light)
+                .setColor(color)
+                .setUv(1, 1);
+
+        consumer.addVertex(pose, p4)
+                .setNormal(0, -1, 0)
+                .setOverlay(overlay)
+                .setLight(light)
+                .setColor(color)
+                .setUv(0, 1);
     }
 
     private void calculateSubdivideLength(

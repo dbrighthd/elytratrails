@@ -475,6 +475,16 @@ public class ConfigScreenBuilder {
                 .setTooltip(Component.translatable("text.elytratrails.option.disableFallFlyingCrouching.@Tooltip"))
                 .setSaveConsumer(newValue -> config.disableFallFlyingCrouching = newValue)
                 .build());
+        debug.addEntry(entryBuilder.startBooleanToggle(Component.translatable("text.elytratrails.option.debugRender"), config.debugRender)
+                .setDefaultValue(defaultModConfig.debugRender)
+                .setTooltip(Component.translatable("text.elytratrails.option.debugRender.@Tooltip"))
+                .setSaveConsumer(newValue -> config.debugRender = newValue)
+                .build());
+        debug.addEntry(entryBuilder.startBooleanToggle(Component.translatable("text.elytratrails.option.hideTrailDuringDebugRender"), config.hideTrailDuringDebugRender)
+                .setDefaultValue(defaultModConfig.hideTrailDuringDebugRender)
+                .setTooltip(Component.translatable("text.elytratrails.option.hideTrailDuringDebugRender.@Tooltip"))
+                .setSaveConsumer(newValue -> config.hideTrailDuringDebugRender = newValue)
+                .build());
         debug.addEntry(entryBuilder.startBooleanToggle(Component.translatable("text.elytratrails.option.resourcePackOverride"), config.resourcePackOverride)
                 .setDefaultValue(defaultModConfig.resourcePackOverride)
                 .setTooltip(Component.translatable("text.elytratrails.option.resourcePackOverride.@Tooltip"))

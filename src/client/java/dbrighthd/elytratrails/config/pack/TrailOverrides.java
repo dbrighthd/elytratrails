@@ -206,6 +206,9 @@ public record TrailOverrides(JsonObject values) {
                 getDouble("xOffset"),
                 getDouble("yOffset"),
                 getDouble("zOffset"),
+                getDouble("xOffsetPostBillboard"),
+                getDouble("yOffsetPostBillboard"),
+                getDouble("zOffsetPostBillboard"),
                 getBoolean("billBoarded"),
                 getBoolean("useColorOverride"));
     }
