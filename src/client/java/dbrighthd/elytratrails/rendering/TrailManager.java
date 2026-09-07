@@ -175,6 +175,10 @@ public class TrailManager {
 
     public boolean removeTrailFromMap(Trail trail) {
         deadPointDistance.remove(trail.trailId());
+        if(isActiveTrail(trail))
+        {
+            stopTrail(trail.entityId());
+        }
         return true;
 
     }
