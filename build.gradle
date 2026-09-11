@@ -38,6 +38,11 @@ loom {
 			sourceSet sourceSets.client
 		}
 	}
+	runs {
+		client {
+			vmArg "-XX:StackShadowPages=32"
+		}
+	}
 }
 
 dependencies {

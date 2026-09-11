@@ -3,7 +3,6 @@ package dbrighthd.elytratrails.rendering;
 import com.mojang.renderpearl.api.pipeline.CompareOp;
 import com.mojang.renderpearl.api.pipeline.PolygonMode;
 import com.mojang.renderpearl.api.pipeline.*;
-import com.mojang.renderpearl.api.pipeline.PolygonMode;
 import dbrighthd.elytratrails.ElytraTrails;
 import net.minecraft.client.renderer.BindGroupLayouts;
 import net.minecraft.client.renderer.RenderPipelines;
@@ -28,7 +27,7 @@ public class TrailPipelines {
             // Specifies that the shaders have access to the 'Globals' uniform
             .build();
 
-    public static final OitPipelineSet OIT_ENTITY_WIREFRAME = register(OitPipelineSet.builder("entity", RenderPipeline.builder(new RenderPipeline.Snippet[]{OIT_ENTITY_SNIPPET}).withPolygonMode(PolygonMode.WIREFRAME).withCull(false)).withAccumulateModifier((accumulate) -> accumulate.withShaderDefine("PER_FACE_LIGHTING").withBindGroupLayout(BindGroupLayouts.SAMPLER1).withBindGroupLayout(BindGroupLayouts.SAMPLER2)).build());
+    public static final OitPipelineSet OIT_ENTITY_WIREFRAME = register(OitPipelineSet.builder("entity", RenderPipeline.builder(OIT_ENTITY_SNIPPET).withPolygonMode(PolygonMode.WIREFRAME).withCull(false)).withAccumulateModifier((accumulate) -> accumulate.withShaderDefine("PER_FACE_LIGHTING").withBindGroupLayout(BindGroupLayouts.SAMPLER1).withBindGroupLayout(BindGroupLayouts.SAMPLER2)).build());
     public static final RenderPipeline PIPELINE_ENTITY_TRANSLUCENT_CULL = RenderPipelines.register(RenderPipeline.builder(ENTITY_SNIPPET)
             .withLocation(Identifier.fromNamespaceAndPath(ElytraTrails.MOD_ID, "pipeline/entity_translucent_cull"))
             .withShaderDefine("ALPHA_CUTOUT", 0.1F)
