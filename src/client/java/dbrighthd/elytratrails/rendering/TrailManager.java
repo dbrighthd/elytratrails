@@ -11,7 +11,7 @@ import dbrighthd.elytratrails.util.FlashBackUtil;
 import it.unimi.dsi.fastutil.ints.Int2ObjectMap;
 import it.unimi.dsi.fastutil.ints.Int2ObjectOpenHashMap;
 import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents;
-import net.fabricmc.fabric.api.client.rendering.v1.level.LevelRenderEvents;
+import net.fabricmc.fabric.api.client.rendering.v1.level.LevelExtractionEvents;
 import net.minecraft.client.Minecraft;
 import net.minecraft.core.BlockPos;
 import net.minecraft.util.LightCoordsUtil;
@@ -55,8 +55,7 @@ public class TrailManager {
         this.sampler = sampler;
 
         ClientTickEvents.END_CLIENT_TICK.register(this::removeDeadPoints);
-        //noinspection deprecation
-        LevelRenderEvents.END_EXTRACTION.register(_ -> {
+        LevelExtractionEvents.END_EXTRACTION.register(_ -> {
             modConfig = getConfig();
             now = ElytraTimeUtil.currentMillis();
             deltaT = now - past;
