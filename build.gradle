@@ -56,8 +56,7 @@ dependencies {
 	 	exclude(group: "net.fabricmc.fabric-api")
 	 }
 
-//	compileOnly "maven.modrinth:iris:${project.iris_version}"
-	compileOnly files("../iris/iris-fabric-1.11.4-snapshot+mc26.3-rc-2-local.jar")
+	compileOnly "maven.modrinth:iris:${project.iris_version}"
 	compileOnly "maven.modrinth:entity-model-features:${project.emf_version}"
 	compileOnly "maven.modrinth:entitytexturefeatures:${project.etf_version}"
 
