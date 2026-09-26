@@ -130,6 +130,7 @@ public class TrailPipelines {
                     .withLocation(Identifier.parse("elytratrails:pipeline/entity_cutout_lit"))
                     .withShaderDefine("ALPHA_CUTOUT", 0.1F)
                     .withShaderDefine("PER_FACE_LIGHTING")
+                    .withColorTargetState(ColorTargetState.DEFAULT)
                     .withCull(false)
                     .withBindGroupLayout(EXAMPLE_LAYOUT)
                     // Intentionally no blend (cutout)
