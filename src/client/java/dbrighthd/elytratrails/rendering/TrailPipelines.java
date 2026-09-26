@@ -108,6 +108,7 @@ public class TrailPipelines {
                     .withLocation(Identifier.parse("elytratrails:pipeline/entity_cutout_emissive_unlit"))
                     .withShaderDefine("ALPHA_CUTOUT", 0.1F)
                     .withShaderDefine("NO_CARDINAL_LIGHTING")
+                    .withColorTargetState(ColorTargetState.DEFAULT)
                     .withCull(false)
                     .withBindGroupLayout(EXAMPLE_LAYOUT)
                     .build());
@@ -118,6 +119,7 @@ public class TrailPipelines {
                     .withShaderDefine("ALPHA_CUTOUT", 0.1F)
                     .withPolygonMode(PolygonMode.WIREFRAME)
                     .withShaderDefine("NO_CARDINAL_LIGHTING")
+                    .withColorTargetState(ColorTargetState.DEFAULT)
                     .withCull(false)
                     .withBindGroupLayout(EXAMPLE_LAYOUT)
                     .build());
