@@ -1,6 +1,5 @@
 package dbrighthd.elytratrails.rendering;
 
-import com.github.exopandora.shouldersurfing.client.ShoulderSurfing;
 import dbrighthd.elytratrails.api.ElytraTrailsAPI;
 import dbrighthd.elytratrails.api.ResolvedValues;
 import dbrighthd.elytratrails.config.ModConfig;
@@ -93,10 +92,10 @@ public class TrailManager {
             }
         }
     }
-    //This might not be a good way to make a 3d direction based on position, but its what I could think of
+    //This might not be a good way to make a 3d direction b ased on position, but its what I could think of
     Vec3 positionToWindVector(Trail.Point point)
     {
-        double t = now * modConfig.windTimeScale;
+        double t = now * (modConfig.windTimeScale * 0.0001);
         Vec3 combined = point.pos().scale(0.02 * modConfig.windScale);
         double outPerlin1 = perlinNoise.get(combined.x, combined.y, combined.z + t);
         double outPerlin2 = perlinNoise.get(combined.x + 100, combined.y + 50, combined.z -100 + t); //arbitrary offset just so the second angle is different

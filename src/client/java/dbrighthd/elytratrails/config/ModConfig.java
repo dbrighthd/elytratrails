@@ -32,7 +32,7 @@ public class ModConfig {
     public boolean alwaysSnapTrail = true;
     public boolean logTrails = false;
     public boolean applyWind = false;
-    public double windTimeScale = 0;
+    public double windTimeScale = 0.5;
     public double windScale = 1.0;
     public double windSpeed = 1.0;
     public ClearTrails clearTrailsOption = ClearTrails.NO;
