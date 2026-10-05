@@ -95,9 +95,10 @@ public class TrailManager {
     //This might not be a good way to make a 3d direction based on position, but its what I could think of
     Vec3 positionToWindVector(Trail.Point point)
     {
+        double t = now * (modConfig.windTimeScale * 0.0001);
         Vec3 combined = point.pos().scale(0.02 * modConfig.windScale);
-        double outPerlin1 = perlinNoise.getValue(combined.x, combined.y, combined.z);
-        double outPerlin2 = perlinNoise.getValue(combined.x + 100, combined.y + 50, combined.z -100); //arbitrary offset just so the second angle is different
+        double outPerlin1 = perlinNoise.getValue(combined.x, combined.y, combined.z + t);
+        double outPerlin2 = perlinNoise.getValue(combined.x + 100, combined.y + 50, combined.z -100 + t); //arbitrary offset just so the second angle is different
         double angleRad1 = outPerlin1 * 2 * Math.PI;
         double angleRad2 = outPerlin2 * 2 * Math.PI;
         return (new Vec3(sin(angleRad1) * cos(angleRad2), cos(angleRad1), sin(angleRad1) * sin(angleRad2))).scale(0.0005).scale(deltaT * modConfig.windSpeed);
