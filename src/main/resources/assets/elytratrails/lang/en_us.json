@@ -14,7 +14,7 @@
   "text.elytratrails.option.debugRender.@Tooltip": "Render dots at trail points. GREEN: Wingtip/last trail point, RED: trail point YELLOW: end of trail, BLUE: spline point",
 
   "text.elytratrails.option.windTimeScale" : "Wind Direction Time Scale",
-  "text.elytratrails.option.windTimeScale.@Tooltip" : "How fast it should change direction over time ( 0 for a static vector field ). 1 is recommended",
+  "text.elytratrails.option.windTimeScale.@Tooltip" : "How fast it should change direction over time ( 0 for a static vector field ). 0-1 is recommended",
 
   "text.elytratrails.option.hideTrailDuringDebugRender" : "Hide Trail During Debug Render",
   "text.elytratrails.option.hideTrailDuringDebugRender.@Tooltip" : "Skip trail rendering when rendering dots",
