@@ -25,6 +25,7 @@ import net.minecraft.client.renderer.entity.state.AvatarRenderState;
 import net.minecraft.client.renderer.entity.state.EntityRenderState;
 import net.minecraft.client.renderer.entity.state.HumanoidRenderState;
 import net.minecraft.client.renderer.feature.ModelFeatureRenderer;
+import net.minecraft.client.renderer.feature.phase.FeatureRenderPhase;
 import net.minecraft.client.renderer.feature.phase.SimpleFeatureRenderPhase;
 import net.minecraft.client.renderer.feature.phase.TranslucentFeatureRenderPhase;
 import net.minecraft.client.renderer.feature.submit.SubmitNode;
@@ -494,48 +495,19 @@ public class WingTipSampler {
     private List<SubmitNode> getAllModelSubmits() {
         List<SubmitNode> out = new ArrayList<>();
 
-        for (SubmitNodeCollection collection : submitStorage.getSubmitsPerOrder().values()) {
-            SimpleFeatureRenderPhase solids = collection.solid;
-            SimpleFeatureRenderPhase oitTranslucents = collection.oitTranslucent;
-            for(SimpleFeatureRenderPhase.FeatureSubmits<?> submits: Arrays.stream(solids.submitsByFeature).toList())
-            {
-                if(submits == null)
-                {
-                    continue;
-                }
-                out.addAll(submits.unbatched);
-                for(List<?  > submitList : submits.batches.values())
-                {
-                    for(var item : submitList)
-                    {
-                        if(item instanceof SubmitNode submitNode)
-                        {
-                            out.add(submitNode);
-                        }
-                    }
-                }
-            }
-            for(SimpleFeatureRenderPhase.FeatureSubmits<?> submits: Arrays.stream(oitTranslucents.submitsByFeature).toList())
-            {
-                if(submits == null)
-                {
-                    continue;
-                }
-                out.addAll(submits.unbatched);
-                for(List<?  > submitList : submits.batches.values())
-                {
-                    for(var item : submitList)
-                    {
-                        if(item instanceof SubmitNode submitNode)
-                        {
-                            out.add(submitNode);
-                        }
-                    }
-                }
-            }
-            out.addAll((collection.seeThrough.submits));
+        for (SubmitNodeCollection collection : submitStorage.getSubmitsPerOrder().values())
+        {
+            collectPhase(collection.solid, out);
+            collectPhase(collection.oitTranslucent, out);
+            collectPhase(collection.seeThrough, out);
+            collectPhase(collection.translucentModels, out);
+            collectPhase(collection.translucentBlocksAndItems, out);
         }
         return out;
     }
 
+    private static void collectPhase(FeatureRenderPhase<? extends SubmitNode> phase, List<SubmitNode> out)
+    {
+        phase.sortInto((submit, _) -> out.add(submit));
+    }
 }
