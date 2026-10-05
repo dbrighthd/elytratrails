@@ -95,10 +95,6 @@ public class WingTipSampler {
         }
         if (mc.level == null || ShaderChecksUtil.isShadowPass()) return new PlayerEmitters(true, List.of());
         ModelFeatureRenderer.Submit<?> elytraSubmit = extractElytraRenderState(player, partialTick);
-        if(elytraSubmit == null)
-        {
-            elytraSubmit = extractElytraRenderState(player, partialTick);
-        }
         if (elytraSubmit == null || !(elytraSubmit.model() instanceof ElytraModel elytraModel) || !(elytraSubmit.state() instanceof HumanoidRenderState humanoidState))
         {
             return new PlayerEmitters(true, List.of());
