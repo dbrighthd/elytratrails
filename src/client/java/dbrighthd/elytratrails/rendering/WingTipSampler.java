@@ -26,6 +26,7 @@ import net.minecraft.client.renderer.entity.state.EntityRenderState;
 import net.minecraft.client.renderer.entity.state.HumanoidRenderState;
 import net.minecraft.client.renderer.feature.ModelFeatureRenderer;
 import net.minecraft.client.renderer.feature.phase.SimpleFeatureRenderPhase;
+import net.minecraft.client.renderer.feature.phase.TranslucentFeatureRenderPhase;
 import net.minecraft.client.renderer.feature.submit.SubmitNode;
 import net.minecraft.client.renderer.state.level.CameraRenderState;
 import net.minecraft.core.BlockPos;
@@ -495,7 +496,7 @@ public class WingTipSampler {
 
         for (SubmitNodeCollection collection : submitStorage.getSubmitsPerOrder().values()) {
             SimpleFeatureRenderPhase solids = collection.solid;
-
+            SimpleFeatureRenderPhase oitTranslucents = collection.oitTranslucent;
             for(SimpleFeatureRenderPhase.FeatureSubmits<?> submits: Arrays.stream(solids.submitsByFeature).toList())
             {
                 if(submits == null)
@@ -514,7 +515,25 @@ public class WingTipSampler {
                     }
                 }
             }
-
+            for(SimpleFeatureRenderPhase.FeatureSubmits<?> submits: Arrays.stream(oitTranslucents.submitsByFeature).toList())
+            {
+                if(submits == null)
+                {
+                    continue;
+                }
+                out.addAll(submits.unbatched);
+                for(List<?  > submitList : submits.batches.values())
+                {
+                    for(var item : submitList)
+                    {
+                        if(item instanceof SubmitNode submitNode)
+                        {
+                            out.add(submitNode);
+                        }
+                    }
+                }
+            }
+            out.addAll((collection.seeThrough.submits));
         }
         return out;
     }
