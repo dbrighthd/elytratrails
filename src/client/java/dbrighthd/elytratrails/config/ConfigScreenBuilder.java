@@ -126,6 +126,11 @@ public class ConfigScreenBuilder {
                 .setTooltip(Component.translatable("text.elytratrails.option.windSpeed.@Tooltip"))
                 .setSaveConsumer(newValue -> config.windSpeed = newValue)
                 .build());
+        general.addEntry(entryBuilder.startDoubleField(Component.translatable("text.elytratrails.option.windTimeScale"), config.windTimeScale)
+                .setDefaultValue(defaultModConfig.windTimeScale)
+                .setTooltip(Component.translatable("text.elytratrails.option.windTimeScale.@Tooltip"))
+                .setSaveConsumer(newValue -> config.windTimeScale = newValue)
+                .build());
 
 
         general.addEntry(entryBuilder.startEnumSelector(
