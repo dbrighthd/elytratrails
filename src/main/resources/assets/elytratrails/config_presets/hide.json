@@ -20,7 +20,7 @@
   "fadeStart": false,
   "fadeStartDistance": 4.0,
   "lifeTimeFade": false,
-  "prideTrailRight": "",
+  "prideTrailRight": "hide_two",
   "increaseWidthOverTime": false,
   "startingWidthMultiplier": 1.0,
   "endingWidthMultiplier": 10.0,
