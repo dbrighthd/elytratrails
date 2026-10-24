@@ -1,6 +1,5 @@
 package dbrighthd.elytratrails.compat.recolor;
 
-import bluebird.recolor.ColorLoader;
 import bluebird.recolor.Colors;
 import net.minecraft.client.Minecraft;
 import net.minecraft.util.Mth;
