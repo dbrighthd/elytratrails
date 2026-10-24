@@ -8,4 +8,5 @@ public class ModStatuses {
     public static final boolean FLASHBACK_LOADED = FabricLoader.getInstance().isModLoaded("flashback");
     public static final boolean CLOTH_LOADED = FabricLoader.getInstance().isModLoaded("cloth-config");
     public static final boolean CPM_LOADED = FabricLoader.getInstance().isModLoaded("cpm");
+    public static final boolean RECOLOR_LOADED = FabricLoader.getInstance().isModLoaded("recolor");
 }

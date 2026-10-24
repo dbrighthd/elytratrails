@@ -1,6 +1,8 @@
 package dbrighthd.elytratrails.config.pack;
 
 import dbrighthd.elytratrails.network.ClientPlayerConfigStore;
+import net.minecraft.world.entity.monster.Enderman;
+import net.minecraft.world.entity.monster.Shulker;
 
 import static dbrighthd.elytratrails.config.pack.TrailPackConfigManager.resolveTrailFromPlayerConfig;
 

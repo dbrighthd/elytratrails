@@ -1,4 +1,6 @@
 package dbrighthd.elytratrails.api;
+import dbrighthd.elytratrails.compat.ModStatuses;
+import dbrighthd.elytratrails.compat.recolor.RecolorCompat;
 import net.minecraft.client.Minecraft;
 import net.minecraft.util.Mth;
 import net.minecraft.world.entity.Entity;
@@ -35,6 +37,6 @@ public class APIExample {
 
     public static void RegisterExampleAPIHook()
     {
-        setConditionalColorOverrides((entity) -> entity instanceof ExperienceOrb, APIExample::expOrbColorOverride);
+        setConditionalColorOverrides((entity) -> entity instanceof ExperienceOrb, ModStatuses.RECOLOR_LOADED ? RecolorCompat::expOrbColorOverrideRecolor : APIExample::expOrbColorOverride);
     }
 }
