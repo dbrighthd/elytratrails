@@ -6,6 +6,7 @@ import net.minecraft.client.model.object.equipment.ElytraModel;
 import net.minecraft.client.renderer.feature.ModelFeatureRenderer;
 import net.minecraft.client.renderer.rendertype.RenderType;
 import net.minecraft.client.renderer.texture.TextureAtlasSprite;
+import net.minecraft.client.renderer.texture.UvMapping;
 import org.jspecify.annotations.Nullable;
 
 import java.util.ArrayList;
@@ -19,9 +20,9 @@ public class CpmModelStorage {
     }
 
     @SuppressWarnings("unused")
-    public static <S> void submitModel(final Model<? super S> model, final S state, final PoseStack poseStack, final RenderType renderType, final int lightCoords, final int overlayCoords, final int tintedColor, final @Nullable TextureAtlasSprite sprite, final int outlineColor, final ModelFeatureRenderer.@Nullable CrumblingOverlay crumblingOverlay)
+    public static <S> void submitModel(Model<? super S> model, S state, final PoseStack poseStack, final RenderType renderType, final int lightCoords, final int overlayCoords, final int tintedColor, final @Nullable UvMapping uvMapping, final int outlineColor)
     {
-        ModelFeatureRenderer.Submit<S> modelSubmit = new ModelFeatureRenderer.Submit<>(renderType, poseStack.last().copy(), model, state, lightCoords, overlayCoords, tintedColor, sprite,  new PoseStack.Pose());
+        ModelFeatureRenderer.Submit<S> modelSubmit = new ModelFeatureRenderer.Submit<>(renderType, poseStack.last().copy(), model, state, lightCoords, overlayCoords, tintedColor, uvMapping,  new PoseStack.Pose());
         modelSubmits.add(modelSubmit);
     }
 
