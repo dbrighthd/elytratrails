@@ -15,6 +15,8 @@ public class ModConfig {
      */
     public ClientConfig clientPlayerConfig = ClientConfig.getDefaultClientConfig();
     public ClientConfig otherPlayerConfig = ClientConfig.getDefaultClientConfig();
+    public boolean disableArrowCritParticles = false;
+    public boolean arrowOvershoot = false;
     public boolean exportPreset = false;
     public String exportPresetName = "";
     public boolean enableAllTrails = true;

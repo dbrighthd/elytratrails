@@ -13,6 +13,7 @@
     "defaultRequire": 1
   },
   "mixins": [
+    "AbstractArrowMixin",
     "LocalPlayerMixin",
     "compat.EmfModelPartRootRegisterMixin",
     "compat.RecorderMixin",

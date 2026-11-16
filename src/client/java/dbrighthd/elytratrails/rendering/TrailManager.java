@@ -5,6 +5,7 @@ import dbrighthd.elytratrails.api.ResolvedValues;
 import dbrighthd.elytratrails.config.ModConfig;
 import dbrighthd.elytratrails.config.pack.ResolvedSampleSettings;
 import dbrighthd.elytratrails.config.pack.ResolvedTrailSettings;
+import dbrighthd.elytratrails.handler.ArrowHandler;
 import dbrighthd.elytratrails.network.ClientPlayerConfigStore;
 import dbrighthd.elytratrails.util.ElytraTimeUtil;
 import dbrighthd.elytratrails.util.FlashBackUtil;
@@ -55,6 +56,7 @@ public class TrailManager {
         this.sampler = sampler;
 
         ClientTickEvents.END_CLIENT_TICK.register(this::removeDeadPoints);
+        ClientTickEvents.END_LEVEL_TICK.register(ArrowHandler::stepFakeArrows);
         LevelExtractionEvents.END_EXTRACTION.register(_ -> {
             modConfig = getConfig();
             now = ElytraTimeUtil.currentMillis();
@@ -283,8 +285,13 @@ public class TrailManager {
 
     private void gatherEntityTrails(Minecraft ctx, boolean recordEmitter) {
         if (ctx.level == null) return;
+        gatherEntityTrailsInIterable(ctx,recordEmitter,ctx.level.entitiesForRendering(), false);
+        gatherEntityTrailsInIterable(ctx,recordEmitter, ArrowHandler.getFakeArrows(ctx.level,ctx.getDeltaTracker().getGameTimeDeltaPartialTick(false)), true);
+    }
 
-        for (Entity entity : ctx.level.entitiesForRendering()) {
+    private void gatherEntityTrailsInIterable(Minecraft ctx, boolean recordEmitter, Iterable<Entity> entities, boolean fake)
+    {
+        for (Entity entity : entities) {
             if (entity instanceof Avatar) {
                 continue;
             }
@@ -349,7 +356,6 @@ public class TrailManager {
             }
         }
     }
-
     public static ResolvedTrailSettings getConfigFromPlayerId(int entityId) {
         return resolveFromPlayerConfig(ClientPlayerConfigStore.getOrDefault(entityId));
     }
@@ -373,7 +379,7 @@ public class TrailManager {
                 return false;
             }
         }
-        return (!config.speedDependentTrail() || (entity.getDeltaMovement().lengthSqr() > config.trailMinSpeed() * config.trailMinSpeed()));
+        return (!config.speedDependentTrail() || (Math.max(entity.getKnownSpeed().lengthSqr(),entity.getDeltaMovement().lengthSqr()) > config.trailMinSpeed() * config.trailMinSpeed()));
     }
 
     public List<Trail> trails() {

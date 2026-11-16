@@ -10,6 +10,13 @@
   "text.elytratrails.category.server.@Tooltip": "Networking + safety limits for settings received from other players.",
   "text.elytratrails.category.particles.@Tooltip": "Optional particle effects while flying.",
 
+  "text.elytratrails.option.disableArrowCritParticles" : "Disable Arrow Crit Particles",
+  "text.elytratrails.option.disableArrowCritParticles.@Tooltip" : "Disables crit particles on arrows. this is good to have on if you are using arrow trails",
+
+  "text.elytratrails.option.arrowOvershoot" : "Arrow Overshoot",
+  "text.elytratrails.option.arrowOvershoot.@Tooltip" : "Overshoot arrows for trails",
+
+
   "text.elytratrails.option.debugRender": "Debug Render",
   "text.elytratrails.option.debugRender.@Tooltip": "Render dots at trail points. GREEN: Wingtip/last trail point, RED: trail point YELLOW: end of trail, BLUE: spline point",
 

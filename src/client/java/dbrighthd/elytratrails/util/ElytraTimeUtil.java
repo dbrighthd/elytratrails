@@ -20,4 +20,9 @@ public class ElytraTimeUtil {
     public static long currentMillis() {
         return (long) (tickCounter * 1000 + (Minecraft.getInstance().getDeltaTracker().getGameTimeDeltaPartialTick(false) * 1000)) / 20;
     }
+
+    public static long currentTick()
+    {
+        return tickCounter;
+    }
 }

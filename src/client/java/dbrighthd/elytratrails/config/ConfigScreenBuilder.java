@@ -131,7 +131,16 @@ public class ConfigScreenBuilder {
                 .setTooltip(Component.translatable("text.elytratrails.option.windTimeScale.@Tooltip"))
                 .setSaveConsumer(newValue -> config.windTimeScale = newValue)
                 .build());
-
+        general.addEntry(entryBuilder.startBooleanToggle(Component.translatable("text.elytratrails.option.disableArrowCritParticles"), config.disableArrowCritParticles)
+                .setDefaultValue(defaultModConfig.disableArrowCritParticles)
+                .setTooltip(Component.translatable("text.elytratrails.option.disableArrowCritParticles.@Tooltip"))
+                .setSaveConsumer(newValue -> config.disableArrowCritParticles = newValue)
+                .build());
+        general.addEntry(entryBuilder.startBooleanToggle(Component.translatable("text.elytratrails.option.arrowOvershoot"), config.arrowOvershoot)
+                .setDefaultValue(defaultModConfig.arrowOvershoot)
+                .setTooltip(Component.translatable("text.elytratrails.option.arrowOvershoot.@Tooltip"))
+                .setSaveConsumer(newValue -> config.arrowOvershoot = newValue)
+                .build());
 
         general.addEntry(entryBuilder.startEnumSelector(
                         Component.translatable("text.elytratrails.option.clearTrails"),
