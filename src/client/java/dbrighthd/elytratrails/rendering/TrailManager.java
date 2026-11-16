@@ -70,13 +70,15 @@ public class TrailManager {
             } else {
                 lastSample = ElytraTimeUtil.currentMillis();
             }
+            synchronized (activeTrails) {
             if (!modConfig.enableAllTrails) {
                 removeAllTrails();
                 return;
             }
-            gatherPlayerTrails(Minecraft.getInstance(), recordEmitters);
-            if (ElytraTrailsAPI.doAPIOverridesExist() || modConfig.extendedEmfSupport && (!entitiesWithTrails.isEmpty() || !entitiesWithTrailOverrides.isEmpty())) {
-                gatherEntityTrails(Minecraft.getInstance(), recordEmitters);
+                gatherPlayerTrails(Minecraft.getInstance(), recordEmitters);
+                if (ElytraTrailsAPI.doAPIOverridesExist() || modConfig.extendedEmfSupport && (!entitiesWithTrails.isEmpty() || !entitiesWithTrailOverrides.isEmpty())) {
+                    gatherEntityTrails(Minecraft.getInstance(), recordEmitters);
+                }
             }
             past = ElytraTimeUtil.currentMillis();
         });
@@ -129,46 +131,47 @@ public class TrailManager {
     }
 
     private void removeDeadPoints(Minecraft ctx) {
-        long currentTime = ElytraTimeUtil.currentMillis();
-        if (getConfig().logTrails) {
+        synchronized (activeTrails) {
+            long currentTime = ElytraTimeUtil.currentMillis();
+            if (getConfig().logTrails) {
+                for (Trail trail : trails) {
+                    if (trail.points().isEmpty()) {
+                        LOGGER.info("Removed trail from entity {}, no trail points.", trail.entityId());
+                        continue;
+                    }
+                    if (trail.points().stream().allMatch(p -> currentTime - p.epoch() > trail.config().trailLifetime() * 1000)) {
+                        LOGGER.info("Removed trail from entity {}, all trail points exceeded lifetime {}", trail.entityId(), trail.config().trailLifetime());
+                    }
+
+                }
+            }
+            trails.removeIf(trail -> trailsToRemove.contains(trail.trailId()));
+            trailsToRemove.clear();
+            trails.removeIf(t -> (t.points().isEmpty() || t.points().stream().allMatch(p -> currentTime - p.epoch() > t.config().trailLifetime() * 1000)) && removeTrailFromMap(t));
             for (Trail trail : trails) {
-                if (trail.points().isEmpty()) {
-                    LOGGER.info("Removed trail from entity {}, no trail points.", trail.entityId());
-                    continue;
+                if (trail.colorOverride() != null) {
+                    trail.colorOverride().setColor();
                 }
-                if (trail.points().stream().allMatch(p -> currentTime - p.epoch() > trail.config().trailLifetime() * 1000)) {
-                    LOGGER.info("Removed trail from entity {}, all trail points exceeded lifetime {}", trail.entityId(), trail.config().trailLifetime());
-                }
+                List<Trail.Point> points = trail.points();
+                if (points.size() < 2) continue;
 
-            }
-        }
-        trails.removeIf(trail -> trailsToRemove.contains(trail.trailId()));
-        trailsToRemove.clear();
-        trails.removeIf(t -> (t.points().isEmpty() || t.points().stream().allMatch(p -> currentTime - p.epoch() > t.config().trailLifetime() * 1000)) && removeTrailFromMap(t));
-        for (Trail trail : trails) {
-            if(trail.colorOverride() != null)
-            {
-                trail.colorOverride().setColor();
-            }
-            List<Trail.Point> points = trail.points();
-            if (points.size() < 2) continue;
+                float removedDistance = 0.0f;
+                long lifetimeMs = (long) (trail.config().trailLifetime() * 1000.0);
 
-            float removedDistance = 0.0f;
-            long lifetimeMs = (long) (trail.config().trailLifetime() * 1000.0);
+                while (points.size() > 1) {
+                    Trail.Point point = points.get(0);
 
-            while (points.size() > 1) {
-                Trail.Point point = points.get(0);
+                    if (currentTime - point.epoch() <= lifetimeMs) {
+                        break;
+                    }
 
-                if (currentTime - point.epoch() <= lifetimeMs) {
-                    break;
+                    removedDistance += (float) point.pos().distanceTo(points.get(1).pos());
+                    points.removeFirst();
                 }
 
-                removedDistance += (float) point.pos().distanceTo(points.get(1).pos());
-                points.removeFirst();
-            }
-
-            if (removedDistance > 0.0f) {
-                deadPointDistance.merge(trail.trailId(), removedDistance, Float::sum);
+                if (removedDistance > 0.0f) {
+                    deadPointDistance.merge(trail.trailId(), removedDistance, Float::sum);
+                }
             }
         }
     }
